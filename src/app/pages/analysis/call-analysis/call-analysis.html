@@ -1,0 +1,213 @@
+<p-card>
+    <ng-template #title>
+        <div class="flex flex-col md:flex-row md:items-start md:justify-between mb-4">
+            <h2 class="text-surface-900 dark:text-surface-0 text-2xl font-semibold mb-4 md:mb-0">
+                Analise de conversas
+            </h2>
+            <div class="inline-flex items-center">
+
+                <p-iconfield>
+                    <p-inputicon class="pi pi-search"/>
+                    <input
+                        pInputText
+                        type="text"
+                        (input)="onFilterGlobal($event)"
+                        placeholder="Pesquisar"
+                        [style]="{ borderRadius: '2rem' }"
+                        class="w-full"
+                    />
+                </p-iconfield>
+
+                <div class="mx-4">
+                    <p-fileupload
+                        mode="basic"
+                        chooseIcon="pi pi-upload"
+                        chooseLabel="MP3"
+                        name="audio"
+                        [url]="'https://' + environment.IASMIN_PABX_URL + '/uploads/' + user.id"
+                        accept="audio/mpeg"
+                        [maxFileSize]="10 * 1024 * 1024"
+                        (onUpload)="onUpload($event)"
+                        [disabled]="user.isExpired"
+                        auto="true"
+                        chooseStyleClass="p-button-outlined p-button-rounded"
+                    />
+                </div>
+
+                <p-button [label]="reportLabel" outlined rounded icon="pi pi-calendar" (onClick)="dialogVisible=true" ></p-button>
+
+            </div>
+        </div>
+    </ng-template>
+
+    <p-table
+        #dataTable
+        [value]="cdrs"
+        [paginator]="true"
+        [rows]="15"
+        [globalFilterFields]="['temperature', 'title', 'destination', 'startTime', 'callerId']"
+        [tableStyle]="{ 'min-width': '40rem' }"
+        stripedRows
+        rowHover
+    >
+        <ng-template pTemplate="header">
+            <tr>
+                <th pSortableColumn="startTime">Data/Hora
+                    <p-sortIcon field="startTime"></p-sortIcon>
+                </th>
+                <th>Responsável</th>
+                <th>Telefone</th>
+                <th style="width: 20%">Título</th>
+                <th pSortableColumn="temperature" >Temperatura
+                    <p-sortIcon field="temperature"></p-sortIcon>
+                </th>
+                <th pSortableColumn="engagement">Engajamento
+                    <p-sortIcon field="engagement"></p-sortIcon>
+                </th>
+                <th pSortableColumn="status">Analise
+                    <p-sortIcon field="status"></p-sortIcon>
+                </th>
+                <th>Detalhes</th>
+            </tr>
+            <tr>
+                <th></th>
+                <th>
+                    <p-columnFilter field="callerId" matchMode="in" [showMenu]="false">
+                        <ng-template pTemplate="filter" let-filter="filterCallback">
+                            <p-multiselect [(ngModel)]="selectedCallerIds" [options]="callerIdOptions"
+                                           optionLabel="label" optionValue="value" placeholder="Filtrar"
+                                           (onChange)="filter($event.value)" [filter]="true" display="chip"
+                                           [panelStyle]="{ minWidth: '16rem' }">
+                                <ng-template pTemplate="item" let-option>
+                                    <div class="flex items-center gap-2">
+                                        <span>{{ option.label }}</span>
+                                    </div>
+                                </ng-template>
+                            </p-multiselect>
+                        </ng-template>
+                    </p-columnFilter>
+                </th>
+                <th></th>
+                <th></th>
+                <th>
+                    <p-columnFilter field="temperature" matchMode="in" [showMenu]="false">
+                        <ng-template pTemplate="filter" let-filter="filterCallback">
+                            <p-multi-select [(ngModel)]="selectedTemperatures" [options]="temperatureOptions"
+                                            optionLabel="label" optionValue="value" placeholder="Filtrar"
+                                            (onChange)="filter($event.value)" [filter]="true" display="chip"
+                                            [panelStyle]="{ minWidth: '16rem' }">
+                                <ng-template pTemplate="item" let-option>
+                                    <div class="flex items-center gap-2">
+                                        <span>{{ option.label }}</span>
+                                    </div>
+                                </ng-template>
+                            </p-multi-select>
+                        </ng-template>
+                    </p-columnFilter>
+                </th>
+                <th></th>
+                <th></th>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-cdr let-rowIndex="rowIndex">
+            <tr>
+                <td>{{ cdr.startTime | date:'dd/MM/yyyy HH:mm:ss' }}</td>
+                <td>{{ clearCallerId(cdr.callerId) }}</td>
+                <td>
+                    <div class="flex items-center gap-1">
+                        <i *ngIf="cdr.userfield === UserFieldEnum.UPLOAD" class="pi pi-upload text-blue-500"
+                           title="Upload"></i>
+                        <i
+                            *ngIf="cdr.userfield === UserFieldEnum.OUTBOUND"
+                            class="pi pi-arrow-up"
+                            [ngClass]="{'text-green-500': cdr.disposition=='ANSWERED', 'text-red-500': cdr.disposition!='ANSWERED'}"
+                            title="Saída"
+                        ></i>
+                        <i
+                            *ngIf="cdr.userfield === UserFieldEnum.INBOUND"
+                            class="pi pi-arrow-down"
+                            [ngClass]="{'text-green-500': cdr.disposition=='ANSWERED', 'text-red-500': cdr.disposition!='ANSWERED'}"
+                            title="Entrada"
+                        ></i>
+
+                        <ng-container *ngIf="cdr.userfield === UserFieldEnum.TEST else button">
+                            <i class="pi pi-microphone text-green-500" title="Teste Assistente"></i>
+                            <p>Teste</p>
+                        </ng-container>
+                        <ng-template #button>
+                            <p-button *ngIf="cdr.userfield !== UserFieldEnum.UPLOAD"
+                                      icon="pi pi-phone"
+                                      [label]="cdr.userfield === UserFieldEnum.INBOUND ? telephoneFormat(cdr.src) : telephoneFormat(cdr.destination)"
+                                      (click)="dial(cdr.userfield === UserFieldEnum.INBOUND ? cdr.src : cdr.destination)"
+                                      [link]="true"
+                                      iconPos="right"
+                                      [disabled]="user.isExpired"
+                            />
+                        </ng-template>
+                    </div>
+                </td>
+                <td>
+                    <ng-container
+                        *ngIf="cdr.userfield === UserFieldEnum.INBOUND && cdr.billableSeconds === 0 else normalTitle"
+                    >
+                        <p-badge value="Não atendida" severity="danger"/>
+                    </ng-container>
+                    <ng-template #normalTitle>
+                        {{ cdr.title }}
+                    </ng-template>
+                </td>
+                <td>
+                    <p-tag [value]="cdr.temperature" [severity]="getTemperatureSeverity(cdr.temperature)"/>
+                </td>
+                <td>
+                    <p-rating [(ngModel)]="cdr.engagement" readonly/>
+                </td>
+                <td>
+                    <ng-container *ngIf="cdr.callRecord">
+                        <p-progress-spinner *ngIf="cdr.status === CallAnalyzeStatusEnum.ANALYZING"
+                                            [style]="{ width: '2rem', height: '2rem' }"/>
+                        <i *ngIf="cdr.status === CallAnalyzeStatusEnum.FINISHED"
+                           class="pi pi-check-circle text-green-500"></i>
+                        <p-button *ngIf="cdr.status === CallAnalyzeStatusEnum.FAILED"
+                                  (click)="retryAnalyze(cdr.id, rowIndex)" outlined icon="pi pi-refresh"></p-button>
+                    </ng-container>
+                    <ng-container *ngIf="!cdr.callRecord">
+                        <i class="pi pi-times-circle text-gray-500"></i>
+                    </ng-container>
+                </td>
+                <td>
+                    <p-button
+                        *ngIf="cdr.callRecord && cdr.status === CallAnalyzeStatusEnum.FINISHED"
+                        [routerLink]="['details', cdr.id]"
+                        icon="pi pi-search"
+                        outlined>
+                    </p-button>
+                </td>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+            <p-progress-spinner *ngIf="loading" [style]="{ width: '2rem', height: '2rem' }"/>
+            <tr>
+                <td *ngIf="!loading" colspan="6" class="text-center p-4">Nenhum registro encontrado.</td>
+            </tr>
+        </ng-template>
+    </p-table>
+</p-card>
+<p-dialog
+    [(visible)]="dialogVisible"
+    [modal]="true"
+    header="Escolha o Mês"
+    [draggable]="false"
+    [style]="{ width: '32rem' }"
+>
+    <p-date-picker [(ngModel)]="reportDate" view="month" inline ></p-date-picker>
+
+    <ng-template pTemplate="footer">
+        <button pButton class="p-button-text" (click)="closeDialog()">Cancelar</button>
+        <p-button label="Buscar" (onClick)="executeReport()" [disabled]="!reportDate" ><i *ngIf="reportLoading" class="pi pi-spin pi-spinner"></i></p-button>
+    </ng-template>
+    <small *ngFor="let error of reportErrors" class="text-red-600">{{ error }}</small>
+</p-dialog>
+<p-toast/>

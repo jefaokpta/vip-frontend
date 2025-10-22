@@ -1,0 +1,97 @@
+<div class="flex justify-between gap-2 m-4">
+    <div class="card">
+        <div class="font-semibold mb-2">Sentimento</div>
+        <p-tag [value]="cdr?.sentiment" [severity]="getSentimentSeverity(cdr?.sentiment)"></p-tag>
+    </div>
+    <div class="card">
+        <div class="font-semibold mb-2">Temperatura</div>
+        <p-tag [value]="cdr?.temperature" [severity]="getTemperatureSeverity(cdr?.temperature)"></p-tag>
+    </div>
+    <div class="card">
+        <div class="font-semibold mb-2">Engajamento</div>
+        <ng-container *ngIf="cdr?.engagement">
+            <p-rating [(ngModel)]="cdr!.engagement" [readonly]="true"></p-rating>
+        </ng-container>
+    </div>
+    <div>
+        <div class="card">
+            <div class="font-semibold mb-2">Informações</div>
+            <div class="flex gap-4">
+                <div class="col-span-2">
+                    <p class="font-medium">Data/Hora:</p>
+                    <p>{{ cdr?.startTime | date: 'dd/MM/yyyy HH:mm:ss' }}</p>
+                </div>
+                <div>
+                    <p class="font-medium">Telefone:</p>
+                    <p>{{ cdr?.destination }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="font-semibold text-xl">{{ cdr?.title }}</div>
+    <div class="mt-2" [innerHTML]="formattedText(cdr?.summary)"></div>
+</div>
+
+<div class="flex flex-col md:flex-row md:items-start md:justify-between gap-2 mb-4">
+    <div class="card">
+        <div class="font-semibold mb-2">Ação recomendada</div>
+        <div [innerHTML]="formattedText(cdr?.action)"></div>
+    </div>
+    <div>
+        <div class="card">
+            <div class="font-semibold mb-2">Palavras mais frequentes</div>
+            <div class="flex gap-2">
+                <ng-container *ngIf="cdr?.mostFrequentWords">
+                    <p-tag *ngFor="let word of cdr!.mostFrequentWords.split(',')" [value]="word"></p-tag>
+                </ng-container>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="flex justify-between mb-4">
+    <div class="card w-full">
+        <div class="flex justify-between items-center">
+            <div class="font-semibold mb-2">Assistentes de IA</div>
+            <p-progress-spinner *ngIf="pendingAnalysis > 0" [style]="{ width: '2rem', height: '2rem' }"/>
+        </div>
+        <ng-container *ngFor="let assistantAnalise of assistantAnalysis; let i = index" >
+            <p-accordion [value]="i">
+                <p-accordion-panel value="0">
+                    <p-accordion-header>{{ assistantAnalise.name }}</p-accordion-header>
+                    <p-accordion-content>
+                        <app-assistant-analysis-text [text]="assistantAnalise.text"></app-assistant-analysis-text>
+                    </p-accordion-content>
+                </p-accordion-panel>
+            </p-accordion>
+        </ng-container>
+    </div>
+</div>
+
+<div class="card">
+    <p-accordion>
+        <p-accordion-panel value="0">
+            <p-accordion-header>Transcrição completa</p-accordion-header>
+            <p-accordion-content>
+                <audio controls class="w-full" [src]="callRecordAudioSrc" type="audio/mpeg"></audio>
+                <ng-container *ngFor="let segment of recognition?.segments">
+                    <ng-container *ngIf="segment.callLeg === CallLegEnum.A || segment.callLeg === CallLegEnum.BOTH else callLegB">
+                        <ng-container *ngIf="segment.callLeg === CallLegEnum.A else callLegBoth">
+                            <app-message-leg-a [text]="segment.text" [time]="segment.startSecond"></app-message-leg-a>
+                        </ng-container>
+                        <ng-template #callLegBoth>
+                            <app-message-leg-a [text]="segment.text" [time]="segment.startSecond"></app-message-leg-a>
+                        </ng-template>
+                    </ng-container>
+                    <ng-template #callLegB>
+                        <app-message-leg-b [text]="segment.text" [time]="segment.startSecond"></app-message-leg-b>
+                    </ng-template>
+                </ng-container>
+            </p-accordion-content>
+        </p-accordion-panel>
+    </p-accordion>
+</div>
+
