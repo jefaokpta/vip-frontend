@@ -3,20 +3,20 @@
  * @email jefaokpta@hotmail.com
  * @create 5/2/25
  */
-import { Injectable, signal } from '@angular/core';
-import { UA, WebSocketInterface } from 'jssip';
-import { environment } from '../../environments/environment';
-import { UserService } from '@/services/user.service';
-import { PhoneState, PhoneStateEnum } from '@/types/types';
-import { RTCSession } from 'jssip/lib/RTCSession';
-import { RTCSessionEvent, UnRegisteredEvent } from 'jssip/lib/UA';
-import { HttpClientService } from '@/services/http-client.service';
+import {Injectable, signal} from '@angular/core';
+import {UA, WebSocketInterface} from 'jssip';
+import {environment} from '../../environments/environment';
+import {UserService} from '@/services/user.service';
+import {PhoneState, PhoneStateEnum} from '@/types/types';
+import {RTCSession} from 'jssip/lib/RTCSession';
+import {RTCSessionEvent, UnRegisteredEvent} from 'jssip/lib/UA';
+import {HttpClientService} from '@/services/http-client.service';
 
 @Injectable({
     providedIn: 'root'
 })
 export class WebphoneService {
-    private readonly IASMIN_PABX_URL = environment.IASMIN_PABX_URL;
+    private readonly PABX_URL = environment.PABX_URL;
     private readonly ua: UA;
     private readonly phoneState = signal<PhoneState>({ state: PhoneStateEnum.INITIALIZING });
     private readonly callTimer = signal(0);
@@ -32,8 +32,7 @@ export class WebphoneService {
         private readonly userService: UserService,
         private readonly httpClientService: HttpClientService
     ) {
-        // const socket = new WebSocketInterface(`wss://${this.IASMIN_PABX_URL}:8089/ws`);
-        const socket = new WebSocketInterface(`wss://vip-register.vipsolutions.com.br:8089/ws`);
+        const socket = new WebSocketInterface(`wss://${this.PABX_URL}:8089/ws`);
         const user = userService.getUser();
         // const config = {
         //     uri: `sip:${user.id}@${this.IASMIN_PABX_URL}`,
@@ -42,7 +41,7 @@ export class WebphoneService {
         //     register: true
         // };
         const config = {
-            uri: `sip:web@vip-register.vipsolutions.com.br`,
+            uri: `sip:web@${this.PABX_URL}`,
             password: `jefao123`,
             sockets: [socket],
             register: true
@@ -87,7 +86,7 @@ export class WebphoneService {
                 mediaConstraints: { audio: true, video: false },
                 extraHeaders: [`X-CALL-TOKEN: ${callToken.token}`]
             };
-            const target = `sip:${telephone}@${this.IASMIN_PABX_URL}`;
+            const target = `sip:${telephone}@${this.PABX_URL}`;
             this.updatePhoneStatus({ session: this.ua.call(target, options) });
         }
     }

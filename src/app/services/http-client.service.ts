@@ -4,8 +4,8 @@
  * @create 4/22/25
  */
 
-import { HttpClient } from '@angular/common/http';
-import { environment } from '../../environments/environment';
+import {HttpClient} from '@angular/common/http';
+import {environment} from '../../environments/environment';
 import {
     Assistant,
     AssistantAnalysis,
@@ -19,15 +19,14 @@ import {
     UserFieldEnum,
     VoiceAssistant
 } from '@/types/types';
-import { firstValueFrom, Observable, timeout } from 'rxjs';
-import { Injectable } from '@angular/core';
-import { Pipedrive } from '@/pages/integrations/types';
+import {firstValueFrom, Observable, timeout} from 'rxjs';
+import {Injectable} from '@angular/core';
 
 @Injectable({
     providedIn: 'root'
 })
 export class HttpClientService {
-    private readonly BACKEND = environment.IASMIN_BACKEND_URL;
+    private readonly BACKEND = environment.BACKEND_URL;
     private readonly HTTP_TIMEOUT = 30_000;
     private readonly HTTP_LONG_TIMEOUT = 300_000;
     private readonly BEARER = 'Bearer ';
@@ -258,32 +257,6 @@ export class HttpClientService {
         );
     }
 
-    getGoogleAuthStatus() {
-        return this.executeRequest(this.http.get(`${this.BACKEND}/google/status`, this.headers()));
-    }
-
-    getPipedriveInfo(controlNumber: string): Promise<Pipedrive> {
-        return this.executeRequest(
-            this.http.get<Pipedrive>(`${this.BACKEND}/pipedrive/${controlNumber}`, this.headers())
-        );
-    }
-
-    createOrUpdatePipedrive(payload: {
-        url: string;
-        token: string;
-        controlNumber: string;
-        dealStatus: string;
-    }): Promise<Pipedrive> {
-        const trimmedPayload = {
-            url: payload.url.trim(),
-            token: payload.token.trim(),
-            controlNumber: payload.controlNumber,
-            dealStatus: payload.dealStatus
-        };
-        return this.executeRequest(
-            this.http.post<Pipedrive>(`${this.BACKEND}/pipedrive`, trimmedPayload, this.headers())
-        );
-    }
 
     /**
      * Executa uma requisição HTTP com timeout e retorna a primeira resposta como Promise

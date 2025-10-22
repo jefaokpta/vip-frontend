@@ -1,16 +1,16 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { HttpClientService } from '@/services/http-client.service';
-import { DatePipe, NgForOf, NgIf } from '@angular/common';
-import { TagModule } from 'primeng/tag';
-import { ProgressBarModule } from 'primeng/progressbar';
-import { Rating } from 'primeng/rating';
-import { ChipModule } from 'primeng/chip';
-import { CardModule } from 'primeng/card';
-import { PanelModule } from 'primeng/panel';
-import { DividerModule } from 'primeng/divider';
-import { FormsModule } from '@angular/forms';
-import { Accordion, AccordionContent, AccordionHeader, AccordionPanel } from 'primeng/accordion';
+import {Component, OnInit} from '@angular/core';
+import {ActivatedRoute} from '@angular/router';
+import {HttpClientService} from '@/services/http-client.service';
+import {DatePipe, NgForOf, NgIf} from '@angular/common';
+import {TagModule} from 'primeng/tag';
+import {ProgressBarModule} from 'primeng/progressbar';
+import {Rating} from 'primeng/rating';
+import {ChipModule} from 'primeng/chip';
+import {CardModule} from 'primeng/card';
+import {PanelModule} from 'primeng/panel';
+import {DividerModule} from 'primeng/divider';
+import {FormsModule} from '@angular/forms';
+import {Accordion, AccordionContent, AccordionHeader, AccordionPanel} from 'primeng/accordion';
 import {
     Assistant,
     AssistantAnalysis,
@@ -24,13 +24,13 @@ import {
     User,
     UserFieldEnum
 } from '@/types/types';
-import { MessageLegAComponent } from '@/pages/analysis/components/message-leg-a.component';
-import { MessageLegBComponent } from '@/pages/analysis/components/message-leg-b.component';
-import { ProgressSpinner } from 'primeng/progressspinner';
-import { environment } from '../../../../environments/environment';
-import { AssistantAnalysisTextComponent } from '@/pages/analysis/components/assistant-analysis-text.component';
-import { UserService } from '@/services/user.service';
-import { formattedText } from '@/util/utils';
+import {MessageLegAComponent} from '@/pages/analysis/components/message-leg-a.component';
+import {MessageLegBComponent} from '@/pages/analysis/components/message-leg-b.component';
+import {ProgressSpinner} from 'primeng/progressspinner';
+import {environment} from '../../../../environments/environment';
+import {AssistantAnalysisTextComponent} from '@/pages/analysis/components/assistant-analysis-text.component';
+import {UserService} from '@/services/user.service';
+import {formattedText} from '@/util/utils';
 
 @Component({
     selector: 'app-call-details',
@@ -80,7 +80,7 @@ export class CallDetails implements OnInit {
         const cdrId = this.route.snapshot.paramMap.get('id')!;
         this.httpClientService.findCdrById(cdrId).then((cdr) => {
             this.cdr = cdr;
-            this.callRecordAudioSrc = `https://${environment.IASMIN_PABX_URL}/static/mp3s/${this.cdr.callRecord}`;
+            this.callRecordAudioSrc = `https://${environment.PABX_URL}/static/mp3s/${this.cdr.callRecord}`;
             this.httpClientService.findRecognitions(cdr.uniqueId).then((recognition) => {
                 recognition.segments = this.invertSegmentLegs(cdr.userfield, recognition.segments);
                 this.recognition = recognition;

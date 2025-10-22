@@ -23,7 +23,6 @@
         "chart.js": "4.4.2",
         "jssip": "^3.10.1",
         "jwt-decode": "^4.0.0",
-        "ngx-socket-io": "^4.8.5",
         "primeclt": "^0.1.5",
         "primeicons": "^7.0.0",
         "primelocale": "^2.1.5",
