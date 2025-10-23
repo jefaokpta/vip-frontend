@@ -257,6 +257,10 @@ export class HttpClientService {
         );
     }
 
+    findWorkers(): Promise<Worker[]> {
+        return this.executeRequest(this.http.get<Worker[]>(`${this.BACKEND}/workers`, this.headers()));
+    }
+
 
     /**
      * Executa uma requisição HTTP com timeout e retorna a primeira resposta como Promise

@@ -3,7 +3,7 @@
  * @email jefaokpta@hotmail.com
  * @create 4/22/25
  */
-import { RTCSession } from 'jssip/lib/RTCSession';
+import {RTCSession} from 'jssip/lib/RTCSession';
 
 export interface LoginResponse {
     readonly token: string;
@@ -205,4 +205,17 @@ export interface WsEvent {
     readonly type: WsEventEnum;
     readonly cdr?: Cdr;
     readonly callAnalyze?: CallAnalyzeEvent;
+}
+
+export interface Channel {
+    workerId: string;
+    action: string;
+    channelId: string;
+}
+
+export interface Worker {
+    id: string,
+    isReady: boolean,
+    maxChannels: number,
+    channelMessages: Channel[],
 }
