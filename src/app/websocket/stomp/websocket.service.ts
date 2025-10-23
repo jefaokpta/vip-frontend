@@ -4,7 +4,7 @@ import {RxStomp} from "@stomp/rx-stomp";
 @Injectable({
     providedIn: 'root'
 })
-export class RxStompService extends RxStomp {
+export class WebsocketService extends RxStomp {
 
     constructor() {
         super()

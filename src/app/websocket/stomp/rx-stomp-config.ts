@@ -1,9 +1,9 @@
-import {RxStompConfig} from '@stomp/rx-stomp';
-import {environment} from "../../../../../../environments/environment";
+import {environment} from "../../../environments/environment";
+import {RxStompConfig} from "@stomp/rx-stomp";
 
 export const myRxStompConfig: RxStompConfig = {
     // Which server?
-    brokerURL: environment.WEBSOCKET_STOMP,
+    brokerURL: environment.WEBSOCKET_BACKEND_URL,
 
     // Headers
     // Typical keys: login, passcode, host

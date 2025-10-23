@@ -26,7 +26,7 @@ import {Injectable} from '@angular/core';
     providedIn: 'root'
 })
 export class HttpClientService {
-    private readonly BACKEND = environment.BACKEND_URL;
+    private readonly BACKEND = environment.API_BACKEND_URL;
     private readonly HTTP_TIMEOUT = 30_000;
     private readonly HTTP_LONG_TIMEOUT = 300_000;
     private readonly BEARER = 'Bearer ';

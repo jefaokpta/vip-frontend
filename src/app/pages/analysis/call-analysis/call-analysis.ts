@@ -1,33 +1,31 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { DatePipe, NgClass, NgForOf, NgIf } from '@angular/common';
-import { HttpClientService } from '@/services/http-client.service';
-import { Table, TableModule } from 'primeng/table';
-import { InputTextModule } from 'primeng/inputtext';
-import { ProgressBarModule } from 'primeng/progressbar';
-import { TagModule } from 'primeng/tag';
-import { Rating } from 'primeng/rating';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { Button, ButtonDirective } from 'primeng/button';
-import { RouterLink } from '@angular/router';
-import { CallAnalyzeStatusEnum, Cdr, RoleEnum, User, UserFieldEnum, WsEvent, WsEventEnum } from '@/types/types';
-import { IconField } from 'primeng/iconfield';
-import { InputIcon } from 'primeng/inputicon';
-import { WebsocketService } from '@/websocket/websocket.service';
-import { Subscription } from 'rxjs';
-import { ProgressSpinner } from 'primeng/progressspinner';
-import { WebphoneService } from '@/webphone/webphone.service';
-import { getTemperatureSeverity, sortCdrByDate, telephoneFormat } from '@/util/utils';
-import { Toast } from 'primeng/toast';
-import { MessageService } from 'primeng/api';
-import { FileUploadModule } from 'primeng/fileupload';
-import { environment } from '../../../../environments/environment';
-import { UserService } from '@/services/user.service';
-import { Badge } from 'primeng/badge';
-import { Card } from 'primeng/card';
-import { MultiSelect } from 'primeng/multiselect';
-import { DatePicker } from 'primeng/datepicker';
-import { Dialog } from 'primeng/dialog';
-import { isArray } from 'chart.js/helpers';
+import {Component, OnInit, ViewChild} from '@angular/core';
+import {DatePipe, NgClass, NgForOf, NgIf} from '@angular/common';
+import {HttpClientService} from '@/services/http-client.service';
+import {Table, TableModule} from 'primeng/table';
+import {InputTextModule} from 'primeng/inputtext';
+import {ProgressBarModule} from 'primeng/progressbar';
+import {TagModule} from 'primeng/tag';
+import {Rating} from 'primeng/rating';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {Button, ButtonDirective} from 'primeng/button';
+import {RouterLink} from '@angular/router';
+import {CallAnalyzeStatusEnum, Cdr, RoleEnum, User, UserFieldEnum, WsEvent, WsEventEnum} from '@/types/types';
+import {IconField} from 'primeng/iconfield';
+import {InputIcon} from 'primeng/inputicon';
+import {ProgressSpinner} from 'primeng/progressspinner';
+import {WebphoneService} from '@/webphone/webphone.service';
+import {getTemperatureSeverity, sortCdrByDate, telephoneFormat} from '@/util/utils';
+import {Toast} from 'primeng/toast';
+import {MessageService} from 'primeng/api';
+import {FileUploadModule} from 'primeng/fileupload';
+import {environment} from '../../../../environments/environment';
+import {UserService} from '@/services/user.service';
+import {Badge} from 'primeng/badge';
+import {Card} from 'primeng/card';
+import {MultiSelect} from 'primeng/multiselect';
+import {DatePicker} from 'primeng/datepicker';
+import {Dialog} from 'primeng/dialog';
+import {isArray} from 'chart.js/helpers';
 
 @Component({
     selector: 'app-call-analysis',
@@ -60,7 +58,7 @@ import { isArray } from 'chart.js/helpers';
     providers: [MessageService],
     templateUrl: './call-analysis.html'
 })
-export class CallAnalysis implements OnInit, OnDestroy {
+export class CallAnalysis implements OnInit {
     @ViewChild('dataTable') dt!: Table;
     cdrs: Cdr[] = [];
     user: User;
@@ -79,19 +77,14 @@ export class CallAnalysis implements OnInit, OnDestroy {
     protected readonly environment = environment;
     protected readonly getTemperatureSeverity = getTemperatureSeverity;
     protected readonly telephoneFormat = telephoneFormat;
-    private readonly backendEventSubscription: Subscription;
 
     constructor(
         private readonly httpClienteService: HttpClientService,
-        private readonly websocketService: WebsocketService,
         private readonly webphoneService: WebphoneService,
         private readonly messageService: MessageService,
         private readonly userService: UserService
     ) {
         this.user = this.userService.getUser();
-        this.backendEventSubscription = this.websocketService
-            .backendEvent()
-            .subscribe((event) => this.handleWsMessage(event));
     }
 
     ngOnInit(): void {
@@ -100,10 +93,6 @@ export class CallAnalysis implements OnInit, OnDestroy {
             this.rebuildCallerIdOptions();
             this.loading = false;
         });
-    }
-
-    ngOnDestroy(): void {
-        this.backendEventSubscription.unsubscribe();
     }
 
     // Exibe apenas o nome quando vier entre aspas, caso contrário retorna o valor original
@@ -205,7 +194,6 @@ export class CallAnalysis implements OnInit, OnDestroy {
                 this.reportLabel = `${m}/${y}`;
                 this.dialogVisible = false;
                 this.reportDate = undefined;
-                this.backendEventSubscription.unsubscribe();
             })
             .catch((err) => {
                 if (isArray(err.error.message)) this.reportErrors = err.error.message;

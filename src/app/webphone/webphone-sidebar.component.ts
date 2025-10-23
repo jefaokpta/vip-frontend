@@ -1,21 +1,19 @@
-import { Component, computed, OnDestroy, OnInit } from '@angular/core';
-import { ButtonModule } from 'primeng/button';
-import { DrawerModule } from 'primeng/drawer';
-import { BadgeModule } from 'primeng/badge';
-import { LayoutService } from '@/layout/service/layout.service';
-import { Card } from 'primeng/card';
-import { InputTextModule } from 'primeng/inputtext';
-import { FormsModule } from '@angular/forms';
-import { WebphoneService } from '@/webphone/webphone.service';
-import { NgClass, NgIf } from '@angular/common';
-import { Cdr, User, UserFieldEnum, WsEventEnum } from '@/types/types';
-import { HttpClientService } from '@/services/http-client.service';
-import { TableModule } from 'primeng/table';
-import { sortCdrByDate, telephoneFormat } from '@/util/utils';
-import { Subscription } from 'rxjs';
-import { WebsocketService } from '@/websocket/websocket.service';
-import { handleCalleId } from '@/webphone/utils';
-import { UserService } from '@/services/user.service';
+import {Component, computed, OnInit} from '@angular/core';
+import {ButtonModule} from 'primeng/button';
+import {DrawerModule} from 'primeng/drawer';
+import {BadgeModule} from 'primeng/badge';
+import {LayoutService} from '@/layout/service/layout.service';
+import {Card} from 'primeng/card';
+import {InputTextModule} from 'primeng/inputtext';
+import {FormsModule} from '@angular/forms';
+import {WebphoneService} from '@/webphone/webphone.service';
+import {NgClass, NgIf} from '@angular/common';
+import {Cdr, User, UserFieldEnum} from '@/types/types';
+import {HttpClientService} from '@/services/http-client.service';
+import {TableModule} from 'primeng/table';
+import {sortCdrByDate, telephoneFormat} from '@/util/utils';
+import {handleCalleId} from '@/webphone/utils';
+import {UserService} from '@/services/user.service';
 
 @Component({
     selector: 'app-webphone-sidebar',
@@ -150,30 +148,19 @@ import { UserService } from '@/services/user.service';
         </p-drawer>
     `
 })
-export class WebphoneSidebarComponent implements OnInit, OnDestroy {
+export class WebphoneSidebarComponent implements OnInit {
     telephoneNumber?: string = undefined;
     dialpadVisible = false;
     cdrs: Cdr[] = [];
-    newCdrSubscription: Subscription;
     user: User
 
     constructor(
         public layoutService: LayoutService,
         private readonly webphoneService: WebphoneService,
         private readonly httpClientService: HttpClientService,
-        private readonly websocketService: WebsocketService,
         private readonly userService: UserService
     ) {
         this.user = this.userService.getUser()
-        this.newCdrSubscription = this.websocketService.backendEvent().subscribe((event) => {
-            if (event.type === WsEventEnum.CDR_NEW && event.cdr!.id === this.user.id){
-                this.cdrs = sortCdrByDate(this.deDuplicate([...this.cdrs, event.cdr!]));
-            }
-        });
-    }
-
-    ngOnDestroy(): void {
-        this.newCdrSubscription.unsubscribe();
     }
 
     ngOnInit(): void {
