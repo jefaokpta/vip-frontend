@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit} from "@angular/core";
+import {Component, OnDestroy} from "@angular/core";
 import {WebsocketService} from "@/websocket/stomp/websocket.service";
 import {Subscription} from "rxjs";
 import {rxStompServiceFactory} from "@/websocket/stomp/rx-stomp-service-factory";
@@ -8,18 +8,15 @@ import {rxStompServiceFactory} from "@/websocket/stomp/rx-stomp-service-factory"
     providers: [{provide: WebsocketService, useFactory: rxStompServiceFactory}],
     template: '<p>websocket works!</p>'
 })
-export class WebsocketComponent implements OnInit, OnDestroy {
+export class WebsocketComponent implements OnDestroy {
 
     private readonly webSocketSubscription: Subscription;
 
     constructor(private readonly webSocketService: WebsocketService) {
-        this.webSocketSubscription = this.webSocketService.watch("/topic").subscribe(message => {
+        this.webSocketSubscription = this.webSocketService.watch("/topic/active-channels").subscribe(message => {
             console.log(message);
+            console.log(message.body);
         })
-    }
-
-    ngOnInit(): void {
-
     }
 
     ngOnDestroy(): void {
