@@ -13,11 +13,18 @@ import {HttpClientService} from "@/services/http-client.service";
     providers: [{provide: WebsocketService, useFactory: rxStompServiceFactory}],
     imports: [Card, NgForOf, BadgeModule],
     template: `
-        <div class="grid grid-cols-12 gap-8">
-            <div class="col-span-12 xl:col-span-9">
-                <p-card header="Total de chamadas">
-                    <span class="font-semibold text-4xl">{{ totalCalls() }}</span>
-                </p-card>
+        <div class="flex flex-col gap-4">
+            <div class="flex justify-around">
+                <div>
+                    <p-card header="Total de chamadas">
+                        <span class="font-semibold text-4xl">{{ totalCalls() }}</span>
+                    </p-card>
+                </div>
+                <div>
+                    <p-card header="Capacidade total">
+                        <span class="font-semibold text-4xl">{{ sumMaxChannels() }}</span>
+                    </p-card>
+                </div>
             </div>
             <div class="col-span-12 xl:col-span-9">
                 <p-card header="Workers">
@@ -71,6 +78,12 @@ export class Dashboard implements OnDestroy, OnInit {
         this.httpClientService.findWorkers().then(workers => {
             this.workersMap.set(new Map(workers.map(worker => [worker.id, worker])));
         })
+    }
+
+    sumMaxChannels() {
+        return this.workers()
+            .filter(w => w.isReady)
+            .reduce((acc, w) => acc + w.maxChannels, 0);
     }
 
     private addChannel(channel: Channel) {
