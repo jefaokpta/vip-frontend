@@ -1,4 +1,4 @@
-import {Component, computed, OnDestroy, signal} from '@angular/core';
+import {Component, computed, OnDestroy, OnInit, signal} from '@angular/core';
 import {Subscription} from "rxjs";
 import {WebsocketService} from "@/websocket/stomp/websocket.service";
 import {rxStompServiceFactory} from "@/websocket/stomp/rx-stomp-service-factory";
@@ -6,6 +6,7 @@ import {Card} from "primeng/card";
 import {Channel, Worker} from "@/types/types";
 import {NgForOf} from "@angular/common";
 import {BadgeModule} from "primeng/badge";
+import {HttpClientService} from "@/services/http-client.service";
 
 @Component({
     selector: 'app-components-dashboard',
@@ -24,7 +25,8 @@ import {BadgeModule} from "primeng/badge";
                         <p-card *ngFor="let worker of workers()" header="{{ worker.id }}">
                             <div class="flex flex-col gap-2">
                                 <p-badge [severity]="worker.isReady ? 'success' : 'danger'" value="Ativo"></p-badge>
-                                <span class="text-2xl">Canais: {{ worker.channelMessages.length }}</span>
+                                <span>Limite: {{ worker.maxChannels }}</span>
+                                <span class="text-2xl">Ativos: {{ worker.channelMessages.length }}</span>
                             </div>
                         </p-card>
                     </div>
@@ -33,17 +35,26 @@ import {BadgeModule} from "primeng/badge";
         </div>
     `
 })
-export class Dashboard implements OnDestroy {
+export class Dashboard implements OnDestroy, OnInit {
     private readonly webSocketSubscription: Subscription;
     private readonly workersMap = signal(new Map<string, Worker>());
     readonly workers = computed(() => Array.from(this.workersMap().values()));
     readonly totalCalls = computed(() => this.workers().reduce((acc, w) => acc + w.channelMessages.length, 0));
 
-    constructor(private readonly webSocketService: WebsocketService) {
+    constructor(
+        private readonly webSocketService: WebsocketService,
+        private readonly httpClientService: HttpClientService
+    ) {
         this.webSocketSubscription = this.webSocketService.watch("/topic/active-channels").subscribe(message => {
             const channel: Channel = JSON.parse(message.body);
             if (channel.action === "ADD_CHANNEL") this.addChannel(channel);
             else this.removeChannel(channel);
+        })
+    }
+
+    ngOnInit() {
+        this.httpClientService.findWorkers().then(workers => {
+            this.workersMap.set(new Map(workers.map(worker => [worker.id, worker])));
         })
     }
 

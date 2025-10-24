@@ -17,7 +17,8 @@ import {
     UpdateAttendant,
     User,
     UserFieldEnum,
-    VoiceAssistant
+    VoiceAssistant,
+    Worker
 } from '@/types/types';
 import {firstValueFrom, Observable, timeout} from 'rxjs';
 import {Injectable} from '@angular/core';
