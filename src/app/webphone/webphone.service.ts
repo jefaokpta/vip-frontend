@@ -79,12 +79,12 @@ export class WebphoneService {
     }
 
     async makeCall(telephone: string) {
-        const callToken = await this.httpClientService.getCallToken();
+        // const callToken = await this.httpClientService.getCallToken();
         if (this.ua) {
             const options = {
                 eventHandlers: this.callEventHandlers(),
                 mediaConstraints: { audio: true, video: false },
-                extraHeaders: [`X-CALL-TOKEN: ${callToken.token}`]
+                extraHeaders: [`X-CALL-TOKEN: TOKEN_PLACEHOLDER`]
             };
             const target = `sip:${telephone}@${this.PABX_URL}`;
             this.updatePhoneStatus({ session: this.ua.call(target, options) });
