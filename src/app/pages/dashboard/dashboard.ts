@@ -1,4 +1,4 @@
-import {Component, OnDestroy} from '@angular/core';
+import {Component, computed, OnDestroy, signal} from '@angular/core';
 import {Subscription} from "rxjs";
 import {WebsocketService} from "@/websocket/stomp/websocket.service";
 import {rxStompServiceFactory} from "@/websocket/stomp/rx-stomp-service-factory";
@@ -15,16 +15,16 @@ import {BadgeModule} from "primeng/badge";
         <div class="grid grid-cols-12 gap-8">
             <div class="col-span-12 xl:col-span-9">
                 <p-card header="Total de chamadas">
-                    <span class="font-semibold text-4xl">{{ totalCalls }}</span>
+                    <span class="font-semibold text-4xl">{{ totalCalls() }}</span>
                 </p-card>
             </div>
             <div class="col-span-12 xl:col-span-9">
                 <p-card header="Workers">
                     <div class="flex gap-4">
-                        <p-card *ngFor="let worker of workers" header="{{ worker.id }}">
+                        <p-card *ngFor="let worker of workers()" header="{{ worker.id }}">
                             <div class="flex flex-col gap-2">
                                 <p-badge [severity]="worker.isReady ? 'success' : 'danger'" value="Ativo"></p-badge>
-                                <span class="text-2xl">Canais: {{ worker.maxChannels }}</span>
+                                <span class="text-2xl">Canais: {{ worker.channelMessages.length }}</span>
                             </div>
                         </p-card>
                     </div>
@@ -35,41 +35,45 @@ import {BadgeModule} from "primeng/badge";
 })
 export class Dashboard implements OnDestroy {
     private readonly webSocketSubscription: Subscription;
-    private readonly workersMap: Map<string, Worker> = new Map();
-    totalCalls: number = 0;
-    workers: Worker[] = Array.from(this.workersMap.values())
-
-    // workers: Worker[] = [
-    //     {id: "WORKER1", channelMessages: [], maxChannels: 0, isReady: true},
-    //     {id: "WORKER2", channelMessages: [], maxChannels: 0, isReady: false}
-    // ];
+    private readonly workersMap = signal(new Map<string, Worker>());
+    readonly workers = computed(() => Array.from(this.workersMap().values()));
+    readonly totalCalls = computed(() => this.workers().reduce((acc, w) => acc + w.channelMessages.length, 0));
 
     constructor(private readonly webSocketService: WebsocketService) {
         this.webSocketSubscription = this.webSocketService.watch("/topic/active-channels").subscribe(message => {
             const channel: Channel = JSON.parse(message.body);
             if (channel.action === "ADD_CHANNEL") this.addChannel(channel);
             else this.removeChannel(channel);
-            this.totalCalls = Array.from(this.workersMap.values())
-                .reduce((acc, w) => acc + w.channelMessages.length, 0);
         })
     }
 
     private addChannel(channel: Channel) {
-        const worker = this.workersMap.get(channel.workerId) ?? {
-            id: channel.workerId,
-            channelMessages: [],
-            maxChannels: 0,
-            isReady: true
-        };
-        worker.channelMessages.push(channel);
-        this.workersMap.set(channel.workerId, worker);
+        this.workersMap.update(map => {
+            const newMap = new Map(map);
+            const worker = newMap.get(channel.workerId);
+            if (worker) {
+                worker.channelMessages.push(channel);
+            } else {
+                newMap.set(channel.workerId, {
+                    id: channel.workerId,
+                    channelMessages: [channel],
+                    maxChannels: 0,
+                    isReady: true
+                });
+            }
+            return newMap;
+        });
     }
 
     private removeChannel(channel: Channel) {
-        const worker = this.workersMap.get(channel.workerId)
-        if (!worker) return;
-        const index = worker.channelMessages.findIndex(c => c.channelId === channel.channelId);
-        if (index !== -1) worker.channelMessages.splice(index, 1);
+        this.workersMap.update(map => {
+            const newMap = new Map(map);
+            const worker = newMap.get(channel.workerId);
+            if (!worker) return newMap;
+            const index = worker.channelMessages.findIndex(c => c.channelId === channel.channelId);
+            if (index !== -1) worker.channelMessages.splice(index, 1);
+            return newMap;
+        });
     }
 
     ngOnDestroy(): void {
