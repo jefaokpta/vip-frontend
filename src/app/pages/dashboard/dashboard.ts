@@ -23,10 +23,11 @@ import {HttpClientService} from "@/services/http-client.service";
                 <p-card header="Workers">
                     <div class="flex gap-4">
                         <p-card *ngFor="let worker of workers()" header="{{ worker.id }}">
-                            <div class="flex flex-col gap-2">
+                            <div class="flex flex-col text-center gap-2">
                                 <p-badge [severity]="worker.isReady ? 'success' : 'danger'" value="Ativo"></p-badge>
                                 <span>Limite: {{ worker.maxChannels }}</span>
-                                <span class="text-2xl">Ativos: {{ worker.channelMessages.length }}</span>
+                                <span>Ativos</span>
+                                <span class="text-2xl">{{ worker.channelMessages.length }}</span>
                             </div>
                         </p-card>
                     </div>
