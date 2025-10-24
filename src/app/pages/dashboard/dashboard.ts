@@ -48,8 +48,22 @@ export class Dashboard implements OnDestroy, OnInit {
     ) {
         this.webSocketSubscription = this.webSocketService.watch("/topic/active-channels").subscribe(message => {
             const channel: Channel = JSON.parse(message.body);
-            if (channel.action === "ADD_CHANNEL") this.addChannel(channel);
-            else this.removeChannel(channel);
+            switch (channel.action) {
+                case 'ADD_CHANNEL':
+                    this.addChannel(channel);
+                    break;
+                case 'REMOVE_CHANNEL':
+                    this.removeChannel(channel);
+                    break;
+                case 'ACTIVATE_WORKER':
+                    this.activateWorker(channel);
+                    break;
+                case 'DEACTIVATE_WORKER':
+                    this.deactivateWorker(channel);
+                    break;
+                default:
+                    break;
+            }
         })
     }
 
@@ -90,5 +104,34 @@ export class Dashboard implements OnDestroy, OnInit {
 
     ngOnDestroy(): void {
         this.webSocketSubscription.unsubscribe();
+    }
+
+    private activateWorker(channel: Channel) {
+        this.workersMap.update(map => {
+            const newMap = new Map(map);
+            const worker = newMap.get(channel.workerId);
+            if (worker) {
+                worker.isReady = true;
+            } else {
+                newMap.set(channel.workerId, {
+                    id: channel.workerId,
+                    channelMessages: [],
+                    maxChannels: 0,
+                    isReady: true
+                });
+            }
+            return newMap;
+        });
+    }
+
+    private deactivateWorker(channel: Channel) {
+        this.workersMap.update(map => {
+            const newMap = new Map(map);
+            const worker = newMap.get(channel.workerId);
+            if (worker) {
+                worker.isReady = false;
+            }
+            return newMap;
+        });
     }
 }
