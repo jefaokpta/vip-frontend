@@ -1,10 +1,10 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
-import { AppMenuitem } from './app.menuitem';
-import { UserService } from '@/services/user.service';
-import { RoleEnum, User } from '@/types/types';
-import { MenuItem } from 'primeng/api';
+import {Component, OnInit} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {RouterModule} from '@angular/router';
+import {AppMenuitem} from './app.menuitem';
+import {UserService} from '@/services/user.service';
+import {RoleEnum, User} from '@/types/types';
+import {MenuItem} from 'primeng/api';
 
 @Component({
     selector: 'app-menu',
@@ -20,42 +20,20 @@ import { MenuItem } from 'primeng/api';
 export class AppMenu implements OnInit {
     private readonly model: MenuItem[] = [
         {
-            label: 'Analises',
-            icon: 'pi pi-home',
+            label: 'PABX',
             items: [
                 {
-                    label: 'Analise de Conversas',
-                    icon: 'pi pi-fw pi-chart-bar',
-                    routerLink: ['/pages/analysis']
+                    label: 'PABX',
+                    icon: 'pi pi-fw pi-phone',
+                    routerLink: ['/pages/pabx']
                 },
-                {
-                    label: 'Assistentes de IA',
-                    icon: 'pi pi-fw pi-microchip-ai',
-                    routerLink: ['/pages/assistants']
-                },
-                {
-                    label: 'Assistentes de Voz',
-                    roles: ['admin', 'super'],
-                    icon: 'fa fa-phone-volume',
-                    routerLink: ['/pages/voice/assistants']
-                }
             ]
         },
         {
             label: 'Configurações',
             roles: ['admin', 'super'],
-            icon: 'pi pi-fw pi-phone',
+            icon: 'pi pi-fw pi-microchip-ai',
             items: [
-                {
-                    label: 'Telefonia',
-                    icon: 'pi pi-fw pi-phone',
-                    routerLink: ['/pages/attendants']
-                },
-                {
-                    label: 'Diretrizes',
-                    icon: 'pi pi-fw pi-book',
-                    routerLink: ['/pages/guidelines']
-                },
                 {
                     label: 'Usuários',
                     icon: 'pi pi-fw pi-users',

@@ -1,9 +1,9 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
-import { AppMenu } from './app.menu';
-import { LayoutService } from '@/layout/service/layout.service';
-import { RouterModule } from '@angular/router';
-import { Image } from 'primeng/image';
-import { NgIf } from '@angular/common';
+import {Component, ElementRef, ViewChild} from '@angular/core';
+import {AppMenu} from './app.menu';
+import {LayoutService} from '@/layout/service/layout.service';
+import {RouterModule} from '@angular/router';
+import {Image} from 'primeng/image';
+import {NgIf} from '@angular/common';
 
 @Component({
     selector: '[app-sidebar]',
@@ -13,12 +13,12 @@ import { NgIf } from '@angular/common';
         <div class="sidebar-header">
             <ng-container *ngIf="layoutService.isDarkTheme(); else lightTheme">
                 <a [routerLink]="['/']" class="app-logo">
-                    <p-image src="layout/images/iasmin-white.png" alt="logo iasmin" width="190rem"></p-image>
+                    <p-image src="layout/images/vip-white.png" alt="logo Vip" width="190rem"></p-image>
                 </a>
             </ng-container>
             <ng-template #lightTheme>
                 <a [routerLink]="['/']" class="app-logo">
-                    <p-image src="layout/images/iasmin-black.png" alt="logo iasmin" width="190rem"></p-image>
+                    <p-image src="layout/images/vip-black.png" alt="logo Vip" width="190rem"></p-image>
                 </a>
             </ng-template>
         </div>
