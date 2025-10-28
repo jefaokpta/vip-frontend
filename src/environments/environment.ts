@@ -5,5 +5,5 @@ export const environment = {
     // WEBSOCKET_BACKEND_URL: 'ws://localhost:8080/ws',
     API_BACKEND_URL: 'https://veia.vipsolutions.com.br/vip-status-manager',
     WEBSOCKET_BACKEND_URL: 'wss://veia.vipsolutions.com.br/vip-status-manager/ws',
-    PABX_URL: 'vip-register.vipsolutions.com.br'
+    PABX_URL: '192.168.15.124'
 };

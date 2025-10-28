@@ -21,8 +21,13 @@ import {HttpClientService} from "@/services/http-client.service";
                     </p-card>
                 </div>
                 <div>
-                    <p-card header="Capacidade total">
+                    <p-card header="Máximo de canais">
                         <span class="font-semibold text-4xl">{{ sumMaxChannels() }}</span>
+                    </p-card>
+                </div>
+                <div>
+                    <p-card header="Maximo de registros">
+                        <span class="font-semibold text-4xl">3000</span>
                     </p-card>
                 </div>
             </div>
