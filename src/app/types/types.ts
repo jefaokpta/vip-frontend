@@ -214,7 +214,8 @@ export interface Channel {
 }
 
 export interface Worker {
-    id: string,
+    id: number,
+    name: string,
     isReady: boolean,
     maxChannels: number,
     channelMessages: Channel[],

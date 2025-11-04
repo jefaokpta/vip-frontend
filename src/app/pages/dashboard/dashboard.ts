@@ -34,7 +34,7 @@ import {HttpClientService} from "@/services/http-client.service";
             <div class="col-span-12 xl:col-span-9">
                 <p-card header="Workers">
                     <div class="flex gap-4">
-                        <p-card *ngFor="let worker of workers()" header="{{ worker.id }}">
+                        <p-card *ngFor="let worker of workers()" header="{{ worker.name }}">
                             <div class="flex flex-col text-center gap-2">
                                 <p-badge [severity]="worker.isReady ? 'success' : 'danger'" value="Ativo"></p-badge>
                                 <span>Limite: {{ worker.maxChannels }}</span>
@@ -81,7 +81,7 @@ export class Dashboard implements OnDestroy, OnInit {
 
     ngOnInit() {
         this.httpClientService.findWorkers().then(workers => {
-            this.workersMap.set(new Map(workers.map(worker => [worker.id, worker])));
+            this.workersMap.set(new Map(workers.map(worker => [worker.name, worker])));
         })
     }
 
@@ -99,7 +99,8 @@ export class Dashboard implements OnDestroy, OnInit {
                 worker.channelMessages.push(channel);
             } else {
                 newMap.set(channel.workerId, {
-                    id: channel.workerId,
+                    id: 0,
+                    name: channel.workerId,
                     channelMessages: [channel],
                     maxChannels: 0,
                     isReady: true
@@ -132,7 +133,8 @@ export class Dashboard implements OnDestroy, OnInit {
                 worker.isReady = true;
             } else {
                 newMap.set(channel.workerId, {
-                    id: channel.workerId,
+                    id: 0,
+                    name: channel.workerId,
                     channelMessages: [],
                     maxChannels: 0,
                     isReady: true
