@@ -207,16 +207,10 @@ export interface WsEvent {
     readonly callAnalyze?: CallAnalyzeEvent;
 }
 
-export interface Channel {
-    workerId: string;
-    action: string;
-    channelId: string;
-}
-
 export interface Worker {
     id: number,
     name: string,
     isReady: boolean,
     maxChannels: number,
-    channelMessages: Channel[],
+    channelIds: string[],
 }
