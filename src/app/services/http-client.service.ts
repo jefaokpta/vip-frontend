@@ -6,7 +6,7 @@
 
 import {HttpClient} from '@angular/common/http';
 import {environment} from '../../environments/environment';
-import {Cdr, Company, LoginResponse, Recognition, User, Worker} from '@/types/types';
+import {Company, LoginResponse, Peer, User, Worker} from '@/types/types';
 import {firstValueFrom, Observable, timeout} from 'rxjs';
 import {Injectable} from '@angular/core';
 
@@ -27,38 +27,6 @@ export class HttpClientService {
     validateToken() {
         return this.executeRequest(
             this.http.get<{ token: string }>(`${this.BACKEND}/auth/validate-token`, this.headers())
-        );
-    }
-
-    getCallToken(): Promise<LoginResponse> {
-        return this.executeRequest(this.http.get<LoginResponse>(`${this.BACKEND}/auth/call-token`, this.headers()));
-    }
-
-    findAllCdr(): Promise<Cdr[]> {
-        return this.executeRequest(this.http.get<Cdr[]>(`${this.BACKEND}/cdr`, this.headers()));
-    }
-
-    findAllCdrByMonth(date: Date): Promise<Cdr[]> {
-        const m = date.getMonth();
-        const y = date.getFullYear();
-        return this.executeRequest(this.http.get<Cdr[]>(`${this.BACKEND}/cdr/reports/${y}/${m}`, this.headers()));
-    }
-
-    findCdrById(id: string): Promise<Cdr> {
-        return this.executeRequest(this.http.get<Cdr>(`${this.BACKEND}/cdr/${id}`, this.headers()));
-    }
-
-    findRecognitions(cdrId: string): Promise<Recognition> {
-        return this.executeRequest(this.http.get<Recognition>(`${this.BACKEND}/recognitions/${cdrId}`, this.headers()));
-    }
-
-    retryAnalyze(cdrId: number) {
-        return this.executeRequest(this.http.get(`${this.BACKEND}/recognitions/retry/${cdrId}`, this.headers()));
-    }
-
-    notifyUploadToBackend(userId: number, callRecord: string) {
-        return this.executeRequest(
-            this.http.post(`${this.BACKEND}/cdr/upload`, { id: userId, callRecord }, this.headers())
         );
     }
 
@@ -161,8 +129,8 @@ export class HttpClientService {
         return this.executeRequest(this.http.get<Worker[]>(`${this.BACKEND}/workers`, this.headers()));
     }
 
-    findPeersByCompany(companyId: number): Promise<Worker[]> {
-        return this.executeRequest(this.http.get<Worker[]>(`${this.BACKEND}/workers/company/${companyId}`, this.headers()));
+    findPeersByCompany(companyId: string): Promise<Peer[]> {
+        return this.executeRequest(this.http.get<Peer[]>(`${this.BACKEND}/peers/${companyId}`, this.headers()));
     }
 
 

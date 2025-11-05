@@ -208,9 +208,34 @@ export interface WsEvent {
 }
 
 export interface Worker {
-    id: number,
-    name: string,
-    isReady: boolean,
-    maxChannels: number,
-    channelIds: string[],
+    readonly id: number,
+    readonly name: string,
+    readonly isReady: boolean,
+    readonly maxChannels: number,
+    readonly channelIds: string[],
+}
+
+export enum PeerStateEnum {
+    UNKNOWN = 'UNKNOWN',
+    NOT_INUSE = 'NOT_INUSE',
+    INUSE = 'INUSE',
+    BUSY = 'BUSY',
+    INVALID = 'INVALID',
+    UNAVAILABLE = 'UNAVAILABLE',
+    RINGING = 'RINGING',
+    RINGINUSE = 'RINGINUSE',
+    ONHOLD = 'ONHOLD'
+}
+
+export interface PeerState {
+    readonly endpoint: string,
+    readonly state: PeerStateEnum
+}
+
+export interface Peer {
+    readonly id: number,
+    readonly name: string,
+    readonly peer: string,
+    readonly companyId: string,
+    readonly endpointStates: PeerState
 }

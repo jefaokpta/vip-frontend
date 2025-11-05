@@ -71,6 +71,9 @@ export class Dashboard implements OnDestroy, OnInit {
         this.httpClientService.findWorkers().then(workers => {
             this.workersMap.set(new Map(workers.map(worker => [worker.name, worker])));
         })
+        this.httpClientService.findPeersByCompany('100023').then(peers => {
+            console.log(peers);
+        })
     }
 
     sumMaxChannels() {
