@@ -6,20 +6,7 @@
 
 import {HttpClient} from '@angular/common/http';
 import {environment} from '../../environments/environment';
-import {
-    Assistant,
-    AssistantAnalysis,
-    Cdr,
-    Company,
-    Guideline,
-    LoginResponse,
-    Recognition,
-    UpdateAttendant,
-    User,
-    UserFieldEnum,
-    VoiceAssistant,
-    Worker
-} from '@/types/types';
+import {Cdr, Company, LoginResponse, Recognition, User, Worker} from '@/types/types';
 import {firstValueFrom, Observable, timeout} from 'rxjs';
 import {Injectable} from '@angular/core';
 
@@ -29,7 +16,6 @@ import {Injectable} from '@angular/core';
 export class HttpClientService {
     private readonly BACKEND = environment.API_BACKEND_URL;
     private readonly HTTP_TIMEOUT = 30_000;
-    private readonly HTTP_LONG_TIMEOUT = 300_000;
     private readonly BEARER = 'Bearer ';
 
     constructor(private readonly http: HttpClient) {}
@@ -98,93 +84,6 @@ export class HttpClientService {
 
     createCompany(company: Company) {
         return this.executeRequest(this.http.post(`${this.BACKEND}/companies`, company, this.headers()));
-    }
-
-    findGuideline(): Promise<Guideline[]> {
-        return this.executeRequest(this.http.get<Guideline[]>(`${this.BACKEND}/guidelines`, this.headers()));
-    }
-
-    updateCompanyAttendants(updateAttendant: UpdateAttendant, phone: string) {
-        return this.executeRequest(
-            this.http.patch(`${this.BACKEND}/companies/phones/${phone}/attendants`, updateAttendant, this.headers())
-        );
-    }
-
-    updateGuideline(guideline: Guideline) {
-        return this.executeRequest(this.http.post(`${this.BACKEND}/guidelines`, guideline, this.headers()));
-    }
-
-    findAssistants(userId: number): Promise<Assistant[]> {
-        return this.executeRequest(
-            this.http.get<Assistant[]>(`${this.BACKEND}/assistants/user/${userId}`, this.headers())
-        );
-    }
-
-    listAssistants(controlNumber: string, userId: number): Promise<Assistant[]> {
-        return this.executeRequest(
-            this.http.get<Assistant[]>(
-                `${this.BACKEND}/assistants/company/${controlNumber}/user/${userId}`,
-                this.headers()
-            )
-        );
-    }
-
-    findAllVoiceAssistants(): Promise<VoiceAssistant[]> {
-        return this.executeRequest(this.http.get<VoiceAssistant[]>(`${this.BACKEND}/vapi`, this.headers()));
-    }
-
-    updateTestAssistantPhoneNumber(vapiAssistantId: string) {
-        return this.executeRequest(
-            this.http.patch(`${this.BACKEND}/vapi/phone-numbers/${vapiAssistantId}`, {}, this.headers())
-        );
-    }
-
-    createAssistant(assistant: Assistant) {
-        return this.executeRequest(this.http.post(`${this.BACKEND}/assistants`, assistant, this.headers()));
-    }
-
-    createVoiceAssistant(assistant: VoiceAssistant) {
-        return this.executeRequest(this.http.post(`${this.BACKEND}/vapi`, assistant, this.headers()));
-    }
-
-    findAssistantById(id: string): Promise<Assistant> {
-        return this.executeRequest(this.http.get<Assistant>(`${this.BACKEND}/assistants/${id}`, this.headers()));
-    }
-
-    findVoiceAssistantById(id: string): Promise<VoiceAssistant> {
-        return this.executeRequest(this.http.get<VoiceAssistant>(`${this.BACKEND}/vapi/${id}`, this.headers()));
-    }
-
-    updateAssistant(assistant: Assistant) {
-        return this.executeRequest(
-            this.http.patch(`${this.BACKEND}/assistants/${assistant.id}`, assistant, this.headers())
-        );
-    }
-
-    updateVoiceAssistant(assistant: VoiceAssistant) {
-        return this.executeRequest(this.http.put(`${this.BACKEND}/vapi/${assistant.id}`, assistant, this.headers()));
-    }
-
-    deleteAssistant(id: number) {
-        this.executeRequest(this.http.delete<void>(`${this.BACKEND}/assistants/${id}`, this.headers()));
-    }
-
-    deleteVoiceAssistant(id: number) {
-        this.executeRequest(this.http.delete<void>(`${this.BACKEND}/vapi/${id}`, this.headers()));
-    }
-
-    assistantAnalysis(assistantId: number, uniqueId: string, userfield: UserFieldEnum): Promise<AssistantAnalysis> {
-        return this.executeLongRequest(
-            this.http.post<AssistantAnalysis>(
-                `${this.BACKEND}/assistants/analysis`,
-                {
-                    assistantId,
-                    uniqueId,
-                    userfield
-                },
-                this.headers()
-            )
-        );
     }
 
     findAllUsers(): Promise<User[]> {
@@ -262,6 +161,10 @@ export class HttpClientService {
         return this.executeRequest(this.http.get<Worker[]>(`${this.BACKEND}/workers`, this.headers()));
     }
 
+    findPeersByCompany(companyId: number): Promise<Worker[]> {
+        return this.executeRequest(this.http.get<Worker[]>(`${this.BACKEND}/workers/company/${companyId}`, this.headers()));
+    }
+
 
     /**
      * Executa uma requisição HTTP com timeout e retorna a primeira resposta como Promise
@@ -270,10 +173,6 @@ export class HttpClientService {
      */
     private executeRequest<T>(request: Observable<T>): Promise<T> {
         return firstValueFrom(request.pipe(timeout(this.HTTP_TIMEOUT)));
-    }
-
-    private executeLongRequest<T>(request: Observable<T>): Promise<T> {
-        return firstValueFrom(request.pipe(timeout(this.HTTP_LONG_TIMEOUT)));
     }
 
     private headers() {

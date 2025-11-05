@@ -11,7 +11,7 @@ import {NgClass, NgIf} from '@angular/common';
 import {Cdr, User, UserFieldEnum} from '@/types/types';
 import {HttpClientService} from '@/services/http-client.service';
 import {TableModule} from 'primeng/table';
-import {sortCdrByDate, telephoneFormat} from '@/util/utils';
+import {telephoneFormat} from '@/util/utils';
 import {handleCalleId} from '@/webphone/utils';
 import {UserService} from '@/services/user.service';
 
@@ -164,10 +164,10 @@ export class WebphoneSidebarComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        this.httpClientService.findAllCdr().then((cdrs) => {
-            this.cdrs = sortCdrByDate(this.deDuplicate(cdrs))
-                .filter(cdr => cdr.peer === this.user.id.toString())
-        });
+        // this.httpClientService.findAllCdr().then((cdrs) => {
+        //     this.cdrs = sortCdrByDate(this.deDuplicate(cdrs))
+        //         .filter(cdr => cdr.peer === this.user.id.toString())
+        // });
     }
 
     get phoneStatus() {
