@@ -3,7 +3,7 @@ import {Subscription} from "rxjs";
 import {WebsocketService} from "@/websocket/stomp/websocket.service";
 import {rxStompServiceFactory} from "@/websocket/stomp/rx-stomp-service-factory";
 import {Card} from "primeng/card";
-import {Worker} from "@/types/types";
+import {Peer, Worker} from "@/types/types";
 import {NgForOf} from "@angular/common";
 import {BadgeModule} from "primeng/badge";
 import {HttpClientService} from "@/services/http-client.service";
@@ -64,6 +64,15 @@ export class Dashboard implements OnDestroy, OnInit {
                 workers.set(worker.name, worker);
                 return new Map(workers);
             })
+        })
+
+        this.webSocketService.watch("/topic/peers").subscribe(message => {
+            const peer: Peer = JSON.parse(message.body);
+            console.log('WS peer ', peer);
+            // this.peersMap.update(peers => {
+            //     peers.set(peer.name, peer);
+            //     return new Map(peers);
+            // })
         })
     }
 
