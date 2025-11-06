@@ -138,6 +138,7 @@ export enum PeerStateEnum {
 }
 
 export interface PeerState {
+    readonly serverId: string,
     readonly endpoint: string,
     readonly state: PeerStateEnum
 }
@@ -147,5 +148,5 @@ export interface Peer {
     readonly name: string,
     readonly peer: string,
     readonly companyId: string,
-    readonly endpointStates: PeerState
+    readonly endpointStates: PeerState[]
 }

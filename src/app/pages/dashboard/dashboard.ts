@@ -3,7 +3,7 @@ import {Subscription} from "rxjs";
 import {WebsocketService} from "@/websocket/stomp/websocket.service";
 import {rxStompServiceFactory} from "@/websocket/stomp/rx-stomp-service-factory";
 import {Card} from "primeng/card";
-import {Peer, Worker} from "@/types/types";
+import {Peer, PeerStateEnum, Worker} from "@/types/types";
 import {NgForOf} from "@angular/common";
 import {BadgeModule} from "primeng/badge";
 import {HttpClientService} from "@/services/http-client.service";
@@ -31,6 +31,7 @@ import {HttpClientService} from "@/services/http-client.service";
                     </p-card>
                 </div>
             </div>
+
             <div class="col-span-12 xl:col-span-9">
                 <p-card header="Workers">
                     <div class="flex gap-4">
@@ -45,13 +46,29 @@ import {HttpClientService} from "@/services/http-client.service";
                     </div>
                 </p-card>
             </div>
+
+            <div class="col-span-12 xl:col-span-9">
+                <p-card header="Ramais">
+                    <div class="flex gap-4">
+                        <p-card *ngFor="let peer of peers()" header="{{ peer.name }} {{peer.peer}}">
+                            <div class="flex flex-col text-center gap-2">
+                                <p-badge *ngFor="let es of peer.endpointStates" [severity]="peerStateSeverity(es.state)"
+                                         [value]="es.state"></p-badge>
+                                <span>{{ peer.endpointStates[0].serverId }}</span>
+                            </div>
+                        </p-card>
+                    </div>
+                </p-card>
+            </div>
         </div>
     `
 })
 export class Dashboard implements OnDestroy, OnInit {
     private readonly webSocketSubscription: Subscription;
     private readonly workersMap = signal(new Map<string, Worker>());
+    private readonly peersMap = signal(new Map<string, Peer>());
     readonly workers = computed(() => Array.from(this.workersMap().values()));
+    readonly peers = computed(() => Array.from(this.peersMap().values()));
     readonly totalCalls = computed(() => this.workers().reduce((acc, w) => acc + w.channelIds.length, 0));
 
     constructor(
@@ -68,11 +85,10 @@ export class Dashboard implements OnDestroy, OnInit {
 
         this.webSocketService.watch("/topic/peers").subscribe(message => {
             const peer: Peer = JSON.parse(message.body);
-            console.log('WS peer ', peer);
-            // this.peersMap.update(peers => {
-            //     peers.set(peer.name, peer);
-            //     return new Map(peers);
-            // })
+            this.peersMap.update(peers => {
+                peers.set(peer.peer, peer);
+                return new Map(peers);
+            })
         })
     }
 
@@ -81,8 +97,24 @@ export class Dashboard implements OnDestroy, OnInit {
             this.workersMap.set(new Map(workers.map(worker => [worker.name, worker])));
         })
         this.httpClientService.findPeersByCompany('100023').then(peers => {
-            console.log(peers);
+            this.peersMap.set(new Map(peers.map(peer => [peer.peer, peer])));
         })
+    }
+
+    peerStateSeverity(peerStateEnum: PeerStateEnum) {
+        switch (peerStateEnum) {
+            case PeerStateEnum.NOT_INUSE:
+                return 'success';
+            case PeerStateEnum.BUSY:
+            case PeerStateEnum.INUSE:
+                return 'danger';
+            case PeerStateEnum.RINGING:
+            case PeerStateEnum.RINGINUSE:
+            case PeerStateEnum.ONHOLD:
+                return 'warn';
+            default:
+                return 'info';
+        }
     }
 
     sumMaxChannels() {
