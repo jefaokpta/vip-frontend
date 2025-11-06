@@ -50,38 +50,11 @@ export interface Cdr {
     readonly billableSeconds: number;
 }
 
-export enum CallLegEnum {
-    A = 'A',
-    B = 'B',
-    BOTH = 'BOTH',
-}
-
-export interface Segment {
-    readonly id: number;
-    readonly segmentId: number;
-    readonly text: string;
-    readonly seek: number;
-    readonly callLeg: CallLegEnum
-    readonly startSecond: number;
-    readonly endSecond: number;
-}
-
-export interface Recognition {
-    readonly id: number;
-    readonly uniqueId: string;
-    segments: Segment[];
-}
-
 export enum RoleEnum {
     FREE = 'free',
     USER = 'user',
     ADMIN = 'admin',
     SUPER = 'super',
-}
-
-interface MenuItem {
-    roles?: RoleEnum[];
-    items?: MenuItem[];
 }
 
 export interface User {
@@ -108,10 +81,6 @@ export interface Attendant {
     readonly attendantTypeEnum: AttendantTypeEnum;
 }
 
-export interface UpdateAttendant {
-    readonly attendants: Attendant[];
-}
-
 export interface CompanyPhone {
     readonly id?: number;
     readonly phone: string;
@@ -123,47 +92,6 @@ export interface Company {
     readonly name: string;
     readonly controlNumber: string;
     readonly phones: CompanyPhone[];
-}
-
-export interface Guideline {
-    readonly id?: number;
-    readonly controlNumber: number;
-    readonly companyName: string;
-    readonly activity: string;
-    readonly actuationArea: string;
-    readonly descriptionUrl: string;
-    readonly description: string;
-}
-
-export interface Assistant {
-    readonly id?: number;
-    readonly userId: number;
-    readonly name: string;
-    readonly controlNumber: number;
-    readonly objective: string;
-    readonly descriptionUrls: string[];
-}
-
-export interface VoiceAssistant {
-    readonly id?: number;
-    readonly vapiAssistantId: string
-    readonly name: string;
-    readonly startSpeaking: boolean
-    readonly firstMessage: string;
-    readonly objective: string;
-    readonly tools: string[];
-}
-
-export interface AssistantAnalysis {
-    readonly uniqueId: string;
-    readonly assistantId: number;
-    readonly text: string;
-    readonly name: string;
-}
-
-export enum WsEventEnum {
-    CDR_NEW = 'CDR_NEW',
-    CDR_ANALYSED = 'CDR_ANALYZED',
 }
 
 export enum PhoneStateEnum {
@@ -187,24 +115,6 @@ export enum CallAnalyzeStatusEnum {
     ANALYZING = 'ANALYZING',
     FINISHED = 'FINISHED',
     FAILED = 'FAILED',
-}
-
-export interface CallAnalyze {
-    readonly title: string;
-    readonly temperature: TemperatureEnum;
-    readonly engagement: number;
-    readonly status: CallAnalyzeStatusEnum;
-}
-
-export interface CallAnalyzeEvent {
-    readonly cdrId: number;
-    readonly analyze: CallAnalyze;
-}
-
-export interface WsEvent {
-    readonly type: WsEventEnum;
-    readonly cdr?: Cdr;
-    readonly callAnalyze?: CallAnalyzeEvent;
 }
 
 export interface Worker {
