@@ -8,6 +8,7 @@ import {EditCompanyPage} from '@/pages/company/edit-company.page';
 import {PersonPage} from '@/pages/person.page';
 import {PeerPage} from "@/pages/peer/peer.page";
 import {DialplanPage} from "@/pages/dialplan/dialplan.page";
+import {AliasPage} from "@/pages/alias/alias.page";
 
 export default [
     {path: 'companies', component: CompanyPage, data: {breadcrumb: 'Empresas'}},
@@ -19,5 +20,6 @@ export default [
     { path: 'profile', component: PersonPage, data: { breadcrumb: 'Perfil' } },
     {path: 'peers', component: PeerPage, data: {breadcrumb: 'Ramais'}},
     {path: 'dialplans', component: DialplanPage, data: {breadcrumb: 'Regras de Discagem'}},
+    {path: 'aliases', component: AliasPage, data: {breadcrumb: 'Alias de Discagem'}},
     { path: '**', redirectTo: '/notfound' }
 ] as Routes;

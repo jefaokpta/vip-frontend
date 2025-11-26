@@ -53,6 +53,7 @@ export class AppMenu implements OnInit {
                         {
                             label: 'Alias de Discagem',
                             icon: 'pi pi-fw pi-list',
+                            routerLink: ['/pages/aliases']
                         },
                         {
                             label: 'Rotas de Chamada',
