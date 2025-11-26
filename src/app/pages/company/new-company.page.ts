@@ -1,14 +1,14 @@
-import { Component, OnInit } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { InputTextModule } from 'primeng/inputtext';
-import { ButtonModule } from 'primeng/button';
-import { CardModule } from 'primeng/card';
-import { ToastModule } from 'primeng/toast';
-import { NgForOf, NgIf } from '@angular/common';
-import { HttpClientService } from '@/services/http-client.service';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { Tooltip } from 'primeng/tooltip';
-import { Company } from '@/types/types';
+import {Component, OnInit} from '@angular/core';
+import {FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {InputTextModule} from 'primeng/inputtext';
+import {ButtonModule} from 'primeng/button';
+import {CardModule} from 'primeng/card';
+import {ToastModule} from 'primeng/toast';
+import {NgForOf, NgIf} from '@angular/common';
+import {HttpClientService} from '@/services/http-client.service';
+import {Router, RouterLink} from '@angular/router';
+import {Tooltip} from 'primeng/tooltip';
+import {Company} from '@/types/types';
 
 /**
  * @author Jefferson Alves Reis (jefaokpta)
@@ -16,7 +16,7 @@ import { Company } from '@/types/types';
  * @create 4/25/25
  */
 @Component({
-    selector: 'app-edit-company',
+    selector: 'app-new-company',
     standalone: true,
     imports: [
         InputTextModule,
@@ -59,12 +59,20 @@ import { Company } from '@/types/types';
                     <input
                         id="controlNumber"
                         type="number"
-                        readonly
                         pInputText
-                        placeholder="Ex: 123456"
+                        placeholder="Ex: 100021"
                         class="p-inputtext"
                         formControlName="controlNumber"
                     />
+                    <small
+                        *ngIf="controlNumber?.invalid && (controlNumber?.dirty || controlNumber?.touched)"
+                        class="p-error block mt-2"
+                    >
+                        <div *ngIf="controlNumber?.errors?.['required']">Código da empresa é obrigatório.</div>
+                        <div *ngIf="controlNumber?.errors?.['pattern']">
+                            Código deve conter exatamente 6 dígitos numéricos.
+                        </div>
+                    </small>
                 </div>
 
                 <div class="field mb-4">
@@ -116,28 +124,30 @@ import { Company } from '@/types/types';
                     </p-button>
                 </div>
 
-                <small *ngIf="showSubmitError" class="text-red-500"
+                <small *ngIf="showError" class="text-red-500"
                     >Houve um erro, verifique se o código de controle já existe.</small
                 >
             </form>
         </p-card>
     `
 })
-export class EditCompanyPage implements OnInit {
+export class NewCompanyPage implements OnInit {
     form!: FormGroup;
     pending = false;
-    showSubmitError = false;
-    private companyDb?: Company
+    showError = false;
 
     constructor(
         private readonly fb: FormBuilder,
         private readonly httpClientService: HttpClientService,
-        private readonly router: Router,
-        private readonly activatedRoute: ActivatedRoute
+        private readonly router: Router
     ) {}
 
     get phones() {
         return this.form.get('phones') as FormArray;
+    }
+
+    get controlNumber() {
+        return this.form.get('controlNumber');
     }
 
     get name() {
@@ -146,19 +156,11 @@ export class EditCompanyPage implements OnInit {
 
     ngOnInit(): void {
         this.form = this.fb.group({
-            id: ['', [Validators.required]],
             name: ['', [Validators.required]],
             controlNumber: ['', [Validators.required, Validators.pattern('^[0-9]{6}$')]],
             phones: this.fb.array([])
         });
-        const id = this.activatedRoute.snapshot.paramMap.get('id')!;
-        this.httpClientService.findOneCompany(id).then((company) => {
-            this.form.patchValue(company);
-            company.phones.forEach((phone) => {
-                this.phones.push(this.fb.control(phone.phone, [Validators.required, Validators.pattern('^[0-9]{10,11}$')]));
-            });
-            this.companyDb = company;
-        });
+        this.addPhone();
     }
 
     addPhone() {
@@ -171,19 +173,20 @@ export class EditCompanyPage implements OnInit {
 
     async onSubmit() {
         this.pending = true;
-        this.showSubmitError = false;
+        this.showError = false;
         const company: Company = {
             ...this.form.value,
-            controlNumber: this.companyDb!.controlNumber,
+            controlNumber: this.form.value.controlNumber.toString(),
             phones: this.form.value.phones.map((phone: string) => {
-                const hasPhone = this.companyDb!.phones.find((p) => p.phone === phone);
-                return hasPhone ?? { phone };
+                return { phone };
             })
         };
         this.httpClientService
-            .updateCompany(company)
+            .createCompany(company)
             .then(() => this.router.navigate(['/pages/companies']))
-            .catch(() => (this.showSubmitError = true))
+            .catch(() => {
+                this.showError = true;
+            })
             .finally(() => (this.pending = false));
     }
 }

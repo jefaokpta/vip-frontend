@@ -1,24 +1,24 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { Button } from 'primeng/button';
-import { IconField } from 'primeng/iconfield';
-import { InputIcon } from 'primeng/inputicon';
-import { InputText } from 'primeng/inputtext';
-import { MessageService, PrimeTemplate } from 'primeng/api';
-import { Router, RouterLink } from '@angular/router';
-import { Table, TableModule } from 'primeng/table';
-import { Tooltip } from 'primeng/tooltip';
-import { Company, User } from '@/types/types';
-import { HttpClientService } from '@/services/http-client.service';
-import { Card } from 'primeng/card';
-import { UserService } from '@/services/user.service';
-import { NgClass, NgIf } from '@angular/common';
-import { Toast } from 'primeng/toast';
-import { ProgressSpinner } from 'primeng/progressspinner';
-import { FormsModule } from '@angular/forms';
-import { telephoneFormat } from '@/util/utils';
+import {Component, OnInit, ViewChild} from '@angular/core';
+import {Button} from 'primeng/button';
+import {IconField} from 'primeng/iconfield';
+import {InputIcon} from 'primeng/inputicon';
+import {InputText} from 'primeng/inputtext';
+import {MessageService, PrimeTemplate} from 'primeng/api';
+import {Router, RouterLink} from '@angular/router';
+import {Table, TableModule} from 'primeng/table';
+import {Tooltip} from 'primeng/tooltip';
+import {Company, User} from '@/types/types';
+import {HttpClientService} from '@/services/http-client.service';
+import {Card} from 'primeng/card';
+import {UserService} from '@/services/user.service';
+import {NgClass, NgIf} from '@angular/common';
+import {Toast} from 'primeng/toast';
+import {ProgressSpinner} from 'primeng/progressspinner';
+import {FormsModule} from '@angular/forms';
+import {telephoneFormat} from '@/util/utils';
 
 @Component({
-    selector: 'app-companies',
+    selector: 'app-company-page',
     standalone: true,
     imports: [
         Button,
@@ -141,7 +141,7 @@ import { telephoneFormat } from '@/util/utils';
         <p-toast />
     `
 })
-export class CompaniesPage implements OnInit {
+export class CompanyPage implements OnInit {
     companies: Company[] = [];
     @ViewChild('dataTable') dt!: Table;
     readonly user: User;

@@ -43,10 +43,12 @@ export class AppMenu implements OnInit {
                         {
                             label: 'Ramais',
                             icon: 'pi pi-fw pi-image',
+                            routerLink: ['/pages/peers']
                         },
                         {
                             label: 'Regras de Discagem',
                             icon: 'pi pi-fw pi-list',
+                            routerLink: ['/pages/dialplans']
                         },
                         {
                             label: 'Alias de Discagem',
