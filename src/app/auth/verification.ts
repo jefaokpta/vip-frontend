@@ -1,14 +1,14 @@
-import { Component, computed, inject } from '@angular/core';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { ButtonModule } from 'primeng/button';
-import { AppConfigurator } from '@/layout/components/app.configurator';
-import { FormsModule } from '@angular/forms';
-import { LayoutService } from '@/layout/service/layout.service';
-import { RippleModule } from 'primeng/ripple';
-import { InputNumber, InputNumberModule } from 'primeng/inputnumber';
-import { InputOtpModule } from 'primeng/inputotp';
-import { NgIf } from '@angular/common';
-import { HttpClientService } from '@/services/http-client.service';
+import {Component, computed, inject} from '@angular/core';
+import {ActivatedRoute, Router, RouterModule} from '@angular/router';
+import {ButtonModule} from 'primeng/button';
+import {AppConfigurator} from '@/layout/components/app.configurator';
+import {FormsModule} from '@angular/forms';
+import {LayoutService} from '@/layout/service/layout.service';
+import {RippleModule} from 'primeng/ripple';
+import {InputNumber, InputNumberModule} from 'primeng/inputnumber';
+import {InputOtpModule} from 'primeng/inputotp';
+import {NgIf} from '@angular/common';
+import {HttpClientService} from '@/services/http-client.service';
 
 @Component({
     selector: 'app-verification',

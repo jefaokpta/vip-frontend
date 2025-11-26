@@ -1,12 +1,12 @@
-import { Component, computed, inject } from '@angular/core';
-import { RouterModule } from '@angular/router';
-import { ButtonModule } from 'primeng/button';
-import { AppConfigurator } from '@/layout/components/app.configurator';
-import { FormsModule } from '@angular/forms';
-import { InputTextModule } from 'primeng/inputtext';
-import { LayoutService } from '@/layout/service/layout.service';
-import { IconFieldModule } from 'primeng/iconfield';
-import { InputIconModule } from 'primeng/inputicon';
+import {Component, computed, inject} from '@angular/core';
+import {RouterModule} from '@angular/router';
+import {ButtonModule} from 'primeng/button';
+import {AppConfigurator} from '@/layout/components/app.configurator';
+import {FormsModule} from '@angular/forms';
+import {InputTextModule} from 'primeng/inputtext';
+import {LayoutService} from '@/layout/service/layout.service';
+import {IconFieldModule} from 'primeng/iconfield';
+import {InputIconModule} from 'primeng/inputicon';
 
 @Component({
     selector: 'app-lockscreen',
@@ -20,7 +20,8 @@ import { InputIconModule } from 'primeng/inputicon';
         InputIconModule
     ],
     standalone: true,
-    template: `<svg
+    template: `
+        <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 1600 800"
             class="fixed left-0 top-0 min-h-screen min-w-screen"
@@ -60,7 +61,8 @@ import { InputIconModule } from 'primeng/inputicon';
         </svg>
         <div class="px-8 min-h-screen flex justify-center items-center">
             <div class="px-8 min-h-screen flex justify-center items-center">
-            <div class="border border-surface-200 dark:border-surface-700 bg-surface-0 dark:bg-surface-900 rounded py-16 px-6 md:px-16 z-10">
+                <div
+                    class="border border-surface-200 dark:border-surface-700 bg-surface-0 dark:bg-surface-900 rounded py-16 px-6 md:px-16 z-10">
                     <div class="mb-12 flex flex-col items-center">
                         <div
                             class="text-surface-900 dark:text-surface-0 text-xl font-bold mb-2"
@@ -69,7 +71,7 @@ import { InputIconModule } from 'primeng/inputicon';
                         </div>
                         <span
                             class="text-surface-600 dark:text-surface-200 font-medium mb-8"
-                            >Please enter your password</span
+                        >Please enter your password</span
                         >
 
                         <img
@@ -80,12 +82,12 @@ import { InputIconModule } from 'primeng/inputicon';
 
                         <span
                             class="font-medium text-surface-900 dark:text-surface-0"
-                            >Isabella Andolini</span
+                        >Isabella Andolini</span
                         >
                     </div>
                     <div class="flex flex-col">
                         <p-iconfield class="w-full mb-6">
-                            <p-inputicon class="pi pi-lock" />
+                            <p-inputicon class="pi pi-lock"/>
                             <input
                                 id="password"
                                 type="password"

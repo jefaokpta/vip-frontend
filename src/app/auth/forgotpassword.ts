@@ -1,14 +1,14 @@
-import { Component, computed, OnInit } from '@angular/core';
-import { Router, RouterModule } from '@angular/router';
-import { ButtonModule } from 'primeng/button';
-import { LayoutService } from '@/layout/service/layout.service';
-import { AppConfigurator } from '@/layout/components/app.configurator';
-import { IconFieldModule } from 'primeng/iconfield';
-import { InputIconModule } from 'primeng/inputicon';
-import { InputTextModule } from 'primeng/inputtext';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { NgIf } from '@angular/common';
-import { HttpClientService } from '@/services/http-client.service';
+import {Component, computed, OnInit} from '@angular/core';
+import {Router, RouterModule} from '@angular/router';
+import {ButtonModule} from 'primeng/button';
+import {LayoutService} from '@/layout/service/layout.service';
+import {AppConfigurator} from '@/layout/components/app.configurator';
+import {IconFieldModule} from 'primeng/iconfield';
+import {InputIconModule} from 'primeng/inputicon';
+import {InputTextModule} from 'primeng/inputtext';
+import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {NgIf} from '@angular/common';
+import {HttpClientService} from '@/services/http-client.service';
 
 @Component({
     selector: 'app-forgot-password',

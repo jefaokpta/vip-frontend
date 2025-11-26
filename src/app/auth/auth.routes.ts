@@ -1,12 +1,12 @@
-import { Routes } from '@angular/router';
-import { Access } from './access';
-import { Login } from './login';
-import { Error } from './error';
-import { Register } from './register';
-import { ForgotPassword } from './forgotpassword';
-import { NewPassword } from './newpassword';
-import { Verification } from './verification';
-import { LockScreen } from './lockscreen';
+import {Routes} from '@angular/router';
+import {Access} from './access';
+import {Login} from './login';
+import {Error} from './error';
+import {Register} from './register';
+import {ForgotPassword} from './forgotpassword';
+import {NewPassword} from './newpassword';
+import {Verification} from './verification';
+import {LockScreen} from './lockscreen';
 
 export default [
     { path: 'access', component: Access },

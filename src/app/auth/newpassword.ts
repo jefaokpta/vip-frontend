@@ -1,18 +1,18 @@
-import { Component, computed, OnInit } from '@angular/core';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { ButtonModule } from 'primeng/button';
-import { LayoutService } from '@/layout/service/layout.service';
-import { AppConfigurator } from '@/layout/components/app.configurator';
-import { IconFieldModule } from 'primeng/iconfield';
-import { InputIconModule } from 'primeng/inputicon';
-import { InputTextModule } from 'primeng/inputtext';
-import { PasswordModule } from 'primeng/password';
-import { Divider } from 'primeng/divider';
-import { NgIf } from '@angular/common';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { matchPasswordValidator, passwordStrengthValidator } from '@/pages/utils/validators';
-import { HttpClientService } from '@/services/http-client.service';
-import { InputOtp } from 'primeng/inputotp';
+import {Component, computed, OnInit} from '@angular/core';
+import {ActivatedRoute, Router, RouterModule} from '@angular/router';
+import {ButtonModule} from 'primeng/button';
+import {LayoutService} from '@/layout/service/layout.service';
+import {AppConfigurator} from '@/layout/components/app.configurator';
+import {IconFieldModule} from 'primeng/iconfield';
+import {InputIconModule} from 'primeng/inputicon';
+import {InputTextModule} from 'primeng/inputtext';
+import {PasswordModule} from 'primeng/password';
+import {Divider} from 'primeng/divider';
+import {NgIf} from '@angular/common';
+import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
+import {matchPasswordValidator, passwordStrengthValidator} from '@/pages/utils/validators';
+import {HttpClientService} from '@/services/http-client.service';
+import {InputOtp} from 'primeng/inputotp';
 
 @Component({
     selector: 'app-new-password',

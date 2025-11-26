@@ -1,20 +1,20 @@
-import { Component, computed, inject, OnInit } from '@angular/core';
-import { CheckboxModule } from 'primeng/checkbox';
-import { CommonModule } from '@angular/common';
-import { InputTextModule } from 'primeng/inputtext';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { LayoutService } from '@/layout/service/layout.service';
-import { AppConfigurator } from '@/layout/components/app.configurator';
-import { IconFieldModule } from 'primeng/iconfield';
-import { InputIconModule } from 'primeng/inputicon';
-import { ButtonModule } from 'primeng/button';
-import { ProgressSpinnerModule } from 'primeng/progressspinner';
-import { Image } from 'primeng/image';
-import { DropdownModule } from 'primeng/dropdown';
-import { Password } from 'primeng/password';
-import { HttpClientService } from '@/services/http-client.service';
-import { UserService } from '@/services/user.service';
+import {Component, computed, inject, OnInit} from '@angular/core';
+import {CheckboxModule} from 'primeng/checkbox';
+import {CommonModule} from '@angular/common';
+import {InputTextModule} from 'primeng/inputtext';
+import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
+import {ActivatedRoute, Router, RouterModule} from '@angular/router';
+import {LayoutService} from '@/layout/service/layout.service';
+import {AppConfigurator} from '@/layout/components/app.configurator';
+import {IconFieldModule} from 'primeng/iconfield';
+import {InputIconModule} from 'primeng/inputicon';
+import {ButtonModule} from 'primeng/button';
+import {ProgressSpinnerModule} from 'primeng/progressspinner';
+import {Image} from 'primeng/image';
+import {DropdownModule} from 'primeng/dropdown';
+import {Password} from 'primeng/password';
+import {HttpClientService} from '@/services/http-client.service';
+import {UserService} from '@/services/user.service';
 
 @Component({
     selector: 'app-login',
