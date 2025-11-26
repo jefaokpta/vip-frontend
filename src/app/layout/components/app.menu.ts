@@ -20,13 +20,92 @@ import {MenuItem} from 'primeng/api';
 export class AppMenu implements OnInit {
     private readonly model: MenuItem[] = [
         {
-            label: 'PABX',
+            label: 'SERVIÇOS',
             items: [
                 {
                     label: 'PABX',
                     icon: 'pi pi-fw pi-phone',
-                    routerLink: ['/pages/pabx']
+                    items: [
+                        {
+                            label: 'Relatórios',
+                            icon: 'pi pi-fw pi-chart-bar',
+                            items: [
+                                {
+                                    label: 'Chamadas',
+                                    icon: 'pi pi-fw pi-chart-bar',
+                                },
+                                {
+                                    label: 'DAC',
+                                    icon: 'pi pi-fw pi-image',
+                                }
+                            ]
+                        },
+                        {
+                            label: 'Ramais',
+                            icon: 'pi pi-fw pi-image',
+                        },
+                        {
+                            label: 'Regras de Discagem',
+                            icon: 'pi pi-fw pi-list',
+                        },
+                        {
+                            label: 'Alias de Discagem',
+                            icon: 'pi pi-fw pi-list',
+                        },
+                        {
+                            label: 'Rotas de Chamada',
+                            icon: 'pi pi-fw pi-list',
+                        },
+                        {
+                            label: 'Troncos',
+                            icon: 'pi pi-fw pi-list',
+                        }
+                    ],
                 },
+                {
+                    label: 'Video Conferências',
+                    icon: 'pi pi-fw pi-video',
+                    items: [
+                        {
+                            label: 'Salas',
+                            icon: 'pi pi-fw pi-image',
+                        },
+                    ]
+                },
+                {
+                    label: 'Whatsapp',
+                    icon: 'pi pi-fw pi-whatsapp',
+                    items: [
+                        {
+                            label: 'Mensagens',
+                            icon: 'pi pi-envelope',
+                        },
+                        {
+                            label: 'Registros',
+                            icon: 'pi pi-fw pi-image',
+                        }
+                    ]
+                },
+                {
+                    label: 'LGPD',
+                    icon: 'pi pi-fw pi-file',
+                    items: [
+                        {
+                            label: 'Cadastros',
+                            icon: 'pi pi-envelope',
+                        },
+                    ]
+                },
+                {
+                    label: 'CRM',
+                    icon: 'pi pi-fw pi-file',
+                    items: [
+                        {
+                            label: 'Clientes',
+                            icon: 'pi pi-envelope',
+                        },
+                    ]
+                }
             ]
         },
         {
