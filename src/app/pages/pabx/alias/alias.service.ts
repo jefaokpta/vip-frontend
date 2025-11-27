@@ -22,6 +22,12 @@ export class AliasService {
     }
 
     deleteAlias(id: number) {
-        return executeRequest(this.http.delete(`${this.BACKEND}/aliases/${id}`, httpHeaders()));
+        const user = this.userService.getUser()
+        return executeRequest(this.http.delete(`${this.BACKEND}/aliases/${user.controlNumber}/${id}`, httpHeaders()));
+    }
+
+    createAlias(alias: Alias) {
+        const user = this.userService.getUser()
+        return executeRequest(this.http.post(`${this.BACKEND}/aliases/${user.controlNumber}`, alias, httpHeaders()));
     }
 }

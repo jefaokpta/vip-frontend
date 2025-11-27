@@ -35,8 +35,9 @@ import {NgIf} from "@angular/common";
         <p-card>
             <ng-template #title>
                 <div class="flex flex-col md:flex-row md:items-start md:justify-between mb-4">
-                    <h2 class="text-surface-900 dark:text-surface-0 text-2xl font-semibold mb-4 md:mb-0">Alias de
-                        Discagem</h2>
+                    <h2 class="text-surface-900 dark:text-surface-0 text-2xl font-semibold mb-4 md:mb-0">
+                        Alias de Discagem
+                    </h2>
                     <div class="inline-flex items-center">
                         <p-iconfield>
                             <p-inputicon class="pi pi-search"/>
@@ -154,23 +155,23 @@ export class AliasPage implements OnInit {
                 outlined: true
             },
             accept: () => {
-                this.aliasService.deleteAlias(alias.id).then(() => {
-                    this.aliases = this.aliases.filter((a) => a.id !== alias.id);
-                    this.messageService.add({
-                        severity: 'success',
-                        summary: 'Alias removido com sucesso',
-                        detail: 'O alias foi removido com sucesso',
-                        life: 15_000
-                    });
-                })
-                    .catch(() => {
+                this.aliasService.deleteAlias(alias.id)
+                    .then(() => {
+                        this.aliases = this.aliases.filter((a) => a.id !== alias.id);
                         this.messageService.add({
-                            severity: 'error',
-                            summary: 'Desculpe não foi possível remover o alias',
-                            detail: 'Tente novamente mais tarde.',
+                            severity: 'success',
+                            summary: 'Alias removido com sucesso',
+                            detail: 'O alias foi removido com sucesso',
                             life: 15_000
                         });
+                    }).catch(() => {
+                    this.messageService.add({
+                        severity: 'error',
+                        summary: 'Desculpe não foi possível remover o alias',
+                        detail: 'Tente novamente mais tarde.',
+                        life: 15_000
                     });
+                });
             }
         });
     }

@@ -5,10 +5,10 @@ import {ButtonModule} from 'primeng/button';
 import {CardModule} from 'primeng/card';
 import {ToastModule} from 'primeng/toast';
 import {NgForOf, NgIf} from '@angular/common';
-import {HttpClientService} from '@/services/http-client.service';
 import {Router, RouterLink} from '@angular/router';
 import {Tooltip} from 'primeng/tooltip';
-import {Company} from '@/types/types';
+import {Alias} from "@/pages/pabx/types";
+import {AliasService} from "@/pages/pabx/alias/alias.service";
 
 /**
  * @author Jefferson Alves Reis (jefaokpta)
@@ -16,7 +16,7 @@ import {Company} from '@/types/types';
  * @create 4/25/25
  */
 @Component({
-    selector: 'app-new-company',
+    selector: 'app-new-alias-page',
     standalone: true,
     imports: [
         InputTextModule,
@@ -33,12 +33,12 @@ import {Company} from '@/types/types';
         <p-card>
             <ng-template #title>
                 <div class="flex justify-between">
-                    <span class="font-semibold text-2xl">Nova Empresa</span>
+                    <span class="font-semibold text-2xl">Novo Alias</span>
                     <p-button
                         type="button"
                         label="Voltar"
                         icon="pi pi-arrow-left"
-                        routerLink="/pages/companies"
+                        routerLink="/pages/pabx/alias"
                         outlined
                         severity="secondary"
                     ></p-button>
@@ -48,67 +48,46 @@ import {Company} from '@/types/types';
             <form [formGroup]="form" (ngSubmit)="onSubmit()" class="p-fluid">
                 <div class="field mb-4">
                     <label for="name" class="block mb-2">Nome *</label>
-                    <input id="name" pInputText class="p-inputtext" formControlName="name" />
+                    <input id="name" pInputText class="p-inputtext" formControlName="name"/>
                     <small *ngIf="name?.invalid && (name?.dirty || name?.touched)" class="p-error block mt-2">
                         <div *ngIf="name?.errors?.['required']">Nome é obrigatório.</div>
                     </small>
                 </div>
 
                 <div class="field mb-4">
-                    <label for="controlNumber" class="block mb-2">Código de Controle *</label>
-                    <input
-                        id="controlNumber"
-                        type="number"
-                        pInputText
-                        placeholder="Ex: 100021"
-                        class="p-inputtext"
-                        formControlName="controlNumber"
-                    />
-                    <small
-                        *ngIf="controlNumber?.invalid && (controlNumber?.dirty || controlNumber?.touched)"
-                        class="p-error block mt-2"
-                    >
-                        <div *ngIf="controlNumber?.errors?.['required']">Código da empresa é obrigatório.</div>
-                        <div *ngIf="controlNumber?.errors?.['pattern']">
-                            Código deve conter exatamente 6 dígitos numéricos.
-                        </div>
-                    </small>
-                </div>
-
-                <div class="field mb-4">
                     <div class="flex items-center gap-4 mb-2">
-                        <label class="font-medium">Telefones (DDR)</label>
+                        <label class="font-medium">Expressões Regulares</label>
                         <p-button
                             type="button"
                             icon="pi pi-plus"
-                            (onClick)="addPhone()"
-                            pTooltip="Adicionar telefones"
+                            (onClick)="addExpression()"
+                            pTooltip="Adicionar expressão"
                             tooltipPosition="right"
                             outlined
                             size="small"
                         ></p-button>
                     </div>
 
-                    <div formArrayName="phones">
-                        <div *ngFor="let phone of phones.controls; let i = index" class="mb-3">
+                    <div formArrayName="expressions">
+                        <div *ngFor="let expression of expressions.controls; let i = index" class="mb-3">
                             <div class="flex gap-2">
                                 <div class="flex-grow-1">
                                     <input
                                         [formControlName]="i"
                                         type="text"
                                         pInputText
-                                        placeholder="DDD + Telefone"
+                                        placeholder="1X[34]"
                                         class="w-full"
                                     />
-                                    <small *ngIf="phone.invalid && phone.touched" class="p-error block"
-                                        >Telefone inválido</small
-                                    >
+                                    <small *ngIf="expression.invalid && expression.touched" class="p-error block">
+                                        Expressão Obrigatória
+                                    </small>
                                 </div>
                                 <p-button
-                                    *ngIf="phones.length > 1"
+                                    *ngIf="expressions.length > 1"
                                     type="button"
                                     icon="pi pi-trash"
-                                    (onClick)="removePhone(i)"
+                                    (onClick)="removeExpression(i)"
                                     severity="danger"
                                     outlined
                                 ></p-button>
@@ -124,30 +103,27 @@ import {Company} from '@/types/types';
                     </p-button>
                 </div>
 
-                <small *ngIf="showError" class="text-red-500"
-                    >Houve um erro, verifique se o código de controle já existe.</small
-                >
+                <small *ngIf="showError" class="text-red-500">
+                    Erro ao salvar o alias
+                </small>
             </form>
         </p-card>
     `
 })
-export class NewCompanyPage implements OnInit {
+export class NewAliasPage implements OnInit {
     form!: FormGroup;
     pending = false;
     showError = false;
 
     constructor(
         private readonly fb: FormBuilder,
-        private readonly httpClientService: HttpClientService,
-        private readonly router: Router
-    ) {}
-
-    get phones() {
-        return this.form.get('phones') as FormArray;
+        private readonly router: Router,
+        private readonly aliasService: AliasService
+    ) {
     }
 
-    get controlNumber() {
-        return this.form.get('controlNumber');
+    get expressions() {
+        return this.form.get('expressions') as FormArray;
     }
 
     get name() {
@@ -157,33 +133,30 @@ export class NewCompanyPage implements OnInit {
     ngOnInit(): void {
         this.form = this.fb.group({
             name: ['', [Validators.required]],
-            controlNumber: ['', [Validators.required, Validators.pattern('^[0-9]{6}$')]],
-            phones: this.fb.array([])
+            expressions: this.fb.array([])
         });
-        this.addPhone();
+        this.addExpression();
     }
 
-    addPhone() {
-        this.phones.push(this.fb.control('', [Validators.required, Validators.pattern('^[0-9]{10,11}$')]));
+    addExpression() {
+        this.expressions.push(this.fb.control('', [Validators.required]));
     }
 
-    removePhone(index: number) {
-        this.phones.removeAt(index);
+    removeExpression(index: number) {
+        this.expressions.removeAt(index);
     }
 
     async onSubmit() {
         this.pending = true;
         this.showError = false;
-        const company: Company = {
+        const alias: Alias = {
             ...this.form.value,
-            controlNumber: this.form.value.controlNumber.toString(),
-            expressions: this.form.value.phones.map((phone: string) => {
-                return { phone };
+            expressions: this.form.value.expressions.map((expression: string) => {
+                return {expression};
             })
         };
-        this.httpClientService
-            .createCompany(company)
-            .then(() => this.router.navigate(['/pages/companies']))
+        this.aliasService.createAlias(alias)
+            .then(() => this.router.navigate(['/pages/pabx/aliases']))
             .catch(() => {
                 this.showError = true;
             })

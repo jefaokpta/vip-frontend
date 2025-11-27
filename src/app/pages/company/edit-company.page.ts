@@ -175,7 +175,7 @@ export class EditCompanyPage implements OnInit {
         const company: Company = {
             ...this.form.value,
             controlNumber: this.companyDb!.controlNumber,
-            phones: this.form.value.phones.map((phone: string) => {
+            expressions: this.form.value.phones.map((phone: string) => {
                 const hasPhone = this.companyDb!.phones.find((p) => p.phone === phone);
                 return hasPhone ?? { phone };
             })
