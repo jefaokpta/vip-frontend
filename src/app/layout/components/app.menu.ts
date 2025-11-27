@@ -2,9 +2,9 @@ import {Component, OnInit} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {RouterModule} from '@angular/router';
 import {AppMenuitem} from './app.menuitem';
-import {UserService} from '@/services/user.service';
 import {RoleEnum, User} from '@/types/types';
 import {MenuItem} from 'primeng/api';
+import {UserService} from "@/pages/users/user.service";
 
 @Component({
     selector: 'app-menu',

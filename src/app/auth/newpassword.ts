@@ -11,8 +11,8 @@ import {Divider} from 'primeng/divider';
 import {NgIf} from '@angular/common';
 import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {matchPasswordValidator, passwordStrengthValidator} from '@/pages/utils/validators';
-import {HttpClientService} from '@/services/http-client.service';
 import {InputOtp} from 'primeng/inputotp';
+import {UserService} from "@/pages/users/user.service";
 
 @Component({
     selector: 'app-new-password',
@@ -140,9 +140,9 @@ export class NewPassword implements OnInit {
     constructor(
         private readonly layoutService: LayoutService,
         private readonly fb: FormBuilder,
-        private readonly httpClientService: HttpClientService,
         private readonly router: Router,
-        private readonly activatedRoute: ActivatedRoute
+        private readonly activatedRoute: ActivatedRoute,
+        private readonly userService: UserService
     ) {}
 
     ngOnInit(): void {
@@ -178,7 +178,7 @@ export class NewPassword implements OnInit {
                 this.pending = false;
                 return;
             }
-            this.httpClientService
+            this.userService
                 .createResetUserPassword({ ...this.form.value, confirmationCode: this.code })
                 .then(() => this.router.navigate(['/auth/login']))
                 .catch((err) => {
@@ -188,7 +188,7 @@ export class NewPassword implements OnInit {
                 .finally(() => (this.pending = false));
             return;
         }
-        this.httpClientService
+        this.userService
             .createResetUserPassword(this.form.value)
             .then(() => this.router.navigate(['/auth/login']))
             .catch((err) => {

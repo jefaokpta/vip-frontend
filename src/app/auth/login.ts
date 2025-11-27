@@ -13,8 +13,7 @@ import {ProgressSpinnerModule} from 'primeng/progressspinner';
 import {Image} from 'primeng/image';
 import {DropdownModule} from 'primeng/dropdown';
 import {Password} from 'primeng/password';
-import {HttpClientService} from '@/services/http-client.service';
-import {UserService} from '@/services/user.service';
+import {UserService} from "@/pages/users/user.service";
 
 @Component({
     selector: 'app-login',
@@ -115,7 +114,6 @@ export class Login implements OnInit {
     errorMessage: string = '';
 
     LayoutService = inject(LayoutService);
-    private readonly httpClientService = inject(HttpClientService);
     private readonly router = inject(Router);
     private readonly route = inject(ActivatedRoute);
     private readonly fb: FormBuilder = inject(FormBuilder);
@@ -147,7 +145,7 @@ export class Login implements OnInit {
         this.errorMessage = '';
         const { email, password } = this.form.value;
         try {
-            const response = await this.httpClientService.authenticate(email, password);
+            const response = await this.userService.authenticate(email, password);
             this.userService.loginSuccess(response.token);
             this.router.navigate([this.returnUrl]);
         } catch (err: any) {

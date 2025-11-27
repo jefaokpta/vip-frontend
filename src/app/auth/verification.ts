@@ -8,7 +8,7 @@ import {RippleModule} from 'primeng/ripple';
 import {InputNumber, InputNumberModule} from 'primeng/inputnumber';
 import {InputOtpModule} from 'primeng/inputotp';
 import {NgIf} from '@angular/common';
-import {HttpClientService} from '@/services/http-client.service';
+import {UserService} from "@/pages/users/user.service";
 
 @Component({
     selector: 'app-verification',
@@ -73,7 +73,7 @@ export class Verification {
     constructor(
         private readonly activatedRoute: ActivatedRoute,
         private readonly router: Router,
-        private readonly httpClientService: HttpClientService
+        private readonly userService: UserService
     ) {
         const hash = activatedRoute.snapshot.paramMap.get('email');
         if (hash) this.email = decodeURI(hash);
@@ -94,7 +94,7 @@ export class Verification {
             this.pending = false;
             return;
         }
-        this.httpClientService
+        this.userService
             .confirmUserEmail(this.email, this.code.toString())
             .then(() => this.router.navigate(['/auth/newpassword', { email: encodeURI(this.email!) }]))
             .catch(() => (this.wrongCode = true))

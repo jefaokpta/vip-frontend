@@ -1,16 +1,16 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { Router, RouterModule } from '@angular/router';
-import { CommonModule } from '@angular/common';
-import { StyleClassModule } from 'primeng/styleclass';
-import { LayoutService } from '@/layout/service/layout.service';
-import { AppBreadcrumb } from './app.breadcrumb';
-import { InputTextModule } from 'primeng/inputtext';
-import { ButtonModule } from 'primeng/button';
-import { IconFieldModule } from 'primeng/iconfield';
-import { InputIconModule } from 'primeng/inputicon';
-import { Avatar } from 'primeng/avatar';
-import { UserService } from '@/services/user.service';
-import { WebphoneTopbarComponent } from '@/webphone/webphone-topbar.component';
+import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import {Router, RouterModule} from '@angular/router';
+import {CommonModule} from '@angular/common';
+import {StyleClassModule} from 'primeng/styleclass';
+import {LayoutService} from '@/layout/service/layout.service';
+import {AppBreadcrumb} from './app.breadcrumb';
+import {InputTextModule} from 'primeng/inputtext';
+import {ButtonModule} from 'primeng/button';
+import {IconFieldModule} from 'primeng/iconfield';
+import {InputIconModule} from 'primeng/inputicon';
+import {Avatar} from 'primeng/avatar';
+import {WebphoneTopbarComponent} from '@/webphone/webphone-topbar.component';
+import {UserService} from "@/pages/users/user.service";
 
 @Component({
     selector: '[app-topbar]',

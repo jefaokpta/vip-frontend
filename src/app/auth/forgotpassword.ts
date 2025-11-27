@@ -1,5 +1,5 @@
 import {Component, computed, OnInit} from '@angular/core';
-import {Router, RouterModule} from '@angular/router';
+import {RouterModule} from '@angular/router';
 import {ButtonModule} from 'primeng/button';
 import {LayoutService} from '@/layout/service/layout.service';
 import {AppConfigurator} from '@/layout/components/app.configurator';
@@ -8,7 +8,7 @@ import {InputIconModule} from 'primeng/inputicon';
 import {InputTextModule} from 'primeng/inputtext';
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {NgIf} from '@angular/common';
-import {HttpClientService} from '@/services/http-client.service';
+import {UserService} from "@/pages/users/user.service";
 
 @Component({
     selector: 'app-forgot-password',
@@ -79,8 +79,7 @@ export class ForgotPassword implements OnInit {
     constructor(
         private readonly LayoutService: LayoutService,
         private readonly fb: FormBuilder,
-        private readonly router: Router,
-        private readonly httpClientService: HttpClientService
+        private readonly userService: UserService
     ) {}
 
     ngOnInit(): void {
@@ -90,7 +89,7 @@ export class ForgotPassword implements OnInit {
     }
 
     onSubmit() {
-        this.httpClientService
+        this.userService
             .forgotPassword(this.form.value.email)
             .then(() => {
                 this.submitError = false;

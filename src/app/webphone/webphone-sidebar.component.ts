@@ -11,9 +11,9 @@ import {NgClass, NgIf} from '@angular/common';
 import {TableModule} from 'primeng/table';
 import {telephoneFormat} from './utils';
 import {handleCalleId} from '@/webphone/utils';
-import {UserService} from '@/services/user.service';
 import {Cdr, UserFieldEnum} from "@/pabx/types";
 import {User} from "@/types/types";
+import {UserService} from "@/pages/users/user.service";
 
 @Component({
     selector: 'app-webphone-sidebar',

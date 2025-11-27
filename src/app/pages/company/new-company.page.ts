@@ -5,10 +5,10 @@ import {ButtonModule} from 'primeng/button';
 import {CardModule} from 'primeng/card';
 import {ToastModule} from 'primeng/toast';
 import {NgForOf, NgIf} from '@angular/common';
-import {HttpClientService} from '@/services/http-client.service';
 import {Router, RouterLink} from '@angular/router';
 import {Tooltip} from 'primeng/tooltip';
 import {Company} from '@/types/types';
+import {CompanyService} from "@/pages/company/company.service";
 
 /**
  * @author Jefferson Alves Reis (jefaokpta)
@@ -138,7 +138,7 @@ export class NewCompanyPage implements OnInit {
 
     constructor(
         private readonly fb: FormBuilder,
-        private readonly httpClientService: HttpClientService,
+        private readonly companyService: CompanyService,
         private readonly router: Router
     ) {}
 
@@ -181,7 +181,7 @@ export class NewCompanyPage implements OnInit {
                 return { phone };
             })
         };
-        this.httpClientService
+        this.companyService
             .createCompany(company)
             .then(() => this.router.navigate(['/pages/companies']))
             .catch(() => {

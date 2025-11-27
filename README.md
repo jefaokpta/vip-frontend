@@ -26,10 +26,10 @@ Este README foi escrito para facilitar a manutenção por humanos e por agentes 
   - `IASMIN_PABX_URL`: host do PABX para o WebSocket SIP (WSS).
 - WebPhone (JsSIP) em `src/app/webphone/webphone.service.ts`:
   - Conecta via `wss://{IASMIN_PABX_URL}:8089/ws` usando JsSIP `UA` e `WebSocketInterface`;
-  - Integração com `UserService` para identificar o usuário e `HttpClientService` para obter token da chamada;
+  - Integração com `UserService` para identificar o usuário e `DashboardService` para obter token da chamada;
   - Controle de estado com Angular Signals (PhoneState/PhoneStateEnum) e timers;
   - Manipuladores de eventos para conectado/registrado/chamada em progresso/falhas.
-- Serviços utilitários em `src/app/services` (UserService, HttpClientService, etc.).
+- Serviços utilitários em `src/app/services` (UserService, DashboardService, etc.).
 
 Estrutura de pastas (parcial):
 - `src/app/webphone/webphone.service.ts` — lógica do telefone via web (SIP/RTC);
@@ -83,7 +83,7 @@ npm test
 ## Guia do WebPhone (JsSIP)
 - Configuração: o serviço `WebphoneService` cria um `UA` com `uri` no formato `sip:{user.id}@{IASMIN_PABX_URL}` e autentica com senha baseada no usuário (`IASMIN_WEBPHONE_{user.id}`). O WebSocket é `wss://{IASMIN_PABX_URL}:8089/ws`.
 - Início: o `UA.start()` é chamado no construtor do serviço. Eventos tratados: `connected`, `disconnected`, `registered`, `registrationFailed`, `newRTCSession`.
-- Chamada: `makeCall(telephone)` obtém um token via `HttpClientService.getCallToken()` e inicia a chamada com `extraHeaders` (e.g. `X-CALL-TOKEN`).
+- Chamada: `makeCall(telephone)` obtém um token via `DashboardService.getCallToken()` e inicia a chamada com `extraHeaders` (e.g. `X-CALL-TOKEN`).
 - Recepção: sessões de entrada são tratadas em `incommingSession` com anexação de `MediaStream` a um elemento `Audio`.
 - Controles: `answerCall`, `hangup`, `sendDTMF`, `toggleMute`, controle de tempo de chamada.
 

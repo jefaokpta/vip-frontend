@@ -8,14 +8,14 @@ import {Router, RouterLink} from '@angular/router';
 import {Table, TableModule} from 'primeng/table';
 import {Tooltip} from 'primeng/tooltip';
 import {Company, User} from '@/types/types';
-import {HttpClientService} from '@/services/http-client.service';
 import {Card} from 'primeng/card';
-import {UserService} from '@/services/user.service';
 import {NgClass, NgIf} from '@angular/common';
 import {Toast} from 'primeng/toast';
 import {ProgressSpinner} from 'primeng/progressspinner';
 import {FormsModule} from '@angular/forms';
 import {telephoneFormat} from '@/webphone/utils';
+import {CompanyService} from "@/pages/company/company.service";
+import {UserService} from "@/pages/users/user.service";
 
 @Component({
     selector: 'app-company-page',
@@ -148,7 +148,7 @@ export class CompanyPage implements OnInit {
     loading = true;
 
     constructor(
-        private readonly httpClientService: HttpClientService,
+        private readonly companyService: CompanyService,
         private readonly userService: UserService,
         private readonly router: Router,
         private readonly messageService: MessageService
@@ -157,15 +157,14 @@ export class CompanyPage implements OnInit {
     }
 
     ngOnInit(): void {
-        this.httpClientService.findAllCompanies().then((companies) => {
+        this.companyService.findAllCompanies().then((companies) => {
             this.companies = companies;
             this.loading = false;
         });
     }
 
     manageCompany(controlNumber: number) {
-        this.userService
-            .manageCompany(controlNumber)
+        this.userService.manageOtherCompany(controlNumber)
             .then(() => this.router.navigate(['/']))
             .catch(() => {
                 this.messageService.add({

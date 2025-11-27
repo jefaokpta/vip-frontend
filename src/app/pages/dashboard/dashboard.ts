@@ -6,7 +6,7 @@ import {Card} from "primeng/card";
 import {Worker} from "@/types/types";
 import {NgForOf} from "@angular/common";
 import {BadgeModule} from "primeng/badge";
-import {HttpClientService} from "@/services/http-client.service";
+import {DashboardService} from "@/pages/dashboard/dashboard.service";
 import {Peer, PeerStateEnum} from "@/pabx/types";
 
 @Component({
@@ -74,7 +74,7 @@ export class Dashboard implements OnDestroy, OnInit {
 
     constructor(
         private readonly webSocketService: WebsocketService,
-        private readonly httpClientService: HttpClientService
+        private readonly httpClientService: DashboardService
     ) {
         this.webSocketSubscription = this.webSocketService.watch("/topic/workers").subscribe(message => {
             const worker: Worker = JSON.parse(message.body);

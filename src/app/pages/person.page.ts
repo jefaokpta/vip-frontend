@@ -1,16 +1,16 @@
-import { Component, OnInit } from '@angular/core';
-import { Button, ButtonModule } from 'primeng/button';
-import { Card } from 'primeng/card';
-import { Divider } from 'primeng/divider';
-import { FormArray, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { InputText } from 'primeng/inputtext';
-import { NgForOf, NgIf } from '@angular/common';
-import { Password } from 'primeng/password';
-import { passwordStrengthValidator } from '@/pages/utils/validators';
-import { UserService } from '@/services/user.service';
-import { User } from '@/types/types';
-import { Toast } from 'primeng/toast';
-import { MessageService } from 'primeng/api';
+import {Component, OnInit} from '@angular/core';
+import {Button, ButtonModule} from 'primeng/button';
+import {Card} from 'primeng/card';
+import {Divider} from 'primeng/divider';
+import {FormArray, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
+import {InputText} from 'primeng/inputtext';
+import {NgForOf, NgIf} from '@angular/common';
+import {Password} from 'primeng/password';
+import {passwordStrengthValidator} from '@/pages/utils/validators';
+import {User} from '@/types/types';
+import {Toast} from 'primeng/toast';
+import {MessageService} from 'primeng/api';
+import {UserService} from "@/pages/users/user.service";
 
 @Component({
     selector: 'app-empty',
@@ -171,7 +171,6 @@ export class PersonPage implements OnInit {
         if (this.showPasswordFields) {
             this.passwordArray.clear();
         } else {
-            this.passwordArray.push(this.fb.control('', [Validators.required, Validators.minLength(8)]));
             this.passwordArray.push(this.fb.control('', [Validators.required, Validators.minLength(8), passwordStrengthValidator()]));
         }
         this.showPasswordFields = !this.showPasswordFields;

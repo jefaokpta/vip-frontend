@@ -6,11 +6,9 @@
 import {Injectable, signal} from '@angular/core';
 import {UA, WebSocketInterface} from 'jssip';
 import {environment} from '../../environments/environment';
-import {UserService} from '@/services/user.service';
 import {PhoneState, PhoneStateEnum} from '@/types/types';
 import {RTCSession} from 'jssip/lib/RTCSession';
 import {RTCSessionEvent, UnRegisteredEvent} from 'jssip/lib/UA';
-import {HttpClientService} from '@/services/http-client.service';
 
 @Injectable({
     providedIn: 'root'
@@ -28,18 +26,8 @@ export class WebphoneService {
     }
     readonly phoneState$ = this.phoneState.asReadonly();
 
-    constructor(
-        private readonly userService: UserService,
-        private readonly httpClientService: HttpClientService
-    ) {
+    constructor() {
         const socket = new WebSocketInterface(`wss://${this.PABX_URL}:8089/ws`);
-        const user = userService.getUser();
-        // const config = {
-        //     uri: `sip:${user.id}@${this.IASMIN_PABX_URL}`,
-        //     password: `IASMIN_WEBPHONE_${user.id}`,
-        //     sockets: [socket],
-        //     register: true
-        // };
         const config = {
             uri: `sip:web@${this.PABX_URL}`,
             password: `jefao123`,
@@ -79,7 +67,6 @@ export class WebphoneService {
     }
 
     async makeCall(telephone: string) {
-        // const callToken = await this.httpClientService.getCallToken();
         if (this.ua) {
             const options = {
                 eventHandlers: this.callEventHandlers(),

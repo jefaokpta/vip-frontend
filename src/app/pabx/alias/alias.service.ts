@@ -3,7 +3,7 @@ import {HttpClient} from "@angular/common/http";
 import {environment} from "../../../environments/environment";
 import {executeRequest, httpHeaders} from "@/util/utils";
 import {Alias} from "@/pabx/types";
-import {UserService} from "@/services/user.service";
+import {UserService} from "@/pages/users/user.service";
 
 @Injectable({providedIn: 'root'})
 export class AliasService {

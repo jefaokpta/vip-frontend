@@ -4,17 +4,17 @@
  * @create 5/13/25
  */
 
-import { Component, OnInit } from '@angular/core';
-import { Button } from 'primeng/button';
-import { InputText } from 'primeng/inputtext';
-import { NgIf } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { HttpClientService } from '@/services/http-client.service';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { Card } from 'primeng/card';
-import { RoleEnum } from '@/types/types';
-import { UserService } from '@/services/user.service';
-import { Select } from 'primeng/select';
+import {Component, OnInit} from '@angular/core';
+import {Button} from 'primeng/button';
+import {InputText} from 'primeng/inputtext';
+import {NgIf} from '@angular/common';
+import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {ActivatedRoute, Router, RouterLink} from '@angular/router';
+import {Card} from 'primeng/card';
+import {RoleEnum} from '@/types/types';
+import {Select} from 'primeng/select';
+import {UserService} from "@/pages/users/user.service";
+import {CompanyService} from "@/pages/company/company.service";
 
 @Component({
     selector: 'app-edit-user',
@@ -100,10 +100,10 @@ export class EditUserPage implements OnInit {
 
     constructor(
         private readonly fb: FormBuilder,
-        private readonly httpClientService: HttpClientService,
         private readonly router: Router,
         private readonly userService: UserService,
-        private readonly activatedRoute: ActivatedRoute
+        private readonly activatedRoute: ActivatedRoute,
+        private readonly companyService: CompanyService
     ) {}
 
     ngOnInit(): void {
@@ -118,10 +118,10 @@ export class EditUserPage implements OnInit {
             this.roleOptions.push({ label: 'Super Usuário', value: RoleEnum.SUPER });
         }
         const id = this.activatedRoute.snapshot.paramMap.get('id')!;
-        this.httpClientService.findOneUser(+id).then((user) => {
+        this.userService.findOneUser(+id).then((user) => {
             this.form.patchValue(user);
-            this.role?.setValue(user.roles[user.roles.length - 1]);
-            this.httpClientService.findOneCompanyByControlNumber(user.controlNumber).then((company) => {
+            this.role?.setValue(user.roles.at(-1));
+            this.companyService.findOneCompanyByControlNumber(user.controlNumber).then((company) => {
                 this.ddrOptions = company.phones.map((phone) => ({
                     label: phone.phone,
                     value: phone.phone
@@ -146,12 +146,9 @@ export class EditUserPage implements OnInit {
 
     onSubmit() {
         this.pending = true;
-        this.httpClientService
+        this.userService
             .updateUser({ ...this.form.value, roles: [this.form.value.role] })
             .then(() => this.router.navigate(['/pages/users']))
-            .catch((err) => {
-                console.error(err.message);
-            })
             .finally(() => (this.pending = false));
     }
 }

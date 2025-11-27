@@ -5,10 +5,10 @@ import {ButtonModule} from 'primeng/button';
 import {CardModule} from 'primeng/card';
 import {ToastModule} from 'primeng/toast';
 import {NgForOf, NgIf} from '@angular/common';
-import {HttpClientService} from '@/services/http-client.service';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {Tooltip} from 'primeng/tooltip';
 import {Company} from '@/types/types';
+import {CompanyService} from "@/pages/company/company.service";
 
 /**
  * @author Jefferson Alves Reis (jefaokpta)
@@ -131,7 +131,7 @@ export class EditCompanyPage implements OnInit {
 
     constructor(
         private readonly fb: FormBuilder,
-        private readonly httpClientService: HttpClientService,
+        private readonly companyService: CompanyService,
         private readonly router: Router,
         private readonly activatedRoute: ActivatedRoute
     ) {}
@@ -152,7 +152,7 @@ export class EditCompanyPage implements OnInit {
             phones: this.fb.array([])
         });
         const id = this.activatedRoute.snapshot.paramMap.get('id')!;
-        this.httpClientService.findOneCompany(id).then((company) => {
+        this.companyService.findOneCompany(id).then((company) => {
             this.form.patchValue(company);
             company.phones.forEach((phone) => {
                 this.phones.push(this.fb.control(phone.phone, [Validators.required, Validators.pattern('^[0-9]{10,11}$')]));
@@ -180,7 +180,7 @@ export class EditCompanyPage implements OnInit {
                 return hasPhone ?? { phone };
             })
         };
-        this.httpClientService
+        this.companyService
             .updateCompany(company)
             .then(() => this.router.navigate(['/pages/companies']))
             .catch(() => (this.showSubmitError = true))

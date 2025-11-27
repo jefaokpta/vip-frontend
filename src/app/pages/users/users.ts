@@ -1,23 +1,23 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { Button } from 'primeng/button';
-import { ConfirmDialog, ConfirmDialogModule } from 'primeng/confirmdialog';
-import { IconField } from 'primeng/iconfield';
-import { InputIcon } from 'primeng/inputicon';
-import { InputText } from 'primeng/inputtext';
-import { ConfirmationService, MessageService, PrimeTemplate } from 'primeng/api';
-import { RouterLink } from '@angular/router';
-import { Table, TableModule } from 'primeng/table';
-import { Tooltip } from 'primeng/tooltip';
-import { Company, RoleEnum, User } from '@/types/types';
-import { HttpClientService } from '@/services/http-client.service';
-import { Card } from 'primeng/card';
-import { Toast } from 'primeng/toast';
-import { Dialog } from 'primeng/dialog';
-import { UserService } from '@/services/user.service';
-import { NgIf } from '@angular/common';
-import { Select } from 'primeng/select';
-import { FormsModule } from '@angular/forms';
-import { ProgressSpinner } from 'primeng/progressspinner';
+import {Component, OnInit, ViewChild} from '@angular/core';
+import {Button} from 'primeng/button';
+import {ConfirmDialog, ConfirmDialogModule} from 'primeng/confirmdialog';
+import {IconField} from 'primeng/iconfield';
+import {InputIcon} from 'primeng/inputicon';
+import {InputText} from 'primeng/inputtext';
+import {ConfirmationService, MessageService, PrimeTemplate} from 'primeng/api';
+import {RouterLink} from '@angular/router';
+import {Table, TableModule} from 'primeng/table';
+import {Tooltip} from 'primeng/tooltip';
+import {Company, RoleEnum, User} from '@/types/types';
+import {Card} from 'primeng/card';
+import {Toast} from 'primeng/toast';
+import {Dialog} from 'primeng/dialog';
+import {NgIf} from '@angular/common';
+import {Select} from 'primeng/select';
+import {FormsModule} from '@angular/forms';
+import {ProgressSpinner} from 'primeng/progressspinner';
+import {UserService} from "./user.service";
+import {CompanyService} from "@/pages/company/company.service";
 
 @Component({
     selector: 'app-users',
@@ -167,7 +167,6 @@ import { ProgressSpinner } from 'primeng/progressspinner';
                 </p-select>
                 <div class="flex justify-end gap-2">
                     <p-button label="Cancelar" severity="secondary" (click)="migrateUserShow = false" />
-                    <p-button label="Migrar" (click)="migrateUser()" />
                 </div>
             </p-dialog>
         </p-card>
@@ -188,9 +187,9 @@ export class UsersPage implements OnInit {
 
     constructor(
         private readonly confirmationService: ConfirmationService,
-        private readonly httpClientService: HttpClientService,
         private readonly messageService: MessageService,
-        private readonly userService: UserService
+        private readonly userService: UserService,
+        private readonly companyService: CompanyService,
     ) {
         this.userLogged = userService.getUser();
     }
@@ -200,9 +199,9 @@ export class UsersPage implements OnInit {
     }
 
     ngOnInit(): void {
-        this.httpClientService.findAllUsers().then((users) => (this.users = users));
+        this.userService.findAllUsers().then((users) => (this.users = users));
         if (this.userLogged.roles.includes(RoleEnum.SUPER)) {
-            this.httpClientService.findAllCompanies().then((companies) => {
+            this.companyService.findAllCompanies().then((companies) => {
                 this.companies = companies;
                 this.loading = false;
             });
@@ -233,7 +232,7 @@ export class UsersPage implements OnInit {
                 outlined: true
             },
             accept: () => {
-                this.httpClientService
+                this.userService
                     .deleteUser(user.id)
                     .then(() => {
                         this.users = this.users.filter((u) => u.id !== user.id);
@@ -257,7 +256,7 @@ export class UsersPage implements OnInit {
     }
 
     translateRole(user: User): string {
-        const lastRole = user.roles[user.roles.length - 1];
+        const lastRole = user.roles.at(-1);
         switch (lastRole) {
             case 'admin':
                 return 'Administrador';
@@ -277,30 +276,4 @@ export class UsersPage implements OnInit {
         this.migrateUserShow = true;
     }
 
-    migrateUser() {
-        this.httpClientService
-            .migrateUser(this.userToMigrate!, this.selectedCompany!)
-            .then(() => {
-                this.messageService.add({
-                    severity: 'success',
-                    summary: 'Usuário migrado com sucesso',
-                    detail: `${this.userToMigrate?.name} foi migrado com sucesso`,
-                    life: 15_000
-                });
-                this.users = this.users.filter((u) => u.id !== this.userToMigrate!.id);
-            })
-            .catch(() => {
-                this.messageService.add({
-                    severity: 'error',
-                    summary: 'Desculpe não foi possível migrar o usuário',
-                    detail: 'Tente novamente mais tarde.',
-                    life: 15_000
-                });
-            })
-            .finally(() => {
-                this.migrateUserShow = false;
-                this.userToMigrate = undefined;
-                this.selectedCompany = undefined;
-            });
-    }
 }
