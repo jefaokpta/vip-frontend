@@ -6,64 +6,67 @@
 
 import {HttpClient} from '@angular/common/http';
 import {environment} from '../../environments/environment';
-import {Company, LoginResponse, Peer, User, Worker} from '@/types/types';
-import {firstValueFrom, Observable, timeout} from 'rxjs';
+import {Company, LoginResponse, User, Worker} from '@/types/types';
 import {Injectable} from '@angular/core';
+import {executeRequest, httpHeaders} from "@/util/utils";
+import {Peer} from '@/pages/pabx/types';
 
 @Injectable({
     providedIn: 'root'
 })
 export class HttpClientService {
     private readonly BACKEND = environment.API_BACKEND_URL;
-    private readonly HTTP_TIMEOUT = 30_000;
-    private readonly BEARER = 'Bearer ';
+    private readonly REQUEST_TIMEOUT = 30_000;
 
-    constructor(private readonly http: HttpClient) {}
+
+    constructor(private readonly http: HttpClient) {
+    }
 
     authenticate(email: string, password: string): Promise<LoginResponse> {
-        return this.executeRequest(this.http.post<LoginResponse>(`${this.BACKEND}/users/login`, { email, password }));
+        return executeRequest(this.http.post<LoginResponse>(`${this.BACKEND}/users/login`, {
+            email,
+            password
+        }), this.REQUEST_TIMEOUT);
     }
 
     validateToken() {
-        return this.executeRequest(
-            this.http.get<{ token: string }>(`${this.BACKEND}/auth/validate-token`, this.headers())
+        return executeRequest(
+            this.http.get<{ token: string }>(`${this.BACKEND}/auth/validate-token`, httpHeaders())
         );
     }
 
     findOneCompany(id: string): Promise<Company> {
-        return this.executeRequest(this.http.get<Company>(`${this.BACKEND}/companies/${id}`, this.headers()));
+        return executeRequest(this.http.get<Company>(`${this.BACKEND}/companies/${id}`, httpHeaders()));
     }
 
     findOneCompanyByControlNumber(controlNumber: string): Promise<Company> {
-        return this.executeRequest(
-            this.http.get<Company>(`${this.BACKEND}/companies/cn/${controlNumber}`, this.headers())
-        );
+        return executeRequest(this.http.get<Company>(`${this.BACKEND}/companies/cn/${controlNumber}`, httpHeaders()));
     }
 
     updateCompany(company: Company) {
-        return this.executeRequest(
-            this.http.put<Company>(`${this.BACKEND}/companies/${company.id}`, company, this.headers())
+        return executeRequest(
+            this.http.put<Company>(`${this.BACKEND}/companies/${company.id}`, company, httpHeaders())
         );
     }
 
     findAllCompanies(): Promise<Company[]> {
-        return this.executeRequest(this.http.get<Company[]>(`${this.BACKEND}/companies`, this.headers()));
+        return executeRequest(this.http.get<Company[]>(`${this.BACKEND}/companies`, httpHeaders()));
     }
 
     createCompany(company: Company) {
-        return this.executeRequest(this.http.post(`${this.BACKEND}/companies`, company, this.headers()));
+        return executeRequest(this.http.post(`${this.BACKEND}/companies`, company, httpHeaders()));
     }
 
     findAllUsers(): Promise<User[]> {
-        return this.executeRequest(this.http.get<User[]>(`${this.BACKEND}/users/cn/security`, this.headers()));
+        return executeRequest(this.http.get<User[]>(`${this.BACKEND}/users/cn/security`, httpHeaders()));
     }
 
     findOneUser(id: number): Promise<User> {
-        return this.executeRequest(this.http.get<User>(`${this.BACKEND}/users/${id}`, this.headers()));
+        return executeRequest(this.http.get<User>(`${this.BACKEND}/users/${id}`, httpHeaders()));
     }
 
     updateUser(user: Partial<User>) {
-        return this.executeRequest(this.http.patch(`${this.BACKEND}/users/${user.id}`, user, this.headers()));
+        return executeRequest(this.http.patch(`${this.BACKEND}/users/${user.id}`, user, httpHeaders()));
     }
 
     updateProfile(profile: { name: string; passwordArray: string[] }): Promise<LoginResponse> {
@@ -72,82 +75,65 @@ export class HttpClientService {
             oldPassword: profile.passwordArray[0],
             newPassword: profile.passwordArray[1]
         };
-        return this.executeRequest(
-            this.http.patch<LoginResponse>(`${this.BACKEND}/users/profile/update`, payload, this.headers())
+        return executeRequest(
+            this.http.patch<LoginResponse>(`${this.BACKEND}/users/profile/update`, payload, httpHeaders())
         );
     }
 
     createUser(user: User) {
-        return this.executeRequest(this.http.post<User>(`${this.BACKEND}/users`, user, this.headers()));
+        return executeRequest(this.http.post<User>(`${this.BACKEND}/users`, user, httpHeaders()));
     }
 
     forgotPassword(email: string) {
-        return this.executeRequest(this.http.post(`${this.BACKEND}/users/forgot/password`, { email }, this.headers()));
+        return executeRequest(this.http.post(`${this.BACKEND}/users/forgot/password`, {email}, httpHeaders()));
     }
 
     manageCompany(controlNumber: number): Promise<LoginResponse> {
-        return this.executeRequest(
-            this.http.post<LoginResponse>(`${this.BACKEND}/users/manage`, { controlNumber }, this.headers())
+        return executeRequest(
+            this.http.post<LoginResponse>(`${this.BACKEND}/users/manage`, {controlNumber}, httpHeaders())
         );
     }
 
     exitManageCompany(user: User): Promise<LoginResponse> {
-        return this.executeRequest(
+        return executeRequest(
             this.http.post<LoginResponse>(
                 `${this.BACKEND}/users/manage/exit`,
                 { controlNumber: user.controlNumber },
-                this.headers()
+                httpHeaders()
             )
         );
     }
 
     confirmUserEmail(email: string, confirmationCode: string) {
-        return this.executeRequest(
-            this.http.post(`${this.BACKEND}/users/confirm`, { email, confirmationCode }, this.headers())
+        return executeRequest(
+            this.http.post(`${this.BACKEND}/users/confirm`, {email, confirmationCode}, httpHeaders())
         );
     }
 
     createResetUserPassword(payload: { email: string; password: string; confirmationCode?: string }) {
-        return this.executeRequest(this.http.post(`${this.BACKEND}/users/create/password`, payload, this.headers()));
+        return executeRequest(this.http.post(`${this.BACKEND}/users/create/password`, payload, httpHeaders()));
     }
 
     deleteUser(id: number) {
-        return this.executeRequest(this.http.delete(`${this.BACKEND}/users/${id}`, this.headers()));
+        return executeRequest(this.http.delete(`${this.BACKEND}/users/${id}`, httpHeaders()));
     }
 
     migrateUser(user: User, company: Company) {
-        return this.executeRequest(
+        return executeRequest(
             this.http.post(
                 `${this.BACKEND}/users/migrate`,
                 { user, newControlNumber: company.controlNumber },
-                this.headers()
+                httpHeaders()
             )
         );
     }
 
     findWorkers(): Promise<Worker[]> {
-        return this.executeRequest(this.http.get<Worker[]>(`${this.BACKEND}/workers`, this.headers()));
+        return executeRequest(this.http.get<Worker[]>(`${this.BACKEND}/workers`, httpHeaders()));
     }
 
     findPeersByCompany(companyId: string): Promise<Peer[]> {
-        return this.executeRequest(this.http.get<Peer[]>(`${this.BACKEND}/peers/${companyId}`, this.headers()));
+        return executeRequest(this.http.get<Peer[]>(`${this.BACKEND}/peers/${companyId}`, httpHeaders()));
     }
 
-
-    /**
-     * Executa uma requisição HTTP com timeout e retorna a primeira resposta como Promise
-     * @param request Observable da requisição HTTP
-     * @returns Promise com resultado da requisição
-     */
-    private executeRequest<T>(request: Observable<T>): Promise<T> {
-        return firstValueFrom(request.pipe(timeout(this.HTTP_TIMEOUT)));
-    }
-
-    private headers() {
-        return {
-            headers: {
-                Authorization: this.BEARER + localStorage.getItem('token')
-            }
-        };
-    }
 }

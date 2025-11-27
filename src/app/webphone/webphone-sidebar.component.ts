@@ -1,4 +1,4 @@
-import {Component, computed, OnInit} from '@angular/core';
+import {Component, computed} from '@angular/core';
 import {ButtonModule} from 'primeng/button';
 import {DrawerModule} from 'primeng/drawer';
 import {BadgeModule} from 'primeng/badge';
@@ -8,12 +8,12 @@ import {InputTextModule} from 'primeng/inputtext';
 import {FormsModule} from '@angular/forms';
 import {WebphoneService} from '@/webphone/webphone.service';
 import {NgClass, NgIf} from '@angular/common';
-import {Cdr, User, UserFieldEnum} from '@/types/types';
-import {HttpClientService} from '@/services/http-client.service';
 import {TableModule} from 'primeng/table';
-import {telephoneFormat} from '@/util/utils';
+import {telephoneFormat} from './utils';
 import {handleCalleId} from '@/webphone/utils';
 import {UserService} from '@/services/user.service';
+import {Cdr, UserFieldEnum} from "@/pages/pabx/types";
+import {User} from "@/types/types";
 
 @Component({
     selector: 'app-webphone-sidebar',
@@ -148,7 +148,7 @@ import {UserService} from '@/services/user.service';
         </p-drawer>
     `
 })
-export class WebphoneSidebarComponent implements OnInit {
+export class WebphoneSidebarComponent {
     telephoneNumber?: string = undefined;
     dialpadVisible = false;
     cdrs: Cdr[] = [];
@@ -157,17 +157,9 @@ export class WebphoneSidebarComponent implements OnInit {
     constructor(
         public layoutService: LayoutService,
         private readonly webphoneService: WebphoneService,
-        private readonly httpClientService: HttpClientService,
         private readonly userService: UserService
     ) {
         this.user = this.userService.getUser()
-    }
-
-    ngOnInit(): void {
-        // this.httpClientService.findAllCdr().then((cdrs) => {
-        //     this.cdrs = sortCdrByDate(this.deDuplicate(cdrs))
-        //         .filter(cdr => cdr.peer === this.user.id.toString())
-        // });
     }
 
     get phoneStatus() {
@@ -193,7 +185,7 @@ export class WebphoneSidebarComponent implements OnInit {
 
     private sanitizePhone(input?: string): string | undefined {
         if (!input) return undefined;
-        const digits = input.replace(/\D/g, '');
+        const digits = input.replaceAll(/\D/g, '');
         return digits.length ? digits : undefined;
     }
 

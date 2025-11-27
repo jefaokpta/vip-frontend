@@ -3,10 +3,11 @@ import {Subscription} from "rxjs";
 import {WebsocketService} from "@/websocket/stomp/websocket.service";
 import {rxStompServiceFactory} from "@/websocket/stomp/rx-stomp-service-factory";
 import {Card} from "primeng/card";
-import {Peer, PeerStateEnum, Worker} from "@/types/types";
+import {Worker} from "@/types/types";
 import {NgForOf} from "@angular/common";
 import {BadgeModule} from "primeng/badge";
 import {HttpClientService} from "@/services/http-client.service";
+import {Peer, PeerStateEnum} from "@/pages/pabx/types";
 
 @Component({
     selector: 'app-components-dashboard',

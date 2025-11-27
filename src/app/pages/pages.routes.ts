@@ -6,9 +6,9 @@ import {CompanyPage} from '@/pages/company/company.page';
 import {NewCompanyPage} from '@/pages/company/new-company.page';
 import {EditCompanyPage} from '@/pages/company/edit-company.page';
 import {PersonPage} from '@/pages/person.page';
-import {PeerPage} from "@/pages/peer/peer.page";
-import {DialplanPage} from "@/pages/dialplan/dialplan.page";
-import {AliasPage} from "@/pages/alias/alias.page";
+import {PeerPage} from "@/pages/pabx/peer/peer.page";
+import {DialplanPage} from "@/pages/pabx/dialplan/dialplan.page";
+import {AliasPage} from "@/pages/pabx/alias/alias.page";
 
 export default [
     {path: 'companies', component: CompanyPage, data: {breadcrumb: 'Empresas'}},

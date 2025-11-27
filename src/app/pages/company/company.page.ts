@@ -15,7 +15,7 @@ import {NgClass, NgIf} from '@angular/common';
 import {Toast} from 'primeng/toast';
 import {ProgressSpinner} from 'primeng/progressspinner';
 import {FormsModule} from '@angular/forms';
-import {telephoneFormat} from '@/util/utils';
+import {telephoneFormat} from '@/webphone/utils';
 
 @Component({
     selector: 'app-company-page',

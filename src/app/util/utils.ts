@@ -4,34 +4,23 @@
  * @create 5/9/25
  */
 
-import { Cdr, TemperatureEnum } from '@/types/types';
+import {firstValueFrom, Observable, timeout} from "rxjs";
 
-export function sortCdrByDate(cdrs: Cdr[]) {
-    return cdrs.sort((a, b) => new Date(b.startTime).getTime() - new Date(a.startTime).getTime());
+/**
+ * Executa uma requisição HTTP com timeout e retorna a primeira resposta como Promise
+ * @param request Observable da requisição HTTP
+ * @param requestTimeout
+ * @returns Promise com resultado da requisição
+ */
+export function executeRequest<T>(request: Observable<T>, requestTimeout: number = 5_000): Promise<T> {
+    return firstValueFrom(request.pipe(timeout(requestTimeout)));
 }
 
-export function getTemperatureSeverity(temperature: TemperatureEnum) {
-    switch (temperature) {
-        case 'QUENTE':
-            return 'danger';
-        case 'MORNA':
-            return 'warn';
-        case 'FRIA':
-            return 'info';
-        default:
-            return 'info';
-    }
-}
-
-export function formattedText(text: string): string {
-    return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-}
-
-export function telephoneFormat(tel?: string): string {
-    if (!tel) return '';
-    const match = RegExp(/^(\d{2})(\d{4,5})(\d{4})$/).exec(tel);
-    if (match) {
-        return `(${match[1]}) ${match[2]}-${match[3]}`;
-    }
-    return tel;
+export function httpHeaders() {
+    const bearer = 'Bearer ';
+    return {
+        headers: {
+            Authorization: bearer + localStorage.getItem('token')
+        }
+    };
 }

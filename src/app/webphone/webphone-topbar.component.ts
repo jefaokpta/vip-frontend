@@ -3,15 +3,14 @@
  * @email jefaokpta@hotmail.com
  * @create 5/5/25
  */
-import { Component } from '@angular/core';
-import { Button } from 'primeng/button';
-import { WebphoneService } from '@/webphone/webphone.service';
-import { LayoutService } from '@/layout/service/layout.service';
-import { NgClass, NgIf } from '@angular/common';
-import { ButtonGroup } from 'primeng/buttongroup';
-import { PhoneStateEnum } from '@/types/types';
-import { handleCalleId } from '@/webphone/utils';
-import { telephoneFormat } from '@/util/utils';
+import {Component} from '@angular/core';
+import {Button} from 'primeng/button';
+import {WebphoneService} from '@/webphone/webphone.service';
+import {LayoutService} from '@/layout/service/layout.service';
+import {NgClass, NgIf} from '@angular/common';
+import {ButtonGroup} from 'primeng/buttongroup';
+import {PhoneStateEnum} from '@/types/types';
+import {handleCalleId, telephoneFormat} from '@/webphone/utils';
 
 @Component({
     selector: 'app-webphone-topbar',
@@ -72,5 +71,5 @@ export class WebphoneTopbarComponent {
 
     protected readonly PhoneStateEnum = PhoneStateEnum;
     protected readonly handleCalleId = handleCalleId;
-    protected readonly telephoneFormat = telephoneFormat;
+    protected readonly telephoneFormat = telephoneFormat
 }
