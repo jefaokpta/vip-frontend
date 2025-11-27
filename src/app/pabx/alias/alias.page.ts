@@ -13,6 +13,7 @@ import {ConfirmDialog} from "primeng/confirmdialog";
 import {Toast} from "primeng/toast";
 import {Alias} from "@/pabx/types";
 import {NgIf} from "@angular/common";
+import {Tooltip} from "primeng/tooltip";
 
 @Component({
     selector: 'app-alias-page',
@@ -29,7 +30,8 @@ import {NgIf} from "@angular/common";
         ProgressSpinner,
         ConfirmDialog,
         Toast,
-        NgIf
+        NgIf,
+        Tooltip
     ],
     template: `
         <p-card>
@@ -140,13 +142,13 @@ export class AliasPage implements OnInit {
 
     confirmDelete(alias: Alias) {
         this.confirmationService.confirm({
-            message: `Deseja realmente apagar ${alias.name}?`,
+            message: `Deletar ${alias.name}?`,
             header: 'Confirmação',
             closable: true,
             closeOnEscape: true,
             icon: 'pi pi-exclamation-triangle',
             acceptButtonProps: {
-                label: 'Apagar',
+                label: 'Deletar',
                 severity: 'danger'
             },
             rejectButtonProps: {

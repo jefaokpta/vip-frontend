@@ -4,7 +4,7 @@ import {InputTextModule} from 'primeng/inputtext';
 import {ButtonModule} from 'primeng/button';
 import {CardModule} from 'primeng/card';
 import {NgForOf, NgIf} from '@angular/common';
-import {Router, RouterLink} from '@angular/router';
+import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {Tooltip} from 'primeng/tooltip';
 import {Alias} from "@/pabx/types";
 import {AliasService} from "@/pabx/alias/alias.service";
@@ -15,7 +15,7 @@ import {AliasService} from "@/pabx/alias/alias.service";
  * @create 4/25/25
  */
 @Component({
-    selector: 'app-new-alias-page',
+    selector: 'app-edit-alias-page',
     standalone: true,
     imports: [
         InputTextModule,
@@ -31,7 +31,7 @@ import {AliasService} from "@/pabx/alias/alias.service";
         <p-card>
             <ng-template #title>
                 <div class="flex justify-between">
-                    <span class="font-semibold text-2xl">Novo Alias</span>
+                    <span class="font-semibold text-2xl">Editar Alias</span>
                     <p-button
                         type="button"
                         label="Voltar"
@@ -108,15 +108,17 @@ import {AliasService} from "@/pabx/alias/alias.service";
         </p-card>
     `
 })
-export class NewAliasPage implements OnInit {
+export class EditAliasPage implements OnInit {
     form!: FormGroup;
     pending = false;
     showError = false;
+    private alias: Alias | undefined;
 
     constructor(
         private readonly fb: FormBuilder,
         private readonly router: Router,
-        private readonly aliasService: AliasService
+        private readonly aliasService: AliasService,
+        private readonly activatedRoute: ActivatedRoute
     ) {
     }
 
@@ -133,7 +135,15 @@ export class NewAliasPage implements OnInit {
             name: ['', [Validators.required]],
             expressions: this.fb.array([])
         });
-        this.addExpression();
+        this.aliasService.findAliasById(this.activatedRoute.snapshot.params['id'])
+            .then(alias => {
+                this.alias = alias;
+                this.form.patchValue(alias);
+                this.form.setControl('expressions', this.fb.array(alias.expressions.map(expression => this.fb.control(expression.expression))));
+            })
+            .catch(() => {
+                this.router.navigate(['/pabx/aliases']);
+            });
     }
 
     addExpression() {
@@ -148,12 +158,17 @@ export class NewAliasPage implements OnInit {
         this.pending = true;
         this.showError = false;
         const alias: Alias = {
+            ...this.alias!,
             ...this.form.value,
             expressions: this.form.value.expressions.map((expression: string) => {
+                const exprExists = this.alias?.expressions.find(e => e.expression === expression);
+                if (exprExists) {
+                    return exprExists
+                }
                 return {expression};
             })
         };
-        this.aliasService.createAlias(alias)
+        this.aliasService.updateAlias(alias)
             .then(() => this.router.navigate(['/pabx/aliases']))
             .catch(() => {
                 this.showError = true;

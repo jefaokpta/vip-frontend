@@ -30,4 +30,14 @@ export class AliasService {
         const user = this.userService.getUser()
         return executeRequest(this.http.post(`${this.BACKEND}/aliases/${user.controlNumber}`, alias, httpHeaders()));
     }
+
+    findAliasById(id: number) {
+        const user = this.userService.getUser()
+        return executeRequest(this.http.get<Alias>(`${this.BACKEND}/aliases/${user.controlNumber}/${id}`, httpHeaders()));
+    }
+
+    updateAlias(alias: Alias) {
+        const user = this.userService.getUser()
+        return executeRequest(this.http.put(`${this.BACKEND}/aliases/${user.controlNumber}/${alias.id}`, alias, httpHeaders()));
+    }
 }
