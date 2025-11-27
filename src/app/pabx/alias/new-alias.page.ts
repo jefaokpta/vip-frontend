@@ -7,8 +7,8 @@ import {ToastModule} from 'primeng/toast';
 import {NgForOf, NgIf} from '@angular/common';
 import {Router, RouterLink} from '@angular/router';
 import {Tooltip} from 'primeng/tooltip';
-import {Alias} from "@/pages/pabx/types";
-import {AliasService} from "@/pages/pabx/alias/alias.service";
+import {Alias} from "@/pabx/types";
+import {AliasService} from "@/pabx/alias/alias.service";
 
 /**
  * @author Jefferson Alves Reis (jefaokpta)

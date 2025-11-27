@@ -43,27 +43,27 @@ export class AppMenu implements OnInit {
                         {
                             label: 'Ramais',
                             icon: 'pi pi-fw pi-image',
-                            routerLink: ['/pages/pabx/peers']
+                            routerLink: ['/pabx/peers']
                         },
                         {
                             label: 'Regras de Discagem',
                             icon: 'pi pi-fw pi-list',
-                            routerLink: ['/pages/pabx/dialplans']
+                            routerLink: ['/pabx/dialplans']
                         },
                         {
                             label: 'Alias de Discagem',
                             icon: 'pi pi-fw pi-list',
-                            routerLink: ['/pages/pabx/aliases']
+                            routerLink: ['/pabx/aliases']
                         },
                         {
                             label: 'Rotas de Chamada',
                             icon: 'pi pi-fw pi-list',
-                            routerLink: ['/pages/pabx/routes']
+                            routerLink: ['/pabx/routes']
                         },
                         {
                             label: 'Troncos',
                             icon: 'pi pi-fw pi-list',
-                            routerLink: ['/pages/pabx/trunks']
+                            routerLink: ['/pabx/trunks']
                         }
                     ],
                 },

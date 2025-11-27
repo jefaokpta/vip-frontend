@@ -7,7 +7,7 @@ import {Worker} from "@/types/types";
 import {NgForOf} from "@angular/common";
 import {BadgeModule} from "primeng/badge";
 import {HttpClientService} from "@/services/http-client.service";
-import {Peer, PeerStateEnum} from "@/pages/pabx/types";
+import {Peer, PeerStateEnum} from "@/pabx/types";
 
 @Component({
     selector: 'app-components-dashboard',

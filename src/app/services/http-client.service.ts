@@ -9,7 +9,7 @@ import {environment} from '../../environments/environment';
 import {Company, LoginResponse, User, Worker} from '@/types/types';
 import {Injectable} from '@angular/core';
 import {executeRequest, httpHeaders} from "@/util/utils";
-import {Peer} from '@/pages/pabx/types';
+import {Peer} from '@/pabx/types';
 
 @Injectable({
     providedIn: 'root'

@@ -1,8 +1,8 @@
 import {Injectable} from "@angular/core";
 import {HttpClient} from "@angular/common/http";
-import {environment} from "../../../../environments/environment";
+import {environment} from "../../../environments/environment";
 import {executeRequest, httpHeaders} from "@/util/utils";
-import {Alias} from "@/pages/pabx/types";
+import {Alias} from "@/pabx/types";
 import {UserService} from "@/services/user.service";
 
 @Injectable({providedIn: 'root'})

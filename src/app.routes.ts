@@ -16,7 +16,11 @@ export const appRoutes: Routes = [
             {
                 path: 'pages',
                 loadChildren: () => import('@/pages/pages.routes')
-            }
+            },
+            {
+                path: 'pabx',
+                loadChildren: () => import('@/pabx/pabx.routes')
+            },
         ]
     },
     { path: 'notfound', component: Notfound },

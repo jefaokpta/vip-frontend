@@ -1,4 +1,4 @@
-import {Cdr} from "@/pages/pabx/types";
+import {Cdr} from "@/pabx/types";
 import {TemperatureEnum} from "@/types/types";
 
 export function sortCdrByDate(cdrs: Cdr[]) {

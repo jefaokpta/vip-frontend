@@ -6,12 +6,12 @@ import {IconField} from "primeng/iconfield";
 import {InputIcon} from "primeng/inputicon";
 import {InputText} from "primeng/inputtext";
 import {Button} from "primeng/button";
-import {AliasService} from "@/pages/pabx/alias/alias.service";
+import {AliasService} from "@/pabx/alias/alias.service";
 import {RouterLink} from "@angular/router";
 import {ProgressSpinner} from "primeng/progressspinner";
 import {ConfirmDialog} from "primeng/confirmdialog";
 import {Toast} from "primeng/toast";
-import {Alias} from "@/pages/pabx/types";
+import {Alias} from "@/pabx/types";
 import {NgIf} from "@angular/common";
 
 @Component({
