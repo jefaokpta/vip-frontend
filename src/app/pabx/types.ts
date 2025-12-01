@@ -16,7 +16,6 @@ export interface AliasExpression {
 
 export enum SrcEnum {
     ANY = 'ANY',
-    CALLBACK = 'CALLBACK',
     PEER = 'PEER',
     AGENT = 'AGENT',
     ALIAS = 'ALIAS',

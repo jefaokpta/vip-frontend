@@ -1,13 +1,13 @@
 import {Component, OnInit} from '@angular/core';
-import {FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {InputTextModule} from 'primeng/inputtext';
 import {ButtonModule} from 'primeng/button';
 import {CardModule} from 'primeng/card';
-import {NgForOf, NgIf} from '@angular/common';
+import {NgIf} from '@angular/common';
 import {Router, RouterLink} from '@angular/router';
-import {Tooltip} from 'primeng/tooltip';
 import {DialPlanService} from './dial-plan.service';
 import {DialPlan} from "@/pabx/types";
+import {Select} from "primeng/select";
 
 /**
  * @author Jefferson Alves Reis (jefaokpta)
@@ -24,8 +24,7 @@ import {DialPlan} from "@/pabx/types";
         NgIf,
         ReactiveFormsModule,
         RouterLink,
-        NgForOf,
-        Tooltip
+        Select
     ],
     template: `
         <p-card>
@@ -44,6 +43,7 @@ import {DialPlan} from "@/pabx/types";
             </ng-template>
 
             <form [formGroup]="form" (ngSubmit)="onSubmit()" class="p-fluid">
+
                 <div class="field mb-4">
                     <label for="name" class="block mb-2">Nome *</label>
                     <input id="name" pInputText class="p-inputtext" formControlName="name"/>
@@ -52,47 +52,97 @@ import {DialPlan} from "@/pabx/types";
                     </small>
                 </div>
 
-                <div class="field mb-4">
-                    <div class="flex items-center gap-4 mb-2">
-                        <label class="font-medium">Expressões Regulares</label>
-                        <p-button
-                            type="button"
-                            icon="pi pi-plus"
-                            (onClick)="addExpression()"
-                            pTooltip="Adicionar expressão"
-                            tooltipPosition="right"
-                            outlined
-                            size="small"
-                        ></p-button>
+                <div class="flex gap-24">
+                    <div class="field mb-4">
+                        <label for="src" class="block mb-2">Origem *</label>
+                        <p-select
+                            id="src"
+                            [options]="srcOptions"
+                            formControlName="src"
+                            optionLabel="label"
+                            optionValue="value"
+                            placeholder="Selecione uma origem"
+                            (onChange)="manageSrcValue()"
+                        ></p-select>
+                        <small *ngIf="src?.invalid && (src?.dirty || src?.touched)" class="p-error block mt-2">
+                            <div *ngIf="src?.errors?.['required']">Origem é obrigatória.</div>
+                        </small>
                     </div>
-
-                    <div formArrayName="expressions">
-                        <div *ngFor="let expression of expressions.controls; let i = index" class="mb-3">
-                            <div class="flex gap-2">
-                                <div class="flex-grow-1">
-                                    <input
-                                        [formControlName]="i"
-                                        type="text"
-                                        pInputText
-                                        placeholder="1X[34]"
-                                        class="w-full"
-                                    />
-                                    <small *ngIf="expression.invalid && expression.touched" class="p-error block">
-                                        Expressão Obrigatória
-                                    </small>
-                                </div>
-                                <p-button
-                                    *ngIf="expressions.length > 1"
-                                    type="button"
-                                    icon="pi pi-trash"
-                                    (onClick)="removeExpression(i)"
-                                    severity="danger"
-                                    outlined
-                                ></p-button>
-                            </div>
-                        </div>
+                    <div class="field mb-4" *ngIf="src?.value == 'PEER'">
+                        <label for="srcValue" class="block mb-2">Ramal *</label>
+                        <p-select
+                            id="srcValue"
+                            [options]="peerOptions"
+                            formControlName="srcValue"
+                            optionLabel="label"
+                            optionValue="value"
+                            placeholder="Selecione um ramal"
+                        ></p-select>
+                        <small *ngIf="srcValue?.invalid && (srcValue?.dirty || srcValue?.touched)"
+                               class="p-error block mt-2">
+                            <div *ngIf="srcValue?.errors?.['required']">Ramal é obrigatório.</div>
+                        </small>
+                    </div>
+                    <div class="field mb-4" *ngIf="src?.value == 'AGENT'">
+                        <label for="srcValue" class="block mb-2">Agente *</label>
+                        <p-select
+                            id="srcValue"
+                            [options]="agentOptions"
+                            formControlName="srcValue"
+                            optionLabel="label"
+                            optionValue="value"
+                            placeholder="Selecione um agente"
+                        ></p-select>
+                        <small *ngIf="srcValue?.invalid && (srcValue?.dirty || srcValue?.touched)"
+                               class="p-error block mt-2">
+                            <div *ngIf="srcValue?.errors?.['required']">Agente é obrigatório.</div>
+                        </small>
                     </div>
                 </div>
+
+                <!--                <div class="field mb-4">-->
+                <!--                    <div class="flex items-center gap-4 mb-2">-->
+                <!--                        <label class="font-medium">Expressões Regulares</label>-->
+                <!--                        <p-button-->
+                <!--                            type="button"-->
+                <!--                            icon="pi pi-plus"-->
+                <!--                            (onClick)="addExpression()"-->
+                <!--                            pTooltip="Adicionar expressão"-->
+                <!--                            tooltipPosition="right"-->
+                <!--                            outlined-->
+                <!--                            size="small"-->
+                <!--                        ></p-button>-->
+                <!--                    </div>-->
+
+                <!--                    <div formArrayName="expressions">-->
+                <!--                        <div *ngFor="let expression of expressions.controls; let i = index" class="mb-3">-->
+                <!--                            <div class="flex gap-2">-->
+                <!--                                <div class="flex-grow-1">-->
+                <!--                                    <input-->
+                <!--                                        [formControlName]="i"-->
+                <!--                                        type="text"-->
+                <!--                                        pInputText-->
+                <!--                                        placeholder="1X[34]"-->
+                <!--                                        class="w-full"-->
+                <!--                                    />-->
+                <!--                                    <small *ngIf="expression.invalid && expression.touched" class="p-error block">-->
+                <!--                                        Expressão Obrigatória-->
+                <!--                                    </small>-->
+                <!--                                </div>-->
+                <!--                                <p-button-->
+                <!--                                    *ngIf="expressions.length > 1"-->
+                <!--                                    type="button"-->
+                <!--                                    icon="pi pi-trash"-->
+                <!--                                    (onClick)="removeExpression(i)"-->
+                <!--                                    severity="danger"-->
+                <!--                                    outlined-->
+                <!--                                ></p-button>-->
+                <!--                            </div>-->
+                <!--                        </div>-->
+                <!--                    </div>-->
+                <!--                </div>-->
+
+                <p-card header="Ações" class="mb-4"></p-card>
 
                 <div class="flex mt-4">
                     <p-button type="submit" label="Salvar" [disabled]="form.invalid || pending">
@@ -113,6 +163,26 @@ export class NewDialplanPage implements OnInit {
     pending = false;
     showError = false;
 
+    srcOptions = [
+        {label: 'Qualquer', value: 'ANY'},
+        {label: 'Ramal', value: 'PEER'},
+        {label: 'Agente', value: 'AGENT'},
+        {label: 'Expressão Regular', value: 'EXPRESSION'},
+        {label: 'Alias', value: 'ALIAS'},
+        {label: 'Tronco', value: 'TRUNK'},
+    ];
+
+
+    peerOptions = [
+        {label: 'Ramal 1929', value: '1929'},
+        {label: 'Ramal 1928', value: '1928'},
+    ];
+
+    agentOptions = [
+        {label: 'Agente 1', value: '1'},
+        {label: 'Agente 2', value: '2'},
+    ];
+
     constructor(
         private readonly fb: FormBuilder,
         private readonly router: Router,
@@ -120,28 +190,30 @@ export class NewDialplanPage implements OnInit {
     ) {
     }
 
-    get expressions() {
-        return this.form.get('expressions') as FormArray;
-    }
-
     get name() {
         return this.form.get('name');
+    }
+
+    get src() {
+        return this.form.get('src');
+    }
+
+    get srcValue() {
+        return this.form.get('srcValue');
     }
 
     ngOnInit(): void {
         this.form = this.fb.group({
             name: ['', [Validators.required]],
-            expressions: this.fb.array([])
+            src: ['', [Validators.required]],
         });
-        this.addExpression();
     }
 
-    addExpression() {
-        this.expressions.push(this.fb.control('', [Validators.required]));
-    }
-
-    removeExpression(index: number) {
-        this.expressions.removeAt(index);
+    manageSrcValue() {
+        this.form.removeControl('srcValue');
+        if (this.src?.value == 'PEER' || this.src?.value == 'AGENT') {
+            this.form.addControl('srcValue', this.fb.control('', [Validators.required]));
+        }
     }
 
     onSubmit() {
@@ -149,15 +221,13 @@ export class NewDialplanPage implements OnInit {
         this.showError = false;
         const dialplan: DialPlan = {
             ...this.form.value,
-            expressions: this.form.value.expressions.map((expression: string) => {
-                return {expression};
-            })
         };
-        this.dialPlanService.create(dialplan)
-            .then(() => this.router.navigate(['/pabx/dialplans']))
-            .catch(() => {
-                this.showError = true;
-            })
-            .finally(() => (this.pending = false));
+        console.log(dialplan);
+        // this.dialPlanService.create(dialplan)
+        //     .then(() => this.router.navigate(['/pabx/dialplans']))
+        //     .catch(() => {
+        //         this.showError = true;
+        //     })
+        //     .finally(() => (this.pending = false));
     }
 }
