@@ -8,12 +8,12 @@ import {RouterLink} from "@angular/router";
 import {ProgressSpinner} from "primeng/progressspinner";
 import {ConfirmDialog} from "primeng/confirmdialog";
 import {Toast} from "primeng/toast";
-import {Dialplan} from "@/pabx/types";
+import {DialPlan} from "@/pabx/types";
 import {NgIf} from "@angular/common";
 import {Tooltip} from "primeng/tooltip";
 import {InputText} from "primeng/inputtext";
 import {ConfirmationService, MessageService} from "primeng/api";
-import {DialplanService} from "@/pabx/dialplan/dialplan.service";
+import {DialPlanService} from "@/pabx/dialplan/dial-plan.service";
 
 @Component({
     selector: 'app-dialplan-page',
@@ -115,14 +115,14 @@ import {DialplanService} from "@/pabx/dialplan/dialplan.service";
     `
 })
 export class DialplanPage implements OnInit {
-    dialplans: Dialplan[] = [];
+    dialplans: DialPlan[] = [];
     @ViewChild('dataTable') dt!: Table;
     loading = true;
 
     constructor(
         private readonly confirmationService: ConfirmationService,
         private readonly messageService: MessageService,
-        private readonly dialplanService: DialplanService
+        private readonly dialplanService: DialPlanService
     ) {
     }
 
@@ -140,7 +140,7 @@ export class DialplanPage implements OnInit {
         }
     }
 
-    confirmDelete(dialplan: Dialplan) {
+    confirmDelete(dialplan: DialPlan) {
         this.confirmationService.confirm({
             message: `Deletar ${dialplan.name}?`,
             header: 'Confirmação',

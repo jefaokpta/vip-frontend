@@ -46,7 +46,7 @@ export interface DialPlanAction {
     readonly arg5?: string
 }
 
-export interface Dialplan {
+export interface DialPlan {
     readonly id: number,
     readonly name: string,
     readonly srcEnum: SrcEnum,

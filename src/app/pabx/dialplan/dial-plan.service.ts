@@ -2,11 +2,11 @@ import {Injectable} from "@angular/core";
 import {HttpClient} from "@angular/common/http";
 import {environment} from "../../../environments/environment";
 import {executeRequest, httpHeaders} from "@/util/utils";
-import {Dialplan} from "@/pabx/types";
+import {DialPlan} from "@/pabx/types";
 import {UserService} from "@/pages/users/user.service";
 
 @Injectable({providedIn: 'root'})
-export class DialplanService {
+export class DialPlanService {
 
     private readonly BACKEND = environment.API_BACKEND_URL;
 
@@ -16,9 +16,9 @@ export class DialplanService {
     ) {
     }
 
-    findAll(): Promise<Dialplan[]> {
+    findAll(): Promise<DialPlan[]> {
         const user = this.userService.getUser()
-        return executeRequest(this.http.get<Dialplan[]>(`${this.BACKEND}/dialplans/${user.controlNumber}`, httpHeaders()));
+        return executeRequest(this.http.get<DialPlan[]>(`${this.BACKEND}/dialplans/${user.controlNumber}`, httpHeaders()));
     }
 
     delete(id: number) {
@@ -26,17 +26,17 @@ export class DialplanService {
         return executeRequest(this.http.delete(`${this.BACKEND}/dialplans/${user.controlNumber}/${id}`, httpHeaders()));
     }
 
-    create(dialplan: Dialplan) {
+    create(dialplan: DialPlan) {
         const user = this.userService.getUser()
         return executeRequest(this.http.post(`${this.BACKEND}/dialplans/${user.controlNumber}`, dialplan, httpHeaders()));
     }
 
     findById(id: number) {
         const user = this.userService.getUser()
-        return executeRequest(this.http.get<Dialplan>(`${this.BACKEND}/dialplans/${user.controlNumber}/${id}`, httpHeaders()));
+        return executeRequest(this.http.get<DialPlan>(`${this.BACKEND}/dialplans/${user.controlNumber}/${id}`, httpHeaders()));
     }
 
-    update(dialplan: Dialplan) {
+    update(dialplan: DialPlan) {
         const user = this.userService.getUser()
         return executeRequest(this.http.put(`${this.BACKEND}/dialplans/${user.controlNumber}/${dialplan.id}`, dialplan, httpHeaders()));
     }
