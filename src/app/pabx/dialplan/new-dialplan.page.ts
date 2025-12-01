@@ -6,7 +6,7 @@ import {CardModule} from 'primeng/card';
 import {NgIf} from '@angular/common';
 import {Router, RouterLink} from '@angular/router';
 import {DialPlanService} from './dial-plan.service';
-import {DialPlan} from "@/pabx/types";
+import {DialPlan, SrcEnum} from "@/pabx/types";
 import {Select} from "primeng/select";
 import {AgentSelectComponent} from "@/pabx/dialplan/components/agent-select-component";
 import {PeerSelectComponent} from "@/pabx/dialplan/components/peer-select-component";
@@ -84,6 +84,16 @@ import {PeerSelectComponent} from "@/pabx/dialplan/components/peer-select-compon
                         formControlName="srcValue"
                         [showError]="srcValue?.errors?.['required']"
                     ></app-agent-select-component>
+
+                    <div class="field mb-4" *ngIf="src?.value == 'EXPRESSION'">
+                        <label for="srcValue" class="block mb-2">Expressão Regular *</label>
+                        <input id="srcValue" pInputText class="p-inputtext" formControlName="srcValue"/>
+                        <small *ngIf="srcValue?.invalid && (srcValue?.dirty || srcValue?.touched)"
+                               class="p-error block mt-2">
+                            <div *ngIf="srcValue?.errors?.['required']">Expressão Regular é obrigatória.</div>
+                        </small>
+                    </div>
+
                 </div>
 
                 <!--                <div class="field mb-4">-->
@@ -150,23 +160,12 @@ export class NewDialplanPage implements OnInit {
     showError = false;
 
     srcOptions = [
-        {label: 'Qualquer', value: 'ANY'},
-        {label: 'Ramal', value: 'PEER'},
-        {label: 'Agente', value: 'AGENT'},
-        {label: 'Expressão Regular', value: 'EXPRESSION'},
-        {label: 'Alias', value: 'ALIAS'},
-        {label: 'Tronco', value: 'TRUNK'},
-    ];
-
-
-    peerOptions = [
-        {label: 'Ramal 1929', value: '1929'},
-        {label: 'Ramal 1928', value: '1928'},
-    ];
-
-    agentOptions = [
-        {label: 'Agente 1', value: '1'},
-        {label: 'Agente 2', value: '2'},
+        {label: 'Qualquer', value: SrcEnum.ANY},
+        {label: 'Ramal', value: SrcEnum.PEER},
+        {label: 'Agente', value: SrcEnum.AGENT},
+        {label: 'Expressão Regular', value: SrcEnum.EXPRESSION},
+        {label: 'Alias', value: SrcEnum.ALIAS},
+        {label: 'Tronco', value: SrcEnum.TRUNK},
     ];
 
     constructor(
@@ -197,7 +196,7 @@ export class NewDialplanPage implements OnInit {
 
     manageSrcValue() {
         this.form.removeControl('srcValue');
-        if (this.src?.value == 'PEER' || this.src?.value == 'AGENT') {
+        if (this.src?.value != 'ANY') {
             this.form.addControl('srcValue', this.fb.control('', [Validators.required]));
         }
     }
