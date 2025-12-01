@@ -3,15 +3,70 @@ import {CallAnalyzeStatusEnum, SentimentEnum, TemperatureEnum} from "@/types/typ
 
 export interface Alias {
     readonly id: number;
-    name: string;
-    companyId: string;
-    expressions: AliasExpression[]
+    readonly name: string;
+    readonly companyId: string;
+    readonly expressions: AliasExpression[]
 }
 
 export interface AliasExpression {
     readonly id: number;
     readonly expression: string;
     readonly aliasId: number;
+}
+
+export enum SrcEnum {
+    ANY = 'ANY',
+    CALLBACK = 'CALLBACK',
+    PEER = 'PEER',
+    AGENT = 'AGENT',
+    ALIAS = 'ALIAS',
+    EXPRESSION = 'EXPRESSION',
+    TRUNK = 'TRUNK'
+}
+
+export enum DialPlanActionEnum {
+    ANSWER = 'ANSWER',
+    HANGUP = 'HANGUP',
+    PLAYBACK = 'PLAYBACK',
+    SET_VARIABLE = 'SET_VARIABLE',
+    DIAL_TRUNK = 'DIAL_TRUNK',
+    DIAL_PEER = 'DIAL_PEER',
+    ACCOUNT_CODE = 'ACCOUNT_CODE'
+}
+
+export interface DialPlanAction {
+    readonly id: number,
+    readonly dialPlanActionEnum: DialPlanActionEnum,
+    readonly priority: number,
+    readonly dialplanId: number,
+    readonly arg1?: string,
+    readonly arg2?: string,
+    readonly arg3?: string,
+    readonly arg4?: string,
+    readonly arg5?: string
+}
+
+export interface Dialplan {
+    readonly id: number,
+    readonly name: string,
+    readonly srcEnum: SrcEnum,
+    readonly srcValue?: string,
+    readonly dst?: string,
+    readonly isAlwaysActive: boolean,
+    readonly isActive: boolean,
+    readonly priority: number,
+    readonly companyId: string,
+    readonly startTime?: Date,
+    readonly endTime?: Date,
+    readonly monday?: boolean,
+    readonly tuesday?: boolean,
+    readonly wednesday?: boolean,
+    readonly thursday?: boolean,
+    readonly friday?: boolean,
+    readonly saturday?: boolean,
+    readonly sunday?: boolean,
+    readonly dstAlias?: number,
+    readonly dialPlanActions: DialPlanAction[]
 }
 
 export enum PeerStateEnum {
