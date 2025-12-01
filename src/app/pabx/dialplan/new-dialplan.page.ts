@@ -8,6 +8,8 @@ import {Router, RouterLink} from '@angular/router';
 import {DialPlanService} from './dial-plan.service';
 import {DialPlan} from "@/pabx/types";
 import {Select} from "primeng/select";
+import {AgentSelectComponent} from "@/pabx/dialplan/components/agent-select-component";
+import {PeerSelectComponent} from "@/pabx/dialplan/components/peer-select-component";
 
 /**
  * @author Jefferson Alves Reis (jefaokpta)
@@ -24,7 +26,9 @@ import {Select} from "primeng/select";
         NgIf,
         ReactiveFormsModule,
         RouterLink,
-        Select
+        Select,
+        AgentSelectComponent,
+        PeerSelectComponent
     ],
     template: `
         <p-card>
@@ -68,36 +72,18 @@ import {Select} from "primeng/select";
                             <div *ngIf="src?.errors?.['required']">Origem é obrigatória.</div>
                         </small>
                     </div>
-                    <div class="field mb-4" *ngIf="src?.value == 'PEER'">
-                        <label for="srcValue" class="block mb-2">Ramal *</label>
-                        <p-select
-                            id="srcValue"
-                            [options]="peerOptions"
-                            formControlName="srcValue"
-                            optionLabel="label"
-                            optionValue="value"
-                            placeholder="Selecione um ramal"
-                        ></p-select>
-                        <small *ngIf="srcValue?.invalid && (srcValue?.dirty || srcValue?.touched)"
-                               class="p-error block mt-2">
-                            <div *ngIf="srcValue?.errors?.['required']">Ramal é obrigatório.</div>
-                        </small>
-                    </div>
-                    <div class="field mb-4" *ngIf="src?.value == 'AGENT'">
-                        <label for="srcValue" class="block mb-2">Agente *</label>
-                        <p-select
-                            id="srcValue"
-                            [options]="agentOptions"
-                            formControlName="srcValue"
-                            optionLabel="label"
-                            optionValue="value"
-                            placeholder="Selecione um agente"
-                        ></p-select>
-                        <small *ngIf="srcValue?.invalid && (srcValue?.dirty || srcValue?.touched)"
-                               class="p-error block mt-2">
-                            <div *ngIf="srcValue?.errors?.['required']">Agente é obrigatório.</div>
-                        </small>
-                    </div>
+
+                    <app-peer-select-component
+                        *ngIf="src?.value == 'PEER'"
+                        formControlName="srcValue"
+                        [showError]="srcValue?.errors?.['required']"
+                    ></app-peer-select-component>
+
+                    <app-agent-select-component
+                        *ngIf="src?.value == 'AGENT'"
+                        formControlName="srcValue"
+                        [showError]="srcValue?.errors?.['required']"
+                    ></app-agent-select-component>
                 </div>
 
                 <!--                <div class="field mb-4">-->
