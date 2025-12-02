@@ -153,7 +153,7 @@ export class NewAliasPage implements OnInit {
                 return {expression};
             })
         };
-        this.aliasService.createAlias(alias)
+        this.aliasService.create(alias)
             .then(() => this.router.navigate(['/pabx/aliases']))
             .catch(() => {
                 this.showError = true;

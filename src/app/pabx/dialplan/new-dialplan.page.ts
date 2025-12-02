@@ -10,6 +10,7 @@ import {DialPlan, SrcEnum} from "@/pabx/types";
 import {Select} from "primeng/select";
 import {AgentSelectComponent} from "@/pabx/dialplan/components/agent-select-component";
 import {PeerSelectComponent} from "@/pabx/dialplan/components/peer-select-component";
+import {AliasSelectComponent} from "@/pabx/dialplan/components/alias-select-component";
 
 /**
  * @author Jefferson Alves Reis (jefaokpta)
@@ -28,7 +29,8 @@ import {PeerSelectComponent} from "@/pabx/dialplan/components/peer-select-compon
         RouterLink,
         Select,
         AgentSelectComponent,
-        PeerSelectComponent
+        PeerSelectComponent,
+        AliasSelectComponent
     ],
     template: `
         <p-card>
@@ -84,6 +86,12 @@ import {PeerSelectComponent} from "@/pabx/dialplan/components/peer-select-compon
                         formControlName="srcValue"
                         [showError]="srcValue?.errors?.['required']"
                     ></app-agent-select-component>
+
+                    <app-alias-select-component
+                        *ngIf="src?.value == 'ALIAS'"
+                        formControlName="srcValue"
+                        [showError]="srcValue?.errors?.['required']"
+                    ></app-alias-select-component>
 
                     <div class="field mb-4" *ngIf="src?.value == 'EXPRESSION'">
                         <label for="srcValue" class="block mb-2">Expressão Regular *</label>

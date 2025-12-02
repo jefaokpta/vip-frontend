@@ -16,27 +16,27 @@ export class AliasService {
     ) {
     }
 
-    findAllAliases(): Promise<Alias[]> {
+    findAll(): Promise<Alias[]> {
         const user = this.userService.getUser()
         return executeRequest(this.http.get<Alias[]>(`${this.BACKEND}/aliases/${user.controlNumber}`, httpHeaders()));
     }
 
-    deleteAlias(id: number) {
+    delete(id: number) {
         const user = this.userService.getUser()
         return executeRequest(this.http.delete(`${this.BACKEND}/aliases/${user.controlNumber}/${id}`, httpHeaders()));
     }
 
-    createAlias(alias: Alias) {
+    create(alias: Alias) {
         const user = this.userService.getUser()
         return executeRequest(this.http.post(`${this.BACKEND}/aliases/${user.controlNumber}`, alias, httpHeaders()));
     }
 
-    findAliasById(id: number) {
+    findById(id: number) {
         const user = this.userService.getUser()
         return executeRequest(this.http.get<Alias>(`${this.BACKEND}/aliases/${user.controlNumber}/${id}`, httpHeaders()));
     }
 
-    updateAlias(alias: Alias) {
+    update(alias: Alias) {
         const user = this.userService.getUser()
         return executeRequest(this.http.put(`${this.BACKEND}/aliases/${user.controlNumber}/${alias.id}`, alias, httpHeaders()));
     }

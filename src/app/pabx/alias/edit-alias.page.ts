@@ -135,7 +135,7 @@ export class EditAliasPage implements OnInit {
             name: ['', [Validators.required]],
             expressions: this.fb.array([])
         });
-        this.aliasService.findAliasById(this.activatedRoute.snapshot.params['id'])
+        this.aliasService.findById(this.activatedRoute.snapshot.params['id'])
             .then(alias => {
                 this.alias = alias;
                 this.form.patchValue(alias);
@@ -168,7 +168,7 @@ export class EditAliasPage implements OnInit {
                 return {expression};
             })
         };
-        this.aliasService.updateAlias(alias)
+        this.aliasService.update(alias)
             .then(() => this.router.navigate(['/pabx/aliases']))
             .catch(() => {
                 this.showError = true;

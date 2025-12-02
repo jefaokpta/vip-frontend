@@ -127,7 +127,7 @@ export class AliasPage implements OnInit {
     }
 
     ngOnInit(): void {
-        this.aliasService.findAllAliases().then((aliases) => {
+        this.aliasService.findAll().then((aliases) => {
             this.aliases = aliases;
             this.loading = false;
         });
@@ -157,7 +157,7 @@ export class AliasPage implements OnInit {
                 outlined: true
             },
             accept: () => {
-                this.aliasService.deleteAlias(alias.id)
+                this.aliasService.delete(alias.id)
                     .then(() => {
                         this.aliases = this.aliases.filter((a) => a.id !== alias.id);
                         this.messageService.add({
