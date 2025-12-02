@@ -11,6 +11,7 @@ import {Select} from "primeng/select";
 import {AgentSelectComponent} from "@/pabx/dialplan/components/agent-select-component";
 import {PeerSelectComponent} from "@/pabx/dialplan/components/peer-select-component";
 import {AliasSelectComponent} from "@/pabx/dialplan/components/alias-select-component";
+import {TrunkSelectComponent} from "@/pabx/dialplan/components/trunk-select-component";
 
 /**
  * @author Jefferson Alves Reis (jefaokpta)
@@ -30,7 +31,8 @@ import {AliasSelectComponent} from "@/pabx/dialplan/components/alias-select-comp
         Select,
         AgentSelectComponent,
         PeerSelectComponent,
-        AliasSelectComponent
+        AliasSelectComponent,
+        TrunkSelectComponent
     ],
     template: `
         <p-card>
@@ -92,6 +94,12 @@ import {AliasSelectComponent} from "@/pabx/dialplan/components/alias-select-comp
                         formControlName="srcValue"
                         [showError]="srcValue?.errors?.['required']"
                     ></app-alias-select-component>
+
+                    <app-trunk-select-component
+                        *ngIf="src?.value == 'TRUNK'"
+                        formControlName="srcValue"
+                        [showError]="srcValue?.errors?.['required']"
+                    ></app-trunk-select-component>
 
                     <div class="field mb-4" *ngIf="src?.value == 'EXPRESSION'">
                         <label for="srcValue" class="block mb-2">Expressão Regular *</label>
