@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {InputTextModule} from 'primeng/inputtext';
 import {ButtonModule} from 'primeng/button';
 import {CardModule} from 'primeng/card';
@@ -12,6 +12,7 @@ import {AgentSelectComponent} from "@/pabx/dialplan/components/agent-select-comp
 import {PeerSelectComponent} from "@/pabx/dialplan/components/peer-select-component";
 import {AliasSelectComponent} from "@/pabx/dialplan/components/alias-select-component";
 import {TrunkSelectComponent} from "@/pabx/dialplan/components/trunk-select-component";
+import {ToggleSwitch} from "primeng/toggleswitch";
 
 /**
  * @author Jefferson Alves Reis (jefaokpta)
@@ -32,7 +33,9 @@ import {TrunkSelectComponent} from "@/pabx/dialplan/components/trunk-select-comp
         AgentSelectComponent,
         PeerSelectComponent,
         AliasSelectComponent,
-        TrunkSelectComponent
+        TrunkSelectComponent,
+        ToggleSwitch,
+        FormsModule
     ],
     template: `
         <p-card>
@@ -109,8 +112,31 @@ import {TrunkSelectComponent} from "@/pabx/dialplan/components/trunk-select-comp
                             <div *ngIf="srcValue?.errors?.['required']">Expressão Regular é obrigatória.</div>
                         </small>
                     </div>
-
                 </div>
+
+                <div class="flex gap-4 items-center">
+                    <div class="field mb-4" *ngIf="!dstToggle?.value">
+                        <label for="extension" class="block mb-2">Destino *</label>
+                        <input id="extension" pInputText class="p-inputtext" formControlName="dst"
+                               placeholder="Expressão regular"/>
+                        <small *ngIf="dst?.invalid && (dst?.dirty || dst?.touched)" class="p-error block mt-2">
+                            <div *ngIf="dst?.errors?.['required']">Destino é obrigatório.</div>
+                        </small>
+                    </div>
+
+                    <app-alias-select-component
+                        *ngIf="dstToggle?.value"
+                        formControlName="dstAlias"
+                        [showError]="dstAlias?.errors?.['required']"
+                    ></app-alias-select-component>
+
+                    <div class="field mb-4">
+                        <label for="dstAlias" class="block mb-2">Usar Alias</label>
+                        <p-toggleswitch name="dstToggle" formControlName="dstToggle"
+                                        (onChange)="isDstUsingAlias($event)"/>
+                    </div>
+                </div>
+
 
                 <!--                <div class="field mb-4">-->
                 <!--                    <div class="flex items-center gap-4 mb-2">-->
@@ -195,6 +221,10 @@ export class NewDialplanPage implements OnInit {
         return this.form.get('name');
     }
 
+    get dst() {
+        return this.form.get('dst');
+    }
+
     get src() {
         return this.form.get('src');
     }
@@ -203,10 +233,20 @@ export class NewDialplanPage implements OnInit {
         return this.form.get('srcValue');
     }
 
+    get dstAlias() {
+        return this.form.get('dstAlias');
+    }
+
+    get dstToggle() {
+        return this.form.get('dstToggle');
+    }
+
     ngOnInit(): void {
         this.form = this.fb.group({
             name: ['', [Validators.required]],
             src: ['', [Validators.required]],
+            dst: ['', [Validators.required]],
+            dstToggle: [false],
         });
     }
 
@@ -230,5 +270,15 @@ export class NewDialplanPage implements OnInit {
         //         this.showError = true;
         //     })
         //     .finally(() => (this.pending = false));
+    }
+
+    protected isDstUsingAlias(event: any) {
+        if (event.checked) {
+            this.form.removeControl('dst');
+            this.form.addControl('dstAlias', this.fb.control('', [Validators.required]));
+        } else {
+            this.form.removeControl('dstAlias');
+            this.form.addControl('dst', this.fb.control('', [Validators.required]));
+        }
     }
 }
