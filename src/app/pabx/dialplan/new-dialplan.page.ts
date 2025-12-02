@@ -107,7 +107,9 @@ import {ToggleSwitch} from "primeng/toggleswitch";
 
                             <div class="field mb-4" *ngIf="src?.value == 'EXPRESSION'">
                                 <label for="srcValue" class="block mb-2">Expressão Regular *</label>
-                                <input id="srcValue" pInputText class="p-inputtext" formControlName="srcValue"/>
+                                <input id="srcValue" pInputText class="p-inputtext" formControlName="srcValue"
+                                       placeholder="1[34]XX"
+                                />
                                 <small *ngIf="srcValue?.invalid && (srcValue?.dirty || srcValue?.touched)"
                                        class="p-error block mt-2">
                                     <div *ngIf="srcValue?.errors?.['required']">Expressão Regular é obrigatória.</div>
@@ -121,7 +123,8 @@ import {ToggleSwitch} from "primeng/toggleswitch";
                             <div class="field mb-4" *ngIf="!dstToggle?.value">
                                 <label for="extension" class="block mb-2">Expressão regular *</label>
                                 <input id="extension" pInputText class="p-inputtext" formControlName="dst"
-                                       placeholder="Expressão regular"/>
+                                       placeholder="1[34]XX"
+                                />
                                 <small *ngIf="dst?.invalid && (dst?.dirty || dst?.touched)" class="p-error block mt-2">
                                     <div *ngIf="dst?.errors?.['required']">Expressão regular é obrigatória.</div>
                                 </small>
