@@ -55,13 +55,21 @@ import {ToggleSwitch} from "primeng/toggleswitch";
 
             <form [formGroup]="form" (ngSubmit)="onSubmit()" class="p-fluid">
                 <div class="flex flex-col gap-4">
-                    <div class="field">
-                        <label for="name" class="block mb-2">Nome *</label>
-                        <input id="name" pInputText class="p-inputtext" formControlName="name"/>
-                        <small *ngIf="name?.invalid && (name?.dirty || name?.touched)" class="p-error block mt-2">
-                            <div *ngIf="name?.errors?.['required']">Nome é obrigatório.</div>
-                        </small>
+                    <div class="flex items-center justify-between">
+                        <div class="field">
+                            <label for="name" class="block mb-2">Nome *</label>
+                            <input id="name" pInputText class="p-inputtext" formControlName="name"/>
+                            <small *ngIf="name?.invalid && (name?.dirty || name?.touched)" class="p-error block mt-2">
+                                <div *ngIf="name?.errors?.['required']">Nome é obrigatório.</div>
+                            </small>
+                        </div>
+
+                        <div class="flex gap-2">
+                            <span>Regra ativa</span>
+                            <p-toggleswitch name="isActive" formControlName="isActive"/>
+                        </div>
                     </div>
+
 
                     <p-card header="Origem">
                         <div class="flex gap-24">
@@ -145,10 +153,10 @@ import {ToggleSwitch} from "primeng/toggleswitch";
                         </div>
                     </p-card>
 
-                    <p-card header="Horários">
+                    <p-card header="Periodos">
                         <div class="flex gap-2">
-                            <span>Sempre ativa</span>
-                            <p-toggleswitch name="dstToggle"/>
+                            <span>24h</span>
+                            <p-toggleswitch name="isAlwaysActive" formControlName="isAlwaysActive"/>
                         </div>
                     </p-card>
 
@@ -261,6 +269,8 @@ export class NewDialplanPage implements OnInit {
             name: ['', [Validators.required]],
             src: ['', [Validators.required]],
             dst: ['', [Validators.required]],
+            isAlwaysActive: [true],
+            isActive: [true],
             dstToggle: [false],
         });
     }
