@@ -4,7 +4,7 @@ import {DialplanPage} from "@/pabx/dialplan/dialplan.page";
 import {AliasPage} from "@/pabx/alias/alias.page";
 import {NewAliasPage} from "@/pabx/alias/new-alias.page";
 import {EditAliasPage} from "@/pabx/alias/edit-alias.page";
-import {NewDialplanPage} from "@/pabx/dialplan/new-dialplan.page";
+import {NewDialplanPage} from "@/pabx/dialplan/new-dialplan/new-dialplan.page";
 
 export default [
     {path: 'peers', component: PeerPage, data: {breadcrumb: 'Ramais'}},

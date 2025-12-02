@@ -28,7 +28,7 @@ export enum DialPlanActionEnum {
     HANGUP = 'HANGUP',
     PLAYBACK = 'PLAYBACK',
     SET_VARIABLE = 'SET_VARIABLE',
-    DIAL_TRUNK = 'DIAL_TRUNK',
+    DIAL_ROUTE = 'DIAL_ROUTE',
     DIAL_PEER = 'DIAL_PEER',
     ACCOUNT_CODE = 'ACCOUNT_CODE'
 }
