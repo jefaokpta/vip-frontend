@@ -119,8 +119,15 @@ import {ToggleSwitch} from "primeng/toggleswitch";
                     </p-card>
 
                     <p-card header="Destino">
-                        <div class="flex gap-4">
-                            <div class="field mb-4" *ngIf="!dstToggle?.value">
+                        <div class="flex flex-col gap-2">
+                            <div class="flex gap-2">
+                                <span>Usar Alias</span>
+                                <p-toggleswitch name="dstToggle" formControlName="dstToggle"
+                                                (onChange)="isDstUsingAlias($event)"
+                                />
+                            </div>
+
+                            <div class="field" *ngIf="!dstToggle?.value">
                                 <label for="extension" class="block mb-2">Expressão regular *</label>
                                 <input id="extension" pInputText class="p-inputtext" formControlName="dst"
                                        placeholder="1[34]XX"
@@ -135,15 +142,15 @@ import {ToggleSwitch} from "primeng/toggleswitch";
                                 formControlName="dstAlias"
                                 [showError]="dstAlias?.errors?.['required']"
                             ></app-alias-select-component>
-
-                            <div class="field mb-4">
-                                <label for="dstAlias" class="block mb-2">Usar Alias</label>
-                                <p-toggleswitch name="dstToggle" formControlName="dstToggle"
-                                                (onChange)="isDstUsingAlias($event)"/>
-                            </div>
                         </div>
                     </p-card>
 
+                    <p-card header="Horários">
+                        <div class="flex gap-2">
+                            <span>Sempre ativa</span>
+                            <p-toggleswitch name="dstToggle"/>
+                        </div>
+                    </p-card>
 
                     <!--                <div class="field mb-4">-->
                     <!--                    <div class="flex items-center gap-4 mb-2">-->
