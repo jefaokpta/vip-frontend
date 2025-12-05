@@ -131,6 +131,7 @@ export class NewDialplanPage implements OnInit {
         this.dialplanActions.push(this.fb.group({
             dialPlanActionEnum: this.selectedAction?.value,
             arg1: [''],
+            arg2: [''],
         }));
     }
 
