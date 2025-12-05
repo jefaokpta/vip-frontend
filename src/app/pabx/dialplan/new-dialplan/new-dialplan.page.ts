@@ -14,6 +14,7 @@ import {AliasSelectComponent} from "@/pabx/dialplan/components/alias-select-comp
 import {TrunkSelectComponent} from "@/pabx/dialplan/components/trunk-select-component";
 import {ToggleSwitch} from "primeng/toggleswitch";
 import {TableModule} from "primeng/table";
+import {PeerActionComponent} from "@/pabx/dialplan/components/peer-action.component";
 
 /**
  * @author Jefferson Alves Reis (jefaokpta)
@@ -37,7 +38,8 @@ import {TableModule} from "primeng/table";
         TrunkSelectComponent,
         ToggleSwitch,
         FormsModule,
-        TableModule
+        TableModule,
+        PeerActionComponent
     ],
     templateUrl: './new-dialplan.page.html',
 })

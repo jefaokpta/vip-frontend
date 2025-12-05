@@ -16,7 +16,7 @@ import {Panel} from "primeng/panel";
     template: `
         <p-panel header="Chamar Rota" [toggleable]="true" toggler="header" collapsed>
             <p class="m-0">
-                Lorem ipsum dolor sit amet...
+                dados da rota
             </p>
         </p-panel>
     `

@@ -1,11 +1,12 @@
 import {Component, forwardRef, Input} from '@angular/core';
 import {ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule} from '@angular/forms';
 import {Panel} from "primeng/panel";
+import {PeerSelectComponent} from "@/pabx/dialplan/components/peer-select-component";
 
 @Component({
     selector: 'app-peer-action-component',
     standalone: true,
-    imports: [ReactiveFormsModule, FormsModule, Panel],
+    imports: [ReactiveFormsModule, FormsModule, Panel, PeerSelectComponent],
     providers: [
         {
             provide: NG_VALUE_ACCESSOR,
@@ -15,9 +16,7 @@ import {Panel} from "primeng/panel";
     ],
     template: `
         <p-panel header="Chamar Ramal" [toggleable]="true" toggler="header" collapsed>
-            <p class="m-0">
-                Lorem ipsum dolor sit amet...
-            </p>
+            <app-peer-select-component formControlName="value"/>
         </p-panel>
     `
 })

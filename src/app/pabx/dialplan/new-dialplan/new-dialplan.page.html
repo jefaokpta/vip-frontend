@@ -119,34 +119,6 @@
                 </div>
             </p-card>
 
-            <!--                    <div formArrayName="expressions">-->
-            <!--                        <div *ngFor="let expression of expressions.controls; let i = index" class="mb-3">-->
-            <!--                            <div class="flex gap-2">-->
-            <!--                                <div class="flex-grow-1">-->
-            <!--                                    <input-->
-            <!--                                        [formControlName]="i"-->
-            <!--                                        type="text"-->
-            <!--                                        pInputText-->
-            <!--                                        placeholder="1X[34]"-->
-            <!--                                        class="w-full"-->
-            <!--                                    />-->
-            <!--                                    <small *ngIf="expression.invalid && expression.touched" class="p-error block">-->
-            <!--                                        Expressão Obrigatória-->
-            <!--                                    </small>-->
-            <!--                                </div>-->
-            <!--                                <p-button-->
-            <!--                                    *ngIf="expressions.length > 1"-->
-            <!--                                    type="button"-->
-            <!--                                    icon="pi pi-trash"-->
-            <!--                                    (onClick)="removeExpression(i)"-->
-            <!--                                    severity="danger"-->
-            <!--                                    outlined-->
-            <!--                                ></p-button>-->
-            <!--                            </div>-->
-            <!--                        </div>-->
-            <!--                    </div>-->
-            <!--                </div>-->
-
             <p-card header="Configurar Ações">
                 <div class="flex gap-4">
                     <div class="field">
@@ -164,22 +136,25 @@
 
                 <div class="flex flex-col gap-2" formArrayName="dialplanActions">
                     <p-table [value]="dialplanActions.controls" [tableStyle]="{'min-width': '50rem'}">
-                        <ng-template pTemplate="header">
+                        <ng-template #header>
                             <tr>
-                                <th style="width: 30%">Ação</th>
-                                <th>Argumento</th>
-                                <th style="width: 5%"></th>
+                                <th style="width: 1rem"></th>
+                                <th></th>
+                                <th style="width: 1rem"></th>
                             </tr>
                         </ng-template>
-                        <ng-template pTemplate="body" let-action let-index="rowIndex">
-                            <tr [formGroupName]="index">
-                                <td>{{ action.get('dialPlanActionEnum').value }}</td>
+                        <ng-template #body let-action let-index="rowIndex">
+                            <tr [formGroupName]="index" [pReorderableRow]="index">
                                 <td>
-                                    <input pInputText formControlName="arg1" placeholder="Argumento"/>
+                                    <span class="pi pi-bars" pReorderableRowHandle></span>
+                                </td>
+                                <td>
+                                    <app-peer-action-component formControlName="arg1"></app-peer-action-component>
                                 </td>
                                 <td>
                                     <p-button icon="pi pi-trash" severity="danger" outlined
-                                              (onClick)="removeDialplanAction(index)"></p-button>
+                                              (onClick)="removeDialplanAction(index)">
+                                    </p-button>
                                 </td>
                             </tr>
                         </ng-template>
