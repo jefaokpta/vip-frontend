@@ -16,12 +16,14 @@ import {PeerSelectComponent} from "@/pabx/dialplan/components/peer-select-compon
     ],
     template: `
         <p-panel header="Chamar Ramal" [toggleable]="true" toggler="header" collapsed>
-            <app-peer-select-component formControlName="value"/>
+            <app-peer-select-component [(ngModel)]="value" (ngModelChange)="onValueChange($event)"
+                                       [isShowLabel]="isShowLabel"/>
         </p-panel>
     `
 })
 export class PeerActionComponent implements ControlValueAccessor {
     @Input() showError = false;
+    @Input() isShowLabel = true;
     value: string = '';
 
     constructor() {

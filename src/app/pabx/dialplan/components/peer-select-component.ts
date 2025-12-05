@@ -17,7 +17,7 @@ import {NgIf} from '@angular/common';
     ],
     template: `
         <div class="field mb-4">
-            <label for="peer" class="block mb-2">Ramal *</label>
+            <label for="peer" class="block mb-2" *ngIf="isShowLabel">Ramal *</label>
             <p-select
                 id="peer"
                 [options]="peerOptions"
@@ -35,6 +35,7 @@ import {NgIf} from '@angular/common';
 })
 export class PeerSelectComponent implements ControlValueAccessor, OnInit {
     @Input() showError = false;
+    @Input() isShowLabel = true;
 
     value: string = '';
     peerOptions: { label: string; value: string }[] = [];
