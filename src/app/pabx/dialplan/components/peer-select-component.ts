@@ -23,6 +23,8 @@ import {NgIf} from '@angular/common';
                 [options]="peerOptions"
                 [(ngModel)]="value"
                 (ngModelChange)="onValueChange($event)"
+                [filter]="true"
+                filterBy="label"
                 optionLabel="label"
                 optionValue="value"
                 placeholder="Selecione um ramal"

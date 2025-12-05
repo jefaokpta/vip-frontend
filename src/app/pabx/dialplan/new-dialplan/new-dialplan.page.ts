@@ -15,6 +15,7 @@ import {TrunkSelectComponent} from "@/pabx/dialplan/components/trunk-select-comp
 import {ToggleSwitch} from "primeng/toggleswitch";
 import {TableModule} from "primeng/table";
 import {PeerActionComponent} from "@/pabx/dialplan/components/peer-action.component";
+import {RouteActionComponent} from "@/pabx/dialplan/components/route-action.component";
 
 /**
  * @author Jefferson Alves Reis (jefaokpta)
@@ -39,7 +40,8 @@ import {PeerActionComponent} from "@/pabx/dialplan/components/peer-action.compon
         ToggleSwitch,
         FormsModule,
         TableModule,
-        PeerActionComponent
+        PeerActionComponent,
+        RouteActionComponent
     ],
     templateUrl: './new-dialplan.page.html',
 })
@@ -163,4 +165,5 @@ export class NewDialplanPage implements OnInit {
             this.form.addControl('dst', this.fb.control('', [Validators.required]));
         }
     }
+
 }

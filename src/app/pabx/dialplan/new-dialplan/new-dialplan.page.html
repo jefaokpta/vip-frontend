@@ -149,11 +149,19 @@
                                     <span class="pi pi-bars" pReorderableRowHandle></span>
                                 </td>
                                 <td>
+                                    <ng-container *ngIf="action.get('dialPlanActionEnum').value == 'DIAL_PEER'">
                                     <app-peer-action-component
                                         formControlName="arg1"
                                         (flagsChange)="action.get('arg2').setValue($event)"
                                         [showError]="action.get('arg1').errors?.['required']"
                                     ></app-peer-action-component>
+                                    </ng-container>
+                                    <ng-container *ngIf="action.get('dialPlanActionEnum').value == 'DIAL_AGENT'">
+                                        agente {{ action.get('arg1').value }}
+                                    </ng-container>
+                                    <ng-container *ngIf="action.get('dialPlanActionEnum').value == 'DIAL_ROUTE'">
+                                        <app-route-action-component/>
+                                    </ng-container>
                                 </td>
                                 <td>
                                     <p-button icon="pi pi-trash" severity="danger" outlined
@@ -164,8 +172,6 @@
                         </ng-template>
                     </p-table>
                 </div>
-
-
             </p-card>
 
             <div class="flex">
