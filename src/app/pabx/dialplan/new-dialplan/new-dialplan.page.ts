@@ -1,19 +1,18 @@
 import {Component, OnInit} from '@angular/core';
-import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
+import {FormArray, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {InputTextModule} from 'primeng/inputtext';
 import {ButtonModule} from 'primeng/button';
 import {CardModule} from 'primeng/card';
 import {NgIf} from '@angular/common';
 import {Router, RouterLink} from '@angular/router';
 import {DialPlanService} from '../dial-plan.service';
-import {DialPlan, DialPlanAction, DialPlanActionEnum, SrcEnum} from "@/pabx/types";
+import {DialPlan, DialPlanActionEnum, SrcEnum} from "@/pabx/types";
 import {Select} from "primeng/select";
 import {AgentSelectComponent} from "@/pabx/dialplan/components/agent-select-component";
 import {PeerSelectComponent} from "@/pabx/dialplan/components/peer-select-component";
 import {AliasSelectComponent} from "@/pabx/dialplan/components/alias-select-component";
 import {TrunkSelectComponent} from "@/pabx/dialplan/components/trunk-select-component";
 import {ToggleSwitch} from "primeng/toggleswitch";
-import {RouteActionComponent} from "@/pabx/dialplan/components/route-action.component";
 import {TableModule} from "primeng/table";
 
 /**
@@ -38,7 +37,6 @@ import {TableModule} from "primeng/table";
         TrunkSelectComponent,
         ToggleSwitch,
         FormsModule,
-        RouteActionComponent,
         TableModule
     ],
     templateUrl: './new-dialplan.page.html',
@@ -47,7 +45,6 @@ export class NewDialplanPage implements OnInit {
     form!: FormGroup;
     pending = false;
     showError = false;
-    dialplanActions: DialPlanAction[] = [];
 
     srcOptions = [
         {label: 'Qualquer', value: SrcEnum.ANY},
@@ -103,6 +100,10 @@ export class NewDialplanPage implements OnInit {
         return this.form.get('selectedAction');
     }
 
+    get dialplanActions() {
+        return this.form.get('dialplanActions') as FormArray;
+    }
+
     ngOnInit(): void {
         this.form = this.fb.group({
             name: ['', [Validators.required]],
@@ -112,6 +113,7 @@ export class NewDialplanPage implements OnInit {
             isActive: [true],
             dstToggle: [false],
             selectedAction: [''],
+            dialplanActions: this.fb.array([]),
         });
     }
 
@@ -124,9 +126,14 @@ export class NewDialplanPage implements OnInit {
 
     addDialplanAction() {
         if (!this.selectedAction?.value) return
-        this.dialplanActions.push({
+        this.dialplanActions.push(this.fb.group({
             dialPlanActionEnum: this.selectedAction?.value,
-        });
+            arg1: [''],
+        }));
+    }
+
+    removeDialplanAction(index: number) {
+        this.dialplanActions.removeAt(index);
     }
 
     onSubmit() {
