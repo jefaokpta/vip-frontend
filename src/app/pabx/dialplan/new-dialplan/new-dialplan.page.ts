@@ -130,7 +130,7 @@ export class NewDialplanPage implements OnInit {
         if (!this.selectedAction?.value) return
         this.dialplanActions.push(this.fb.group({
             dialPlanActionEnum: this.selectedAction?.value,
-            arg1: [''],
+            arg1: ['', [Validators.required]],
             arg2: [''],
         }));
     }

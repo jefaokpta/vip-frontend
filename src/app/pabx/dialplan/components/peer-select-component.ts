@@ -16,8 +16,8 @@ import {NgIf} from '@angular/common';
         }
     ],
     template: `
-        <div class="field mb-4">
-            <label for="peer" class="block mb-2" *ngIf="isShowLabel">Ramal *</label>
+        <div class="field">
+            <label *ngIf="isShowLabel" for="peer" class="block mb-2">Ramal *</label>
             <p-select
                 id="peer"
                 [options]="peerOptions"
@@ -49,7 +49,12 @@ export class PeerSelectComponent implements ControlValueAccessor, OnInit {
         // Carregue as opções de ramais do seu serviço aqui
         this.peerOptions = [
             {label: 'Ramal 1929', value: '1929'},
-            {label: 'Ramal 1928', value: '1928'}
+            {label: 'Ramal 1928', value: '1928'},
+            {label: 'Ramal 1927', value: '1927'},
+            {label: 'Ramal 1926', value: '1926'},
+            {label: 'Ramal 1925', value: '1925'},
+            {label: 'Ramal 1924', value: '1924'},
+            {label: 'Ramal 1923', value: '1923'},
         ];
     }
 

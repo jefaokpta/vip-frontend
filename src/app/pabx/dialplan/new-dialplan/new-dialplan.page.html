@@ -18,7 +18,7 @@
             <div class="flex items-center justify-between">
                 <div class="field">
                     <label for="name" class="block mb-2">Nome *</label>
-                    <input id="name" pInputText class="p-inputtext" formControlName="name"/>
+                    <input id="name" pInputText formControlName="name"/>
                     <small *ngIf="name?.invalid && (name?.dirty || name?.touched)" class="p-error block mt-2">
                         <div *ngIf="name?.errors?.['required']">Nome é obrigatório.</div>
                     </small>
@@ -32,7 +32,7 @@
 
             <p-card header="Origem">
                 <div class="flex gap-4">
-                    <div class="field mb-4">
+                    <div class="field">
                         <label for="src" class="block mb-2">Tipo *</label>
                         <p-select
                             id="src"
@@ -151,9 +151,9 @@
                                 <td>
                                     <app-peer-action-component
                                         formControlName="arg1"
-                                        [isShowLabel]="false"
-                                        (flagsChange)="action.get('arg2').setValue($event)">
-                                    </app-peer-action-component>
+                                        (flagsChange)="action.get('arg2').setValue($event)"
+                                        [showError]="action.get('arg1').errors?.['required']"
+                                    ></app-peer-action-component>
                                 </td>
                                 <td>
                                     <p-button icon="pi pi-trash" severity="danger" outlined

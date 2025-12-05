@@ -3,11 +3,12 @@ import {ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModul
 import {Panel} from "primeng/panel";
 import {PeerSelectComponent} from "@/pabx/dialplan/components/peer-select-component";
 import {InputText} from "primeng/inputtext";
+import {Message} from "primeng/message";
 
 @Component({
     selector: 'app-peer-action-component',
     standalone: true,
-    imports: [ReactiveFormsModule, FormsModule, Panel, PeerSelectComponent, InputText],
+    imports: [ReactiveFormsModule, FormsModule, Panel, PeerSelectComponent, InputText, Message],
     providers: [
         {
             provide: NG_VALUE_ACCESSOR,
@@ -17,19 +18,22 @@ import {InputText} from "primeng/inputtext";
     ],
     template: `
         <p-panel header="Chamar Ramal" [toggleable]="true" toggler="header" collapsed>
-            <app-peer-select-component [(ngModel)]="value" (ngModelChange)="onValueChange($event)"
-                                       [isShowLabel]="isShowLabel"/>
-            <div class="field mt-4">
-                <label for="flags" class="block mb-2">Flags</label>
-                <input id="flags" pInputText class="p-inputtext" [(ngModel)]="flags"
-                       (ngModelChange)="onFlagsChange($event)"/>
+            <div class="flex flex-col gap-4">
+                <app-peer-select-component [(ngModel)]="value" (ngModelChange)="onValueChange($event)"
+                                           [isShowLabel]="false" [showError]="showError"/>
+                <div class="field">
+                    <label for="flags" class="block">Flags</label>
+                    <input id="flags" pInputText class="p-inputtext" [(ngModel)]="flags"
+                           (ngModelChange)="onFlagsChange($event)"/>
+                </div>
+                <p-message severity="info">Envia chamada para o ramal selecionado</p-message>
             </div>
+
         </p-panel>
     `
 })
 export class PeerActionComponent implements ControlValueAccessor {
     @Input() showError = false;
-    @Input() isShowLabel = true;
     @Output() flagsChange = new EventEmitter<string>();
     value: string = '';
     flags: string = '';
