@@ -34,10 +34,10 @@ export enum DialPlanActionEnum {
 }
 
 export interface DialPlanAction {
-    readonly id: number,
+    readonly id?: number,
     readonly dialPlanActionEnum: DialPlanActionEnum,
-    readonly priority: number,
-    readonly dialplanId: number,
+    readonly priority?: number,
+    readonly dialplanId?: number,
     readonly arg1?: string,
     readonly arg2?: string,
     readonly arg3?: string,

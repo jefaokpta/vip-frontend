@@ -6,15 +6,15 @@ import {CardModule} from 'primeng/card';
 import {NgIf} from '@angular/common';
 import {Router, RouterLink} from '@angular/router';
 import {DialPlanService} from '../dial-plan.service';
-import {DialPlan, DialPlanActionEnum, SrcEnum} from "@/pabx/types";
+import {DialPlan, DialPlanAction, DialPlanActionEnum, SrcEnum} from "@/pabx/types";
 import {Select} from "primeng/select";
 import {AgentSelectComponent} from "@/pabx/dialplan/components/agent-select-component";
 import {PeerSelectComponent} from "@/pabx/dialplan/components/peer-select-component";
 import {AliasSelectComponent} from "@/pabx/dialplan/components/alias-select-component";
 import {TrunkSelectComponent} from "@/pabx/dialplan/components/trunk-select-component";
 import {ToggleSwitch} from "primeng/toggleswitch";
-import {PeerActionComponent} from "@/pabx/dialplan/components/peer-action.component";
 import {RouteActionComponent} from "@/pabx/dialplan/components/route-action.component";
+import {TableModule} from "primeng/table";
 
 /**
  * @author Jefferson Alves Reis (jefaokpta)
@@ -38,8 +38,8 @@ import {RouteActionComponent} from "@/pabx/dialplan/components/route-action.comp
         TrunkSelectComponent,
         ToggleSwitch,
         FormsModule,
-        PeerActionComponent,
-        RouteActionComponent
+        RouteActionComponent,
+        TableModule
     ],
     templateUrl: './new-dialplan.page.html',
 })
@@ -47,6 +47,7 @@ export class NewDialplanPage implements OnInit {
     form!: FormGroup;
     pending = false;
     showError = false;
+    dialplanActions: DialPlanAction[] = [];
 
     srcOptions = [
         {label: 'Qualquer', value: SrcEnum.ANY},
@@ -98,6 +99,10 @@ export class NewDialplanPage implements OnInit {
         return this.form.get('dstToggle');
     }
 
+    get selectedAction() {
+        return this.form.get('selectedAction');
+    }
+
     ngOnInit(): void {
         this.form = this.fb.group({
             name: ['', [Validators.required]],
@@ -107,7 +112,6 @@ export class NewDialplanPage implements OnInit {
             isActive: [true],
             dstToggle: [false],
             selectedAction: [''],
-            dialplanActions: this.fb.array([])
         });
     }
 
@@ -116,6 +120,13 @@ export class NewDialplanPage implements OnInit {
         if (this.src?.value != 'ANY') {
             this.form.addControl('srcValue', this.fb.control('', [Validators.required]));
         }
+    }
+
+    addDialplanAction() {
+        if (!this.selectedAction?.value) return
+        this.dialplanActions.push({
+            dialPlanActionEnum: this.selectedAction?.value,
+        });
     }
 
     onSubmit() {

@@ -76,14 +76,14 @@ import {DialPlanService} from "@/pabx/dialplan/dial-plan.service";
                     </tr>
                 </ng-template>
 
-                <ng-template pTemplate="body" let-alias>
+                <ng-template pTemplate="body" let-dialplan>
                     <tr>
-                        <td>{{ alias.name }}</td>
+                        <td>{{ dialplan.name }}</td>
                         <td>
                             <div class="flex gap-2">
                                 <p-button
                                     icon="pi pi-pencil"
-                                    [routerLink]="['edit', alias.id]"
+                                    [routerLink]="['edit', dialplan.id]"
                                     outlined
                                     size="small"
                                     pTooltip="Editar"
@@ -92,7 +92,7 @@ import {DialPlanService} from "@/pabx/dialplan/dial-plan.service";
                                 <p-button
                                     icon="pi pi-trash"
                                     severity="danger"
-                                    (click)="confirmDelete(alias)"
+                                    (click)="confirmDelete(dialplan)"
                                     outlined
                                     size="small"
                                     pTooltip="Remover"
