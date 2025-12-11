@@ -30,6 +30,7 @@ export enum DialPlanActionEnum {
     SET_VARIABLE = 'SET_VARIABLE',
     DIAL_ROUTE = 'DIAL_ROUTE',
     DIAL_PEER = 'DIAL_PEER',
+    DIAL_AGENT = 'DIAL_AGENT',
     ACCOUNT_CODE = 'ACCOUNT_CODE'
 }
 

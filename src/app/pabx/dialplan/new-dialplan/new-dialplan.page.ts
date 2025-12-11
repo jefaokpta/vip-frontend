@@ -16,6 +16,7 @@ import {ToggleSwitch} from "primeng/toggleswitch";
 import {TableModule} from "primeng/table";
 import {PeerActionComponent} from "@/pabx/dialplan/components/peer-action.component";
 import {RouteActionComponent} from "@/pabx/dialplan/components/route-action.component";
+import {AgentActionComponent} from "@/pabx/dialplan/components/alias-action.component";
 
 /**
  * @author Jefferson Alves Reis (jefaokpta)
@@ -41,7 +42,8 @@ import {RouteActionComponent} from "@/pabx/dialplan/components/route-action.comp
         FormsModule,
         TableModule,
         PeerActionComponent,
-        RouteActionComponent
+        RouteActionComponent,
+        AgentActionComponent
     ],
     templateUrl: './new-dialplan.page.html',
 })
@@ -64,6 +66,7 @@ export class NewDialplanPage implements OnInit {
         {label: 'Desligar', value: DialPlanActionEnum.HANGUP},
         {label: 'Centro de Custo', value: DialPlanActionEnum.ACCOUNT_CODE},
         {label: 'Ramal', value: DialPlanActionEnum.DIAL_PEER},
+        {label: 'Agente', value: DialPlanActionEnum.DIAL_AGENT},
         {label: 'Rota', value: DialPlanActionEnum.DIAL_ROUTE},
         {label: 'Tocar Audio', value: DialPlanActionEnum.PLAYBACK},
         {label: 'Definir Variável', value: DialPlanActionEnum.SET_VARIABLE},
