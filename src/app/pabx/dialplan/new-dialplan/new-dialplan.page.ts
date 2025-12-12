@@ -16,7 +16,11 @@ import {ToggleSwitch} from "primeng/toggleswitch";
 import {TableModule} from "primeng/table";
 import {PeerActionComponent} from "@/pabx/dialplan/components/peer-action.component";
 import {RouteActionComponent} from "@/pabx/dialplan/components/route-action.component";
-import {AgentActionComponent} from "@/pabx/dialplan/components/alias-action.component";
+import {AgentActionComponent} from "@/pabx/dialplan/components/agent-action.component";
+import {AnswerActionComponent} from "@/pabx/dialplan/components/answer-action-component";
+import {HangupActionComponent} from "@/pabx/dialplan/components/hangup-action-component";
+import {PlaybackActionComponent} from "@/pabx/dialplan/components/playback-action.component";
+import {VariableActionComponent} from "@/pabx/dialplan/components/variable-action.component";
 
 /**
  * @author Jefferson Alves Reis (jefaokpta)
@@ -43,7 +47,11 @@ import {AgentActionComponent} from "@/pabx/dialplan/components/alias-action.comp
         TableModule,
         PeerActionComponent,
         RouteActionComponent,
-        AgentActionComponent
+        AgentActionComponent,
+        AnswerActionComponent,
+        HangupActionComponent,
+        PlaybackActionComponent,
+        VariableActionComponent
     ],
     templateUrl: './new-dialplan.page.html',
 })
@@ -136,7 +144,7 @@ export class NewDialplanPage implements OnInit {
         this.dialplanActions.push(this.fb.group({
             dialPlanActionEnum: this.selectedAction?.value,
             arg1: ['', [Validators.required]],
-            arg2: [''],
+            arg2: ['', this.selectedAction.value === DialPlanActionEnum.SET_VARIABLE ? [Validators.required] : []],
         }));
     }
 

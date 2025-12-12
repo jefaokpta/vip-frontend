@@ -162,6 +162,23 @@
                                     <ng-container *ngIf="action.get('dialPlanActionEnum').value == 'DIAL_ROUTE'">
                                         <app-route-action-component/>
                                     </ng-container>
+                                    <ng-container *ngIf="action.get('dialPlanActionEnum').value == 'ANSWER'">
+                                        <app-answer-action-component/>
+                                    </ng-container>
+                                    <ng-container *ngIf="action.get('dialPlanActionEnum').value == 'HANGUP'">
+                                        <app-hangup-action-component/>
+                                    </ng-container>
+                                    <ng-container *ngIf="action.get('dialPlanActionEnum').value == 'PLAYBACK'">
+                                        <app-playback-action-component formControlName="arg1"/>
+                                    </ng-container>
+                                    <ng-container *ngIf="action.get('dialPlanActionEnum').value == 'SET_VARIABLE'">
+                                        <app-variable-action-component
+                                            formControlName="arg1"
+                                            [showError]="action.get('arg1').errors?.['required']"
+                                            (varValueChange)="action.get('arg2').setValue($event)"
+                                            [showVarValueError]="action.get('arg2').errors?.['required']"
+                                        />
+                                    </ng-container>
                                 </td>
                                 <td>
                                     <p-button icon="pi pi-trash" severity="danger" outlined

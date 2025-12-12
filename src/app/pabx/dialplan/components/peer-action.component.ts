@@ -22,7 +22,7 @@ import {Message} from "primeng/message";
                 <app-peer-select-component [(ngModel)]="value" (ngModelChange)="onValueChange($event)"
                                            [isShowLabel]="false" [showError]="showError"/>
                 <div class="field">
-                    <label for="flags" class="block">Flags</label>
+                    <label for="flags" class="block">Flags de controle</label>
                     <input id="flags" pInputText class="p-inputtext" [(ngModel)]="flags"
                            (ngModelChange)="onFlagsChange($event)"/>
                 </div>
