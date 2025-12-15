@@ -5,7 +5,7 @@ import {ConfirmDialog} from "primeng/confirmdialog";
 import {IconField} from "primeng/iconfield";
 import {InputIcon} from "primeng/inputicon";
 import {InputText} from "primeng/inputtext";
-import {NgIf} from "@angular/common";
+import {CurrencyPipe, NgIf} from "@angular/common";
 import {ConfirmationService, MessageService, PrimeTemplate} from "primeng/api";
 import {ProgressSpinner} from "primeng/progressspinner";
 import {RouterLink} from "@angular/router";
@@ -33,7 +33,8 @@ import {Tag} from "primeng/tag";
         TableModule,
         Toast,
         Tooltip,
-        Tag
+        Tag,
+        CurrencyPipe
     ],
     providers: [ConfirmationService, MessageService],
     template: `
@@ -74,6 +75,9 @@ import {Tag} from "primeng/tag";
                     <tr>
                         <th style="width: 10%">Código</th>
                         <th>Título</th>
+                        <th style="width: 10%">Cadência</th>
+                        <th style="width: 10%">Fração</th>
+                        <th style="width: 10%">Custo</th>
                         <th style="width: 10%">Ações</th>
                     </tr>
                 </ng-template>
@@ -81,9 +85,13 @@ import {Tag} from "primeng/tag";
                 <ng-template pTemplate="body" let-accountCode>
                     <tr>
                         <td>
-                            <p-tag [value]="accountCode.code" severity="danger"></p-tag>
+                            <p-tag [value]="accountCode.code"
+                                   [severity]="isDeletable(accountCode)? 'info' : 'danger'"></p-tag>
                         </td>
                         <td>{{ accountCode.title }}</td>
+                        <td>{{ accountCode.cadence }}</td>
+                        <td>{{ accountCode.fraction }}</td>
+                        <td>{{ accountCode.cost | currency:'BRL':true:'1.2-2' }}</td>
                         <td>
                             <div class="flex gap-2">
                                 <p-button
@@ -95,6 +103,7 @@ import {Tag} from "primeng/tag";
                                     tooltipPosition="left"
                                 />
                                 <p-button
+                                    *ngIf="isDeletable(accountCode)"
                                     icon="pi pi-trash"
                                     severity="danger"
                                     (click)="confirmDelete(accountCode)"
@@ -143,6 +152,10 @@ export class AccountCodePage implements OnInit {
         if (target) {
             this.dt.filterGlobal(target.value, 'contains');
         }
+    }
+
+    isDeletable(accountCode: AccountCode) {
+        return accountCode.code.split('.')[1] !== '00';
     }
 
     confirmDelete(accountCode: AccountCode) {
