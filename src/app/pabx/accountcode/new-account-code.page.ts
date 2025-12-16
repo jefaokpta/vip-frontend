@@ -4,15 +4,15 @@
  * @create 5/13/25
  */
 
-import {Component, OnInit} from '@angular/core';
-import {Button} from 'primeng/button';
-import {InputText} from 'primeng/inputtext';
-import {NgIf} from '@angular/common';
-import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
-import {Router, RouterLink} from '@angular/router';
-import {Card} from 'primeng/card';
-import {Select} from 'primeng/select';
-import {AccountCodeService} from "@/pabx/accountcode/account-code.service";
+import { Component, OnInit } from '@angular/core';
+import { Button } from 'primeng/button';
+import { InputText } from 'primeng/inputtext';
+import { NgIf } from '@angular/common';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
+import { Card } from 'primeng/card';
+import { Select } from 'primeng/select';
+import { AccountCodeService } from '@/pabx/accountcode/account-code.service';
 
 @Component({
     selector: 'app-new-account-code-page',
@@ -22,13 +22,18 @@ import {AccountCodeService} from "@/pabx/accountcode/account-code.service";
             <ng-template #title>
                 <div class="flex justify-between">
                     <span class="font-semibold text-2xl">Novo Centro de Custo</span>
-                    <p-button type="button" label="Voltar" icon="pi pi-arrow-left" routerLink="/pabx/accountcodes"
-                              outlined severity="secondary"></p-button>
+                    <p-button
+                        type="button"
+                        label="Voltar"
+                        icon="pi pi-arrow-left"
+                        routerLink="/pabx/accountcodes"
+                        outlined
+                        severity="secondary"
+                    ></p-button>
                 </div>
             </ng-template>
 
             <form [formGroup]="form" (ngSubmit)="onSubmit()" class="p-fluid">
-
                 <div class="field mb-4">
                     <label for="code" class="block mb-2">Categoria *</label>
                     <p-select
@@ -46,7 +51,7 @@ import {AccountCodeService} from "@/pabx/accountcode/account-code.service";
 
                 <div class="field mb-4">
                     <label for="title" class="block mb-2">Título *</label>
-                    <input id="title" pInputText class="p-inputtext" formControlName="acTitle"/>
+                    <input id="title" pInputText class="p-inputtext" formControlName="acTitle" />
                     <small *ngIf="acTitle?.invalid && (acTitle?.dirty || acTitle?.touched)" class="p-error block mt-2">
                         <div *ngIf="acTitle?.errors?.['required']">Título é obrigatório.</div>
                     </small>
@@ -66,14 +71,13 @@ export class NewAccountCodePage implements OnInit {
     constructor(
         private readonly fb: FormBuilder,
         private readonly router: Router,
-        private readonly accountCodeService: AccountCodeService,
-    ) {
-    }
+        private readonly accountCodeService: AccountCodeService
+    ) {}
 
     ngOnInit(): void {
         this.form = this.fb.group({
             acTitle: ['', [Validators.required]],
-            code: ['', [Validators.required]],
+            code: ['', [Validators.required]]
         });
         this.accountCodeService.findAll().then((accountCodes) => {
             this.codeOptions = accountCodes.map((accountCode) => ({
@@ -92,9 +96,8 @@ export class NewAccountCodePage implements OnInit {
     }
 
     onSubmit() {
-        console.log(this.form.value);
-        // this.accountCodeService
-        //     .createAccountCode({ ...this.form.value })
-        //     .then(() => this.router.navigate(['/pages/accountcodes']))
+        this.accountCodeService
+            .create({ ...this.form.value, title: this.acTitle?.value })
+            .then(() => this.router.navigate(['/pabx/accountcodes']));
     }
 }
