@@ -28,4 +28,8 @@ export class AccountCodeService {
         return executeRequest(this.http.delete<void>(`${this.BACKEND}/accounts/${user.controlNumber}/${id}`, httpHeaders()));
     }
 
+    createAccountCode(accountCode: AccountCode) {
+        const user = this.userService.getUser()
+        return executeRequest(this.http.post(`${this.BACKEND}/accounts/${user.controlNumber}`, accountCode, httpHeaders()));
+    }
 }
