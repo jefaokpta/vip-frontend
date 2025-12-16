@@ -22,7 +22,7 @@ import {AccountCodeService} from "@/pabx/accountcode/account-code.service";
             <ng-template #title>
                 <div class="flex justify-between">
                     <span class="font-semibold text-2xl">Novo Centro de Custo</span>
-                    <p-button type="button" label="Voltar" icon="pi pi-arrow-left" routerLink="/pages/accountcodes"
+                    <p-button type="button" label="Voltar" icon="pi pi-arrow-left" routerLink="/pabx/accountcodes"
                               outlined severity="secondary"></p-button>
                 </div>
             </ng-template>
@@ -46,9 +46,9 @@ import {AccountCodeService} from "@/pabx/accountcode/account-code.service";
 
                 <div class="field mb-4">
                     <label for="title" class="block mb-2">Título *</label>
-                    <input id="title" pInputText class="p-inputtext" formControlName="title"/>
-                    <small *ngIf="title.invalid && (title?.dirty || title?.touched)" class="p-error block mt-2">
-                        <div *ngIf="title?.errors?.['required']">Título é obrigatório.</div>
+                    <input id="title" pInputText class="p-inputtext" formControlName="acTitle"/>
+                    <small *ngIf="acTitle?.invalid && (acTitle?.dirty || acTitle?.touched)" class="p-error block mt-2">
+                        <div *ngIf="acTitle?.errors?.['required']">Título é obrigatório.</div>
                     </small>
                 </div>
 
@@ -72,7 +72,7 @@ export class NewAccountCodePage implements OnInit {
 
     ngOnInit(): void {
         this.form = this.fb.group({
-            title: ['', [Validators.required]],
+            acTitle: ['', [Validators.required]],
             code: ['', [Validators.required]],
         });
         this.accountCodeService.findAll().then((accountCodes) => {
@@ -83,8 +83,8 @@ export class NewAccountCodePage implements OnInit {
         });
     }
 
-    get title() {
-        return this.form.get('title');
+    get acTitle() {
+        return this.form.get('acTitle');
     }
 
     get code() {
