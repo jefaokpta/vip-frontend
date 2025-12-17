@@ -3,12 +3,11 @@ import {ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModul
 import {Panel} from "primeng/panel";
 import {PeerSelectComponent} from "@/pabx/dialplan/components/peer-select-component";
 import {InputText} from "primeng/inputtext";
-import {Message} from "primeng/message";
 
 @Component({
     selector: 'app-peer-action-component',
     standalone: true,
-    imports: [ReactiveFormsModule, FormsModule, Panel, PeerSelectComponent, InputText, Message],
+    imports: [ReactiveFormsModule, FormsModule, Panel, PeerSelectComponent, InputText],
     providers: [
         {
             provide: NG_VALUE_ACCESSOR,
@@ -26,7 +25,6 @@ import {Message} from "primeng/message";
                     <input id="flags" pInputText class="p-inputtext" [(ngModel)]="flags"
                            (ngModelChange)="onFlagsChange($event)"/>
                 </div>
-                <p-message severity="info">Envia chamada para o ramal selecionado</p-message>
             </div>
 
         </p-panel>

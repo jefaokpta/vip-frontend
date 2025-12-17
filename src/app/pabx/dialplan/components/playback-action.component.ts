@@ -1,14 +1,13 @@
 import {Component, forwardRef, Input, OnInit} from '@angular/core';
 import {ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule} from '@angular/forms';
 import {Panel} from "primeng/panel";
-import {Message} from "primeng/message";
 import {NgIf} from "@angular/common";
 import {Select} from "primeng/select";
 
 @Component({
     selector: 'app-playback-action-component',
     standalone: true,
-    imports: [ReactiveFormsModule, FormsModule, Panel, Message, NgIf, Select],
+    imports: [ReactiveFormsModule, FormsModule, Panel, NgIf, Select],
     providers: [
         {
             provide: NG_VALUE_ACCESSOR,
@@ -36,7 +35,6 @@ import {Select} from "primeng/select";
                         Audio é obrigatório.
                     </small>
                 </div>
-                <p-message severity="info">Reproduz o arquivo de áudio selecionado</p-message>
             </div>
         </p-panel>
     `

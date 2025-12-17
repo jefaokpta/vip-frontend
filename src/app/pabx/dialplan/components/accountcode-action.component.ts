@@ -1,7 +1,6 @@
 import {Component, forwardRef, Input, OnInit} from '@angular/core';
 import {ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule} from '@angular/forms';
 import {Panel} from "primeng/panel";
-import {Message} from "primeng/message";
 import {NgIf} from "@angular/common";
 import {Select} from "primeng/select";
 import {AccountCodeService} from "@/pabx/accountcode/account-code.service";
@@ -9,7 +8,7 @@ import {AccountCodeService} from "@/pabx/accountcode/account-code.service";
 @Component({
     selector: 'app-account-code-action-component',
     standalone: true,
-    imports: [ReactiveFormsModule, FormsModule, Panel, Message, NgIf, Select],
+    imports: [ReactiveFormsModule, FormsModule, Panel, NgIf, Select],
     providers: [
         {
             provide: NG_VALUE_ACCESSOR,
@@ -21,7 +20,6 @@ import {AccountCodeService} from "@/pabx/accountcode/account-code.service";
         <p-panel header="Definir Centro de Custo" [toggleable]="true" toggler="header" collapsed>
             <div class="flex flex-col gap-4">
                 <div class="field mb-4">
-                    <label for="code" class="block mb-2">Centro de Custo *</label>
                     <p-select
                         id="code"
                         [options]="accountCodeOptions"
@@ -36,7 +34,6 @@ import {AccountCodeService} from "@/pabx/accountcode/account-code.service";
                         Centro de Custo é obrigatório.
                     </small>
                 </div>
-                <p-message severity="info">Define o centro de custo da chamada</p-message>
             </div>
 
         </p-panel>

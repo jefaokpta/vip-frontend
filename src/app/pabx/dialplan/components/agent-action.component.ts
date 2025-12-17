@@ -1,13 +1,12 @@
 import {Component, forwardRef, Input} from '@angular/core';
 import {ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule} from '@angular/forms';
 import {Panel} from "primeng/panel";
-import {Message} from "primeng/message";
 import {AgentSelectComponent} from "@/pabx/dialplan/components/agent-select-component";
 
 @Component({
     selector: 'app-agent-action-component',
     standalone: true,
-    imports: [ReactiveFormsModule, FormsModule, Panel, AgentSelectComponent, Message],
+    imports: [ReactiveFormsModule, FormsModule, Panel, AgentSelectComponent],
     providers: [
         {
             provide: NG_VALUE_ACCESSOR,
@@ -20,7 +19,6 @@ import {AgentSelectComponent} from "@/pabx/dialplan/components/agent-select-comp
             <div class="flex flex-col gap-4">
                 <app-agent-select-component [(ngModel)]="value" (ngModelChange)="onValueChange($event)"
                                             [showError]="showError"/>
-                <p-message severity="info">Envia chamada para o agente selecionado</p-message>
             </div>
 
         </p-panel>
