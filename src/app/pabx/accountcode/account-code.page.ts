@@ -93,7 +93,13 @@ import {Tag} from "primeng/tag";
                         <td>{{ accountCode.title }}</td>
                         <td>{{ accountCode.cadence }}</td>
                         <td>{{ accountCode.fraction }}</td>
-                        <td>{{ accountCode.cost | currency:'BRL':true:'1.2-2' }}</td>
+                        <td>
+                            <div class="flex gap-2">
+                                <span>{{ accountCode.cost | currency:'BRL':true:'1.2-2' }}</span>
+                                <i *ngIf="accountCode.cost == 0" class="pi pi-exclamation-circle" style="color: red"
+                                   pTooltip="Custo zero"></i>
+                            </div>
+                        </td>
                         <td>
                             <ng-container *ngIf="accountCode.updatedAt else noUpdatedAt">
                                 {{ accountCode.updatedAt | date:'dd/MM/yyyy' }}
