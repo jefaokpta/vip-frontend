@@ -5,7 +5,7 @@ import {ConfirmDialog} from "primeng/confirmdialog";
 import {IconField} from "primeng/iconfield";
 import {InputIcon} from "primeng/inputicon";
 import {InputText} from "primeng/inputtext";
-import {CurrencyPipe, NgIf} from "@angular/common";
+import {CurrencyPipe, DatePipe, NgIf} from "@angular/common";
 import {ConfirmationService, MessageService, PrimeTemplate} from "primeng/api";
 import {ProgressSpinner} from "primeng/progressspinner";
 import {RouterLink} from "@angular/router";
@@ -34,7 +34,8 @@ import {Tag} from "primeng/tag";
         Toast,
         Tooltip,
         Tag,
-        CurrencyPipe
+        CurrencyPipe,
+        DatePipe
     ],
     providers: [ConfirmationService, MessageService],
     template: `
@@ -78,6 +79,7 @@ import {Tag} from "primeng/tag";
                         <th style="width: 10%">Cadência</th>
                         <th style="width: 10%">Fração</th>
                         <th style="width: 10%">Custo</th>
+                        <th>Vigência</th>
                         <th style="width: 10%">Ações</th>
                     </tr>
                 </ng-template>
@@ -92,6 +94,14 @@ import {Tag} from "primeng/tag";
                         <td>{{ accountCode.cadence }}</td>
                         <td>{{ accountCode.fraction }}</td>
                         <td>{{ accountCode.cost | currency:'BRL':true:'1.2-2' }}</td>
+                        <td>
+                            <ng-container *ngIf="accountCode.updatedAt else noUpdatedAt">
+                                {{ accountCode.updatedAt | date:'dd/MM/yyyy' }}
+                            </ng-container>
+                            <ng-template #noUpdatedAt>
+                                <span>Não alterado</span>
+                            </ng-template>
+                        </td>
                         <td>
                             <div class="flex gap-2">
                                 <p-button
@@ -181,7 +191,6 @@ export class AccountCodePage implements OnInit {
                         this.messageService.add({
                             severity: 'success',
                             summary: 'Centro de custo removido com sucesso',
-                            detail: 'O centro de custo foi removido com sucesso',
                             life: 15_000
                         });
                     }).catch(() => {
