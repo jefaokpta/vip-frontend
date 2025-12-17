@@ -106,7 +106,7 @@ import {Tag} from "primeng/tag";
                             <div class="flex gap-2">
                                 <p-button
                                     icon="pi pi-pencil"
-                                    [routerLink]="['edit', accountCode.id]"
+                                    [routerLink]="['edit', accountCode.code]"
                                     outlined
                                     size="small"
                                     pTooltip="Editar"

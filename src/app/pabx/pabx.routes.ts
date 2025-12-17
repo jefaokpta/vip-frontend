@@ -7,6 +7,7 @@ import {EditAliasPage} from "@/pabx/alias/edit-alias.page";
 import {NewDialplanPage} from "@/pabx/dialplan/new-dialplan/new-dialplan.page";
 import {AccountCodePage} from "@/pabx/accountcode/account-code.page";
 import {NewAccountCodePage} from "@/pabx/accountcode/new-account-code.page";
+import {EditAccountCodePage} from "@/pabx/accountcode/edit-account-code.page";
 
 export default [
     {path: 'peers', component: PeerPage, data: {breadcrumb: 'Ramais'}},
@@ -17,5 +18,6 @@ export default [
     {path: 'dialplans/new', component: NewDialplanPage, data: {breadcrumb: 'Nova Regra'}},
     {path: 'accountcodes', component: AccountCodePage, data: {breadcrumb: 'Centro de Custos'}},
     {path: 'accountcodes/new', component: NewAccountCodePage, data: {breadcrumb: 'Novo Centro de Custo'}},
+    {path: 'accountcodes/edit/:id', component: EditAccountCodePage, data: {breadcrumb: 'Editar Centro de Custo'}},
     {path: '**', redirectTo: '/notfound'}
 ] as Routes;

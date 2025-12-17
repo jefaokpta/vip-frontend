@@ -1,9 +1,9 @@
-import { Injectable } from '@angular/core';
-import { environment } from '../../../environments/environment';
-import { HttpClient } from '@angular/common/http';
-import { UserService } from '@/pages/users/user.service';
-import { AccountCode } from '@/pabx/types';
-import { executeRequest, httpHeaders } from '@/util/utils';
+import {Injectable} from '@angular/core';
+import {environment} from '../../../environments/environment';
+import {HttpClient} from '@angular/common/http';
+import {UserService} from '@/pages/users/user.service';
+import {AccountCode} from '@/pabx/types';
+import {executeRequest, httpHeaders} from '@/util/utils';
 
 @Injectable({
     providedIn: 'root'
@@ -23,10 +23,10 @@ export class AccountCodeService {
         );
     }
 
-    delete(id: number): Promise<void> {
+    delete(id: number) {
         const user = this.userService.getUser();
         return executeRequest(
-            this.http.delete<void>(`${this.BACKEND}/accounts/${user.controlNumber}/${id}`, httpHeaders())
+            this.http.delete(`${this.BACKEND}/accounts/${user.controlNumber}/${id}`, httpHeaders())
         );
     }
 
@@ -34,6 +34,20 @@ export class AccountCodeService {
         const user = this.userService.getUser();
         return executeRequest(
             this.http.post(`${this.BACKEND}/accounts/${user.controlNumber}`, accountCode, httpHeaders())
+        );
+    }
+
+    findById(id: string): Promise<AccountCode> {
+        const user = this.userService.getUser();
+        return executeRequest(
+            this.http.get<AccountCode>(`${this.BACKEND}/accounts/${user.controlNumber}/${id}`, httpHeaders())
+        );
+    }
+
+    update(accountCode: AccountCode) {
+        const user = this.userService.getUser();
+        return executeRequest(
+            this.http.put(`${this.BACKEND}/accounts/${user.controlNumber}`, accountCode, httpHeaders())
         );
     }
 }
