@@ -21,6 +21,7 @@ import {AnswerActionComponent} from "@/pabx/dialplan/components/answer-action-co
 import {HangupActionComponent} from "@/pabx/dialplan/components/hangup-action-component";
 import {PlaybackActionComponent} from "@/pabx/dialplan/components/playback-action.component";
 import {VariableActionComponent} from "@/pabx/dialplan/components/variable-action.component";
+import {AccountCodeActionComponent} from "@/pabx/dialplan/components/accountcode-action.component";
 
 /**
  * @author Jefferson Alves Reis (jefaokpta)
@@ -51,7 +52,8 @@ import {VariableActionComponent} from "@/pabx/dialplan/components/variable-actio
         AnswerActionComponent,
         HangupActionComponent,
         PlaybackActionComponent,
-        VariableActionComponent
+        VariableActionComponent,
+        AccountCodeActionComponent
     ],
     templateUrl: './new-dialplan.page.html',
 })

@@ -159,6 +159,9 @@
                                     <ng-container *ngIf="action.get('dialPlanActionEnum').value == 'DIAL_AGENT'">
                                         <app-agent-action-component formControlName="arg1"/>
                                     </ng-container>
+                                    <ng-container *ngIf="action.get('dialPlanActionEnum').value == 'ACCOUNT_CODE'">
+                                        <app-account-code-action-component formControlName="arg1"/>
+                                    </ng-container>
                                     <ng-container *ngIf="action.get('dialPlanActionEnum').value == 'DIAL_ROUTE'">
                                         <app-route-action-component/>
                                     </ng-container>
