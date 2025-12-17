@@ -28,6 +28,7 @@ import {NgIf} from '@angular/common';
                 optionLabel="label"
                 optionValue="value"
                 placeholder="Selecione um ramal"
+                appendTo="body"
             ></p-select>
             <small *ngIf="showError" class="p-error block mt-2">
                 Ramal é obrigatório.

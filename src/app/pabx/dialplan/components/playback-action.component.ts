@@ -30,6 +30,7 @@ import {Select} from "primeng/select";
                         optionLabel="label"
                         optionValue="value"
                         placeholder="Selecione um audio"
+                        appendTo="body"
                     ></p-select>
                     <small *ngIf="showError" class="p-error block mt-2">
                         Audio é obrigatório.

@@ -30,6 +30,7 @@ import {AccountCodeService} from "@/pabx/accountcode/account-code.service";
                         optionLabel="label"
                         optionValue="value"
                         placeholder="Selecione o Centro de Custo"
+                        appendTo="body"
                     ></p-select>
                     <small *ngIf="showError" class="p-error block mt-2">
                         Centro de Custo é obrigatório.

@@ -26,6 +26,7 @@ import {NgIf} from '@angular/common';
                 optionLabel="label"
                 optionValue="value"
                 placeholder="Selecione um agente"
+                appendTo="body"
             ></p-select>
             <small *ngIf="showError" class="p-error block mt-2">
                 Agente é obrigatório.
