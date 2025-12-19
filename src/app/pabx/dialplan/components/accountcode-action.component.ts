@@ -4,11 +4,12 @@ import {Panel} from "primeng/panel";
 import {NgIf} from "@angular/common";
 import {Select} from "primeng/select";
 import {AccountCodeService} from "@/pabx/accountcode/account-code.service";
+import {Tooltip} from "primeng/tooltip";
 
 @Component({
     selector: 'app-account-code-action-component',
     standalone: true,
-    imports: [ReactiveFormsModule, FormsModule, Panel, NgIf, Select],
+    imports: [ReactiveFormsModule, FormsModule, Panel, NgIf, Select, Tooltip],
     providers: [
         {
             provide: NG_VALUE_ACCESSOR,
@@ -29,7 +30,24 @@ import {AccountCodeService} from "@/pabx/accountcode/account-code.service";
                         optionValue="value"
                         placeholder="Selecione o Centro de Custo"
                         appendTo="body"
-                    ></p-select>
+                    >
+                        <ng-template #selectedItem let-selectedOption>
+                            <div class="flex items-center gap-2">
+                                <div>{{ selectedOption.label }}</div>
+                                @if (selectedOption.cost == 0) {
+                                    <i class="pi pi-exclamation-circle" style="color: red" pTooltip="Custo zero"></i>
+                                }
+                            </div>
+                        </ng-template>
+                        <ng-template let-account #item>
+                            <div class="flex items-center gap-2">
+                                <div>{{ account.label }}</div>
+                                @if (account.cost == 0) {
+                                    <i class="pi pi-exclamation-circle" style="color: red" pTooltip="Custo zero"></i>
+                                }
+                            </div>
+                        </ng-template>
+                    </p-select>
                     <small *ngIf="showError" class="p-error block mt-2">
                         Centro de Custo é obrigatório.
                     </small>
@@ -42,7 +60,7 @@ import {AccountCodeService} from "@/pabx/accountcode/account-code.service";
 export class AccountCodeActionComponent implements ControlValueAccessor, OnInit {
     @Input() showError = false;
     value: string = '';
-    accountCodeOptions: { label: string; value: string }[] = [];
+    accountCodeOptions: { label: string; value: string, cost: number }[] = [];
 
     constructor(private readonly accountCodeService: AccountCodeService) {
     }
@@ -52,6 +70,7 @@ export class AccountCodeActionComponent implements ControlValueAccessor, OnInit 
             this.accountCodeOptions = accountCodes.map((accountCode) => ({
                 label: accountCode.title,
                 value: accountCode.code,
+                cost: accountCode.cost,
             }));
         });
     }
