@@ -1,7 +1,6 @@
 import {Component, forwardRef, Input, OnInit} from '@angular/core';
 import {ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule} from '@angular/forms';
 import {Panel} from "primeng/panel";
-import {NgIf} from "@angular/common";
 import {Select} from "primeng/select";
 import {AccountCodeService} from "@/pabx/accountcode/account-code.service";
 import {Tooltip} from "primeng/tooltip";
@@ -9,7 +8,7 @@ import {Tooltip} from "primeng/tooltip";
 @Component({
     selector: 'app-account-code-action-component',
     standalone: true,
-    imports: [ReactiveFormsModule, FormsModule, Panel, NgIf, Select, Tooltip],
+    imports: [ReactiveFormsModule, FormsModule, Panel, Select, Tooltip],
     providers: [
         {
             provide: NG_VALUE_ACCESSOR,
@@ -48,9 +47,9 @@ import {Tooltip} from "primeng/tooltip";
                             </div>
                         </ng-template>
                     </p-select>
-                    <small *ngIf="showError" class="p-error block mt-2">
-                        Centro de Custo é obrigatório.
-                    </small>
+                    @if (showError) {
+                        <small class="p-error block mt-2">Centro de Custo é obrigatório.</small>
+                    }
                 </div>
             </div>
 
