@@ -11,7 +11,6 @@ import { ProgressSpinner } from 'primeng/progressspinner';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { Toast } from 'primeng/toast';
 import { Trunk } from '@/pabx/types';
-import { NgIf } from '@angular/common';
 import { Tooltip } from 'primeng/tooltip';
 import { TrunkService } from '@/pabx/trunk/trunk.service';
 
@@ -30,7 +29,6 @@ import { TrunkService } from '@/pabx/trunk/trunk.service';
         ProgressSpinner,
         ConfirmDialog,
         Toast,
-        NgIf,
         Tooltip
     ],
     template: `
@@ -101,10 +99,14 @@ import { TrunkService } from '@/pabx/trunk/trunk.service';
                 </ng-template>
 
                 <ng-template pTemplate="emptymessage">
-                    <p-progress-spinner *ngIf="loading" [style]="{ width: '2rem', height: '2rem' }" />
-                    <tr>
-                        <td colspan="8" *ngIf="!loading" class="text-center p-4">Nenhum tronco encontrado.</td>
-                    </tr>
+                    @if (loading) {
+                        <p-progress-spinner [style]="{ width: '2rem', height: '2rem' }" />
+                    }
+                    @if (!loading) {
+                        <tr>
+                            <td colspan="8" class="text-center p-4">Nenhum tronco encontrado.</td>
+                        </tr>
+                    }
                 </ng-template>
             </p-table>
         </p-card>

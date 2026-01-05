@@ -9,6 +9,7 @@ import { AccountCodePage } from '@/pabx/accountcode/account-code.page';
 import { NewAccountCodePage } from '@/pabx/accountcode/new-account-code.page';
 import { EditAccountCodePage } from '@/pabx/accountcode/edit-account-code.page';
 import { TrunkPage } from '@/pabx/trunk/trunks.page';
+import { NewTrunkPage } from '@/pabx/trunk/new-trunk.page';
 
 export default [
     { path: 'peers', component: PeerPage, data: { breadcrumb: 'Ramais' } },
@@ -21,5 +22,7 @@ export default [
     { path: 'accountcodes/new', component: NewAccountCodePage, data: { breadcrumb: 'Novo Centro de Custo' } },
     { path: 'accountcodes/edit/:id', component: EditAccountCodePage, data: { breadcrumb: 'Editar Centro de Custo' } },
     { path: 'trunks', component: TrunkPage, data: { breadcrumb: 'Troncos' } },
+    { path: 'trunks/new', component: NewTrunkPage, data: { breadcrumb: 'Novo Tronco' } },
+
     { path: '**', redirectTo: '/notfound' }
 ] as Routes;

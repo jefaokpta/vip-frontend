@@ -139,6 +139,7 @@ export interface Trunk {
     readonly companyId: string;
     readonly name: string;
     readonly username: string;
+    readonly secret: string;
     readonly host: string;
     readonly port: number;
     readonly peerQualify: boolean;
@@ -159,7 +160,7 @@ export enum LanguageEnum {
 }
 
 export enum DtmfModeEnum {
-    RFC4733 = 'RFC4733',
+    rfc4733 = 'rfc4733',
     INBAND = 'INBAND',
     INFO = 'INFO'
 }
