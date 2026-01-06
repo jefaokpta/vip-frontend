@@ -10,7 +10,7 @@ import { InputNumber } from 'primeng/inputnumber';
 import { ToggleSwitch } from 'primeng/toggleswitch';
 import { Select } from 'primeng/select';
 import { SelectButton } from 'primeng/selectbutton';
-import { PanelModule } from 'primeng/panel';
+import { Accordion, AccordionContent, AccordionHeader, AccordionPanel } from 'primeng/accordion';
 
 /**
  * @author Jefferson Alves Reis (jefaokpta)
@@ -30,7 +30,10 @@ import { PanelModule } from 'primeng/panel';
         ToggleSwitch,
         Select,
         SelectButton,
-        PanelModule
+        Accordion,
+        AccordionPanel,
+        AccordionHeader,
+        AccordionContent
     ],
     template: `
         <p-card>
@@ -90,65 +93,6 @@ import { PanelModule } from 'primeng/panel';
                 </div>
 
                 <div class="field mb-4">
-                    <label for="port" class="block mb-2">Porta *</label>
-                    <p-input-number id="port" mode="decimal" useGrouping="false" formControlName="port" />
-                    @if (port?.invalid && (port?.dirty || port?.touched)) {
-                        <small class="p-error block mt-2">
-                            <span class="text-red-500">Porta é obrigatória.</span>
-                        </small>
-                    }
-                </div>
-
-                <div class="field mb-4">
-                    <label for="callLimit" class="block mb-2">Limite de Chamadas *</label>
-                    <p-input-number id="callLimit" mode="decimal" useGrouping="false" formControlName="callLimit" />
-                    @if (callLimit?.invalid && (callLimit?.dirty || callLimit?.touched)) {
-                        <small class="p-error block mt-2">
-                            <span class="text-red-500">Limite de chamadas é obrigatório.</span>
-                        </small>
-                    }
-                </div>
-
-                <div class="field mb-4">
-                    <label for="techPrefix" class="block mb-2">Prefixo de Discagem</label>
-                    <input id="techPrefix" pInputText class="p-inputtext" formControlName="techPrefix" />
-                </div>
-
-                <div class="field mb-4">
-                    <label for="peerQualify" class="block mb-2">Testar Alcance</label>
-                    <p-toggleswitch formControlName="peerQualify" />
-                </div>
-
-                <div class="field mb-4">
-                    <label for="codecs" class="block mb-2">Codecs *</label>
-                    <p-select-button
-                        id="codecs"
-                        [options]="codecsOptions"
-                        formControlName="codecs"
-                        [multiple]="true"
-                        optionLabel="label"
-                        optionValue="value"
-                    />
-                    @if (codecs.invalid) {
-                        <small class="p-error block mt-2">
-                            <span class="text-red-500">Ao menos 1 codec é obrigatório.</span>
-                        </small>
-                    }
-                </div>
-
-                <div class="field">
-                    <label for="dtmfMode" class="block mb-2">Tipo de DTMF *</label>
-                    <p-select
-                        id="dtmfMode"
-                        [options]="dtmfOptions"
-                        formControlName="dtmfMode"
-                        optionLabel="label"
-                        optionValue="value"
-                        placeholder="Selecione um tipo de origem"
-                    ></p-select>
-                </div>
-
-                <div class="field">
                     <label for="language" class="block mb-2">Idioma *</label>
                     <p-select
                         id="language"
@@ -159,6 +103,93 @@ import { PanelModule } from 'primeng/panel';
                         placeholder="Selecione um idioma"
                     ></p-select>
                 </div>
+
+                <p-accordion>
+                    <p-accordion-panel value="0">
+                        <p-accordion-header>Configurações Avançadas</p-accordion-header>
+                        <p-accordion-content>
+                            <div class="flex justify-between">
+                                <div>
+                                    <div class="field mb-4">
+                                        <label for="techPrefix" class="block mb-2">Prefixo de Discagem</label>
+                                        <input
+                                            id="techPrefix"
+                                            pInputText
+                                            placeholder="#105"
+                                            class="p-inputtext"
+                                            formControlName="techPrefix"
+                                        />
+                                    </div>
+
+                                    <div class="field mb-4">
+                                        <label for="port" class="block mb-2">Porta *</label>
+                                        <p-input-number
+                                            id="port"
+                                            mode="decimal"
+                                            useGrouping="false"
+                                            formControlName="port"
+                                        />
+                                        @if (port?.invalid && (port?.dirty || port?.touched)) {
+                                            <small class="p-error block mt-2">
+                                                <span class="text-red-500">Porta é obrigatória.</span>
+                                            </small>
+                                        }
+                                    </div>
+
+                                    <div class="field mb-4">
+                                        <label for="callLimit" class="block mb-2">Limite de Chamadas *</label>
+                                        <p-input-number
+                                            id="callLimit"
+                                            mode="decimal"
+                                            useGrouping="false"
+                                            formControlName="callLimit"
+                                        />
+                                        @if (callLimit?.invalid && (callLimit?.dirty || callLimit?.touched)) {
+                                            <small class="p-error block mt-2">
+                                                <span class="text-red-500">Limite de chamadas é obrigatório.</span>
+                                            </small>
+                                        }
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="field mb-4">
+                                        <label for="codecs" class="block mb-2">Codecs *</label>
+                                        <p-select-button
+                                            id="codecs"
+                                            [options]="codecsOptions"
+                                            formControlName="codecs"
+                                            [multiple]="true"
+                                            optionLabel="label"
+                                            optionValue="value"
+                                        />
+                                        @if (codecs.invalid) {
+                                            <small class="p-error block mt-2">
+                                                <span class="text-red-500">Ao menos 1 codec é obrigatório.</span>
+                                            </small>
+                                        }
+                                    </div>
+
+                                    <div class="field mb-4">
+                                        <label for="dtmfMode" class="block mb-2">Tipo de DTMF *</label>
+                                        <p-select
+                                            id="dtmfMode"
+                                            [options]="dtmfOptions"
+                                            formControlName="dtmfMode"
+                                            optionLabel="label"
+                                            optionValue="value"
+                                            placeholder="Selecione um tipo de origem"
+                                        ></p-select>
+                                    </div>
+
+                                    <div class="field">
+                                        <label for="peerQualify" class="block mb-2">Testar Alcance</label>
+                                        <p-toggleswitch formControlName="peerQualify" />
+                                    </div>
+                                </div>
+                            </div>
+                        </p-accordion-content>
+                    </p-accordion-panel>
+                </p-accordion>
 
                 <div class="flex mt-4">
                     <p-button type="submit" label="Salvar" [disabled]="form.invalid || pending">
@@ -173,7 +204,6 @@ import { PanelModule } from 'primeng/panel';
                 @if (showError) {
                     <small class="text-red-500"> Erro ao salvar o tronco </small>
                 }
-                <p-panel header="Configurações Avançadas" [toggleable]="true" toggler="header"> </p-panel>
             </form>
         </p-card>
     `
