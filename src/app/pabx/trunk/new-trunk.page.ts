@@ -1,12 +1,15 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { Router, RouterLink } from '@angular/router';
 import { TrunkService } from '@/pabx/trunk/trunk.service';
-import { DtmfModeEnum, LanguageEnum, TechnologyEnum } from '@/pabx/types';
+import { CodecEnum, DtmfModeEnum, LanguageEnum, TechnologyEnum } from '@/pabx/types';
 import { InputNumber } from 'primeng/inputnumber';
+import { ToggleSwitch } from 'primeng/toggleswitch';
+import { Select } from 'primeng/select';
+import { SelectButton } from 'primeng/selectbutton';
 
 /**
  * @author Jefferson Alves Reis (jefaokpta)
@@ -16,7 +19,17 @@ import { InputNumber } from 'primeng/inputnumber';
 @Component({
     selector: 'app-new-trunk-page',
     standalone: true,
-    imports: [InputTextModule, ButtonModule, CardModule, ReactiveFormsModule, RouterLink, InputNumber],
+    imports: [
+        InputTextModule,
+        ButtonModule,
+        CardModule,
+        ReactiveFormsModule,
+        RouterLink,
+        InputNumber,
+        ToggleSwitch,
+        Select,
+        SelectButton
+    ],
     template: `
         <p-card>
             <ng-template #title>
@@ -94,6 +107,57 @@ import { InputNumber } from 'primeng/inputnumber';
                     }
                 </div>
 
+                <div class="field mb-4">
+                    <label for="techPrefix" class="block mb-2">Prefixo de Discagem</label>
+                    <input id="techPrefix" pInputText class="p-inputtext" formControlName="techPrefix" />
+                </div>
+
+                <div class="field mb-4">
+                    <label for="peerQualify" class="block mb-2">Testar Alcance</label>
+                    <p-toggleswitch formControlName="peerQualify" />
+                </div>
+
+                <div class="field mb-4">
+                    <label for="codecs" class="block mb-2">Codecs *</label>
+                    <p-select-button
+                        id="codecs"
+                        [options]="codecsOptions"
+                        formControlName="codecs"
+                        [multiple]="true"
+                        optionLabel="label"
+                        optionValue="value"
+                    />
+                    @if (codecs.invalid) {
+                        <small class="p-error block mt-2">
+                            <span class="text-red-500">Ao menos 1 codec é obrigatório.</span>
+                        </small>
+                    }
+                </div>
+
+                <div class="field">
+                    <label for="dtmfMode" class="block mb-2">Tipo de DTMF *</label>
+                    <p-select
+                        id="dtmfMode"
+                        [options]="dtmfOptions"
+                        formControlName="dtmfMode"
+                        optionLabel="label"
+                        optionValue="value"
+                        placeholder="Selecione um tipo de origem"
+                    ></p-select>
+                </div>
+
+                <div class="field">
+                    <label for="language" class="block mb-2">Idioma *</label>
+                    <p-select
+                        id="language"
+                        [options]="languageOptions"
+                        formControlName="language"
+                        optionLabel="label"
+                        optionValue="value"
+                        placeholder="Selecione um idioma"
+                    ></p-select>
+                </div>
+
                 <div class="flex mt-4">
                     <p-button type="submit" label="Salvar" [disabled]="form.invalid || pending">
                         @if (pending) {
@@ -122,6 +186,47 @@ export class NewTrunkPage implements OnInit {
         private readonly trunkService: TrunkService
     ) {}
 
+    ngOnInit(): void {
+        this.form = this.fb.group({
+            name: ['', [Validators.required]],
+            username: ['', [Validators.required]],
+            secret: ['', [Validators.required]],
+            host: ['', [Validators.required]],
+            port: [5060, [Validators.required]],
+            peerQualify: [false, [Validators.required]],
+            callLimit: [0, [Validators.required]],
+            language: [LanguageEnum.pt_BR, [Validators.required]],
+            dtmfMode: [DtmfModeEnum.rfc4733, [Validators.required]],
+            technology: [TechnologyEnum.SIP, [Validators.required]],
+            techPrefix: [''],
+            codecs: [[CodecEnum.ALAW], [Validators.required]]
+        });
+    }
+
+    codecsOptions = [
+        { label: CodecEnum.ALAW, value: CodecEnum.ALAW },
+        { label: CodecEnum.ULAW, value: CodecEnum.ULAW },
+        { label: CodecEnum.G729, value: CodecEnum.G729 },
+        { label: CodecEnum.G722, value: CodecEnum.G722 },
+        { label: CodecEnum.GSM, value: CodecEnum.GSM }
+    ];
+
+    dtmfOptions = [
+        { label: 'RFC4733', value: DtmfModeEnum.rfc4733 },
+        { label: 'INFO', value: DtmfModeEnum.INFO },
+        { label: 'INBAND', value: DtmfModeEnum.INBAND }
+    ];
+
+    languageOptions = [
+        { label: 'Português', value: LanguageEnum.pt_BR },
+        { label: 'Inglês', value: LanguageEnum.en },
+        { label: 'Espanhol', value: LanguageEnum.es },
+        { label: 'Francês', value: LanguageEnum.fr }
+    ];
+
+    get codecs() {
+        return this.form.get('codecs') as FormArray;
+    }
     get name() {
         return this.form.get('name');
     }
@@ -137,34 +242,8 @@ export class NewTrunkPage implements OnInit {
     get port() {
         return this.form.get('port');
     }
-
-    get peerQualify() {
-        return this.form.get('peerQualify');
-    }
     get callLimit() {
         return this.form.get('callLimit');
-    }
-    get language() {
-        return this.form.get('language');
-    }
-    get dtmfMode() {
-        return this.form.get('dtmfMode');
-    }
-
-    ngOnInit(): void {
-        this.form = this.fb.group({
-            name: ['', [Validators.required]],
-            username: ['', [Validators.required]],
-            secret: ['', [Validators.required]],
-            host: ['', [Validators.required]],
-            port: [5060, [Validators.required]],
-            peerQualify: [false, [Validators.required]],
-            callLimit: [0, [Validators.required]],
-            language: [LanguageEnum.pt_BR, [Validators.required]],
-            dtmfMode: [DtmfModeEnum.rfc4733, [Validators.required]],
-            technology: [TechnologyEnum.SIP, [Validators.required]],
-            techPrefix: ['']
-        });
     }
 
     onSubmit() {
