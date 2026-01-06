@@ -160,7 +160,7 @@ export enum LanguageEnum {
 }
 
 export enum DtmfModeEnum {
-    rfc4733 = 'rfc4733',
+    RFC4733 = 'RFC4733',
     INBAND = 'INBAND',
     INFO = 'INFO'
 }

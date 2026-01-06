@@ -196,7 +196,7 @@ export class NewTrunkPage implements OnInit {
             peerQualify: [false, [Validators.required]],
             callLimit: [0, [Validators.required]],
             language: [LanguageEnum.pt_BR, [Validators.required]],
-            dtmfMode: [DtmfModeEnum.rfc4733, [Validators.required]],
+            dtmfMode: [DtmfModeEnum.RFC4733, [Validators.required]],
             technology: [TechnologyEnum.SIP, [Validators.required]],
             techPrefix: [''],
             codecs: [[CodecEnum.ALAW], [Validators.required]]
@@ -212,7 +212,7 @@ export class NewTrunkPage implements OnInit {
     ];
 
     dtmfOptions = [
-        { label: 'RFC4733', value: DtmfModeEnum.rfc4733 },
+        { label: 'RFC4733', value: DtmfModeEnum.RFC4733 },
         { label: 'INFO', value: DtmfModeEnum.INFO },
         { label: 'INBAND', value: DtmfModeEnum.INBAND }
     ];
