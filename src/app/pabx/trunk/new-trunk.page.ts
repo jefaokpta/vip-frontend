@@ -10,6 +10,7 @@ import { InputNumber } from 'primeng/inputnumber';
 import { ToggleSwitch } from 'primeng/toggleswitch';
 import { Select } from 'primeng/select';
 import { SelectButton } from 'primeng/selectbutton';
+import { PanelModule } from 'primeng/panel';
 
 /**
  * @author Jefferson Alves Reis (jefaokpta)
@@ -28,7 +29,8 @@ import { SelectButton } from 'primeng/selectbutton';
         InputNumber,
         ToggleSwitch,
         Select,
-        SelectButton
+        SelectButton,
+        PanelModule
     ],
     template: `
         <p-card>
@@ -171,6 +173,7 @@ import { SelectButton } from 'primeng/selectbutton';
                 @if (showError) {
                     <small class="text-red-500"> Erro ao salvar o tronco </small>
                 }
+                <p-panel header="Configurações Avançadas" [toggleable]="true" toggler="header"> </p-panel>
             </form>
         </p-card>
     `
