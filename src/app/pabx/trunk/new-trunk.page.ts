@@ -73,21 +73,21 @@ import { Accordion, AccordionContent, AccordionHeader, AccordionPanel } from 'pr
                 </div>
 
                 <div class="field mb-4">
-                    <label for="secret" class="block mb-2">Senha *</label>
-                    <input id="secret" pInputText class="p-inputtext" formControlName="secret" />
-                    @if (secret?.invalid && (secret?.dirty || secret?.touched)) {
-                        <small class="p-error block mt-2">
-                            <span class="text-red-500">Senha é obrigatória.</span>
-                        </small>
-                    }
-                </div>
-
-                <div class="field mb-4">
                     <label for="host" class="block mb-2">Endereço (Host) *</label>
                     <input id="host" pInputText class="p-inputtext" formControlName="host" />
                     @if (host?.invalid && (host?.dirty || host?.touched)) {
                         <small class="p-error block mt-2">
                             <span class="text-red-500">Endereço (Host) é obrigatório.</span>
+                        </small>
+                    }
+                </div>
+
+                <div class="field mb-4">
+                    <label for="secret" class="block mb-2">Senha *</label>
+                    <input id="secret" pInputText class="p-inputtext" formControlName="secret" />
+                    @if (secret?.invalid && (secret?.dirty || secret?.touched)) {
+                        <small class="p-error block mt-2">
+                            <span class="text-red-500">Senha é obrigatória.</span>
                         </small>
                     }
                 </div>
