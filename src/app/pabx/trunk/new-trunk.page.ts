@@ -11,6 +11,8 @@ import { ToggleSwitch } from 'primeng/toggleswitch';
 import { Select } from 'primeng/select';
 import { SelectButton } from 'primeng/selectbutton';
 import { Accordion, AccordionContent, AccordionHeader, AccordionPanel } from 'primeng/accordion';
+import { NgForOf, NgIf } from '@angular/common';
+import { Tooltip } from 'primeng/tooltip';
 
 /**
  * @author Jefferson Alves Reis (jefaokpta)
@@ -33,7 +35,10 @@ import { Accordion, AccordionContent, AccordionHeader, AccordionPanel } from 'pr
         Accordion,
         AccordionPanel,
         AccordionHeader,
-        AccordionContent
+        AccordionContent,
+        NgForOf,
+        NgIf,
+        Tooltip
     ],
     template: `
         <p-card>
@@ -187,6 +192,47 @@ import { Accordion, AccordionContent, AccordionHeader, AccordionPanel } from 'pr
                                     </div>
                                 </div>
                             </div>
+
+                            <div class="field mb-4">
+                                <div class="flex items-center gap-4 mb-2">
+                                    <label class="font-medium">Configurações Extras</label>
+                                    <p-button
+                                        type="button"
+                                        icon="pi pi-plus"
+                                        (onClick)="addExtraConfig()"
+                                        pTooltip="Adicionar configuração extra"
+                                        tooltipPosition="right"
+                                        outlined
+                                        size="small"
+                                    ></p-button>
+                                </div>
+
+                                <div formArrayName="extraConfigs">
+                                    <div *ngFor="let extra of extraConfigs.controls; let i = index" class="mb-3">
+                                        <div class="flex gap-2">
+                                            <div class="flex-grow-1">
+                                                <input
+                                                    [formControlName]="i"
+                                                    type="text"
+                                                    pInputText
+                                                    placeholder="Nome"
+                                                    class="w-full"
+                                                />
+                                                <small *ngIf="extra.invalid && extra.touched" class="p-error block"
+                                                    >Configuração obrigatória</small
+                                                >
+                                            </div>
+                                            <p-button
+                                                type="button"
+                                                icon="pi pi-trash"
+                                                (onClick)="removeExtraConfig(i)"
+                                                severity="danger"
+                                                outlined
+                                            ></p-button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </p-accordion-content>
                     </p-accordion-panel>
                 </p-accordion>
@@ -232,8 +278,21 @@ export class NewTrunkPage implements OnInit {
             dtmfMode: [DtmfModeEnum.RFC4733, [Validators.required]],
             technology: [TechnologyEnum.SIP, [Validators.required]],
             techPrefix: [''],
-            codecs: [[CodecEnum.ALAW], [Validators.required]]
+            codecs: [[CodecEnum.ALAW], [Validators.required]],
+            extraConfigs: this.fb.array([])
         });
+    }
+
+    addExtraConfig() {
+        const extraConfig = this.fb.group({
+            name: ['', [Validators.required]],
+            value: ['', [Validators.required]]
+        });
+        this.extraConfigs.push(extraConfig);
+    }
+
+    removeExtraConfig(index: number) {
+        this.extraConfigs.removeAt(index);
     }
 
     codecsOptions = [
@@ -277,6 +336,9 @@ export class NewTrunkPage implements OnInit {
     }
     get callLimit() {
         return this.form.get('callLimit');
+    }
+    get extraConfigs() {
+        return this.form.get('extraConfigs') as FormArray;
     }
 
     onSubmit() {
