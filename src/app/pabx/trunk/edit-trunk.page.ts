@@ -3,9 +3,9 @@ import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } fr
 import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { TrunkService } from '@/pabx/trunk/trunk.service';
-import { CodecEnum, DtmfModeEnum, LanguageEnum, TechnologyEnum } from '@/pabx/types';
+import { CodecEnum, DtmfModeEnum, ExtraConfig, LanguageEnum, TechnologyEnum } from '@/pabx/types';
 import { InputNumber } from 'primeng/inputnumber';
 import { ToggleSwitch } from 'primeng/toggleswitch';
 import { Select } from 'primeng/select';
@@ -20,7 +20,7 @@ import { Tooltip } from 'primeng/tooltip';
  * @create 4/25/25
  */
 @Component({
-    selector: 'app-new-trunk-page',
+    selector: 'app-edit-trunk-page',
     standalone: true,
     imports: [
         InputTextModule,
@@ -43,7 +43,7 @@ import { Tooltip } from 'primeng/tooltip';
         <p-card>
             <ng-template #title>
                 <div class="flex justify-between">
-                    <span class="font-semibold text-2xl">Novo Tronco</span>
+                    <span class="font-semibold text-2xl">Editar {{ name?.value }}</span>
                     <p-button
                         type="button"
                         label="Voltar"
@@ -263,19 +263,25 @@ import { Tooltip } from 'primeng/tooltip';
         </p-card>
     `
 })
-export class NewTrunkPage implements OnInit {
+export class EditTrunkPage implements OnInit {
     form!: FormGroup;
     pending = false;
     showError = false;
+    private readonly id: string;
 
     constructor(
         private readonly fb: FormBuilder,
         private readonly router: Router,
-        private readonly trunkService: TrunkService
-    ) {}
+        private readonly trunkService: TrunkService,
+        private readonly activatedRoute: ActivatedRoute
+    ) {
+        this.id = this.activatedRoute.snapshot.params['id'];
+    }
 
     ngOnInit(): void {
         this.form = this.fb.group({
+            id: [this.id],
+            companyId: [''],
             name: ['', [Validators.required]],
             username: ['', [Validators.required]],
             secret: [''],
@@ -290,12 +296,18 @@ export class NewTrunkPage implements OnInit {
             codecs: [[CodecEnum.ALAW], [Validators.required]],
             extraConfigs: this.fb.array([])
         });
+        this.trunkService.findById(this.id).then((trunk) => {
+            this.form.patchValue(trunk);
+            trunk.extraConfigs.forEach((extra) => {
+                this.addExtraConfig(extra);
+            });
+        });
     }
 
-    addExtraConfig() {
+    addExtraConfig(param?: ExtraConfig) {
         const extraConfig = this.fb.group({
-            name: ['', [Validators.required]],
-            value: ['', [Validators.required]]
+            name: [param?.name, [Validators.required]],
+            value: [param?.value, [Validators.required]]
         });
         this.extraConfigs.push(extraConfig);
     }
@@ -351,7 +363,7 @@ export class NewTrunkPage implements OnInit {
         this.pending = true;
         this.showError = false;
         this.trunkService
-            .create(this.form.value)
+            .update(this.form.value)
             .then(() => this.router.navigate(['/pabx/trunks']))
             .catch(() => {
                 this.showError = true;

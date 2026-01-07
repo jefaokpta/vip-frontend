@@ -29,7 +29,7 @@ export class TrunkService {
         return executeRequest(this.http.post(`${this.BACKEND}/trunks/${user.controlNumber}`, trunk, httpHeaders()));
     }
 
-    findById(id: number) {
+    findById(id: string) {
         const user = this.userService.getUser();
         return executeRequest(
             this.http.get<Trunk>(`${this.BACKEND}/trunks/${user.controlNumber}/${id}`, httpHeaders())
