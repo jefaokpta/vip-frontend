@@ -149,7 +149,7 @@ export interface Trunk {
     readonly technology: TechnologyEnum;
     readonly codecs: CodecEnum[];
     readonly techPrefix: string;
-    readonly extraConfigs: Map<string, string>;
+    readonly extraConfigs: ExtraConfig[];
 }
 
 export enum LanguageEnum {
@@ -175,4 +175,9 @@ export enum CodecEnum {
     ALAW = 'ALAW',
     ULAW = 'ULAW',
     GSM = 'GSM'
+}
+
+export interface ExtraConfig {
+    readonly name: string;
+    readonly value: string;
 }

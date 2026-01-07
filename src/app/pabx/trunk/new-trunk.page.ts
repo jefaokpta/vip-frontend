@@ -11,7 +11,7 @@ import { ToggleSwitch } from 'primeng/toggleswitch';
 import { Select } from 'primeng/select';
 import { SelectButton } from 'primeng/selectbutton';
 import { Accordion, AccordionContent, AccordionHeader, AccordionPanel } from 'primeng/accordion';
-import { NgForOf, NgIf } from '@angular/common';
+import { NgForOf } from '@angular/common';
 import { Tooltip } from 'primeng/tooltip';
 
 /**
@@ -37,7 +37,6 @@ import { Tooltip } from 'primeng/tooltip';
         AccordionHeader,
         AccordionContent,
         NgForOf,
-        NgIf,
         Tooltip
     ],
     template: `
@@ -88,13 +87,8 @@ import { Tooltip } from 'primeng/tooltip';
                 </div>
 
                 <div class="field mb-4">
-                    <label for="secret" class="block mb-2">Senha *</label>
+                    <label for="secret" class="block mb-2">Senha</label>
                     <input id="secret" pInputText class="p-inputtext" formControlName="secret" />
-                    @if (secret?.invalid && (secret?.dirty || secret?.touched)) {
-                        <small class="p-error block mt-2">
-                            <span class="text-red-500">Senha é obrigatória.</span>
-                        </small>
-                    }
                 </div>
 
                 <div class="field mb-4">
@@ -208,19 +202,29 @@ import { Tooltip } from 'primeng/tooltip';
                                 </div>
 
                                 <div formArrayName="extraConfigs">
-                                    <div *ngFor="let extra of extraConfigs.controls; let i = index" class="mb-3">
+                                    <div
+                                        *ngFor="let extra of extraConfigs.controls; let i = index"
+                                        [formGroupName]="i"
+                                        class="mb-3"
+                                    >
                                         <div class="flex gap-2">
-                                            <div class="flex-grow-1">
+                                            <div class="flex-1">
                                                 <input
-                                                    [formControlName]="i"
+                                                    formControlName="name"
                                                     type="text"
                                                     pInputText
                                                     placeholder="Nome"
                                                     class="w-full"
                                                 />
-                                                <small *ngIf="extra.invalid && extra.touched" class="p-error block"
-                                                    >Configuração obrigatória</small
-                                                >
+                                            </div>
+                                            <div class="flex-1">
+                                                <input
+                                                    formControlName="value"
+                                                    type="text"
+                                                    pInputText
+                                                    placeholder="Valor"
+                                                    class="w-full"
+                                                />
                                             </div>
                                             <p-button
                                                 type="button"
@@ -230,6 +234,11 @@ import { Tooltip } from 'primeng/tooltip';
                                                 outlined
                                             ></p-button>
                                         </div>
+                                        @if (extra.invalid && (extra.dirty || extra.touched)) {
+                                            <small class="p-error block mt-2">
+                                                <span class="text-red-500">Nome e valor são obrigatórios.</span>
+                                            </small>
+                                        }
                                     </div>
                                 </div>
                             </div>
@@ -269,7 +278,7 @@ export class NewTrunkPage implements OnInit {
         this.form = this.fb.group({
             name: ['', [Validators.required]],
             username: ['', [Validators.required]],
-            secret: ['', [Validators.required]],
+            secret: [''],
             host: ['', [Validators.required]],
             port: [5060, [Validators.required]],
             peerQualify: [false, [Validators.required]],
@@ -325,9 +334,6 @@ export class NewTrunkPage implements OnInit {
     get username() {
         return this.form.get('username');
     }
-    get secret() {
-        return this.form.get('secret');
-    }
     get host() {
         return this.form.get('host');
     }
@@ -344,13 +350,15 @@ export class NewTrunkPage implements OnInit {
     onSubmit() {
         this.pending = true;
         this.showError = false;
-        const trunk = this.form.value;
-        console.log(trunk);
-        // this.trunkService.create(trunk)
-        //     .then(() => this.router.navigate(['/pabx/trunks']))
-        //     .catch(() => {
-        //         this.showError = true;
-        //     })
-        //     .finally(() => (this.pending = false));
+
+        console.log(this.form.value);
+
+        this.trunkService
+            .create(this.form.value)
+            .then(() => this.router.navigate(['/pabx/trunks']))
+            .catch(() => {
+                this.showError = true;
+            })
+            .finally(() => (this.pending = false));
     }
 }
