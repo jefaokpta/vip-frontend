@@ -1,20 +1,20 @@
-import {Component, OnInit, ViewChild} from "@angular/core";
-import {Button} from "primeng/button";
-import {Card} from "primeng/card";
-import {ConfirmDialog} from "primeng/confirmdialog";
-import {IconField} from "primeng/iconfield";
-import {InputIcon} from "primeng/inputicon";
-import {InputText} from "primeng/inputtext";
-import {CurrencyPipe, DatePipe, NgIf} from "@angular/common";
-import {ConfirmationService, MessageService, PrimeTemplate} from "primeng/api";
-import {ProgressSpinner} from "primeng/progressspinner";
-import {RouterLink} from "@angular/router";
-import {Table, TableModule} from "primeng/table";
-import {Toast} from "primeng/toast";
-import {Tooltip} from "primeng/tooltip";
-import {AccountCode} from "@/pabx/types";
-import {AccountCodeService} from "@/pabx/accountcode/account-code.service";
-import {Tag} from "primeng/tag";
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { Button } from 'primeng/button';
+import { Card } from 'primeng/card';
+import { ConfirmDialog } from 'primeng/confirmdialog';
+import { IconField } from 'primeng/iconfield';
+import { InputIcon } from 'primeng/inputicon';
+import { InputText } from 'primeng/inputtext';
+import { CurrencyPipe, DatePipe, NgIf } from '@angular/common';
+import { ConfirmationService, MessageService, PrimeTemplate } from 'primeng/api';
+import { ProgressSpinner } from 'primeng/progressspinner';
+import { RouterLink } from '@angular/router';
+import { Table, TableModule } from 'primeng/table';
+import { Toast } from 'primeng/toast';
+import { Tooltip } from 'primeng/tooltip';
+import { AccountCode } from '@/pabx/types';
+import { AccountCodeService } from '@/pabx/accountcode/account-code.service';
+import { Tag } from 'primeng/tag';
 
 @Component({
     selector: 'app-account-code-page',
@@ -47,7 +47,7 @@ import {Tag} from "primeng/tag";
                     </h2>
                     <div class="inline-flex items-center">
                         <p-iconfield>
-                            <p-inputicon class="pi pi-search"/>
+                            <p-inputicon class="pi pi-search" />
                             <input
                                 pInputText
                                 type="text"
@@ -57,8 +57,14 @@ import {Tag} from "primeng/tag";
                                 class="w-full"
                             />
                         </p-iconfield>
-                        <p-button icon="pi pi-plus" label="Centro de Custo" routerLink="new" outlined class="mx-4"
-                                  rounded/>
+                        <p-button
+                            icon="pi pi-plus"
+                            label="Centro de Custo"
+                            routerLink="new"
+                            outlined
+                            class="mx-4"
+                            rounded
+                        />
                     </div>
                 </div>
             </ng-template>
@@ -87,22 +93,28 @@ import {Tag} from "primeng/tag";
                 <ng-template pTemplate="body" let-accountCode>
                     <tr>
                         <td>
-                            <p-tag [value]="accountCode.code"
-                                   [severity]="isDeletable(accountCode)? 'info' : 'danger'"></p-tag>
+                            <p-tag
+                                [value]="accountCode.code"
+                                [severity]="isDeletable(accountCode) ? 'info' : 'warn'"
+                            ></p-tag>
                         </td>
                         <td>{{ accountCode.title }}</td>
                         <td>{{ accountCode.cadence }}</td>
                         <td>{{ accountCode.fraction }}</td>
                         <td>
                             <div class="flex gap-2">
-                                <span>{{ accountCode.cost | currency:'BRL':true:'1.2-2' }}</span>
-                                <i *ngIf="accountCode.cost == 0" class="pi pi-exclamation-circle" style="color: red"
-                                   pTooltip="Custo zero"></i>
+                                <span>{{ accountCode.cost | currency: 'BRL' : true : '1.2-2' }}</span>
+                                <i
+                                    *ngIf="accountCode.cost == 0"
+                                    class="pi pi-exclamation-circle"
+                                    style="color: red"
+                                    pTooltip="Custo zero"
+                                ></i>
                             </div>
                         </td>
                         <td>
-                            <ng-container *ngIf="accountCode.updatedAt else noUpdatedAt">
-                                {{ accountCode.updatedAt | date:'dd/MM/yyyy' }}
+                            <ng-container *ngIf="accountCode.updatedAt; else noUpdatedAt">
+                                {{ accountCode.updatedAt | date: 'dd/MM/yyyy' }}
                             </ng-container>
                             <ng-template #noUpdatedAt>
                                 <span>Não alterado</span>
@@ -133,15 +145,15 @@ import {Tag} from "primeng/tag";
                 </ng-template>
 
                 <ng-template pTemplate="emptymessage">
-                    <p-progress-spinner *ngIf="loading" [style]="{ width: '2rem', height: '2rem' }"/>
+                    <p-progress-spinner *ngIf="loading" [style]="{ width: '2rem', height: '2rem' }" />
                     <tr>
                         <td colspan="8" *ngIf="!loading" class="text-center p-4">Nenhum centro de custo encontrado.</td>
                     </tr>
                 </ng-template>
             </p-table>
         </p-card>
-        <p-confirm-dialog/>
-        <p-toast/>
+        <p-confirm-dialog />
+        <p-toast />
     `
 })
 export class AccountCodePage implements OnInit {
@@ -153,12 +165,11 @@ export class AccountCodePage implements OnInit {
         private readonly confirmationService: ConfirmationService,
         private readonly messageService: MessageService,
         private readonly accountCodeService: AccountCodeService
-    ) {
-    }
+    ) {}
 
     ngOnInit(): void {
         this.accountCodeService.findAll().then((accountCodes) => {
-            this.accountCodes = accountCodes.sort((a, b) => a.code.localeCompare(b.code))
+            this.accountCodes = accountCodes.sort((a, b) => a.code.localeCompare(b.code));
             this.loading = false;
         });
     }
@@ -191,7 +202,8 @@ export class AccountCodePage implements OnInit {
                 outlined: true
             },
             accept: () => {
-                this.accountCodeService.delete(accountCode.id)
+                this.accountCodeService
+                    .delete(accountCode.id)
                     .then(() => {
                         this.accountCodes = this.accountCodes.filter((a) => a.id !== accountCode.id);
                         this.messageService.add({
@@ -199,14 +211,15 @@ export class AccountCodePage implements OnInit {
                             summary: 'Centro de custo removido com sucesso',
                             life: 15_000
                         });
-                    }).catch(() => {
-                    this.messageService.add({
-                        severity: 'error',
-                        summary: 'Desculpe não foi possível remover o centro de custo',
-                        detail: 'Tente novamente mais tarde.',
-                        life: 15_000
+                    })
+                    .catch(() => {
+                        this.messageService.add({
+                            severity: 'error',
+                            summary: 'Desculpe não foi possível remover o centro de custo',
+                            detail: 'Tente novamente mais tarde.',
+                            life: 15_000
+                        });
                     });
-                });
             }
         });
     }

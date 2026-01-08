@@ -5,8 +5,13 @@ import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { Router, RouterLink } from '@angular/router';
 import { RouteService } from '@/pabx/route/route.service';
-import { NgForOf } from '@angular/common';
 import { InputNumber } from 'primeng/inputnumber';
+import { Select } from 'primeng/select';
+import { TableModule } from 'primeng/table';
+import { Tag } from 'primeng/tag';
+import { TrunkService } from '@/pabx/trunk/trunk.service';
+import { AccountCodeService } from '@/pabx/accountcode/account-code.service';
+import { AccountCode } from '@/pabx/types';
 
 /**
  * @author Jefferson Alves Reis (jefaokpta)
@@ -16,7 +21,17 @@ import { InputNumber } from 'primeng/inputnumber';
 @Component({
     selector: 'app-new-route-page',
     standalone: true,
-    imports: [InputTextModule, ButtonModule, CardModule, ReactiveFormsModule, RouterLink, NgForOf, InputNumber],
+    imports: [
+        InputTextModule,
+        ButtonModule,
+        CardModule,
+        ReactiveFormsModule,
+        RouterLink,
+        InputNumber,
+        Select,
+        TableModule,
+        Tag
+    ],
     template: `
         <p-card>
             <ng-template #title>
@@ -54,46 +69,72 @@ import { InputNumber } from 'primeng/inputnumber';
                     }
                 </div>
 
+                <div class="field mb-4">
+                    <label for="flags" class="block mb-2">Flags de Discagem</label>
+                    <input id="flags" pInputText class="p-inputtext" formControlName="flags" />
+                </div>
+
                 <p-card>
                     <ng-template #title>
                         <span class="font-semibold text-xl">Ordem dos Troncos</span>
                     </ng-template>
 
-                    <div class="field mb-4">
-                        <div formArrayName="routeTrunks">
-                            <div
-                                *ngFor="let routeTrunk of routeTrunks.controls; let i = index"
-                                [formGroupName]="i"
-                                class="mb-3"
-                            >
-                                <div class="flex gap-2">
-                                    <span>Local</span>
-                                    <div class="flex-1">
-                                        <input
-                                            formControlName="name"
-                                            type="text"
-                                            pInputText
-                                            placeholder="Nome"
-                                            class="w-full"
-                                        />
-                                    </div>
-                                    <div class="flex-1">
-                                        <input
-                                            formControlName="value"
-                                            type="text"
-                                            pInputText
-                                            placeholder="Valor"
-                                            class="w-full"
-                                        />
-                                    </div>
-                                </div>
-                                @if (routeTrunk.invalid && (routeTrunk.dirty || routeTrunk.touched)) {
-                                    <small class="p-error block mt-2">
-                                        <span class="text-red-500">Nome e valor são obrigatórios.</span>
-                                    </small>
-                                }
-                            </div>
-                        </div>
+                    <div formArrayName="routeTrunks">
+                        <p-table [value]="routeTrunks.controls" [tableStyle]="{ 'min-width': '50rem' }">
+                            <ng-template #header>
+                                <tr>
+                                    <th style="width: 1rem">Código</th>
+                                    <th>Título</th>
+                                    <th>Tronco 1</th>
+                                    <th>Tronco 2</th>
+                                    <th>Tronco 3</th>
+                                </tr>
+                            </ng-template>
+                            <ng-template #body let-acc let-index="rowIndex">
+                                <tr [formGroupName]="index">
+                                    <td>
+                                        <p-tag [value]="acc.get('accountCode').value" severity="warn" />
+                                    </td>
+                                    <td>{{ acc.get('title').value }}</td>
+                                    <td>
+                                        <p-select
+                                            id="dtmfMode"
+                                            class="max-w-55"
+                                            [options]="trunkOptions"
+                                            formControlName="trunk1"
+                                            optionLabel="label"
+                                            optionValue="value"
+                                            placeholder="Selecione um tronco"
+                                            appendTo="body"
+                                        ></p-select>
+                                    </td>
+                                    <td>
+                                        <p-select
+                                            id="dtmfMode"
+                                            class="max-w-55"
+                                            [options]="trunkOptions"
+                                            formControlName="trunk2"
+                                            optionLabel="label"
+                                            optionValue="value"
+                                            placeholder="Selecione um tronco"
+                                            appendTo="body"
+                                        ></p-select>
+                                    </td>
+                                    <td>
+                                        <p-select
+                                            id="dtmfMode"
+                                            class="max-w-55"
+                                            [options]="trunkOptions"
+                                            formControlName="trunk3"
+                                            optionLabel="label"
+                                            optionValue="value"
+                                            placeholder="Selecione um tronco"
+                                            appendTo="body"
+                                        ></p-select>
+                                    </td>
+                                </tr>
+                            </ng-template>
+                        </p-table>
                     </div>
                 </p-card>
 
@@ -122,7 +163,9 @@ export class NewRoutePage implements OnInit {
     constructor(
         private readonly fb: FormBuilder,
         private readonly router: Router,
-        private readonly routeService: RouteService
+        private readonly routeService: RouteService,
+        private readonly accountCodeService: AccountCodeService,
+        private readonly trunkService: TrunkService
     ) {}
 
     ngOnInit(): void {
@@ -132,15 +175,29 @@ export class NewRoutePage implements OnInit {
             flags: ['T'],
             routeTrunks: this.fb.array([])
         });
-        this.addRouteTrunk();
+        this.accountCodeService.findAll().then((acc) =>
+            this.filterUnwelcomeAccountCodes(acc).forEach((acc) => {
+                this.addRouteTrunk({ accountCode: acc.code, title: acc.title });
+            })
+        );
+        this.trunkService.findAll().then((trunks) =>
+            trunks.forEach((trunk) => {
+                this.trunkOptions.push({ label: trunk.name, value: trunk.username });
+            })
+        );
     }
 
-    private addRouteTrunk() {
-        const routeTrunk = this.fb.group({
-            name: ['', [Validators.required]],
-            value: ['', [Validators.required]]
+    trunkOptions: { label: string; value: string }[] = [];
+
+    private addRouteTrunk(param: { accountCode: string; title: string }) {
+        const routeTrunkRow = this.fb.group({
+            accountCode: [param.accountCode, [Validators.required]],
+            title: [param.title],
+            trunk1: [''],
+            trunk2: [''],
+            trunk3: ['']
         });
-        this.routeTrunks.push(routeTrunk);
+        this.routeTrunks.push(routeTrunkRow);
     }
 
     get name() {
@@ -164,5 +221,10 @@ export class NewRoutePage implements OnInit {
         //         this.showError = true;
         //     })
         //     .finally(() => (this.pending = false));
+    }
+
+    private filterUnwelcomeAccountCodes(accountCodes: AccountCode[]): AccountCode[] {
+        const regex = /^[2-8].00$/;
+        return accountCodes.filter((acc) => regex.test(acc.code));
     }
 }
