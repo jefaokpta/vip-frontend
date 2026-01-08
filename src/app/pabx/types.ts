@@ -181,3 +181,18 @@ export interface ExtraConfig {
     readonly name: string;
     readonly value: string;
 }
+interface RouteTrunk {
+    readonly ccost: string;
+    readonly trunk1: string;
+    readonly trunk2: string;
+    readonly trunk3: string;
+}
+
+export interface Route {
+    readonly id: number;
+    readonly name: string;
+    readonly companyId: string;
+    readonly timeout: number;
+    readonly flags: string;
+    readonly routeTrunks: RouteTrunk[];
+}
