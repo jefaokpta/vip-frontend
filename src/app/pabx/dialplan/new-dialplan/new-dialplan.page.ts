@@ -158,9 +158,10 @@ export class NewDialplanPage implements OnInit {
     onSubmit() {
         this.pending = true;
         this.showError = false;
-        console.log(this.form.value);
+        const dialplan = this.form.value;
+        dialplan.actions = this.actions.value.map((action: any, index: any) => ({ ...action, priority: index }));
         this.dialPlanService
-            .create(this.form.value)
+            .create(dialplan)
             .then(() => this.router.navigate(['/pabx/dialplans']))
             .catch(() => {
                 this.showError = true;
