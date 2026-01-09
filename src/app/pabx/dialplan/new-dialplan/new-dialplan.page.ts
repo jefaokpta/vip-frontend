@@ -1,27 +1,27 @@
-import {Component, OnInit} from '@angular/core';
-import {FormArray, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
-import {InputTextModule} from 'primeng/inputtext';
-import {ButtonModule} from 'primeng/button';
-import {CardModule} from 'primeng/card';
-import {NgIf} from '@angular/common';
-import {Router, RouterLink} from '@angular/router';
-import {DialPlanService} from '../dial-plan.service';
-import {DialPlan, DialPlanActionEnum, SrcEnum} from "@/pabx/types";
-import {Select} from "primeng/select";
-import {AgentSelectComponent} from "@/pabx/dialplan/components/agent-select-component";
-import {PeerSelectComponent} from "@/pabx/dialplan/components/peer-select-component";
-import {AliasSelectComponent} from "@/pabx/dialplan/components/alias-select-component";
-import {TrunkSelectComponent} from "@/pabx/dialplan/components/trunk-select-component";
-import {ToggleSwitch} from "primeng/toggleswitch";
-import {TableModule} from "primeng/table";
-import {PeerActionComponent} from "@/pabx/dialplan/components/peer-action.component";
-import {RouteActionComponent} from "@/pabx/dialplan/components/route-action.component";
-import {AgentActionComponent} from "@/pabx/dialplan/components/agent-action.component";
-import {AnswerActionComponent} from "@/pabx/dialplan/components/answer-action-component";
-import {HangupActionComponent} from "@/pabx/dialplan/components/hangup-action-component";
-import {PlaybackActionComponent} from "@/pabx/dialplan/components/playback-action.component";
-import {VariableActionComponent} from "@/pabx/dialplan/components/variable-action.component";
-import {AccountCodeActionComponent} from "@/pabx/dialplan/components/accountcode-action.component";
+import { Component, OnInit } from '@angular/core';
+import { FormArray, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { InputTextModule } from 'primeng/inputtext';
+import { ButtonModule } from 'primeng/button';
+import { CardModule } from 'primeng/card';
+import { NgIf } from '@angular/common';
+import { Router, RouterLink } from '@angular/router';
+import { DialPlanService } from '../dial-plan.service';
+import { DialPlan, DialPlanActionEnum, SrcEnum } from '@/pabx/types';
+import { Select } from 'primeng/select';
+import { AgentSelectComponent } from '@/pabx/dialplan/components/agent-select-component';
+import { PeerSelectComponent } from '@/pabx/dialplan/components/peer-select-component';
+import { AliasSelectComponent } from '@/pabx/dialplan/components/alias-select-component';
+import { TrunkSelectComponent } from '@/pabx/dialplan/components/trunk-select-component';
+import { ToggleSwitch } from 'primeng/toggleswitch';
+import { TableModule } from 'primeng/table';
+import { PeerActionComponent } from '@/pabx/dialplan/components/peer-action.component';
+import { RouteActionComponent } from '@/pabx/dialplan/components/route-action.component';
+import { AgentActionComponent } from '@/pabx/dialplan/components/agent-action.component';
+import { AnswerActionComponent } from '@/pabx/dialplan/components/answer-action-component';
+import { HangupActionComponent } from '@/pabx/dialplan/components/hangup-action-component';
+import { PlaybackActionComponent } from '@/pabx/dialplan/components/playback-action.component';
+import { VariableActionComponent } from '@/pabx/dialplan/components/variable-action.component';
+import { AccountCodeActionComponent } from '@/pabx/dialplan/components/accountcode-action.component';
 
 /**
  * @author Jefferson Alves Reis (jefaokpta)
@@ -55,7 +55,7 @@ import {AccountCodeActionComponent} from "@/pabx/dialplan/components/accountcode
         VariableActionComponent,
         AccountCodeActionComponent
     ],
-    templateUrl: './new-dialplan.page.html',
+    templateUrl: './new-dialplan.page.html'
 })
 export class NewDialplanPage implements OnInit {
     form!: FormGroup;
@@ -63,31 +63,30 @@ export class NewDialplanPage implements OnInit {
     showError = false;
 
     srcOptions = [
-        {label: 'Qualquer', value: SrcEnum.ANY},
-        {label: 'Ramal', value: SrcEnum.PEER},
-        {label: 'Agente', value: SrcEnum.AGENT},
-        {label: 'Expressão Regular', value: SrcEnum.EXPRESSION},
-        {label: 'Alias', value: SrcEnum.ALIAS},
-        {label: 'Tronco', value: SrcEnum.TRUNK},
+        { label: 'Qualquer', value: SrcEnum.ANY },
+        { label: 'Ramal', value: SrcEnum.PEER },
+        { label: 'Agente', value: SrcEnum.AGENT },
+        { label: 'Expressão Regular', value: SrcEnum.EXPRESSION },
+        { label: 'Alias', value: SrcEnum.ALIAS },
+        { label: 'Tronco', value: SrcEnum.TRUNK }
     ];
 
     actionOptions = [
-        {label: 'Atender', value: DialPlanActionEnum.ANSWER},
-        {label: 'Desligar', value: DialPlanActionEnum.HANGUP},
-        {label: 'Centro de Custo', value: DialPlanActionEnum.ACCOUNT_CODE},
-        {label: 'Ramal', value: DialPlanActionEnum.DIAL_PEER},
-        {label: 'Agente', value: DialPlanActionEnum.DIAL_AGENT},
-        {label: 'Rota', value: DialPlanActionEnum.DIAL_ROUTE},
-        {label: 'Tocar Audio', value: DialPlanActionEnum.PLAYBACK},
-        {label: 'Definir Variável', value: DialPlanActionEnum.SET_VARIABLE},
+        { label: 'Atender', value: DialPlanActionEnum.ANSWER },
+        { label: 'Desligar', value: DialPlanActionEnum.HANGUP },
+        { label: 'Centro de Custo', value: DialPlanActionEnum.ACCOUNT_CODE },
+        { label: 'Ramal', value: DialPlanActionEnum.DIAL_PEER },
+        { label: 'Agente', value: DialPlanActionEnum.DIAL_AGENT },
+        { label: 'Rota', value: DialPlanActionEnum.DIAL_ROUTE },
+        { label: 'Tocar Audio', value: DialPlanActionEnum.PLAYBACK },
+        { label: 'Definir Variável', value: DialPlanActionEnum.SET_VARIABLE }
     ];
 
     constructor(
         private readonly fb: FormBuilder,
         private readonly router: Router,
         private readonly dialPlanService: DialPlanService
-    ) {
-    }
+    ) {}
 
     get name() {
         return this.form.get('name');
@@ -130,7 +129,7 @@ export class NewDialplanPage implements OnInit {
             isActive: [true],
             dstToggle: [false],
             selectedAction: [''],
-            dialplanActions: this.fb.array([]),
+            dialplanActions: this.fb.array([])
         });
     }
 
@@ -142,12 +141,14 @@ export class NewDialplanPage implements OnInit {
     }
 
     addDialplanAction() {
-        if (!this.selectedAction?.value) return
-        this.dialplanActions.push(this.fb.group({
-            dialPlanActionEnum: this.selectedAction?.value,
-            arg1: ['', [Validators.required]],
-            arg2: ['', this.selectedAction.value === DialPlanActionEnum.SET_VARIABLE ? [Validators.required] : []],
-        }));
+        if (!this.selectedAction?.value) return;
+        this.dialplanActions.push(
+            this.fb.group({
+                dialPlanActionEnum: this.selectedAction?.value,
+                arg1: ['', [Validators.required]],
+                arg2: ['', this.selectedAction.value === DialPlanActionEnum.SET_VARIABLE ? [Validators.required] : []]
+            })
+        );
     }
 
     removeDialplanAction(index: number) {
@@ -158,8 +159,8 @@ export class NewDialplanPage implements OnInit {
         this.pending = true;
         this.showError = false;
         const dialplan: DialPlan = {
-            ...this.form.value,
-        };
+            ...this.form.value
+        }; //TODO: garantir q tem ao menos uma ação
         console.log(dialplan);
         // this.dialPlanService.create(dialplan)
         //     .then(() => this.router.navigate(['/pabx/dialplans']))
@@ -178,5 +179,4 @@ export class NewDialplanPage implements OnInit {
             this.form.addControl('dst', this.fb.control('', [Validators.required]));
         }
     }
-
 }

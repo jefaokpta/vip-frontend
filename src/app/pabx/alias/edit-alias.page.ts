@@ -1,13 +1,13 @@
-import {Component, OnInit} from '@angular/core';
-import {FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
-import {InputTextModule} from 'primeng/inputtext';
-import {ButtonModule} from 'primeng/button';
-import {CardModule} from 'primeng/card';
-import {NgForOf, NgIf} from '@angular/common';
-import {ActivatedRoute, Router, RouterLink} from '@angular/router';
-import {Tooltip} from 'primeng/tooltip';
-import {Alias} from "@/pabx/types";
-import {AliasService} from "@/pabx/alias/alias.service";
+import { Component, OnInit } from '@angular/core';
+import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { InputTextModule } from 'primeng/inputtext';
+import { ButtonModule } from 'primeng/button';
+import { CardModule } from 'primeng/card';
+import { NgForOf, NgIf } from '@angular/common';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { Tooltip } from 'primeng/tooltip';
+import { Alias } from '@/pabx/types';
+import { AliasService } from '@/pabx/alias/alias.service';
 
 /**
  * @author Jefferson Alves Reis (jefaokpta)
@@ -17,16 +17,7 @@ import {AliasService} from "@/pabx/alias/alias.service";
 @Component({
     selector: 'app-edit-alias-page',
     standalone: true,
-    imports: [
-        InputTextModule,
-        ButtonModule,
-        CardModule,
-        NgIf,
-        ReactiveFormsModule,
-        RouterLink,
-        NgForOf,
-        Tooltip
-    ],
+    imports: [InputTextModule, ButtonModule, CardModule, NgIf, ReactiveFormsModule, RouterLink, NgForOf, Tooltip],
     template: `
         <p-card>
             <ng-template #title>
@@ -46,7 +37,7 @@ import {AliasService} from "@/pabx/alias/alias.service";
             <form [formGroup]="form" (ngSubmit)="onSubmit()" class="p-fluid">
                 <div class="field mb-4">
                     <label for="name" class="block mb-2">Nome *</label>
-                    <input id="name" pInputText class="p-inputtext" formControlName="name"/>
+                    <input id="name" pInputText class="p-inputtext" formControlName="name" />
                     <small *ngIf="name?.invalid && (name?.dirty || name?.touched)" class="p-error block mt-2">
                         <div *ngIf="name?.errors?.['required']">Nome é obrigatório.</div>
                     </small>
@@ -101,9 +92,7 @@ import {AliasService} from "@/pabx/alias/alias.service";
                     </p-button>
                 </div>
 
-                <small *ngIf="showError" class="text-red-500">
-                    Erro ao salvar o alias
-                </small>
+                <small *ngIf="showError" class="text-red-500"> Erro ao salvar o alias </small>
             </form>
         </p-card>
     `
@@ -119,8 +108,7 @@ export class EditAliasPage implements OnInit {
         private readonly router: Router,
         private readonly aliasService: AliasService,
         private readonly activatedRoute: ActivatedRoute
-    ) {
-    }
+    ) {}
 
     get expressions() {
         return this.form.get('expressions') as FormArray;
@@ -135,11 +123,19 @@ export class EditAliasPage implements OnInit {
             name: ['', [Validators.required]],
             expressions: this.fb.array([])
         });
-        this.aliasService.findById(this.activatedRoute.snapshot.params['id'])
-            .then(alias => {
+        this.aliasService
+            .findById(this.activatedRoute.snapshot.params['id'])
+            .then((alias) => {
                 this.alias = alias;
                 this.form.patchValue(alias);
-                this.form.setControl('expressions', this.fb.array(alias.expressions.map(expression => this.fb.control(expression.expression))));
+                this.form.setControl(
+                    'expressions',
+                    this.fb.array(
+                        alias.expressions.map((expression) =>
+                            this.fb.control(expression.expression, [Validators.required])
+                        )
+                    )
+                );
             })
             .catch(() => {
                 this.router.navigate(['/pabx/aliases']);
@@ -161,14 +157,15 @@ export class EditAliasPage implements OnInit {
             ...this.alias!,
             ...this.form.value,
             expressions: this.form.value.expressions.map((expression: string) => {
-                const exprExists = this.alias?.expressions.find(e => e.expression === expression);
+                const exprExists = this.alias?.expressions.find((e) => e.expression === expression);
                 if (exprExists) {
-                    return exprExists
+                    return exprExists;
                 }
-                return {expression};
+                return { expression };
             })
         };
-        this.aliasService.update(alias)
+        this.aliasService
+            .update(alias)
             .then(() => this.router.navigate(['/pabx/aliases']))
             .catch(() => {
                 this.showError = true;
