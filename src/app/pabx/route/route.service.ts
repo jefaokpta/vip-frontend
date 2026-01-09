@@ -39,7 +39,7 @@ export class RouteService {
     update(route: Route) {
         const user = this.userService.getUser();
         return executeRequest(
-            this.http.put(`${this.BACKEND}/trunks/${user.controlNumber}/${route.id}`, route, httpHeaders())
+            this.http.put(`${this.BACKEND}/routes/${user.controlNumber}/${route.id}`, route, httpHeaders())
         );
     }
 }

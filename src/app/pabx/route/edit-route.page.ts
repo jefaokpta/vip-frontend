@@ -3,15 +3,14 @@ import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } fr
 import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { RouteService } from '@/pabx/route/route.service';
 import { InputNumber } from 'primeng/inputnumber';
 import { Select } from 'primeng/select';
 import { TableModule } from 'primeng/table';
 import { Tag } from 'primeng/tag';
 import { TrunkService } from '@/pabx/trunk/trunk.service';
-import { AccountCodeService } from '@/pabx/accountcode/account-code.service';
-import { AccountCode } from '@/pabx/types';
+import { RouteTrunk } from '@/pabx/types';
 
 /**
  * @author Jefferson Alves Reis (jefaokpta)
@@ -19,7 +18,7 @@ import { AccountCode } from '@/pabx/types';
  * @create 4/25/25
  */
 @Component({
-    selector: 'app-new-route-page',
+    selector: 'app-edit-route-page',
     standalone: true,
     imports: [
         InputTextModule,
@@ -36,7 +35,7 @@ import { AccountCode } from '@/pabx/types';
         <p-card>
             <ng-template #title>
                 <div class="flex justify-between">
-                    <span class="font-semibold text-2xl">Nova Rota</span>
+                    <span class="font-semibold text-2xl">Editar {{ name?.value }}</span>
                     <p-button
                         type="button"
                         label="Voltar"
@@ -147,31 +146,37 @@ import { AccountCode } from '@/pabx/types';
         </p-card>
     `
 })
-export class NewRoutePage implements OnInit {
+export class EditRoutePage implements OnInit {
     form!: FormGroup;
     pending = false;
     showError = false;
+    private readonly id: string;
 
     constructor(
         private readonly fb: FormBuilder,
         private readonly router: Router,
         private readonly routeService: RouteService,
-        private readonly accountCodeService: AccountCodeService,
-        private readonly trunkService: TrunkService
-    ) {}
+        private readonly trunkService: TrunkService,
+        private readonly activatedRoute: ActivatedRoute
+    ) {
+        this.id = this.activatedRoute.snapshot.paramMap.get('id')!;
+    }
 
     ngOnInit(): void {
         this.form = this.fb.group({
+            id: [this.id, [Validators.required]],
+            companyId: ['', [Validators.required]],
             name: ['', [Validators.required]],
             timeout: [60, [Validators.required]],
             flags: ['T'],
             routeTrunks: this.fb.array([])
         });
-        this.accountCodeService.findAll().then((acc) =>
-            this.filterUnwelcomeAccountCodes(acc).forEach((acc) => {
-                this.addRouteTrunk(acc.code);
-            })
-        );
+        this.routeService.findById(this.id).then((route) => {
+            this.form.patchValue(route);
+            route.routeTrunks.forEach((routeTrunk) => {
+                this.addRouteTrunk(routeTrunk);
+            });
+        });
         this.trunkService.findAll().then((trunks) => {
             this.trunkOptions = trunks.map((trunk) => ({ label: trunk.name, value: trunk.username }));
         });
@@ -179,12 +184,12 @@ export class NewRoutePage implements OnInit {
 
     trunkOptions: { label: string; value: string }[] = [];
 
-    private addRouteTrunk(accountCode: string) {
+    private addRouteTrunk(routeTrunk: RouteTrunk) {
         const routeTrunkRow = this.fb.group({
-            accountCode: [accountCode, [Validators.required]],
-            trunk1: [''],
-            trunk2: [''],
-            trunk3: ['']
+            accountCode: [routeTrunk.accountCode, [Validators.required]],
+            trunk1: [routeTrunk.trunk1],
+            trunk2: [routeTrunk.trunk2],
+            trunk3: [routeTrunk.trunk3]
         });
         this.routeTrunks.push(routeTrunkRow);
     }
@@ -203,16 +208,11 @@ export class NewRoutePage implements OnInit {
         this.pending = true;
         this.showError = false;
         this.routeService
-            .create(this.form.value)
+            .update(this.form.value)
             .then(() => this.router.navigate(['/pabx/routes']))
             .catch(() => {
                 this.showError = true;
             })
             .finally(() => (this.pending = false));
-    }
-
-    private filterUnwelcomeAccountCodes(accountCodes: AccountCode[]): AccountCode[] {
-        const regex = /^[2-8].00$/;
-        return accountCodes.filter((acc) => regex.test(acc.code));
     }
 }

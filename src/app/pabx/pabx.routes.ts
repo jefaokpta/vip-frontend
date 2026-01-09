@@ -13,6 +13,7 @@ import { NewTrunkPage } from '@/pabx/trunk/new-trunk.page';
 import { EditTrunkPage } from '@/pabx/trunk/edit-trunk.page';
 import { RoutePage } from './route/routes.page';
 import { NewRoutePage } from '@/pabx/route/new-route.page';
+import { EditRoutePage } from '@/pabx/route/edit-route.page';
 
 export default [
     { path: 'peers', component: PeerPage, data: { breadcrumb: 'Ramais' } },
@@ -29,7 +30,7 @@ export default [
     { path: 'trunks/edit/:id', component: EditTrunkPage, data: { breadcrumb: 'Editar Tronco' } },
     { path: 'routes', component: RoutePage, data: { breadcrumb: 'Rotas' } },
     { path: 'routes/new', component: NewRoutePage, data: { breadcrumb: 'Nova Rota' } },
-    // { path: 'routes/edit/:id', component: EditRoutePage, data: { breadcrumb: 'Editar Rota' } },
+    { path: 'routes/edit/:id', component: EditRoutePage, data: { breadcrumb: 'Editar Rota' } },
 
     { path: '**', redirectTo: '/notfound' }
 ] as Routes;
