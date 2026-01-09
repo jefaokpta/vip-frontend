@@ -14,6 +14,7 @@ import { EditTrunkPage } from '@/pabx/trunk/edit-trunk.page';
 import { RoutePage } from './route/routes.page';
 import { NewRoutePage } from '@/pabx/route/new-route.page';
 import { EditRoutePage } from '@/pabx/route/edit-route.page';
+import { EditDialplanPage } from '@/pabx/dialplan/edit-dialplan/edit-dialplan.page';
 
 export default [
     { path: 'peers', component: PeerPage, data: { breadcrumb: 'Ramais' } },
@@ -22,6 +23,7 @@ export default [
     { path: 'aliases/edit/:id', component: EditAliasPage, data: { breadcrumb: 'Editar Alias' } },
     { path: 'dialplans', component: DialplanPage, data: { breadcrumb: 'Regras de Discagem' } },
     { path: 'dialplans/new', component: NewDialplanPage, data: { breadcrumb: 'Nova Regra' } },
+    { path: 'dialplans/edit/:id', component: EditDialplanPage, data: { breadcrumb: 'Editar Regra' } },
     { path: 'accountcodes', component: AccountCodePage, data: { breadcrumb: 'Centro de Custos' } },
     { path: 'accountcodes/new', component: NewAccountCodePage, data: { breadcrumb: 'Novo Centro de Custo' } },
     { path: 'accountcodes/edit/:id', component: EditAccountCodePage, data: { breadcrumb: 'Editar Centro de Custo' } },

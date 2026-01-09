@@ -63,7 +63,7 @@ export interface DialPlan {
     readonly saturday?: boolean;
     readonly sunday?: boolean;
     readonly dstAlias?: number;
-    readonly dialPlanActions: DialPlanAction[];
+    readonly actions: DialPlanAction[];
 }
 
 export enum PeerStateEnum {
