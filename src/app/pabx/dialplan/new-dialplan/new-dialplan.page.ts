@@ -145,7 +145,7 @@ export class NewDialplanPage implements OnInit {
         this.dialplanActions.push(
             this.fb.group({
                 dialPlanActionEnum: this.selectedAction?.value,
-                arg1: ['', [Validators.required]],
+                arg1: ['', this.actionHasArg1(this.selectedAction?.value)],
                 arg2: ['', this.selectedAction.value === DialPlanActionEnum.SET_VARIABLE ? [Validators.required] : []]
             })
         );
@@ -178,5 +178,10 @@ export class NewDialplanPage implements OnInit {
             this.form.removeControl('dstAlias');
             this.form.addControl('dst', this.fb.control('', [Validators.required]));
         }
+    }
+
+    private actionHasArg1(selectedAction: DialPlanActionEnum): Validators[] {
+        if (selectedAction === DialPlanActionEnum.ANSWER || selectedAction === DialPlanActionEnum.HANGUP) return [];
+        return [Validators.required];
     }
 }
