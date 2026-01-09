@@ -6,7 +6,7 @@ import { CardModule } from 'primeng/card';
 import { NgIf } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { DialPlanService } from '../dial-plan.service';
-import { DialPlan, DialPlanActionEnum, SrcEnum } from '@/pabx/types';
+import { DialPlanActionEnum, SrcEnum } from '@/pabx/types';
 import { Select } from 'primeng/select';
 import { AgentSelectComponent } from '@/pabx/dialplan/components/agent-select-component';
 import { PeerSelectComponent } from '@/pabx/dialplan/components/peer-select-component';
@@ -96,8 +96,8 @@ export class NewDialplanPage implements OnInit {
         return this.form.get('dst');
     }
 
-    get src() {
-        return this.form.get('src');
+    get srcEnum() {
+        return this.form.get('srcEnum');
     }
 
     get srcValue() {
@@ -116,35 +116,35 @@ export class NewDialplanPage implements OnInit {
         return this.form.get('selectedAction');
     }
 
-    get dialplanActions() {
-        return this.form.get('dialplanActions') as FormArray;
+    get actions() {
+        return this.form.get('actions') as FormArray;
     }
 
     ngOnInit(): void {
         this.form = this.fb.group({
             name: ['', [Validators.required]],
-            src: ['', [Validators.required]],
+            srcEnum: ['', [Validators.required]],
             dst: ['', [Validators.required]],
             isAlwaysActive: [true],
             isActive: [true],
             dstToggle: [false],
             selectedAction: [''],
-            dialplanActions: this.fb.array([])
+            actions: this.fb.array([], [Validators.required])
         });
     }
 
     manageSrcValue() {
         this.form.removeControl('srcValue');
-        if (this.src?.value != 'ANY') {
+        if (this.srcEnum?.value != 'ANY') {
             this.form.addControl('srcValue', this.fb.control('', [Validators.required]));
         }
     }
 
     addDialplanAction() {
         if (!this.selectedAction?.value) return;
-        this.dialplanActions.push(
+        this.actions.push(
             this.fb.group({
-                dialPlanActionEnum: this.selectedAction?.value,
+                actionEnum: this.selectedAction?.value,
                 arg1: ['', this.actionHasArg1(this.selectedAction?.value)],
                 arg2: ['', this.selectedAction.value === DialPlanActionEnum.SET_VARIABLE ? [Validators.required] : []]
             })
@@ -152,22 +152,20 @@ export class NewDialplanPage implements OnInit {
     }
 
     removeDialplanAction(index: number) {
-        this.dialplanActions.removeAt(index);
+        this.actions.removeAt(index);
     }
 
     onSubmit() {
         this.pending = true;
         this.showError = false;
-        const dialplan: DialPlan = {
-            ...this.form.value
-        }; //TODO: garantir q tem ao menos uma ação
-        console.log(dialplan);
-        // this.dialPlanService.create(dialplan)
-        //     .then(() => this.router.navigate(['/pabx/dialplans']))
-        //     .catch(() => {
-        //         this.showError = true;
-        //     })
-        //     .finally(() => (this.pending = false));
+        console.log(this.form.value);
+        this.dialPlanService
+            .create(this.form.value)
+            .then(() => this.router.navigate(['/pabx/dialplans']))
+            .catch(() => {
+                this.showError = true;
+            })
+            .finally(() => (this.pending = false));
     }
 
     protected isDstUsingAlias(event: any) {
