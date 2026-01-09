@@ -98,7 +98,6 @@ import { AccountCode } from '@/pabx/types';
                                     <td>{{ acc.get('title').value }}</td>
                                     <td>
                                         <p-select
-                                            class="max-w-55"
                                             [options]="trunkOptions"
                                             formControlName="trunk1"
                                             optionLabel="label"
@@ -109,7 +108,6 @@ import { AccountCode } from '@/pabx/types';
                                     </td>
                                     <td>
                                         <p-select
-                                            class="max-w-55"
                                             [options]="trunkOptions"
                                             formControlName="trunk2"
                                             optionLabel="label"
@@ -120,7 +118,6 @@ import { AccountCode } from '@/pabx/types';
                                     </td>
                                     <td>
                                         <p-select
-                                            class="max-w-55"
                                             [options]="trunkOptions"
                                             formControlName="trunk3"
                                             optionLabel="label"
@@ -177,11 +174,9 @@ export class NewRoutePage implements OnInit {
                 this.addRouteTrunk({ accountCode: acc.code, title: acc.title });
             })
         );
-        this.trunkService.findAll().then((trunks) =>
-            trunks.forEach((trunk) => {
-                this.trunkOptions.push({ label: trunk.name, value: trunk.username });
-            })
-        );
+        this.trunkService.findAll().then((trunks) => {
+            this.trunkOptions = trunks.map((trunk) => ({ label: trunk.name, value: trunk.username }));
+        });
     }
 
     trunkOptions: { label: string; value: string }[] = [];
@@ -211,13 +206,13 @@ export class NewRoutePage implements OnInit {
         this.pending = true;
         this.showError = false;
         console.log(this.form.value);
-        // this.routeService
-        //     .create(this.form.value)
-        //     .then(() => this.router.navigate(['/pabx/routes']))
-        //     .catch(() => {
-        //         this.showError = true;
-        //     })
-        //     .finally(() => (this.pending = false));
+        this.routeService
+            .create(this.form.value)
+            .then(() => this.router.navigate(['/pabx/routes']))
+            .catch(() => {
+                this.showError = true;
+            })
+            .finally(() => (this.pending = false));
     }
 
     private filterUnwelcomeAccountCodes(accountCodes: AccountCode[]): AccountCode[] {
