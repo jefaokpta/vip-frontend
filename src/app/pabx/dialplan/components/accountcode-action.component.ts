@@ -1,9 +1,9 @@
-import {Component, forwardRef, Input, OnInit} from '@angular/core';
-import {ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule} from '@angular/forms';
-import {Panel} from "primeng/panel";
-import {Select} from "primeng/select";
-import {AccountCodeService} from "@/pabx/accountcode/account-code.service";
-import {Tooltip} from "primeng/tooltip";
+import { Component, forwardRef, Input, OnInit } from '@angular/core';
+import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
+import { Panel } from 'primeng/panel';
+import { Select } from 'primeng/select';
+import { AccountCodeService } from '@/pabx/accountcode/account-code.service';
+import { Tooltip } from 'primeng/tooltip';
 
 @Component({
     selector: 'app-account-code-action-component',
@@ -52,33 +52,29 @@ import {Tooltip} from "primeng/tooltip";
                     }
                 </div>
             </div>
-
         </p-panel>
     `
 })
 export class AccountCodeActionComponent implements ControlValueAccessor, OnInit {
     @Input() showError = false;
     value: string = '';
-    accountCodeOptions: { label: string; value: string, cost: number }[] = [];
+    accountCodeOptions: { label: string; value: string; cost: number }[] = [];
 
-    constructor(private readonly accountCodeService: AccountCodeService) {
-    }
+    constructor(private readonly accountCodeService: AccountCodeService) {}
 
     ngOnInit(): void {
         this.accountCodeService.findAll().then((accountCodes) => {
             this.accountCodeOptions = accountCodes.map((accountCode) => ({
-                label: accountCode.title,
+                label: `${accountCode.code} - ${accountCode.title}`,
                 value: accountCode.code,
-                cost: accountCode.cost,
+                cost: accountCode.cost
             }));
         });
     }
 
-    private onChange: (value: string) => void = () => {
-    };
+    private onChange: (value: string) => void = () => {};
 
-    private onTouched: () => void = () => {
-    };
+    private onTouched: () => void = () => {};
 
     writeValue(value: string): void {
         this.value = value;
@@ -97,5 +93,4 @@ export class AccountCodeActionComponent implements ControlValueAccessor, OnInit 
         this.onChange(value);
         this.onTouched();
     }
-
 }

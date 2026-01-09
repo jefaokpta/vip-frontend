@@ -160,10 +160,16 @@
                                         <app-agent-action-component formControlName="arg1"/>
                                     </ng-container>
                                     <ng-container *ngIf="action.get('dialPlanActionEnum').value == 'ACCOUNT_CODE'">
-                                        <app-account-code-action-component formControlName="arg1"/>
+                                        <app-account-code-action-component
+                                            formControlName="arg1"
+                                            [showError]="action.get('arg1').errors?.['required']"
+                                        ></app-account-code-action-component>
                                     </ng-container>
                                     <ng-container *ngIf="action.get('dialPlanActionEnum').value == 'DIAL_ROUTE'">
-                                        <app-route-action-component/>
+                                        <app-route-action-component
+                                            formControlName="arg1"
+                                            [showError]="action.get('arg1').errors?.['required']"
+                                        ></app-route-action-component>
                                     </ng-container>
                                     <ng-container *ngIf="action.get('dialPlanActionEnum').value == 'ANSWER'">
                                         <app-answer-action-component/>
