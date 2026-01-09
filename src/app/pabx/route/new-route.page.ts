@@ -98,7 +98,6 @@ import { AccountCode } from '@/pabx/types';
                                     <td>{{ acc.get('title').value }}</td>
                                     <td>
                                         <p-select
-                                            id="dtmfMode"
                                             class="max-w-55"
                                             [options]="trunkOptions"
                                             formControlName="trunk1"
@@ -110,7 +109,6 @@ import { AccountCode } from '@/pabx/types';
                                     </td>
                                     <td>
                                         <p-select
-                                            id="dtmfMode"
                                             class="max-w-55"
                                             [options]="trunkOptions"
                                             formControlName="trunk2"
@@ -122,7 +120,6 @@ import { AccountCode } from '@/pabx/types';
                                     </td>
                                     <td>
                                         <p-select
-                                            id="dtmfMode"
                                             class="max-w-55"
                                             [options]="trunkOptions"
                                             formControlName="trunk3"
