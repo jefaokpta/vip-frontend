@@ -1,21 +1,20 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
-import {Button} from 'primeng/button';
-import {IconField} from 'primeng/iconfield';
-import {InputIcon} from 'primeng/inputicon';
-import {InputText} from 'primeng/inputtext';
-import {MessageService, PrimeTemplate} from 'primeng/api';
-import {Router, RouterLink} from '@angular/router';
-import {Table, TableModule} from 'primeng/table';
-import {Tooltip} from 'primeng/tooltip';
-import {Company, User} from '@/types/types';
-import {Card} from 'primeng/card';
-import {NgClass, NgIf} from '@angular/common';
-import {Toast} from 'primeng/toast';
-import {ProgressSpinner} from 'primeng/progressspinner';
-import {FormsModule} from '@angular/forms';
-import {telephoneFormat} from '@/webphone/utils';
-import {CompanyService} from "@/pages/company/company.service";
-import {UserService} from "@/pages/users/user.service";
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { Button } from 'primeng/button';
+import { IconField } from 'primeng/iconfield';
+import { InputIcon } from 'primeng/inputicon';
+import { InputText } from 'primeng/inputtext';
+import { MessageService, PrimeTemplate } from 'primeng/api';
+import { Router, RouterLink } from '@angular/router';
+import { Table, TableModule } from 'primeng/table';
+import { Tooltip } from 'primeng/tooltip';
+import { Company, User } from '@/types/types';
+import { Card } from 'primeng/card';
+import { NgIf } from '@angular/common';
+import { Toast } from 'primeng/toast';
+import { ProgressSpinner } from 'primeng/progressspinner';
+import { FormsModule } from '@angular/forms';
+import { CompanyService } from '@/pages/company/company.service';
+import { UserService } from '@/pages/users/user.service';
 
 @Component({
     selector: 'app-company-page',
@@ -33,8 +32,7 @@ import {UserService} from "@/pages/users/user.service";
         NgIf,
         Toast,
         ProgressSpinner,
-        FormsModule,
-        NgClass
+        FormsModule
     ],
     providers: [MessageService],
     template: `
@@ -64,7 +62,7 @@ import {UserService} from "@/pages/users/user.service";
                 [value]="companies"
                 [paginator]="true"
                 [rows]="15"
-                [globalFilterFields]="['name', 'controlNumber']"
+                [globalFilterFields]="['name', 'companyId']"
                 [tableStyle]="{ 'min-width': '40rem' }"
                 stripedRows
             >
@@ -74,10 +72,9 @@ import {UserService} from "@/pages/users/user.service";
                             Nome
                             <p-sortIcon field="name"></p-sortIcon>
                         </th>
-                        <th>DDR</th>
-                        <th pSortableColumn="controlNumber">
+                        <th pSortableColumn="companyId">
                             Cod. Controle
-                            <p-sortIcon field="controlNumber"></p-sortIcon>
+                            <p-sortIcon field="companyId"></p-sortIcon>
                         </th>
                         <th style="width: 10%">Ações</th>
                     </tr>
@@ -86,25 +83,7 @@ import {UserService} from "@/pages/users/user.service";
                 <ng-template pTemplate="body" let-company>
                     <tr>
                         <td>{{ company.name }}</td>
-                        <td>
-                            <p-virtualscroller
-                                [items]="company.phones"
-                                scrollHeight="50px"
-                                styleClass="border border-surface"
-                                [style]="{ width: '130px', height: '100px' }"
-                            >
-                                <ng-template #item let-item let-options="options">
-                                    <div
-                                        class="flex items-center p-2"
-                                        [ngClass]="{ 'bg-surface-100 dark:bg-surface-700': options.odd }"
-                                        style="height: 50px;"
-                                    >
-                                        {{ telephoneFormat(item.phone) }}
-                                    </div>
-                                </ng-template>
-                            </p-virtualscroller>
-                        </td>
-                        <td>{{ company.controlNumber }}</td>
+                        <td>{{ company.companyId }}</td>
                         <td>
                             <div class="flex gap-2">
                                 <p-button
@@ -116,8 +95,8 @@ import {UserService} from "@/pages/users/user.service";
                                     tooltipPosition="left"
                                 />
                                 <p-button
-                                    *ngIf="user.controlNumber !== company.controlNumber"
-                                    (click)="manageCompany(company.controlNumber)"
+                                    *ngIf="user.companyId !== company.companyId"
+                                    (click)="manageCompany(company.companyId)"
                                     icon="pi pi-sign-in"
                                     outlined
                                     size="small"
@@ -164,7 +143,8 @@ export class CompanyPage implements OnInit {
     }
 
     manageCompany(controlNumber: number) {
-        this.userService.manageOtherCompany(controlNumber)
+        this.userService
+            .manageOtherCompany(controlNumber)
             .then(() => this.router.navigate(['/']))
             .catch(() => {
                 this.messageService.add({
@@ -182,6 +162,4 @@ export class CompanyPage implements OnInit {
             this.dt.filterGlobal(target.value, 'contains');
         }
     }
-
-    protected readonly telephoneFormat = telephoneFormat;
 }

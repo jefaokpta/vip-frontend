@@ -4,17 +4,16 @@
  * @create 5/13/25
  */
 
-import {Component, OnInit} from '@angular/core';
-import {Button} from 'primeng/button';
-import {InputText} from 'primeng/inputtext';
-import {NgIf} from '@angular/common';
-import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
-import {Router, RouterLink} from '@angular/router';
-import {Card} from 'primeng/card';
-import {RoleEnum} from '@/types/types';
-import {Select} from 'primeng/select';
-import {CompanyService} from "@/pages/company/company.service";
-import {UserService} from "@/pages/users/user.service";
+import { Component, OnInit } from '@angular/core';
+import { Button } from 'primeng/button';
+import { InputText } from 'primeng/inputtext';
+import { NgIf } from '@angular/common';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
+import { Card } from 'primeng/card';
+import { RoleEnum } from '@/types/types';
+import { Select } from 'primeng/select';
+import { UserService } from '@/pages/users/user.service';
 
 @Component({
     selector: 'app-new-user',
@@ -24,7 +23,14 @@ import {UserService} from "@/pages/users/user.service";
             <ng-template #title>
                 <div class="flex justify-between">
                     <span class="font-semibold text-2xl">Novo Usuário</span>
-                    <p-button type="button" label="Voltar" icon="pi pi-arrow-left" routerLink="/pages/users" outlined severity="secondary"></p-button>
+                    <p-button
+                        type="button"
+                        label="Voltar"
+                        icon="pi pi-arrow-left"
+                        routerLink="/pages/users"
+                        outlined
+                        severity="secondary"
+                    ></p-button>
                 </div>
             </ng-template>
 
@@ -93,7 +99,6 @@ export class NewUserPage implements OnInit {
 
     constructor(
         private readonly fb: FormBuilder,
-        private readonly companyService: CompanyService,
         private readonly router: Router,
         private readonly userService: UserService
     ) {}
@@ -109,12 +114,6 @@ export class NewUserPage implements OnInit {
         if (user.roles.includes(RoleEnum.SUPER)) {
             this.roleOptions.push({ label: 'Super Usuário', value: RoleEnum.SUPER });
         }
-        this.companyService.findOneCompanyByControlNumber(user.controlNumber).then((company) => {
-            this.ddrOptions = company.phones.map((phone) => ({
-                label: phone.phone,
-                value: phone.phone
-            }));
-        });
     }
 
     get name() {
@@ -136,6 +135,6 @@ export class NewUserPage implements OnInit {
     onSubmit() {
         this.userService
             .createUser({ ...this.form.value, roles: [this.form.value.role] })
-            .then(() => this.router.navigate(['/pages/users']))
+            .then(() => this.router.navigate(['/pages/users']));
     }
 }

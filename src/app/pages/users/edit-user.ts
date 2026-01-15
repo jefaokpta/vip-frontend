@@ -4,17 +4,16 @@
  * @create 5/13/25
  */
 
-import {Component, OnInit} from '@angular/core';
-import {Button} from 'primeng/button';
-import {InputText} from 'primeng/inputtext';
-import {NgIf} from '@angular/common';
-import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
-import {ActivatedRoute, Router, RouterLink} from '@angular/router';
-import {Card} from 'primeng/card';
-import {RoleEnum} from '@/types/types';
-import {Select} from 'primeng/select';
-import {UserService} from "@/pages/users/user.service";
-import {CompanyService} from "@/pages/company/company.service";
+import { Component, OnInit } from '@angular/core';
+import { Button } from 'primeng/button';
+import { InputText } from 'primeng/inputtext';
+import { NgIf } from '@angular/common';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { Card } from 'primeng/card';
+import { RoleEnum } from '@/types/types';
+import { Select } from 'primeng/select';
+import { UserService } from '@/pages/users/user.service';
 
 @Component({
     selector: 'app-edit-user',
@@ -102,8 +101,7 @@ export class EditUserPage implements OnInit {
         private readonly fb: FormBuilder,
         private readonly router: Router,
         private readonly userService: UserService,
-        private readonly activatedRoute: ActivatedRoute,
-        private readonly companyService: CompanyService
+        private readonly activatedRoute: ActivatedRoute
     ) {}
 
     ngOnInit(): void {
@@ -121,14 +119,6 @@ export class EditUserPage implements OnInit {
         this.userService.findOneUser(+id).then((user) => {
             this.form.patchValue(user);
             this.role?.setValue(user.roles.at(-1));
-            this.companyService.findOneCompanyByControlNumber(user.controlNumber).then((company) => {
-                this.ddrOptions = company.phones.map((phone) => ({
-                    label: phone.phone,
-                    value: phone.phone
-                }));
-                const ddrCurrent = company.phones.find((p) => p.phone === user.ddr)?.phone;
-                this.ddr?.setValue(ddrCurrent)
-            });
         });
     }
 

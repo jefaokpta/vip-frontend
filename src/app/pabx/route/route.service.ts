@@ -16,30 +16,28 @@ export class RouteService {
 
     findAll(): Promise<Route[]> {
         const user = this.userService.getUser();
-        return executeRequest(this.http.get<Route[]>(`${this.BACKEND}/routes/${user.controlNumber}`, httpHeaders()));
+        return executeRequest(this.http.get<Route[]>(`${this.BACKEND}/routes/${user.companyId}`, httpHeaders()));
     }
 
     delete(id: number) {
         const user = this.userService.getUser();
-        return executeRequest(this.http.delete(`${this.BACKEND}/routes/${user.controlNumber}/${id}`, httpHeaders()));
+        return executeRequest(this.http.delete(`${this.BACKEND}/routes/${user.companyId}/${id}`, httpHeaders()));
     }
 
     create(trunk: Route) {
         const user = this.userService.getUser();
-        return executeRequest(this.http.post(`${this.BACKEND}/routes/${user.controlNumber}`, trunk, httpHeaders()));
+        return executeRequest(this.http.post(`${this.BACKEND}/routes/${user.companyId}`, trunk, httpHeaders()));
     }
 
     findById(id: string) {
         const user = this.userService.getUser();
-        return executeRequest(
-            this.http.get<Route>(`${this.BACKEND}/routes/${user.controlNumber}/${id}`, httpHeaders())
-        );
+        return executeRequest(this.http.get<Route>(`${this.BACKEND}/routes/${user.companyId}/${id}`, httpHeaders()));
     }
 
     update(route: Route) {
         const user = this.userService.getUser();
         return executeRequest(
-            this.http.put(`${this.BACKEND}/routes/${user.controlNumber}/${route.id}`, route, httpHeaders())
+            this.http.put(`${this.BACKEND}/routes/${user.companyId}/${route.id}`, route, httpHeaders())
         );
     }
 }

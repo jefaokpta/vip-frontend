@@ -16,34 +16,30 @@ export class DialPlanService {
 
     findAll(): Promise<DialPlan[]> {
         const user = this.userService.getUser();
-        return executeRequest(
-            this.http.get<DialPlan[]>(`${this.BACKEND}/dialplans/${user.controlNumber}`, httpHeaders())
-        );
+        return executeRequest(this.http.get<DialPlan[]>(`${this.BACKEND}/dialplans/${user.companyId}`, httpHeaders()));
     }
 
     delete(id: number) {
         const user = this.userService.getUser();
-        return executeRequest(this.http.delete(`${this.BACKEND}/dialplans/${user.controlNumber}/${id}`, httpHeaders()));
+        return executeRequest(this.http.delete(`${this.BACKEND}/dialplans/${user.companyId}/${id}`, httpHeaders()));
     }
 
     create(dialplan: DialPlan) {
         const user = this.userService.getUser();
-        return executeRequest(
-            this.http.post(`${this.BACKEND}/dialplans/${user.controlNumber}`, dialplan, httpHeaders())
-        );
+        return executeRequest(this.http.post(`${this.BACKEND}/dialplans/${user.companyId}`, dialplan, httpHeaders()));
     }
 
     findById(id: string) {
         const user = this.userService.getUser();
         return executeRequest(
-            this.http.get<DialPlan>(`${this.BACKEND}/dialplans/${user.controlNumber}/${id}`, httpHeaders())
+            this.http.get<DialPlan>(`${this.BACKEND}/dialplans/${user.companyId}/${id}`, httpHeaders())
         );
     }
 
     update(dialplan: DialPlan) {
         const user = this.userService.getUser();
         return executeRequest(
-            this.http.put(`${this.BACKEND}/dialplans/${user.controlNumber}/${dialplan.id}`, dialplan, httpHeaders())
+            this.http.put(`${this.BACKEND}/dialplans/${user.companyId}/${dialplan.id}`, dialplan, httpHeaders())
         );
     }
 }

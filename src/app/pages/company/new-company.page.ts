@@ -7,7 +7,6 @@ import { ToastModule } from 'primeng/toast';
 import { NgIf } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { CompanyService } from '@/pages/company/company.service';
-import { InputNumber } from 'primeng/inputnumber';
 import { InputMask } from 'primeng/inputmask';
 
 /**
@@ -18,17 +17,7 @@ import { InputMask } from 'primeng/inputmask';
 @Component({
     selector: 'app-new-company',
     standalone: true,
-    imports: [
-        InputTextModule,
-        ButtonModule,
-        CardModule,
-        ToastModule,
-        NgIf,
-        ReactiveFormsModule,
-        RouterLink,
-        InputNumber,
-        InputMask
-    ],
+    imports: [InputTextModule, ButtonModule, CardModule, ToastModule, NgIf, ReactiveFormsModule, RouterLink, InputMask],
     template: `
         <p-card>
             <ng-template #title>
@@ -67,22 +56,18 @@ import { InputMask } from 'primeng/inputmask';
 
                 <div class="field mb-4">
                     <label for="cnpj" class="block mb-2">CNPJ *</label>
-                    <p-inputmask mask="99.999.999/9999-99" formControlName="cnpj" placeholder="99.999.999/9999-99" />
+                    <p-inputmask mask="**.***.***/****-99" formControlName="cnpj" placeholder="**.***.***/****-99" />
                     <small *ngIf="cnpj?.invalid && (cnpj?.dirty || cnpj?.touched)" class="p-error block mt-2">
                         <div *ngIf="cnpj?.errors?.['required']">CNPJ é obrigatório.</div>
-                        <div *ngIf="cnpj?.errors?.['pattern']">CNPJ deve conter exatamente 14 dígitos numéricos.</div>
+                        <div *ngIf="cnpj?.errors?.['pattern']">
+                            CNPJ deve conter apenas números e letras (maiúsculas).
+                        </div>
                     </small>
                 </div>
 
                 <div class="field mb-4">
                     <label for="companyId" class="block mb-2">Código de Controle *</label>
-                    <p-input-number
-                        id="companyId"
-                        mode="decimal"
-                        useGrouping="false"
-                        placeholder="Ex: 100021"
-                        formControlName="companyId"
-                    />
+                    <p-input-mask mask="999999" formControlName="companyId" placeholder="100054" />
                     <small
                         *ngIf="companyId?.invalid && (companyId?.dirty || companyId?.touched)"
                         class="p-error block mt-2"
@@ -150,13 +135,12 @@ export class NewCompanyPage implements OnInit {
     async onSubmit() {
         this.pending = true;
         this.showError = false;
-        console.log(this.form.value);
-        // this.companyService
-        //     .createCompany(company)
-        //     .then(() => this.router.navigate(['/pages/companies']))
-        //     .catch(() => {
-        //         this.showError = true;
-        //     })
-        //     .finally(() => (this.pending = false));
+        this.companyService
+            .createCompany(this.form.value)
+            .then(() => this.router.navigate(['/pages/companies']))
+            .catch(() => {
+                this.showError = true;
+            })
+            .finally(() => (this.pending = false));
     }
 }

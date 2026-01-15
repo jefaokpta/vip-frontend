@@ -1,23 +1,20 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
-import {Button} from 'primeng/button';
-import {ConfirmDialog, ConfirmDialogModule} from 'primeng/confirmdialog';
-import {IconField} from 'primeng/iconfield';
-import {InputIcon} from 'primeng/inputicon';
-import {InputText} from 'primeng/inputtext';
-import {ConfirmationService, MessageService, PrimeTemplate} from 'primeng/api';
-import {RouterLink} from '@angular/router';
-import {Table, TableModule} from 'primeng/table';
-import {Tooltip} from 'primeng/tooltip';
-import {Company, RoleEnum, User} from '@/types/types';
-import {Card} from 'primeng/card';
-import {Toast} from 'primeng/toast';
-import {Dialog} from 'primeng/dialog';
-import {NgIf} from '@angular/common';
-import {Select} from 'primeng/select';
-import {FormsModule} from '@angular/forms';
-import {ProgressSpinner} from 'primeng/progressspinner';
-import {UserService} from "./user.service";
-import {CompanyService} from "@/pages/company/company.service";
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { Button } from 'primeng/button';
+import { ConfirmDialog, ConfirmDialogModule } from 'primeng/confirmdialog';
+import { IconField } from 'primeng/iconfield';
+import { InputIcon } from 'primeng/inputicon';
+import { InputText } from 'primeng/inputtext';
+import { ConfirmationService, MessageService, PrimeTemplate } from 'primeng/api';
+import { RouterLink } from '@angular/router';
+import { Table, TableModule } from 'primeng/table';
+import { Tooltip } from 'primeng/tooltip';
+import { RoleEnum, User } from '@/types/types';
+import { Card } from 'primeng/card';
+import { Toast } from 'primeng/toast';
+import { NgIf } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { ProgressSpinner } from 'primeng/progressspinner';
+import { UserService } from './user.service';
 
 @Component({
     selector: 'app-users',
@@ -35,9 +32,7 @@ import {CompanyService} from "@/pages/company/company.service";
         ConfirmDialogModule,
         Card,
         Toast,
-        Dialog,
         NgIf,
-        Select,
         FormsModule,
         ProgressSpinner
     ],
@@ -97,7 +92,9 @@ import {CompanyService} from "@/pages/company/company.service";
                         <td>{{ user.name }}</td>
                         <td>{{ user.email }}</td>
                         <td>
-                            <i [class]="user.isVerified ? 'pi pi-check text-green-500' : 'pi pi-clock text-gray-500'"></i>
+                            <i
+                                [class]="user.isVerified ? 'pi pi-check text-green-500' : 'pi pi-clock text-gray-500'"
+                            ></i>
                         </td>
                         <td>{{ translateRole(user) }}</td>
                         <td>
@@ -109,15 +106,6 @@ import {CompanyService} from "@/pages/company/company.service";
                                     size="small"
                                     pTooltip="Editar"
                                     tooltipPosition="left"
-                                />
-                                <p-button
-                                    *ngIf="userLogged.roles.includes(RoleEnum.SUPER)"
-                                    icon="pi pi-briefcase"
-                                    severity="warn"
-                                    (click)="migrateUserModal(user)"
-                                    outlined
-                                    size="small"
-                                    pTooltip="Migrar"
                                 />
                                 <p-button
                                     icon="pi pi-trash"
@@ -139,36 +127,6 @@ import {CompanyService} from "@/pages/company/company.service";
                     </tr>
                 </ng-template>
             </p-table>
-            <p-dialog
-                header="Migrar {{ userToMigrate?.name }}"
-                [modal]="true"
-                [visible]="migrateUserShow"
-                [style]="{ width: '25rem', minHeight: '25rem' }"
-                closable="false"
-            >
-                <span class="font-semibold block mb-2">Selecione a empresa</span>
-                <p-select
-                    [options]="companiesFiltered"
-                    [(ngModel)]="selectedCompany"
-                    optionLabel="name"
-                    [filter]="true"
-                    filterBy="name"
-                    [showClear]="true"
-                    placeholder="Escolha a Empresa"
-                    class="w-full mb-4"
-                    emptyMessage="Nenhuma empresa encontrada."
-                >
-                    <ng-template pTemplate="selectedItem" let-selectedItem>
-                        <div>{{ selectedItem.name }}</div>
-                    </ng-template>
-                    <ng-template pTemplate="item" let-company>
-                        <div>{{ company.name }}</div>
-                    </ng-template>
-                </p-select>
-                <div class="flex justify-end gap-2">
-                    <p-button label="Cancelar" severity="secondary" (click)="migrateUserShow = false" />
-                </div>
-            </p-dialog>
         </p-card>
         <p-confirm-dialog />
         <p-toast />
@@ -178,34 +136,19 @@ export class UsersPage implements OnInit {
     users: User[] = [];
     userLogged: User;
     @ViewChild('dataTable') dt!: Table;
-    migrateUserShow = false;
-    userToMigrate?: User;
-    companies: Company[] = [];
-    selectedCompany?: Company;
     protected readonly RoleEnum = RoleEnum;
     loading = true;
 
     constructor(
         private readonly confirmationService: ConfirmationService,
         private readonly messageService: MessageService,
-        private readonly userService: UserService,
-        private readonly companyService: CompanyService,
+        private readonly userService: UserService
     ) {
         this.userLogged = userService.getUser();
     }
 
-    get companiesFiltered() {
-        return this.companies.filter((c) => c.controlNumber !== this.userToMigrate?.controlNumber);
-    }
-
     ngOnInit(): void {
         this.userService.findAllUsers().then((users) => (this.users = users));
-        if (this.userLogged.roles.includes(RoleEnum.SUPER)) {
-            this.companyService.findAllCompanies().then((companies) => {
-                this.companies = companies;
-                this.loading = false;
-            });
-        }
     }
 
     onFilterGlobal(event: Event) {
@@ -270,10 +213,4 @@ export class UsersPage implements OnInit {
                 return 'Desconhecido';
         }
     }
-
-    migrateUserModal(user: User) {
-        this.userToMigrate = user;
-        this.migrateUserShow = true;
-    }
-
 }

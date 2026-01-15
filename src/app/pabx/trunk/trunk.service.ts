@@ -16,30 +16,28 @@ export class TrunkService {
 
     findAll(): Promise<Trunk[]> {
         const user = this.userService.getUser();
-        return executeRequest(this.http.get<Trunk[]>(`${this.BACKEND}/trunks/${user.controlNumber}`, httpHeaders()));
+        return executeRequest(this.http.get<Trunk[]>(`${this.BACKEND}/trunks/${user.companyId}`, httpHeaders()));
     }
 
     delete(id: number) {
         const user = this.userService.getUser();
-        return executeRequest(this.http.delete(`${this.BACKEND}/trunks/${user.controlNumber}/${id}`, httpHeaders()));
+        return executeRequest(this.http.delete(`${this.BACKEND}/trunks/${user.companyId}/${id}`, httpHeaders()));
     }
 
     create(trunk: Trunk) {
         const user = this.userService.getUser();
-        return executeRequest(this.http.post(`${this.BACKEND}/trunks/${user.controlNumber}`, trunk, httpHeaders()));
+        return executeRequest(this.http.post(`${this.BACKEND}/trunks/${user.companyId}`, trunk, httpHeaders()));
     }
 
     findById(id: string) {
         const user = this.userService.getUser();
-        return executeRequest(
-            this.http.get<Trunk>(`${this.BACKEND}/trunks/${user.controlNumber}/${id}`, httpHeaders())
-        );
+        return executeRequest(this.http.get<Trunk>(`${this.BACKEND}/trunks/${user.companyId}/${id}`, httpHeaders()));
     }
 
     update(trunk: Trunk) {
         const user = this.userService.getUser();
         return executeRequest(
-            this.http.put(`${this.BACKEND}/trunks/${user.controlNumber}/${trunk.id}`, trunk, httpHeaders())
+            this.http.put(`${this.BACKEND}/trunks/${user.companyId}/${trunk.id}`, trunk, httpHeaders())
         );
     }
 }

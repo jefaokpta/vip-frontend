@@ -1,43 +1,43 @@
-import {Injectable} from "@angular/core";
-import {HttpClient} from "@angular/common/http";
-import {environment} from "../../../environments/environment";
-import {executeRequest, httpHeaders} from "@/util/utils";
-import {Alias} from "@/pabx/types";
-import {UserService} from "@/pages/users/user.service";
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
+import { executeRequest, httpHeaders } from '@/util/utils';
+import { Alias } from '@/pabx/types';
+import { UserService } from '@/pages/users/user.service';
 
-@Injectable({providedIn: 'root'})
+@Injectable({ providedIn: 'root' })
 export class AliasService {
-
     private readonly BACKEND = environment.API_BACKEND_URL;
 
     constructor(
         private readonly http: HttpClient,
         private readonly userService: UserService
-    ) {
-    }
+    ) {}
 
     findAll(): Promise<Alias[]> {
-        const user = this.userService.getUser()
-        return executeRequest(this.http.get<Alias[]>(`${this.BACKEND}/aliases/${user.controlNumber}`, httpHeaders()));
+        const user = this.userService.getUser();
+        return executeRequest(this.http.get<Alias[]>(`${this.BACKEND}/aliases/${user.companyId}`, httpHeaders()));
     }
 
     delete(id: number) {
-        const user = this.userService.getUser()
-        return executeRequest(this.http.delete(`${this.BACKEND}/aliases/${user.controlNumber}/${id}`, httpHeaders()));
+        const user = this.userService.getUser();
+        return executeRequest(this.http.delete(`${this.BACKEND}/aliases/${user.companyId}/${id}`, httpHeaders()));
     }
 
     create(alias: Alias) {
-        const user = this.userService.getUser()
-        return executeRequest(this.http.post(`${this.BACKEND}/aliases/${user.controlNumber}`, alias, httpHeaders()));
+        const user = this.userService.getUser();
+        return executeRequest(this.http.post(`${this.BACKEND}/aliases/${user.companyId}`, alias, httpHeaders()));
     }
 
     findById(id: number) {
-        const user = this.userService.getUser()
-        return executeRequest(this.http.get<Alias>(`${this.BACKEND}/aliases/${user.controlNumber}/${id}`, httpHeaders()));
+        const user = this.userService.getUser();
+        return executeRequest(this.http.get<Alias>(`${this.BACKEND}/aliases/${user.companyId}/${id}`, httpHeaders()));
     }
 
     update(alias: Alias) {
-        const user = this.userService.getUser()
-        return executeRequest(this.http.put(`${this.BACKEND}/aliases/${user.controlNumber}/${alias.id}`, alias, httpHeaders()));
+        const user = this.userService.getUser();
+        return executeRequest(
+            this.http.put(`${this.BACKEND}/aliases/${user.companyId}/${alias.id}`, alias, httpHeaders())
+        );
     }
 }

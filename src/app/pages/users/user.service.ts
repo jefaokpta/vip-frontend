@@ -53,7 +53,7 @@ export class UserService {
         const response = await executeRequest(
             this.http.post<LoginResponse>(
                 `${this.BACKEND}/users/manage/exit`,
-                { controlNumber: this.getUser().controlNumber },
+                { controlNumber: this.getUser().companyId },
                 httpHeaders()
             )
         );
@@ -93,8 +93,7 @@ export class UserService {
                 id: 0,
                 name: '',
                 email: '',
-                controlNumber: '',
-                ddr: '',
+                companyId: '',
                 isExpired: true,
                 createdAt: new Date(),
                 roles: []

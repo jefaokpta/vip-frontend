@@ -3,7 +3,7 @@
  * @email jefaokpta@hotmail.com
  * @create 4/22/25
  */
-import {RTCSession} from 'jssip/lib/RTCSession';
+import { RTCSession } from 'jssip/lib/RTCSession';
 
 export interface LoginResponse {
     readonly token: string;
@@ -32,8 +32,7 @@ export interface User {
     readonly id: number;
     readonly name: string;
     readonly email: string;
-    readonly controlNumber: string;
-    readonly ddr: string;
+    readonly companyId: string;
     readonly createdAt: Date;
     readonly isExpired: boolean;
     readonly roles: RoleEnum[];
@@ -46,23 +45,18 @@ export enum AttendantTypeEnum {
 }
 
 export interface Attendant {
-    readonly id?: number;
+    readonly id: number;
     readonly name: string;
     readonly attendantId: number;
     readonly attendantTypeEnum: AttendantTypeEnum;
 }
 
-export interface CompanyPhone {
-    readonly id?: number;
-    readonly phone: string;
-    readonly attendants: Attendant[];
-}
-
 export interface Company {
-    readonly id?: number;
+    readonly id: number;
     readonly name: string;
-    readonly controlNumber: string;
-    readonly phones: CompanyPhone[];
+    readonly corporateName: string;
+    readonly companyId: string;
+    readonly cnpj: string;
 }
 
 export enum PhoneStateEnum {
