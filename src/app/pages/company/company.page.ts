@@ -88,7 +88,7 @@ import { UserService } from '@/pages/users/user.service';
                             <div class="flex gap-2">
                                 <p-button
                                     icon="pi pi-pencil"
-                                    [routerLink]="['edit', company.id]"
+                                    [routerLink]="['edit', company.companyId]"
                                     outlined
                                     size="small"
                                     pTooltip="Editar"
@@ -136,7 +136,7 @@ export class CompanyPage implements OnInit {
     }
 
     ngOnInit(): void {
-        this.companyService.findAllCompanies().then((companies) => {
+        this.companyService.findAll().then((companies) => {
             this.companies = companies;
             this.loading = false;
         });

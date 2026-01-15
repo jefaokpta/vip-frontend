@@ -5,7 +5,7 @@ import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { ToastModule } from 'primeng/toast';
 import { NgIf } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CompanyService } from '@/pages/company/company.service';
 import { InputMask } from 'primeng/inputmask';
 
@@ -15,14 +15,14 @@ import { InputMask } from 'primeng/inputmask';
  * @create 4/25/25
  */
 @Component({
-    selector: 'app-new-company',
+    selector: 'app-edit-company',
     standalone: true,
     imports: [InputTextModule, ButtonModule, CardModule, ToastModule, NgIf, ReactiveFormsModule, RouterLink, InputMask],
     template: `
         <p-card>
             <ng-template #title>
                 <div class="flex justify-between">
-                    <span class="font-semibold text-2xl">Nova Empresa</span>
+                    <span class="font-semibold text-2xl">Editar {{ name?.value }}</span>
                     <p-button
                         type="button"
                         label="Voltar"
@@ -67,7 +67,7 @@ import { InputMask } from 'primeng/inputmask';
 
                 <div class="field mb-4">
                     <label for="companyId" class="block mb-2">Código de Controle *</label>
-                    <p-input-mask mask="999999" formControlName="companyId" placeholder="100054" />
+                    <p-input-mask mask="999999" formControlName="companyId" placeholder="100054" readonly />
                     <small
                         *ngIf="companyId?.invalid && (companyId?.dirty || companyId?.touched)"
                         class="p-error block mt-2"
@@ -86,14 +86,14 @@ import { InputMask } from 'primeng/inputmask';
                     </p-button>
                 </div>
 
-                <small *ngIf="showError" class="text-red-500"
-                    >Houve um erro, verifique se o código de controle já existe.</small
-                >
+                <small *ngIf="showError" class="text-red-500">
+                    Houve um erro, verifique se o código de controle já existe.
+                </small>
             </form>
         </p-card>
     `
 })
-export class NewCompanyPage implements OnInit {
+export class EditCompanyPage implements OnInit {
     form!: FormGroup;
     pending = false;
     showError = false;
@@ -101,7 +101,8 @@ export class NewCompanyPage implements OnInit {
     constructor(
         private readonly fb: FormBuilder,
         private readonly companyService: CompanyService,
-        private readonly router: Router
+        private readonly router: Router,
+        private readonly activatedRoute: ActivatedRoute
     ) {}
 
     get name() {
@@ -119,6 +120,7 @@ export class NewCompanyPage implements OnInit {
 
     ngOnInit(): void {
         this.form = this.fb.group({
+            id: ['', [Validators.required]],
             name: ['', [Validators.required]],
             corporateName: ['', [Validators.required]],
             companyId: ['', [Validators.required, Validators.pattern('^[0-9]{6}$')]],
@@ -130,13 +132,17 @@ export class NewCompanyPage implements OnInit {
                 ]
             ]
         });
+        const companyId = this.activatedRoute.snapshot.paramMap.get('id')!;
+        this.companyService.findCompanyId(companyId).then((company) => {
+            this.form.patchValue(company);
+        });
     }
 
     async onSubmit() {
         this.pending = true;
         this.showError = false;
         this.companyService
-            .create(this.form.value)
+            .update(this.form.value)
             .then(() => this.router.navigate(['/pages/companies']))
             .catch(() => {
                 this.showError = true;
