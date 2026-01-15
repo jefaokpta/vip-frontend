@@ -1,14 +1,14 @@
-import {Component, OnInit} from '@angular/core';
-import {FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
-import {InputTextModule} from 'primeng/inputtext';
-import {ButtonModule} from 'primeng/button';
-import {CardModule} from 'primeng/card';
-import {ToastModule} from 'primeng/toast';
-import {NgForOf, NgIf} from '@angular/common';
-import {Router, RouterLink} from '@angular/router';
-import {Tooltip} from 'primeng/tooltip';
-import {Company} from '@/types/types';
-import {CompanyService} from "@/pages/company/company.service";
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { InputTextModule } from 'primeng/inputtext';
+import { ButtonModule } from 'primeng/button';
+import { CardModule } from 'primeng/card';
+import { ToastModule } from 'primeng/toast';
+import { NgIf } from '@angular/common';
+import { Router, RouterLink } from '@angular/router';
+import { CompanyService } from '@/pages/company/company.service';
+import { InputNumber } from 'primeng/inputnumber';
+import { InputMask } from 'primeng/inputmask';
 
 /**
  * @author Jefferson Alves Reis (jefaokpta)
@@ -26,8 +26,8 @@ import {CompanyService} from "@/pages/company/company.service";
         NgIf,
         ReactiveFormsModule,
         RouterLink,
-        NgForOf,
-        Tooltip
+        InputNumber,
+        InputMask
     ],
     template: `
         <p-card>
@@ -55,66 +55,43 @@ import {CompanyService} from "@/pages/company/company.service";
                 </div>
 
                 <div class="field mb-4">
-                    <label for="controlNumber" class="block mb-2">Código de Controle *</label>
-                    <input
-                        id="controlNumber"
-                        type="number"
-                        pInputText
-                        placeholder="Ex: 100021"
-                        class="p-inputtext"
-                        formControlName="controlNumber"
-                    />
+                    <label for="corporateName" class="block mb-2">Razão Social *</label>
+                    <input id="corporateName" pInputText class="p-inputtext" formControlName="corporateName" />
                     <small
-                        *ngIf="controlNumber?.invalid && (controlNumber?.dirty || controlNumber?.touched)"
+                        *ngIf="corporateName?.invalid && (corporateName?.dirty || corporateName?.touched)"
                         class="p-error block mt-2"
                     >
-                        <div *ngIf="controlNumber?.errors?.['required']">Código da empresa é obrigatório.</div>
-                        <div *ngIf="controlNumber?.errors?.['pattern']">
-                            Código deve conter exatamente 6 dígitos numéricos.
-                        </div>
+                        <div *ngIf="corporateName?.errors?.['required']">Razão Social é obrigatório.</div>
                     </small>
                 </div>
 
                 <div class="field mb-4">
-                    <div class="flex items-center gap-4 mb-2">
-                        <label class="font-medium">Telefones (DDR)</label>
-                        <p-button
-                            type="button"
-                            icon="pi pi-plus"
-                            (onClick)="addPhone()"
-                            pTooltip="Adicionar telefones"
-                            tooltipPosition="right"
-                            outlined
-                            size="small"
-                        ></p-button>
-                    </div>
+                    <label for="cnpj" class="block mb-2">CNPJ *</label>
+                    <p-inputmask mask="99.999.999/9999-99" formControlName="cnpj" placeholder="99.999.999/9999-99" />
+                    <small *ngIf="cnpj?.invalid && (cnpj?.dirty || cnpj?.touched)" class="p-error block mt-2">
+                        <div *ngIf="cnpj?.errors?.['required']">CNPJ é obrigatório.</div>
+                        <div *ngIf="cnpj?.errors?.['pattern']">CNPJ deve conter exatamente 14 dígitos numéricos.</div>
+                    </small>
+                </div>
 
-                    <div formArrayName="phones">
-                        <div *ngFor="let phone of phones.controls; let i = index" class="mb-3">
-                            <div class="flex gap-2">
-                                <div class="flex-grow-1">
-                                    <input
-                                        [formControlName]="i"
-                                        type="text"
-                                        pInputText
-                                        placeholder="DDD + Telefone"
-                                        class="w-full"
-                                    />
-                                    <small *ngIf="phone.invalid && phone.touched" class="p-error block"
-                                        >Telefone inválido</small
-                                    >
-                                </div>
-                                <p-button
-                                    *ngIf="phones.length > 1"
-                                    type="button"
-                                    icon="pi pi-trash"
-                                    (onClick)="removePhone(i)"
-                                    severity="danger"
-                                    outlined
-                                ></p-button>
-                            </div>
+                <div class="field mb-4">
+                    <label for="companyId" class="block mb-2">Código de Controle *</label>
+                    <p-input-number
+                        id="companyId"
+                        mode="decimal"
+                        useGrouping="false"
+                        placeholder="Ex: 100021"
+                        formControlName="companyId"
+                    />
+                    <small
+                        *ngIf="companyId?.invalid && (companyId?.dirty || companyId?.touched)"
+                        class="p-error block mt-2"
+                    >
+                        <div *ngIf="companyId?.errors?.['required']">Código da empresa é obrigatório.</div>
+                        <div *ngIf="companyId?.errors?.['pattern']">
+                            Código deve conter exatamente 6 dígitos numéricos.
                         </div>
-                    </div>
+                    </small>
                 </div>
 
                 <div class="flex mt-4">
@@ -142,51 +119,44 @@ export class NewCompanyPage implements OnInit {
         private readonly router: Router
     ) {}
 
-    get phones() {
-        return this.form.get('phones') as FormArray;
-    }
-
-    get controlNumber() {
-        return this.form.get('controlNumber');
-    }
-
     get name() {
         return this.form.get('name');
+    }
+    get companyId() {
+        return this.form.get('companyId');
+    }
+    get cnpj() {
+        return this.form.get('cnpj');
+    }
+    get corporateName() {
+        return this.form.get('corporateName');
     }
 
     ngOnInit(): void {
         this.form = this.fb.group({
             name: ['', [Validators.required]],
-            controlNumber: ['', [Validators.required, Validators.pattern('^[0-9]{6}$')]],
-            phones: this.fb.array([])
+            corporateName: ['', [Validators.required]],
+            companyId: ['', [Validators.required, Validators.pattern('^[0-9]{6}$')]],
+            cnpj: [
+                '',
+                [
+                    Validators.required,
+                    Validators.pattern(String.raw`^[A-Z0-9]{2}\.[A-Z0-9]{3}\.[A-Z0-9]{3}\/[A-Z0-9]{4}-[0-9]{2}$`)
+                ]
+            ]
         });
-        this.addPhone();
-    }
-
-    addPhone() {
-        this.phones.push(this.fb.control('', [Validators.required, Validators.pattern('^[0-9]{10,11}$')]));
-    }
-
-    removePhone(index: number) {
-        this.phones.removeAt(index);
     }
 
     async onSubmit() {
         this.pending = true;
         this.showError = false;
-        const company: Company = {
-            ...this.form.value,
-            controlNumber: this.form.value.controlNumber.toString(),
-            expressions: this.form.value.phones.map((phone: string) => {
-                return { phone };
-            })
-        };
-        this.companyService
-            .createCompany(company)
-            .then(() => this.router.navigate(['/pages/companies']))
-            .catch(() => {
-                this.showError = true;
-            })
-            .finally(() => (this.pending = false));
+        console.log(this.form.value);
+        // this.companyService
+        //     .createCompany(company)
+        //     .then(() => this.router.navigate(['/pages/companies']))
+        //     .catch(() => {
+        //         this.showError = true;
+        //     })
+        //     .finally(() => (this.pending = false));
     }
 }

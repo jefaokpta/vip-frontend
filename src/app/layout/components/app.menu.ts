@@ -1,10 +1,10 @@
-import {Component, OnInit} from '@angular/core';
-import {CommonModule} from '@angular/common';
-import {RouterModule} from '@angular/router';
-import {AppMenuitem} from './app.menuitem';
-import {RoleEnum, User} from '@/types/types';
-import {MenuItem} from 'primeng/api';
-import {UserService} from "@/pages/users/user.service";
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+import { AppMenuitem } from './app.menuitem';
+import { RoleEnum, User } from '@/types/types';
+import { MenuItem } from 'primeng/api';
+import { UserService } from '@/pages/users/user.service';
 
 @Component({
     selector: 'app-menu',
@@ -32,11 +32,11 @@ export class AppMenu implements OnInit {
                             items: [
                                 {
                                     label: 'Chamadas',
-                                    icon: 'pi pi-fw pi-chart-bar',
+                                    icon: 'pi pi-fw pi-chart-bar'
                                 },
                                 {
                                     label: 'DAC',
-                                    icon: 'pi pi-fw pi-image',
+                                    icon: 'pi pi-fw pi-image'
                                 }
                             ]
                         },
@@ -70,7 +70,7 @@ export class AppMenu implements OnInit {
                             icon: 'pi pi-fw pi-list',
                             routerLink: ['/pabx/trunks']
                         }
-                    ],
+                    ]
                 },
                 {
                     label: 'Video Conferências',
@@ -78,8 +78,8 @@ export class AppMenu implements OnInit {
                     items: [
                         {
                             label: 'Salas',
-                            icon: 'pi pi-fw pi-image',
-                        },
+                            icon: 'pi pi-fw pi-image'
+                        }
                     ]
                 },
                 {
@@ -88,11 +88,11 @@ export class AppMenu implements OnInit {
                     items: [
                         {
                             label: 'Mensagens',
-                            icon: 'pi pi-envelope',
+                            icon: 'pi pi-envelope'
                         },
                         {
                             label: 'Registros',
-                            icon: 'pi pi-fw pi-image',
+                            icon: 'pi pi-fw pi-image'
                         }
                     ]
                 },
@@ -102,8 +102,8 @@ export class AppMenu implements OnInit {
                     items: [
                         {
                             label: 'Cadastros',
-                            icon: 'pi pi-envelope',
-                        },
+                            icon: 'pi pi-envelope'
+                        }
                     ]
                 },
                 {
@@ -112,15 +112,15 @@ export class AppMenu implements OnInit {
                     items: [
                         {
                             label: 'Clientes',
-                            icon: 'pi pi-envelope',
-                        },
+                            icon: 'pi pi-envelope'
+                        }
                     ]
                 }
             ]
         },
         {
             label: 'Configurações',
-            roles: ['admin', 'super'],
+            roles: ['ROLE_ADMIN', 'ROLE_SUPER'],
             icon: 'pi pi-fw pi-microchip-ai',
             items: [
                 {
@@ -130,13 +130,13 @@ export class AppMenu implements OnInit {
                 },
                 {
                     label: 'Empresas',
-                    roles: ['super'],
+                    roles: ['ROLE_SUPER'],
                     icon: 'pi pi-fw pi-building',
                     routerLink: ['/pages/companies']
                 },
                 {
                     label: 'Integrações',
-                    roles: ['admin'],
+                    roles: ['ROLE_ADMIN'],
                     icon: 'fa fa-puzzle-piece',
                     routerLink: ['/pages/integrations']
                 }
@@ -212,4 +212,3 @@ export class AppMenu implements OnInit {
         return roles.some((role: RoleEnum) => this.user.roles.includes(role));
     }
 }
-

@@ -4,24 +4,21 @@
  * @create 4/22/25
  */
 
-import {HttpClient} from '@angular/common/http';
-import {environment} from '../../../environments/environment';
-import {LoginResponse, User} from '@/types/types';
-import {Injectable, signal} from '@angular/core';
-import {executeRequest, httpHeaders} from "@/util/utils";
-import {jwtDecode} from "jwt-decode";
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
+import { LoginResponse, User } from '@/types/types';
+import { Injectable, signal } from '@angular/core';
+import { executeRequest, httpHeaders } from '@/util/utils';
+import { jwtDecode } from 'jwt-decode';
 
 @Injectable({
     providedIn: 'root'
 })
 export class UserService {
-
     private readonly user = signal(this.extractUserFromToken());
     private readonly BACKEND = environment.API_BACKEND_URL;
 
-    constructor(private readonly http: HttpClient) {
-    }
-
+    constructor(private readonly http: HttpClient) {}
 
     getUserReactive() {
         return this.user.asReadonly();
@@ -42,12 +39,12 @@ export class UserService {
 
     async refreshToken() {
         const payload = await this.validateToken();
-        this.setUser(payload.token)
+        this.setUser(payload.token);
     }
 
     async manageOtherCompany(controlNumber: number) {
         const response = await executeRequest(
-            this.http.post<LoginResponse>(`${this.BACKEND}/users/manage`, {controlNumber}, httpHeaders())
+            this.http.post<LoginResponse>(`${this.BACKEND}/users/manage`, { controlNumber }, httpHeaders())
         );
         return this.setUser(response.token);
     }
@@ -56,7 +53,7 @@ export class UserService {
         const response = await executeRequest(
             this.http.post<LoginResponse>(
                 `${this.BACKEND}/users/manage/exit`,
-                {controlNumber: this.getUser().controlNumber},
+                { controlNumber: this.getUser().controlNumber },
                 httpHeaders()
             )
         );
@@ -76,7 +73,7 @@ export class UserService {
     }
 
     setUserSettings(darkMode?: boolean) {
-        const settings = {darkMode};
+        const settings = { darkMode };
         localStorage.setItem('settings', JSON.stringify(settings));
     }
 
@@ -103,7 +100,7 @@ export class UserService {
                 roles: []
             };
         const payload = jwtDecode<User>(token);
-        return {...payload, isExpired: this.isUserExpired(payload)};
+        return { ...payload, isExpired: this.isUserExpired(payload) };
     }
 
     isUserExpired(user: User): boolean {
@@ -117,16 +114,16 @@ export class UserService {
     }
 
     authenticate(email: string, password: string): Promise<LoginResponse> {
-        return executeRequest(this.http.post<LoginResponse>(`${this.BACKEND}/users/login`, {
-            email,
-            password
-        }))
+        return executeRequest(
+            this.http.post<LoginResponse>(`${this.BACKEND}/auth/login`, {
+                email,
+                password
+            })
+        );
     }
 
     private validateToken() {
-        return executeRequest(
-            this.http.get<{ token: string }>(`${this.BACKEND}/auth/validate-token`, httpHeaders())
-        );
+        return executeRequest(this.http.get<{ token: string }>(`${this.BACKEND}/auth/validate-token`, httpHeaders()));
     }
 
     findAllUsers(): Promise<User[]> {
@@ -146,12 +143,12 @@ export class UserService {
     }
 
     forgotPassword(email: string) {
-        return executeRequest(this.http.post(`${this.BACKEND}/users/forgot/password`, {email}, httpHeaders()));
+        return executeRequest(this.http.post(`${this.BACKEND}/users/forgot/password`, { email }, httpHeaders()));
     }
 
     confirmUserEmail(email: string, confirmationCode: string) {
         return executeRequest(
-            this.http.post(`${this.BACKEND}/users/confirm`, {email, confirmationCode}, httpHeaders())
+            this.http.post(`${this.BACKEND}/users/confirm`, { email, confirmationCode }, httpHeaders())
         );
     }
 
@@ -162,5 +159,4 @@ export class UserService {
     deleteUser(id: number) {
         return executeRequest(this.http.delete(`${this.BACKEND}/users/${id}`, httpHeaders()));
     }
-
 }

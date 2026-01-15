@@ -1,19 +1,19 @@
-import {Component, computed, inject, OnInit} from '@angular/core';
-import {CheckboxModule} from 'primeng/checkbox';
-import {CommonModule} from '@angular/common';
-import {InputTextModule} from 'primeng/inputtext';
-import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
-import {ActivatedRoute, Router, RouterModule} from '@angular/router';
-import {LayoutService} from '@/layout/service/layout.service';
-import {AppConfigurator} from '@/layout/components/app.configurator';
-import {IconFieldModule} from 'primeng/iconfield';
-import {InputIconModule} from 'primeng/inputicon';
-import {ButtonModule} from 'primeng/button';
-import {ProgressSpinnerModule} from 'primeng/progressspinner';
-import {Image} from 'primeng/image';
-import {DropdownModule} from 'primeng/dropdown';
-import {Password} from 'primeng/password';
-import {UserService} from "@/pages/users/user.service";
+import { Component, computed, inject, OnInit } from '@angular/core';
+import { CheckboxModule } from 'primeng/checkbox';
+import { CommonModule } from '@angular/common';
+import { InputTextModule } from 'primeng/inputtext';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { LayoutService } from '@/layout/service/layout.service';
+import { AppConfigurator } from '@/layout/components/app.configurator';
+import { IconFieldModule } from 'primeng/iconfield';
+import { InputIconModule } from 'primeng/inputicon';
+import { ButtonModule } from 'primeng/button';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { Image } from 'primeng/image';
+import { DropdownModule } from 'primeng/dropdown';
+import { Password } from 'primeng/password';
+import { UserService } from '@/pages/users/user.service';
 
 @Component({
     selector: 'app-login',
@@ -41,7 +41,11 @@ import {UserService} from "@/pages/users/user.service";
             class="fixed left-0 top-0 min-h-screen min-w-[100vw]"
             preserveAspectRatio="none"
         >
-            <rect [attr.fill]="isDarkTheme() ? 'var(--p-primary-900)' : 'var(--p-primary-500)'" width="1600" height="800" />
+            <rect
+                [attr.fill]="isDarkTheme() ? 'var(--p-primary-900)' : 'var(--p-primary-500)'"
+                width="1600"
+                height="800"
+            />
             <path
                 [attr.fill]="isDarkTheme() ? 'var(--p-primary-800)' : 'var(--p-primary-400)'"
                 d="M478.4 581c3.2 0.8 6.4 1.7 9.5 2.5c196.2 52.5 388.7 133.5 593.5 176.6c174.2 36.6 349.5 29.2 518.6-10.2V0H0v574.9c52.3-17.6 106.5-27.7 161.1-30.9C268.4 537.4 375.7 554.2 478.4 581z"
@@ -60,7 +64,9 @@ import {UserService} from "@/pages/users/user.service";
             />
         </svg>
         <div class="px-8 min-h-screen flex justify-center items-center">
-            <div class="border border-surface-200 dark:border-surface-700 bg-surface-0 dark:bg-surface-900 rounded py-16 px-6 md:px-16 z-10">
+            <div
+                class="border border-surface-200 dark:border-surface-700 bg-surface-0 dark:bg-surface-900 rounded py-16 px-6 md:px-16 z-10"
+            >
                 <div class="mb-6">
                     <div class="mb-4">
                         <a href="https://iasmin.io/" target="_blank" class="app-logo">
@@ -71,7 +77,9 @@ import {UserService} from "@/pages/users/user.service";
                 </div>
                 <form [formGroup]="form" (ngSubmit)="onSubmit()" class="p-fluid">
                     <div class="field mb-4">
-                        <label for="email" class="block mb2 text-surface-600 dark:text-surface-200 font-medium">Email</label>
+                        <label for="email" class="block mb2 text-surface-600 dark:text-surface-200 font-medium"
+                            >Email</label
+                        >
                         <input id="email" fluid pInputText class="p-inputtext" formControlName="email" />
                         <small *ngIf="email?.invalid && (email?.dirty || email?.touched)" class="p-error block mt-2">
                             <div *ngIf="email?.errors?.['required']">Email é obrigatório.</div>
@@ -81,9 +89,20 @@ import {UserService} from "@/pages/users/user.service";
 
                     <div class="flex flex-col gap-2 items-end">
                         <div class="field">
-                            <label for="password" class="block mb-2 text-surface-600 dark:text-surface-200 font-medium">Senha</label>
-                            <p-password fluid id="password" formControlName="password" [feedback]="false" [toggleMask]="true"></p-password>
-                            <small *ngIf="password?.invalid && (password?.dirty || password?.touched)" class="p-error block mt-2">
+                            <label for="password" class="block mb-2 text-surface-600 dark:text-surface-200 font-medium"
+                                >Senha</label
+                            >
+                            <p-password
+                                fluid
+                                id="password"
+                                formControlName="password"
+                                [feedback]="false"
+                                [toggleMask]="true"
+                            ></p-password>
+                            <small
+                                *ngIf="password?.invalid && (password?.dirty || password?.touched)"
+                                class="p-error block mt-2"
+                            >
                                 <div *ngIf="password?.errors?.['required']">Senha é obrigatória.</div>
                             </small>
                         </div>
@@ -149,17 +168,8 @@ export class Login implements OnInit {
             this.userService.loginSuccess(response.token);
             this.router.navigate([this.returnUrl]);
         } catch (err: any) {
-            console.error('validar login', err);
-            if (err.error.message.includes('#1')) {
-                this.router.navigate(['/auth/verification', { email: encodeURI(email) }]);
-            }
-            if (err.error.message.includes('#2')) {
-                this.router.navigate(['/auth/newpassword', { email: encodeURI(email) }]);
-            }
-            if (err.error.message.includes('#3')) {
-                this.router.navigate(['/auth/newpassword', { email: encodeURI(email), reset: true }]);
-            }
             this.errorMessage = 'Usuário ou senha inválidos.';
+            console.error(err);
         } finally {
             this.pending = false;
         }
