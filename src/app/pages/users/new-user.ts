@@ -92,8 +92,8 @@ import { UserService } from '@/pages/users/user.service';
 export class NewUserPage implements OnInit {
     form!: FormGroup;
     roleOptions = [
-        { label: 'Usuário', value: RoleEnum.USER },
-        { label: 'Administrador', value: RoleEnum.ADMIN }
+        { label: 'Usuário', value: RoleEnum.ROLE_USER },
+        { label: 'Administrador', value: RoleEnum.ROLE_ADMIN }
     ];
     ddrOptions: { label: string; value: string }[] = [];
 
@@ -108,11 +108,11 @@ export class NewUserPage implements OnInit {
             name: ['', [Validators.required]],
             email: ['', [Validators.required, Validators.email]],
             ddr: ['', [Validators.required]],
-            role: [RoleEnum.USER, [Validators.required]]
+            role: [RoleEnum.ROLE_USER, [Validators.required]]
         });
         const user = this.userService.getUser();
-        if (user.roles.includes(RoleEnum.SUPER)) {
-            this.roleOptions.push({ label: 'Super Usuário', value: RoleEnum.SUPER });
+        if (user.roles.includes(RoleEnum.ROLE_SUPER)) {
+            this.roleOptions.push({ label: 'Super Usuário', value: RoleEnum.ROLE_SUPER });
         }
     }
 

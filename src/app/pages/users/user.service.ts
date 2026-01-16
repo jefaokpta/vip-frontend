@@ -94,6 +94,7 @@ export class UserService {
                 name: '',
                 email: '',
                 companyId: '',
+                isConfirmed: false,
                 isExpired: true,
                 createdAt: new Date(),
                 roles: []
@@ -125,8 +126,9 @@ export class UserService {
         return executeRequest(this.http.get<{ token: string }>(`${this.BACKEND}/auth/validate-token`, httpHeaders()));
     }
 
-    findAllUsers(): Promise<User[]> {
-        return executeRequest(this.http.get<User[]>(`${this.BACKEND}/users/cn/security`, httpHeaders()));
+    findByCompanyId(): Promise<User[]> {
+        const user = this.getUser();
+        return executeRequest(this.http.get<User[]>(`${this.BACKEND}/users/${user.companyId}`, httpHeaders()));
     }
 
     findOneUser(id: number): Promise<User> {

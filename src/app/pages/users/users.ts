@@ -93,7 +93,7 @@ import { UserService } from './user.service';
                         <td>{{ user.email }}</td>
                         <td>
                             <i
-                                [class]="user.isVerified ? 'pi pi-check text-green-500' : 'pi pi-clock text-gray-500'"
+                                [class]="user.isConfirmed ? 'pi pi-check text-green-500' : 'pi pi-clock text-gray-500'"
                             ></i>
                         </td>
                         <td>{{ translateRole(user) }}</td>
@@ -148,7 +148,7 @@ export class UsersPage implements OnInit {
     }
 
     ngOnInit(): void {
-        this.userService.findAllUsers().then((users) => (this.users = users));
+        this.userService.findByCompanyId().then((users) => (this.users = users));
     }
 
     onFilterGlobal(event: Event) {
@@ -201,13 +201,13 @@ export class UsersPage implements OnInit {
     translateRole(user: User): string {
         const lastRole = user.roles.at(-1);
         switch (lastRole) {
-            case 'admin':
+            case 'ROLE_ADMIN':
                 return 'Administrador';
-            case 'user':
+            case 'ROLE_USER':
                 return 'Usuário';
-            case 'super':
+            case 'ROLE_SUPER':
                 return 'Super Usuário';
-            case 'free':
+            case 'ROLE_FREE':
                 return this.userService.isUserExpired(user) ? 'Expirado' : 'Avaliação';
             default:
                 return 'Desconhecido';

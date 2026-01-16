@@ -22,10 +22,10 @@ export enum TemperatureEnum {
 }
 
 export enum RoleEnum {
-    FREE = 'free',
-    USER = 'user',
-    ADMIN = 'admin',
-    SUPER = 'super',
+    ROLE_FREE = 'ROLE_FREE',
+    ROLE_USER = 'ROLE_USER',
+    ROLE_ADMIN = 'ROLE_ADMIN',
+    ROLE_SUPER = 'ROLE_SUPER'
 }
 
 export interface User {
@@ -33,6 +33,7 @@ export interface User {
     readonly name: string;
     readonly email: string;
     readonly companyId: string;
+    readonly isConfirmed: boolean;
     readonly createdAt: Date;
     readonly isExpired: boolean;
     readonly roles: RoleEnum[];
