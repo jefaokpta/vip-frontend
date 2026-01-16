@@ -176,7 +176,7 @@ export class UsersPage implements OnInit {
             },
             accept: () => {
                 this.userService
-                    .deleteUser(user.id)
+                    .delete(user.id)
                     .then(() => {
                         this.users = this.users.filter((u) => u.id !== user.id);
                         this.messageService.add({

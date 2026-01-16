@@ -130,9 +130,8 @@ export class UserService {
         return executeRequest(this.http.get<User[]>(`${this.BACKEND}/users`, httpHeaders()));
     }
 
-    findById(id: number): Promise<User> {
-        const user = this.getUser();
-        return executeRequest(this.http.get<User>(`${this.BACKEND}/users/${user.companyId}/${id}`, httpHeaders()));
+    findById(id: string): Promise<User> {
+        return executeRequest(this.http.get<User>(`${this.BACKEND}/users/${id}`, httpHeaders()));
     }
 
     update(user: User) {
@@ -140,7 +139,6 @@ export class UserService {
     }
 
     create(user: User) {
-        //TODO: como definir manager
         return executeRequest(this.http.post<User>(`${this.BACKEND}/users`, user, httpHeaders()));
     }
 
@@ -158,7 +156,7 @@ export class UserService {
         return executeRequest(this.http.post(`${this.BACKEND}/users/create/password`, payload, httpHeaders()));
     }
 
-    deleteUser(id: number) {
+    delete(id: number) {
         return executeRequest(this.http.delete(`${this.BACKEND}/users/${id}`, httpHeaders()));
     }
 }

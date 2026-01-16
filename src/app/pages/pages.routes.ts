@@ -5,6 +5,7 @@ import { CompanyPage } from '@/pages/company/company.page';
 import { NewCompanyPage } from '@/pages/company/new-company.page';
 import { PersonPage } from '@/pages/person.page';
 import { EditCompanyPage } from '@/pages/company/edit-company.page';
+import { EditUserPage } from '@/pages/users/edit-user';
 
 export default [
     { path: 'companies', component: CompanyPage, data: { breadcrumb: 'Empresas' } },
@@ -12,7 +13,7 @@ export default [
     { path: 'companies/edit/:id', component: EditCompanyPage, data: { breadcrumb: 'Empresas / Editar' } },
     { path: 'users', component: UsersPage, data: { breadcrumb: 'Usuários' } },
     { path: 'users/new', component: NewUserPage, data: { breadcrumb: 'Usuários / Criar' } },
-    // { path: 'users/edit/:id', component: EditUserPage, data: { breadcrumb: 'Usuários / Editar' } },
+    { path: 'users/edit/:id', component: EditUserPage, data: { breadcrumb: 'Usuários / Editar' } },
     { path: 'profile', component: PersonPage, data: { breadcrumb: 'Perfil' } },
     { path: '**', redirectTo: '/notfound' }
 ] as Routes;
