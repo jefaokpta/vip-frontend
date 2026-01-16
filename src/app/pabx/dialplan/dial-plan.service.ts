@@ -3,43 +3,30 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { executeRequest, httpHeaders } from '@/util/utils';
 import { DialPlan } from '@/pabx/types';
-import { UserService } from '@/pages/users/user.service';
 
 @Injectable({ providedIn: 'root' })
 export class DialPlanService {
     private readonly BACKEND = environment.API_BACKEND_URL;
 
-    constructor(
-        private readonly http: HttpClient,
-        private readonly userService: UserService
-    ) {}
+    constructor(private readonly http: HttpClient) {}
 
     findAll(): Promise<DialPlan[]> {
-        const user = this.userService.getUser();
-        return executeRequest(this.http.get<DialPlan[]>(`${this.BACKEND}/dialplans/${user.companyId}`, httpHeaders()));
+        return executeRequest(this.http.get<DialPlan[]>(`${this.BACKEND}/dialplans`, httpHeaders()));
     }
 
     delete(id: number) {
-        const user = this.userService.getUser();
-        return executeRequest(this.http.delete(`${this.BACKEND}/dialplans/${user.companyId}/${id}`, httpHeaders()));
+        return executeRequest(this.http.delete(`${this.BACKEND}/dialplans/${id}`, httpHeaders()));
     }
 
     create(dialplan: DialPlan) {
-        const user = this.userService.getUser();
-        return executeRequest(this.http.post(`${this.BACKEND}/dialplans/${user.companyId}`, dialplan, httpHeaders()));
+        return executeRequest(this.http.post(`${this.BACKEND}/dialplans`, dialplan, httpHeaders()));
     }
 
     findById(id: string) {
-        const user = this.userService.getUser();
-        return executeRequest(
-            this.http.get<DialPlan>(`${this.BACKEND}/dialplans/${user.companyId}/${id}`, httpHeaders())
-        );
+        return executeRequest(this.http.get<DialPlan>(`${this.BACKEND}/dialplans/${id}`, httpHeaders()));
     }
 
     update(dialplan: DialPlan) {
-        const user = this.userService.getUser();
-        return executeRequest(
-            this.http.put(`${this.BACKEND}/dialplans/${user.companyId}/${dialplan.id}`, dialplan, httpHeaders())
-        );
+        return executeRequest(this.http.put(`${this.BACKEND}/dialplans/${dialplan.id}`, dialplan, httpHeaders()));
     }
 }

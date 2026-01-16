@@ -148,7 +148,7 @@ export class UsersPage implements OnInit {
     }
 
     ngOnInit(): void {
-        this.userService.findByCompanyId().then((users) => (this.users = users));
+        this.userService.findAll().then((users) => (this.users = users));
     }
 
     onFilterGlobal(event: Event) {

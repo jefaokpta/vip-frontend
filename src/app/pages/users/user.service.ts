@@ -126,9 +126,8 @@ export class UserService {
         return executeRequest(this.http.get<{ token: string }>(`${this.BACKEND}/auth/validate-token`, httpHeaders()));
     }
 
-    findByCompanyId(): Promise<User[]> {
-        const user = this.getUser();
-        return executeRequest(this.http.get<User[]>(`${this.BACKEND}/users/${user.companyId}`, httpHeaders()));
+    findAll(): Promise<User[]> {
+        return executeRequest(this.http.get<User[]>(`${this.BACKEND}/users`, httpHeaders()));
     }
 
     findById(id: number): Promise<User> {

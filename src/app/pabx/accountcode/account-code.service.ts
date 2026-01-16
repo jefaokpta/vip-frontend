@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { HttpClient } from '@angular/common/http';
-import { UserService } from '@/pages/users/user.service';
 import { AccountCode } from '@/pabx/types';
 import { executeRequest, httpHeaders } from '@/util/utils';
 
@@ -11,37 +10,25 @@ import { executeRequest, httpHeaders } from '@/util/utils';
 export class AccountCodeService {
     private readonly BACKEND = environment.API_BACKEND_URL;
 
-    constructor(
-        private readonly http: HttpClient,
-        private readonly userService: UserService
-    ) {}
+    constructor(private readonly http: HttpClient) {}
 
     findAll(): Promise<AccountCode[]> {
-        const user = this.userService.getUser();
-        return executeRequest(
-            this.http.get<AccountCode[]>(`${this.BACKEND}/accounts/${user.companyId}`, httpHeaders())
-        );
+        return executeRequest(this.http.get<AccountCode[]>(`${this.BACKEND}/accounts`, httpHeaders()));
     }
 
     delete(id: number) {
-        const user = this.userService.getUser();
-        return executeRequest(this.http.delete(`${this.BACKEND}/accounts/${user.companyId}/${id}`, httpHeaders()));
+        return executeRequest(this.http.delete(`${this.BACKEND}/accounts/${id}`, httpHeaders()));
     }
 
     create(accountCode: AccountCode) {
-        const user = this.userService.getUser();
-        return executeRequest(this.http.post(`${this.BACKEND}/accounts/${user.companyId}`, accountCode, httpHeaders()));
+        return executeRequest(this.http.post(`${this.BACKEND}/accounts`, accountCode, httpHeaders()));
     }
 
     findById(id: string): Promise<AccountCode> {
-        const user = this.userService.getUser();
-        return executeRequest(
-            this.http.get<AccountCode>(`${this.BACKEND}/accounts/${user.companyId}/${id}`, httpHeaders())
-        );
+        return executeRequest(this.http.get<AccountCode>(`${this.BACKEND}/accounts/${id}`, httpHeaders()));
     }
 
     update(accountCode: AccountCode) {
-        const user = this.userService.getUser();
-        return executeRequest(this.http.put(`${this.BACKEND}/accounts/${user.companyId}`, accountCode, httpHeaders()));
+        return executeRequest(this.http.put(`${this.BACKEND}/accounts/${accountCode.id}`, accountCode, httpHeaders()));
     }
 }

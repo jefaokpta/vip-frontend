@@ -3,41 +3,30 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { executeRequest, httpHeaders } from '@/util/utils';
 import { Alias } from '@/pabx/types';
-import { UserService } from '@/pages/users/user.service';
 
 @Injectable({ providedIn: 'root' })
 export class AliasService {
     private readonly BACKEND = environment.API_BACKEND_URL;
 
-    constructor(
-        private readonly http: HttpClient,
-        private readonly userService: UserService
-    ) {}
+    constructor(private readonly http: HttpClient) {}
 
     findAll(): Promise<Alias[]> {
-        const user = this.userService.getUser();
-        return executeRequest(this.http.get<Alias[]>(`${this.BACKEND}/aliases/${user.companyId}`, httpHeaders()));
+        return executeRequest(this.http.get<Alias[]>(`${this.BACKEND}/aliases`, httpHeaders()));
     }
 
     delete(id: number) {
-        const user = this.userService.getUser();
-        return executeRequest(this.http.delete(`${this.BACKEND}/aliases/${user.companyId}/${id}`, httpHeaders()));
+        return executeRequest(this.http.delete(`${this.BACKEND}/aliases/${id}`, httpHeaders()));
     }
 
     create(alias: Alias) {
-        const user = this.userService.getUser();
-        return executeRequest(this.http.post(`${this.BACKEND}/aliases/${user.companyId}`, alias, httpHeaders()));
+        return executeRequest(this.http.post(`${this.BACKEND}/aliases`, alias, httpHeaders()));
     }
 
     findById(id: number) {
-        const user = this.userService.getUser();
-        return executeRequest(this.http.get<Alias>(`${this.BACKEND}/aliases/${user.companyId}/${id}`, httpHeaders()));
+        return executeRequest(this.http.get<Alias>(`${this.BACKEND}/aliases/${id}`, httpHeaders()));
     }
 
     update(alias: Alias) {
-        const user = this.userService.getUser();
-        return executeRequest(
-            this.http.put(`${this.BACKEND}/aliases/${user.companyId}/${alias.id}`, alias, httpHeaders())
-        );
+        return executeRequest(this.http.put(`${this.BACKEND}/aliases/${alias.id}`, alias, httpHeaders()));
     }
 }
