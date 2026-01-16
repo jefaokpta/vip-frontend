@@ -9,10 +9,10 @@ import { EditUserPage } from '@/pages/users/edit-user';
 
 export default [
     { path: 'companies', component: CompanyPage, data: { breadcrumb: 'Empresas' } },
-    { path: 'companies/new', component: NewCompanyPage, data: { breadcrumb: 'Empresas / Criar' } },
+    { path: 'companies/new', component: NewCompanyPage, data: { breadcrumb: 'Empresas / Nova' } },
     { path: 'companies/edit/:id', component: EditCompanyPage, data: { breadcrumb: 'Empresas / Editar' } },
     { path: 'users', component: UsersPage, data: { breadcrumb: 'Usuários' } },
-    { path: 'users/new', component: NewUserPage, data: { breadcrumb: 'Usuários / Criar' } },
+    { path: 'users/new', component: NewUserPage, data: { breadcrumb: 'Usuários / Novo' } },
     { path: 'users/edit/:id', component: EditUserPage, data: { breadcrumb: 'Usuários / Editar' } },
     { path: 'profile', component: PersonPage, data: { breadcrumb: 'Perfil' } },
     { path: '**', redirectTo: '/notfound' }

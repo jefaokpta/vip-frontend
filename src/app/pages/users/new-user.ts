@@ -111,10 +111,6 @@ export class NewUserPage implements OnInit {
         return this.form.get('role');
     }
 
-    get ddr() {
-        return this.form.get('ddr');
-    }
-
     onSubmit() {
         const user = { ...this.form.value, roles: [this.form.value.role] };
         this.userService.create(user).then(() => this.router.navigate(['/pages/users']));
