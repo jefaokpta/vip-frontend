@@ -53,21 +53,6 @@ import { UserService } from '@/pages/users/user.service';
                 </div>
 
                 <div class="field mb-4">
-                    <label for="ddr" class="block mb-2">DDR *</label>
-                    <p-select
-                        id="ddr"
-                        [options]="ddrOptions"
-                        formControlName="ddr"
-                        optionLabel="label"
-                        optionValue="value"
-                        placeholder="Selecione o DDR"
-                    ></p-select>
-                    <small *ngIf="ddr?.invalid && (ddr?.dirty || ddr?.touched)" class="p-error block mt-2">
-                        <div *ngIf="ddr?.errors?.['required']">DDR é obrigatório.</div>
-                    </small>
-                </div>
-
-                <div class="field mb-4">
                     <label for="role" class="block mb-2">Nível de Acesso *</label>
                     <p-select
                         id="role"
@@ -95,7 +80,6 @@ export class NewUserPage implements OnInit {
         { label: 'Usuário', value: RoleEnum.ROLE_USER },
         { label: 'Administrador', value: RoleEnum.ROLE_ADMIN }
     ];
-    ddrOptions: { label: string; value: string }[] = [];
 
     constructor(
         private readonly fb: FormBuilder,
@@ -107,7 +91,6 @@ export class NewUserPage implements OnInit {
         this.form = this.fb.group({
             name: ['', [Validators.required]],
             email: ['', [Validators.required, Validators.email]],
-            ddr: ['', [Validators.required]],
             role: [RoleEnum.ROLE_USER, [Validators.required]]
         });
         const user = this.userService.getUser();
@@ -133,8 +116,7 @@ export class NewUserPage implements OnInit {
     }
 
     onSubmit() {
-        this.userService
-            .createUser({ ...this.form.value, roles: [this.form.value.role] })
-            .then(() => this.router.navigate(['/pages/users']));
+        const user = { ...this.form.value, roles: [this.form.value.role] };
+        this.userService.create(user).then(() => this.router.navigate(['/pages/users']));
     }
 }

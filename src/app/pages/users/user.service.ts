@@ -131,15 +131,17 @@ export class UserService {
         return executeRequest(this.http.get<User[]>(`${this.BACKEND}/users/${user.companyId}`, httpHeaders()));
     }
 
-    findOneUser(id: number): Promise<User> {
-        return executeRequest(this.http.get<User>(`${this.BACKEND}/users/${id}`, httpHeaders()));
+    findById(id: number): Promise<User> {
+        const user = this.getUser();
+        return executeRequest(this.http.get<User>(`${this.BACKEND}/users/${user.companyId}/${id}`, httpHeaders()));
     }
 
-    updateUser(user: Partial<User>) {
+    update(user: User) {
         return executeRequest(this.http.patch(`${this.BACKEND}/users/${user.id}`, user, httpHeaders()));
     }
 
-    createUser(user: User) {
+    create(user: User) {
+        //TODO: como definir manager
         return executeRequest(this.http.post<User>(`${this.BACKEND}/users`, user, httpHeaders()));
     }
 
