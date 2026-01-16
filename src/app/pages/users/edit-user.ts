@@ -90,6 +90,7 @@ export class EditUserPage implements OnInit {
 
     ngOnInit(): void {
         this.form = this.fb.group({
+            id: [null, [Validators.required]],
             name: ['', [Validators.required]],
             email: ['', [Validators.required, Validators.email]],
             role: [RoleEnum.ROLE_USER, [Validators.required]]
@@ -97,6 +98,7 @@ export class EditUserPage implements OnInit {
         const id = this.activatedRoute.snapshot.paramMap.get('id')!;
         this.userService.findById(id).then((user) => {
             this.form.patchValue(user);
+            this.role?.setValue(user.roles.at(-1));
         });
         const user = this.userService.getUser();
         if (user.roles.includes(RoleEnum.ROLE_SUPER)) {
@@ -116,12 +118,8 @@ export class EditUserPage implements OnInit {
         return this.form.get('role');
     }
 
-    get ddr() {
-        return this.form.get('ddr');
-    }
-
     onSubmit() {
         const user = { ...this.form.value, roles: [this.form.value.role] };
-        this.userService.create(user).then(() => this.router.navigate(['/pages/users']));
+        this.userService.update(user).then(() => this.router.navigate(['/pages/users']));
     }
 }

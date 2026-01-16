@@ -135,7 +135,7 @@ export class UserService {
     }
 
     update(user: User) {
-        return executeRequest(this.http.patch(`${this.BACKEND}/users/${user.id}`, user, httpHeaders()));
+        return executeRequest(this.http.put(`${this.BACKEND}/users`, user, httpHeaders()));
     }
 
     create(user: User) {
