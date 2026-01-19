@@ -67,7 +67,7 @@ export class UserService {
             newPassword: profile.passwordArray[1]
         };
         const loginResponse = await executeRequest(
-            this.http.patch<LoginResponse>(`${this.BACKEND}/users/profile/update`, payload, httpHeaders())
+            this.http.put<LoginResponse>(`${this.BACKEND}/users/profile`, payload, httpHeaders())
         );
         this.setUser(loginResponse.token);
     }
