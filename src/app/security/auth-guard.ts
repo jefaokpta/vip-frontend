@@ -1,6 +1,6 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router, UrlTree } from '@angular/router';
-import { UserService } from '@/services/user.service';
+import { UserService } from '@/pages/users/user.service';
 
 const LOGIN_ROUTE = '/auth/login';
 

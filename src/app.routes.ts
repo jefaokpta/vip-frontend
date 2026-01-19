@@ -1,12 +1,13 @@
-import {Routes} from '@angular/router';
-import {AppLayout} from '@/layout/components/app.layout';
-import {Notfound} from '@/pages/notfound';
+import { Routes } from '@angular/router';
+import { AppLayout } from '@/layout/components/app.layout';
+import { Notfound } from '@/pages/notfound';
+import { authGuard } from '@/security/auth-guard';
 
 export const appRoutes: Routes = [
     {
         path: '',
         component: AppLayout,
-        // canActivate: [authGuard],
+        canActivate: [authGuard],
         children: [
             {
                 path: '',
@@ -20,7 +21,7 @@ export const appRoutes: Routes = [
             {
                 path: 'pabx',
                 loadChildren: () => import('@/pabx/pabx.routes')
-            },
+            }
         ]
     },
     { path: 'notfound', component: Notfound },

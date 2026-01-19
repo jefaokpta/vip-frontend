@@ -123,7 +123,7 @@ export class UserService {
     }
 
     private validateToken() {
-        return executeRequest(this.http.get<{ token: string }>(`${this.BACKEND}/auth/validate-token`, httpHeaders()));
+        return executeRequest(this.http.get<{ token: string }>(`${this.BACKEND}/security/validate`, httpHeaders()));
     }
 
     findAll(): Promise<User[]> {
