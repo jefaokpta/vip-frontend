@@ -64,7 +64,7 @@ export class UserService {
         const payload = {
             name: profile.name,
             email: profile.email,
-            oldPassword: profile.passwordArray[0],
+            previousPassword: profile.passwordArray[0],
             newPassword: profile.passwordArray[1]
         };
         const loginResponse = await executeRequest(

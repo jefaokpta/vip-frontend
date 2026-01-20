@@ -192,8 +192,8 @@ export class PersonPage implements OnInit {
         if (this.showPasswordFields) {
             this.passwordArray.clear();
         } else {
+            this.passwordArray.push(this.fb.control('', [Validators.required, Validators.minLength(8)]));
             this.passwordArray.push(
-                this.fb.control('', [Validators.required, Validators.minLength(8)]),
                 this.fb.control('', [Validators.required, Validators.minLength(8), passwordStrengthValidator()])
             );
         }
