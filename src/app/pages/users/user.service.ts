@@ -96,13 +96,14 @@ export class UserService {
                 email: '',
                 sub: '',
                 companyId: '',
+                isPasswordCreated: false,
                 isConfirmed: false,
                 isExpired: true,
                 createdAt: new Date(),
                 roles: []
             };
         const payload = jwtDecode<User>(token);
-        return { ...payload, isExpired: this.isUserExpired(payload) };
+        return { ...payload, isExpired: this.isUserExpired(payload), email: payload.sub };
     }
 
     isUserExpired(user: User): boolean {
@@ -145,17 +146,17 @@ export class UserService {
     }
 
     forgotPassword(email: string) {
-        return executeRequest(this.http.post(`${this.BACKEND}/users/forgot/password`, { email }, httpHeaders()));
+        return executeRequest(this.http.post(`${this.BACKEND}/auth/forgot-password`, { email }, httpHeaders()));
     }
 
-    confirmUserEmail(email: string, confirmationCode: string) {
+    confirmUserEmail(email: string, code: string) {
+        return executeRequest(this.http.post(`${this.BACKEND}/auth/confirmation`, { email, code }, httpHeaders()));
+    }
+
+    createFirstPassword(payload: { email: string; password: string }): Promise<LoginResponse> {
         return executeRequest(
-            this.http.post(`${this.BACKEND}/users/confirm`, { email, confirmationCode }, httpHeaders())
+            this.http.post<LoginResponse>(`${this.BACKEND}/users/first-password`, payload, httpHeaders())
         );
-    }
-
-    createResetUserPassword(payload: { email: string; password: string; confirmationCode?: string }) {
-        return executeRequest(this.http.post(`${this.BACKEND}/users/create/password`, payload, httpHeaders()));
     }
 
     delete(id: number) {

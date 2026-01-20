@@ -1,18 +1,17 @@
-import {Component, computed, OnInit} from '@angular/core';
-import {ActivatedRoute, Router, RouterModule} from '@angular/router';
-import {ButtonModule} from 'primeng/button';
-import {LayoutService} from '@/layout/service/layout.service';
-import {AppConfigurator} from '@/layout/components/app.configurator';
-import {IconFieldModule} from 'primeng/iconfield';
-import {InputIconModule} from 'primeng/inputicon';
-import {InputTextModule} from 'primeng/inputtext';
-import {PasswordModule} from 'primeng/password';
-import {Divider} from 'primeng/divider';
-import {NgIf} from '@angular/common';
-import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
-import {matchPasswordValidator, passwordStrengthValidator} from '@/pages/utils/validators';
-import {InputOtp} from 'primeng/inputotp';
-import {UserService} from "@/pages/users/user.service";
+import { Component, computed, OnInit } from '@angular/core';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { ButtonModule } from 'primeng/button';
+import { LayoutService } from '@/layout/service/layout.service';
+import { AppConfigurator } from '@/layout/components/app.configurator';
+import { IconFieldModule } from 'primeng/iconfield';
+import { InputIconModule } from 'primeng/inputicon';
+import { InputTextModule } from 'primeng/inputtext';
+import { PasswordModule } from 'primeng/password';
+import { Divider } from 'primeng/divider';
+import { NgIf } from '@angular/common';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { matchPasswordValidator, passwordStrengthValidator } from '@/pages/utils/validators';
+import { UserService } from '@/pages/users/user.service';
 
 @Component({
     selector: 'app-new-password',
@@ -28,7 +27,6 @@ import {UserService} from "@/pages/users/user.service";
         Divider,
         NgIf,
         ReactiveFormsModule,
-        InputOtp,
         FormsModule
     ],
     standalone: true,
@@ -38,7 +36,11 @@ import {UserService} from "@/pages/users/user.service";
             class="fixed left-0 top-0 min-h-screen min-w-screen"
             preserveAspectRatio="none"
         >
-            <rect [attr.fill]="isDarkTheme() ? 'var(--p-primary-900)' : 'var(--p-primary-500)'" width="1600" height="800" />
+            <rect
+                [attr.fill]="isDarkTheme() ? 'var(--p-primary-900)' : 'var(--p-primary-500)'"
+                width="1600"
+                height="800"
+            />
             <path
                 [attr.fill]="isDarkTheme() ? 'var(--p-primary-800)' : 'var(--p-primary-400)'"
                 d="M478.4 581c3.2 0.8 6.4 1.7 9.5 2.5c196.2 52.5 388.7 133.5 593.5 176.6c174.2 36.6 349.5 29.2 518.6-10.2V0H0v574.9c52.3-17.6 106.5-27.7 161.1-30.9C268.4 537.4 375.7 554.2 478.4 581z"
@@ -57,17 +59,11 @@ import {UserService} from "@/pages/users/user.service";
             />
         </svg>
         <div class="px-8 min-h-screen flex justify-center items-center">
-            <div class="border border-surface-200 dark:border-surface-700 bg-surface-0 dark:bg-surface-900 rounded py-16 px-6 md:px-16 z-10">
+            <div
+                class="border border-surface-200 dark:border-surface-700 bg-surface-0 dark:bg-surface-900 rounded py-16 px-6 md:px-16 z-10"
+            >
                 <div class="mb-6">
-                    <div class="text-surface-900 dark:text-surface-0 text-xl font-bold mb-2">{{ isResetPassword ? 'Redefinir' : 'Criar' }} Senha</div>
-                </div>
-
-                <div class="flex flex-col gap-4 mb-4" *ngIf="isResetPassword">
-                    <span class="text-surface-600 dark:text-surface-200 font-medium">Digite o código de validação enviado para seu email</span>
-                    <div class="flex flex-col gap-4">
-                        <p-input-otp [(ngModel)]="code" [integerOnly]="true" [length]="6"></p-input-otp>
-                        <small *ngIf="codeError" class="dark:text-surface-200 text-red-500">Complete o código</small>
-                    </div>
+                    <div class="text-surface-900 dark:text-surface-0 text-xl font-bold mb-2">Primeiro Acesso</div>
                 </div>
 
                 <span class="text-surface-600 dark:text-surface-200 font-medium">Crie uma senha forte para acesso</span>
@@ -87,9 +83,15 @@ import {UserService} from "@/pages/users/user.service";
                             <ng-template #footer>
                                 <p-divider />
                                 <ul class="pl-2 ml-2 my-0 leading-normal">
-                                    <li *ngIf="password.errors?.['passwordStrength']?.missingUppercase">Deve conter ao menos uma letra maiúscula.</li>
-                                    <li *ngIf="password.errors?.['passwordStrength']?.missingLowercase">Deve conter ao menos uma letra minúscula.</li>
-                                    <li *ngIf="password.errors?.['passwordStrength']?.missingNumber">Deve conter ao menos um número.</li>
+                                    <li *ngIf="password.errors?.['passwordStrength']?.missingUppercase">
+                                        Deve conter ao menos uma letra maiúscula.
+                                    </li>
+                                    <li *ngIf="password.errors?.['passwordStrength']?.missingLowercase">
+                                        Deve conter ao menos uma letra minúscula.
+                                    </li>
+                                    <li *ngIf="password.errors?.['passwordStrength']?.missingNumber">
+                                        Deve conter ao menos um número.
+                                    </li>
                                     <li *ngIf="password.errors?.['passwordStrength']?.missingSpecialChar">
                                         Deve conter ao menos um carácter especial.
                                     </li>
@@ -119,7 +121,9 @@ import {UserService} from "@/pages/users/user.service";
                             <p-button type="submit" label="Criar" fluid [disabled]="form.invalid || pending"></p-button>
                         </div>
 
-                        <small *ngIf="submitError" class="text-red-600">Não foi possível criar sua senha, tente novamente mais tarde.</small>
+                        <small *ngIf="submitError" class="text-red-600"
+                            >Não foi possível criar sua senha, tente novamente mais tarde.</small
+                        >
                         <small *ngIf="submitError" class="text-red-600">{{ customErrorMessage }}</small>
                     </div>
                 </form>
@@ -131,9 +135,6 @@ import {UserService} from "@/pages/users/user.service";
 export class NewPassword implements OnInit {
     form!: FormGroup;
     submitError = false;
-    isResetPassword = false;
-    code?: number;
-    codeError = false;
     pending = false;
     customErrorMessage = '';
 
@@ -157,7 +158,6 @@ export class NewPassword implements OnInit {
             }
         );
         this.form.get('email')!.setValue(this.activatedRoute.snapshot.paramMap.get('email')!);
-        this.isResetPassword = this.activatedRoute.snapshot.paramMap.get('reset') === 'true';
     }
 
     get password() {
@@ -172,25 +172,12 @@ export class NewPassword implements OnInit {
 
     onSubmit() {
         this.pending = true;
-        if (this.isResetPassword) {
-            if (this.code?.toString().length !== 6) {
-                this.codeError = true;
-                this.pending = false;
-                return;
-            }
-            this.userService
-                .createResetUserPassword({ ...this.form.value, confirmationCode: this.code })
-                .then(() => this.router.navigate(['/auth/login']))
-                .catch((err) => {
-                    this.submitError = true;
-                    this.customErrorMessage = err.error.message;
-                })
-                .finally(() => (this.pending = false));
-            return;
-        }
         this.userService
-            .createResetUserPassword(this.form.value)
-            .then(() => this.router.navigate(['/auth/login']))
+            .createFirstPassword(this.form.value)
+            .then((loginResponse) => {
+                this.userService.loginSuccess(loginResponse.token);
+                this.router.navigate(['/']);
+            })
             .catch((err) => {
                 this.submitError = true;
                 this.customErrorMessage = err.error.message;

@@ -35,6 +35,7 @@ export interface User {
     readonly sub: string;
     readonly companyId: string;
     readonly isConfirmed: boolean;
+    readonly isPasswordCreated: boolean;
     readonly createdAt: Date;
     readonly isExpired: boolean;
     readonly roles: RoleEnum[];

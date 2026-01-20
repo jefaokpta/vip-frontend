@@ -1,18 +1,27 @@
-import {Component, computed, inject} from '@angular/core';
-import {ActivatedRoute, Router, RouterModule} from '@angular/router';
-import {ButtonModule} from 'primeng/button';
-import {AppConfigurator} from '@/layout/components/app.configurator';
-import {FormsModule} from '@angular/forms';
-import {LayoutService} from '@/layout/service/layout.service';
-import {RippleModule} from 'primeng/ripple';
-import {InputNumber, InputNumberModule} from 'primeng/inputnumber';
-import {InputOtpModule} from 'primeng/inputotp';
-import {NgIf} from '@angular/common';
-import {UserService} from "@/pages/users/user.service";
+import { Component, computed, inject } from '@angular/core';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { ButtonModule } from 'primeng/button';
+import { AppConfigurator } from '@/layout/components/app.configurator';
+import { FormsModule } from '@angular/forms';
+import { LayoutService } from '@/layout/service/layout.service';
+import { RippleModule } from 'primeng/ripple';
+import { InputNumber, InputNumberModule } from 'primeng/inputnumber';
+import { InputOtpModule } from 'primeng/inputotp';
+import { NgIf } from '@angular/common';
+import { UserService } from '@/pages/users/user.service';
 
 @Component({
     selector: 'app-verification',
-    imports: [ButtonModule, RouterModule, AppConfigurator, FormsModule, InputNumberModule, RippleModule, InputOtpModule, NgIf],
+    imports: [
+        ButtonModule,
+        RouterModule,
+        AppConfigurator,
+        FormsModule,
+        InputNumberModule,
+        RippleModule,
+        InputOtpModule,
+        NgIf
+    ],
     standalone: true,
     template: ` <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -20,7 +29,11 @@ import {UserService} from "@/pages/users/user.service";
             class="fixed left-0 top-0 min-h-screen min-w-[100vw]"
             preserveAspectRatio="none"
         >
-            <rect [attr.fill]="isDarkTheme() ? 'var(--p-primary-900)' : 'var(--p-primary-500)'" width="1600" height="800" />
+            <rect
+                [attr.fill]="isDarkTheme() ? 'var(--p-primary-900)' : 'var(--p-primary-500)'"
+                width="1600"
+                height="800"
+            />
             <path
                 [attr.fill]="isDarkTheme() ? 'var(--p-primary-800)' : 'var(--p-primary-400)'"
                 d="M478.4 581c3.2 0.8 6.4 1.7 9.5 2.5c196.2 52.5 388.7 133.5 593.5 176.6c174.2 36.6 349.5 29.2 518.6-10.2V0H0v574.9c52.3-17.6 106.5-27.7 161.1-30.9C268.4 537.4 375.7 554.2 478.4 581z"
@@ -39,10 +52,14 @@ import {UserService} from "@/pages/users/user.service";
             />
         </svg>
         <div class="px-8 min-h-screen flex justify-center items-center">
-            <div class="border border-surface-200 dark:border-surface-700 bg-surface-0 dark:bg-surface-900 rounded py-16 px-6 md:px-16 z-10">
+            <div
+                class="border border-surface-200 dark:border-surface-700 bg-surface-0 dark:bg-surface-900 rounded py-16 px-6 md:px-16 z-10"
+            >
                 <div class="mb-6">
                     <div class="text-surface-900 dark:text-surface-0 text-xl font-bold mb-2">Código de Verificação</div>
-                    <span class="text-surface-600 dark:text-surface-200 font-medium">O código foi enviado para o email:</span>
+                    <span class="text-surface-600 dark:text-surface-200 font-medium"
+                        >O código foi enviado para o email:</span
+                    >
                     <div class="flex items-center mt-1">
                         <i class="pi pi-envelope text-surface-600 dark:text-surface-200"></i>
                         <span class="text-surface-900 dark:text-surface-0 font-bold ml-2">{{ email }}</span>
@@ -54,7 +71,9 @@ import {UserService} from "@/pages/users/user.service";
                         <i *ngIf="pending" class="pi pi-spin pi-spinner"></i>
                     </p-button>
                     <small *ngIf="codeError" class="text-surface-600 dark:text-surface-200">Complete o código</small>
-                    <small *ngIf="emailError" class="text-surface-600 dark:text-surface-200">Não foi possível obter o email</small>
+                    <small *ngIf="emailError" class="text-surface-600 dark:text-surface-200"
+                        >Não foi possível obter o email</small
+                    >
                     <small *ngIf="wrongCode" class="text-surface-600 dark:text-surface-200">Código inválido</small>
                 </div>
             </div>
@@ -64,7 +83,7 @@ import {UserService} from "@/pages/users/user.service";
 export class Verification {
     layoutService = inject(LayoutService);
     code?: number;
-    readonly email;
+    readonly email: string;
     codeError = false;
     emailError = false;
     wrongCode = false;
@@ -75,8 +94,7 @@ export class Verification {
         private readonly router: Router,
         private readonly userService: UserService
     ) {
-        const hash = activatedRoute.snapshot.paramMap.get('email');
-        if (hash) this.email = decodeURI(hash);
+        this.email = this.activatedRoute.snapshot.queryParams['email'];
     }
 
     confirm() {
@@ -96,7 +114,7 @@ export class Verification {
         }
         this.userService
             .confirmUserEmail(this.email, this.code.toString())
-            .then(() => this.router.navigate(['/auth/newpassword', { email: encodeURI(this.email!) }]))
+            .then(() => this.router.navigate(['/']))
             .catch(() => (this.wrongCode = true))
             .finally(() => (this.pending = false));
     }

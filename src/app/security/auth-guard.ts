@@ -14,6 +14,11 @@ export const authGuard: CanActivateFn = async (route, state): Promise<boolean | 
 
     try {
         await userService.refreshToken();
+        const user = userService.getUser();
+        if (!user.isPasswordCreated) {
+            router.navigate(['/auth/newpassword', { email: encodeURI(user.email) }]);
+            return false;
+        }
         return true;
     } catch (erro) {
         console.error('Falha na validação do token:', erro);
