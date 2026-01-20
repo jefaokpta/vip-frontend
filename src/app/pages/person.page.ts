@@ -193,6 +193,7 @@ export class PersonPage implements OnInit {
             this.passwordArray.clear();
         } else {
             this.passwordArray.push(
+                this.fb.control('', [Validators.required, Validators.minLength(8)]),
                 this.fb.control('', [Validators.required, Validators.minLength(8), passwordStrengthValidator()])
             );
         }
