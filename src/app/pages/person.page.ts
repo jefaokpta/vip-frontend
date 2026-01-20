@@ -1,21 +1,33 @@
-import {Component, OnInit} from '@angular/core';
-import {Button, ButtonModule} from 'primeng/button';
-import {Card} from 'primeng/card';
-import {Divider} from 'primeng/divider';
-import {FormArray, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
-import {InputText} from 'primeng/inputtext';
-import {NgForOf, NgIf} from '@angular/common';
-import {Password} from 'primeng/password';
-import {passwordStrengthValidator} from '@/pages/utils/validators';
-import {User} from '@/types/types';
-import {Toast} from 'primeng/toast';
-import {MessageService} from 'primeng/api';
-import {UserService} from "@/pages/users/user.service";
+import { Component, OnInit } from '@angular/core';
+import { Button, ButtonModule } from 'primeng/button';
+import { Card } from 'primeng/card';
+import { Divider } from 'primeng/divider';
+import { FormArray, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { InputText } from 'primeng/inputtext';
+import { NgForOf, NgIf } from '@angular/common';
+import { Password } from 'primeng/password';
+import { passwordStrengthValidator } from '@/pages/utils/validators';
+import { User } from '@/types/types';
+import { Toast } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
+import { UserService } from '@/pages/users/user.service';
 
 @Component({
     selector: 'app-empty',
     standalone: true,
-    imports: [Button, ButtonModule, Card, Divider, FormsModule, InputText, NgIf, Password, ReactiveFormsModule, NgForOf, Toast],
+    imports: [
+        Button,
+        ButtonModule,
+        Card,
+        Divider,
+        FormsModule,
+        InputText,
+        NgIf,
+        Password,
+        ReactiveFormsModule,
+        NgForOf,
+        Toast
+    ],
     providers: [MessageService],
     template: `
         <p-card>
@@ -80,9 +92,15 @@ import {UserService} from "@/pages/users/user.service";
                                 <ng-template #footer>
                                     <p-divider />
                                     <ul class="pl-2 ml-2 my-0 leading-normal">
-                                        <li *ngIf="pass.errors?.['passwordStrength']?.missingUppercase">Deve conter ao menos uma letra maiúscula.</li>
-                                        <li *ngIf="pass.errors?.['passwordStrength']?.missingLowercase">Deve conter ao menos uma letra minúscula.</li>
-                                        <li *ngIf="pass.errors?.['passwordStrength']?.missingNumber">Deve conter ao menos um número.</li>
+                                        <li *ngIf="pass.errors?.['passwordStrength']?.missingUppercase">
+                                            Deve conter ao menos uma letra maiúscula.
+                                        </li>
+                                        <li *ngIf="pass.errors?.['passwordStrength']?.missingLowercase">
+                                            Deve conter ao menos uma letra minúscula.
+                                        </li>
+                                        <li *ngIf="pass.errors?.['passwordStrength']?.missingNumber">
+                                            Deve conter ao menos um número.
+                                        </li>
                                         <li *ngIf="pass.errors?.['passwordStrength']?.missingSpecialChar">
                                             Deve conter ao menos um carácter especial.
                                         </li>
@@ -125,9 +143,11 @@ export class PersonPage implements OnInit {
     get name() {
         return this.form.get('name');
     }
-
     get passwordArray() {
         return this.form.get('passwordArray') as FormArray;
+    }
+    get email() {
+        return this.form.get('email');
     }
 
     ngOnInit(): void {
@@ -137,6 +157,7 @@ export class PersonPage implements OnInit {
             passwordArray: this.fb.array([])
         });
         this.form.patchValue(this.user);
+        this.email?.setValue(this.user.sub);
     }
 
     onSubmit() {
@@ -171,7 +192,9 @@ export class PersonPage implements OnInit {
         if (this.showPasswordFields) {
             this.passwordArray.clear();
         } else {
-            this.passwordArray.push(this.fb.control('', [Validators.required, Validators.minLength(8), passwordStrengthValidator()]));
+            this.passwordArray.push(
+                this.fb.control('', [Validators.required, Validators.minLength(8), passwordStrengthValidator()])
+            );
         }
         this.showPasswordFields = !this.showPasswordFields;
     }

@@ -32,6 +32,7 @@ export interface User {
     readonly id: number;
     readonly name: string;
     readonly email: string;
+    readonly sub: string;
     readonly companyId: string;
     readonly isConfirmed: boolean;
     readonly createdAt: Date;

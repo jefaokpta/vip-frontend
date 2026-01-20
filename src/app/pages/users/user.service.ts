@@ -60,9 +60,10 @@ export class UserService {
         return this.setUser(response.token);
     }
 
-    async updateProfile(profile: { name: string; passwordArray: string[] }) {
+    async updateProfile(profile: { name: string; email: string; passwordArray: string[] }) {
         const payload = {
             name: profile.name,
+            email: profile.email,
             oldPassword: profile.passwordArray[0],
             newPassword: profile.passwordArray[1]
         };
@@ -93,6 +94,7 @@ export class UserService {
                 id: 0,
                 name: '',
                 email: '',
+                sub: '',
                 companyId: '',
                 isConfirmed: false,
                 isExpired: true,
