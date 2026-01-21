@@ -1,18 +1,27 @@
-import {Component, computed, OnInit} from '@angular/core';
-import {RouterModule} from '@angular/router';
-import {ButtonModule} from 'primeng/button';
-import {LayoutService} from '@/layout/service/layout.service';
-import {AppConfigurator} from '@/layout/components/app.configurator';
-import {IconFieldModule} from 'primeng/iconfield';
-import {InputIconModule} from 'primeng/inputicon';
-import {InputTextModule} from 'primeng/inputtext';
-import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
-import {NgIf} from '@angular/common';
-import {UserService} from "@/pages/users/user.service";
+import { Component, computed, OnInit } from '@angular/core';
+import { RouterModule } from '@angular/router';
+import { ButtonModule } from 'primeng/button';
+import { LayoutService } from '@/layout/service/layout.service';
+import { AppConfigurator } from '@/layout/components/app.configurator';
+import { IconFieldModule } from 'primeng/iconfield';
+import { InputIconModule } from 'primeng/inputicon';
+import { InputTextModule } from 'primeng/inputtext';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { NgIf } from '@angular/common';
+import { UserService } from '@/pages/users/user.service';
 
 @Component({
     selector: 'app-forgot-password',
-    imports: [ButtonModule, RouterModule, AppConfigurator, IconFieldModule, InputIconModule, InputTextModule, NgIf, ReactiveFormsModule],
+    imports: [
+        ButtonModule,
+        RouterModule,
+        AppConfigurator,
+        IconFieldModule,
+        InputIconModule,
+        InputTextModule,
+        NgIf,
+        ReactiveFormsModule
+    ],
     standalone: true,
     template: ` <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -20,7 +29,11 @@ import {UserService} from "@/pages/users/user.service";
             class="fixed left-0 top-0 min-h-screen min-w-[100vw]"
             preserveAspectRatio="none"
         >
-            <rect [attr.fill]="isDarkTheme() ? 'var(--p-primary-900)' : 'var(--p-primary-500)'" width="1600" height="800" />
+            <rect
+                [attr.fill]="isDarkTheme() ? 'var(--p-primary-900)' : 'var(--p-primary-500)'"
+                width="1600"
+                height="800"
+            />
             <path
                 [attr.fill]="isDarkTheme() ? 'var(--p-primary-800)' : 'var(--p-primary-400)'"
                 d="M478.4 581c3.2 0.8 6.4 1.7 9.5 2.5c196.2 52.5 388.7 133.5 593.5 176.6c174.2 36.6 349.5 29.2 518.6-10.2V0H0v574.9c52.3-17.6 106.5-27.7 161.1-30.9C268.4 537.4 375.7 554.2
@@ -40,22 +53,35 @@ import {UserService} from "@/pages/users/user.service";
             />
         </svg>
         <div class="px-8 min-h-screen flex justify-center items-center">
-            <div class="border border-surface-200 dark:border-surface-700 bg-surface-0 dark:bg-surface-900 rounded py-16 px-6 md:px-16 z-10">
+            <div
+                class="border border-surface-200 dark:border-surface-700 bg-surface-0 dark:bg-surface-900 rounded py-16 px-6 md:px-16 z-10"
+            >
                 <div class="mb-6">
                     <div class="text-surface-900 dark:text-surface-0 text-xl font-bold mb-2">Redefinir senha</div>
-                    <span class="text-surface-600 dark:text-surface-200 font-medium">Forneça seu email de cadastro para redefinir sua senha</span>
+                    <span class="text-surface-600 dark:text-surface-200 font-medium"
+                        >Forneça seu email de cadastro para redefinir sua senha</span
+                    >
                 </div>
                 <form [formGroup]="form" (ngSubmit)="onSubmit()">
                     <div class="flex flex-col">
                         <p-iconfield class="w-full mb-6">
                             <p-inputicon class="pi pi-envelope" />
-                            <input id="email" formControlName="email" type="text" pInputText class="w-full md:w-25rem" placeholder="Email" />
+                            <input
+                                id="email"
+                                formControlName="email"
+                                type="text"
+                                pInputText
+                                class="w-full md:w-25rem"
+                                placeholder="Email"
+                            />
                         </p-iconfield>
 
-                        <small *ngIf="submitError" class="text-red-500 mb-2">Não foi possível redefinir sua senha</small>
+                        <small *ngIf="submitError" class="text-red-500 mb-2"
+                            >Não foi possível redefinir sua senha</small
+                        >
 
                         <div class="flex justify-between items-center gap-2">
-                            <p-button fluid label="Voltar" outlined routerLink="/"></p-button>
+                            <p-button fluid label="Entrar" outlined routerLink="/"></p-button>
                             <p-button fluid label="Redefinir" type="submit" [disabled]="form.invalid"></p-button>
                         </div>
 
