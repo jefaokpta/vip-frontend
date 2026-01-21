@@ -15,6 +15,7 @@ import { NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ProgressSpinner } from 'primeng/progressspinner';
 import { UserService } from './user.service';
+import { translateRole } from '@/pages/users/utils';
 
 @Component({
     selector: 'app-users',
@@ -200,17 +201,7 @@ export class UsersPage implements OnInit {
 
     translateRole(user: User): string {
         const lastRole = user.roles.at(-1);
-        switch (lastRole) {
-            case 'ROLE_ADMIN':
-                return 'Administrador';
-            case 'ROLE_USER':
-                return 'Usuário';
-            case 'ROLE_SUPER':
-                return 'Super Usuário';
-            case 'ROLE_FREE':
-                return this.userService.isUserExpired(user) ? 'Expirado' : 'Avaliação';
-            default:
-                return 'Desconhecido';
-        }
+        if (!lastRole) return 'Indefinido';
+        return translateRole(lastRole);
     }
 }

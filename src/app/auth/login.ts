@@ -168,8 +168,7 @@ export class Login implements OnInit {
             this.userService.loginSuccess(response.token);
             this.router.navigate([this.returnUrl]);
         } catch (err: any) {
-            this.errorMessage = 'Usuário ou senha inválidos.';
-            console.error(err);
+            this.errorMessage = err.error?.message ?? 'Usuário ou senha inválidos.';
         } finally {
             this.pending = false;
         }

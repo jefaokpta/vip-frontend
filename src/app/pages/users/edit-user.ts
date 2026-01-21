@@ -14,6 +14,7 @@ import { Card } from 'primeng/card';
 import { RoleEnum } from '@/types/types';
 import { Select } from 'primeng/select';
 import { UserService } from '@/pages/users/user.service';
+import { buildRoleOptions } from '@/pages/users/utils';
 
 @Component({
     selector: 'app-edit-user',
@@ -76,10 +77,7 @@ import { UserService } from '@/pages/users/user.service';
 })
 export class EditUserPage implements OnInit {
     form!: FormGroup;
-    roleOptions = [
-        { label: 'Usuário', value: RoleEnum.ROLE_USER },
-        { label: 'Administrador', value: RoleEnum.ROLE_ADMIN }
-    ];
+    roleOptions: { label: string; value: string }[] = [];
 
     constructor(
         private readonly fb: FormBuilder,
@@ -101,9 +99,7 @@ export class EditUserPage implements OnInit {
             this.role?.setValue(user.roles.at(-1));
         });
         const user = this.userService.getUser();
-        if (user.roles.includes(RoleEnum.ROLE_SUPER)) {
-            this.roleOptions.push({ label: 'Super Usuário', value: RoleEnum.ROLE_SUPER });
-        }
+        this.roleOptions = buildRoleOptions(user.roles);
     }
 
     get name() {

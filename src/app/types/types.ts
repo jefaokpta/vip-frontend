@@ -24,7 +24,9 @@ export enum TemperatureEnum {
 export enum RoleEnum {
     ROLE_FREE = 'ROLE_FREE',
     ROLE_USER = 'ROLE_USER',
+    ROLE_SUPERVISOR = 'ROLE_SUPERVISOR',
     ROLE_ADMIN = 'ROLE_ADMIN',
+    ROLE_SUPPORT = 'ROLE_SUPPORT',
     ROLE_SUPER = 'ROLE_SUPER'
 }
 
