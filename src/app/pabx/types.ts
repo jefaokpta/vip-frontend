@@ -78,10 +78,11 @@ export enum PeerStateEnum {
     ONHOLD = 'ONHOLD'
 }
 
-export interface PeerState {
-    readonly serverId: string;
-    readonly endpoint: string;
-    readonly state: PeerStateEnum;
+export enum PeerTransportEnum {
+    UDP = 'UDP',
+    TCP = 'TCP',
+    TLS = 'TLS',
+    WSS = 'WSS'
 }
 
 export interface Peer {
@@ -89,7 +90,15 @@ export interface Peer {
     readonly name: string;
     readonly peer: string;
     readonly companyId: string;
-    readonly endpointStates: PeerState[];
+    readonly featurePassword: string;
+    readonly language: LanguageEnum;
+    readonly pickUpGroup: string;
+    readonly callGroup: string;
+    readonly peerTransportEnums: PeerTransportEnum[];
+    readonly qualify: boolean;
+    readonly nat: boolean;
+    readonly dtmfModeEnum: DtmfModeEnum;
+    readonly callLimit: number;
 }
 
 export enum UserFieldEnum {

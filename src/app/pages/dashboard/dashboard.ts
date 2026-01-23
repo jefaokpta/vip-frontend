@@ -1,17 +1,17 @@
-import {Component, computed, OnDestroy, OnInit, signal} from '@angular/core';
-import {Subscription} from "rxjs";
-import {WebsocketService} from "@/websocket/stomp/websocket.service";
-import {rxStompServiceFactory} from "@/websocket/stomp/rx-stomp-service-factory";
-import {Card} from "primeng/card";
-import {Worker} from "@/types/types";
-import {NgForOf} from "@angular/common";
-import {BadgeModule} from "primeng/badge";
-import {DashboardService} from "@/pages/dashboard/dashboard.service";
-import {Peer, PeerStateEnum} from "@/pabx/types";
+import { Component, computed, OnDestroy, OnInit, signal } from '@angular/core';
+import { Subscription } from 'rxjs';
+import { WebsocketService } from '@/websocket/stomp/websocket.service';
+import { rxStompServiceFactory } from '@/websocket/stomp/rx-stomp-service-factory';
+import { Card } from 'primeng/card';
+import { Worker } from '@/types/types';
+import { NgForOf } from '@angular/common';
+import { BadgeModule } from 'primeng/badge';
+import { DashboardService } from '@/pages/dashboard/dashboard.service';
+import { Peer, PeerStateEnum } from '@/pabx/types';
 
 @Component({
     selector: 'app-components-dashboard',
-    providers: [{provide: WebsocketService, useFactory: rxStompServiceFactory}],
+    providers: [{ provide: WebsocketService, useFactory: rxStompServiceFactory }],
     imports: [Card, NgForOf, BadgeModule],
     template: `
         <div class="flex flex-col gap-4">
@@ -47,20 +47,6 @@ import {Peer, PeerStateEnum} from "@/pabx/types";
                     </div>
                 </p-card>
             </div>
-
-            <div class="col-span-12 xl:col-span-9">
-                <p-card header="Ramais">
-                    <div class="flex gap-4">
-                        <p-card *ngFor="let peer of peers()" header="{{ peer.name }} {{peer.peer}}">
-                            <div class="flex flex-col text-center gap-2">
-                                <p-badge *ngFor="let es of peer.endpointStates" [severity]="peerStateSeverity(es.state)"
-                                         [value]="es.state"></p-badge>
-                                <span>{{ peer.endpointStates[0].serverId }}</span>
-                            </div>
-                        </p-card>
-                    </div>
-                </p-card>
-            </div>
         </div>
     `
 })
@@ -76,30 +62,30 @@ export class Dashboard implements OnDestroy, OnInit {
         private readonly webSocketService: WebsocketService,
         private readonly httpClientService: DashboardService
     ) {
-        this.webSocketSubscription = this.webSocketService.watch("/topic/workers").subscribe(message => {
+        this.webSocketSubscription = this.webSocketService.watch('/topic/workers').subscribe((message) => {
             const worker: Worker = JSON.parse(message.body);
-            this.workersMap.update(workers => {
+            this.workersMap.update((workers) => {
                 workers.set(worker.name, worker);
                 return new Map(workers);
-            })
-        })
+            });
+        });
 
-        this.webSocketService.watch("/topic/peers").subscribe(message => {
+        this.webSocketService.watch('/topic/peers').subscribe((message) => {
             const peer: Peer = JSON.parse(message.body);
-            this.peersMap.update(peers => {
+            this.peersMap.update((peers) => {
                 peers.set(peer.peer, peer);
                 return new Map(peers);
-            })
-        })
+            });
+        });
     }
 
     ngOnInit() {
-        this.httpClientService.findWorkers().then(workers => {
-            this.workersMap.set(new Map(workers.map(worker => [worker.name, worker])));
-        })
-        this.httpClientService.findPeersByCompany('100023').then(peers => {
-            this.peersMap.set(new Map(peers.map(peer => [peer.peer, peer])));
-        })
+        this.httpClientService.findWorkers().then((workers) => {
+            this.workersMap.set(new Map(workers.map((worker) => [worker.name, worker])));
+        });
+        this.httpClientService.findPeersByCompany('100023').then((peers) => {
+            this.peersMap.set(new Map(peers.map((peer) => [peer.peer, peer])));
+        });
     }
 
     peerStateSeverity(peerStateEnum: PeerStateEnum) {
@@ -120,12 +106,11 @@ export class Dashboard implements OnDestroy, OnInit {
 
     sumMaxChannels() {
         return this.workers()
-            .filter(w => w.isReady)
+            .filter((w) => w.isReady)
             .reduce((acc, w) => acc + w.maxChannels, 0);
     }
 
     ngOnDestroy(): void {
         this.webSocketSubscription.unsubscribe();
     }
-
 }

@@ -1,5 +1,4 @@
 import { Routes } from '@angular/router';
-import { PeerPage } from '@/pabx/peer/peer.page';
 import { DialplanPage } from '@/pabx/dialplan/dialplan.page';
 import { AliasPage } from '@/pabx/alias/alias.page';
 import { NewAliasPage } from '@/pabx/alias/new-alias.page';
@@ -15,9 +14,12 @@ import { RoutePage } from './route/routes.page';
 import { NewRoutePage } from '@/pabx/route/new-route.page';
 import { EditRoutePage } from '@/pabx/route/edit-route.page';
 import { EditDialplanPage } from '@/pabx/dialplan/edit-dialplan/edit-dialplan.page';
+import { NewPeerPage } from '@/pabx/peer/new-peer.page';
+import { PeerPage } from '@/pabx/peer/peer.page';
 
 export default [
     { path: 'peers', component: PeerPage, data: { breadcrumb: 'Ramais' } },
+    { path: 'peers/new', component: NewPeerPage, data: { breadcrumb: 'Novo' } },
     { path: 'aliases', component: AliasPage, data: { breadcrumb: 'Alias de Discagem' } },
     { path: 'aliases/new', component: NewAliasPage, data: { breadcrumb: 'Novo' } },
     { path: 'aliases/edit/:id', component: EditAliasPage, data: { breadcrumb: 'Editar' } },
