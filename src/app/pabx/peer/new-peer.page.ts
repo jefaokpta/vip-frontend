@@ -6,6 +6,9 @@ import { CardModule } from 'primeng/card';
 import { NgIf } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { PeerService } from '@/pabx/peer/peer.service';
+import { LanguageEnum } from '@/pabx/types';
+import { Select } from 'primeng/select';
+import { languageSelectOptions } from '@/pabx/utils';
 
 /**
  * @author Jefferson Alves Reis (jefaokpta)
@@ -15,7 +18,7 @@ import { PeerService } from '@/pabx/peer/peer.service';
 @Component({
     selector: 'app-new-peer-page',
     standalone: true,
-    imports: [InputTextModule, ButtonModule, CardModule, NgIf, ReactiveFormsModule, RouterLink],
+    imports: [InputTextModule, ButtonModule, CardModule, NgIf, ReactiveFormsModule, RouterLink, Select],
     template: `
         <p-card>
             <ng-template #title>
@@ -52,6 +55,32 @@ import { PeerService } from '@/pabx/peer/peer.service';
                     </small>
                 </div>
 
+                <div class="field mb-4">
+                    <label for="featurePassword" class="block mb-2">Senha de Facilidades *</label>
+                    <input id="featurePassword" pInputText class="p-inputtext" formControlName="featurePassword" />
+                    <small
+                        *ngIf="featurePassword?.invalid && (featurePassword?.dirty || featurePassword?.touched)"
+                        class="p-error block mt-2"
+                    >
+                        <div *ngIf="featurePassword?.errors?.['required']">Senha é obrigatória.</div>
+                        <div *ngIf="featurePassword?.errors?.['minlength']">Senha deve ter pelo menos 2 dígitos.</div>
+                        <div *ngIf="featurePassword?.errors?.['maxlength']">Senha deve ter no máximo 4 dígitos.</div>
+                        <div *ngIf="featurePassword?.errors?.['pattern']">Senha deve ter apenas números.</div>
+                    </small>
+                </div>
+
+                <div class="field mb-4">
+                    <label for="language" class="block mb-2">Idioma *</label>
+                    <p-select
+                        id="language"
+                        [options]="languageOptions"
+                        formControlName="language"
+                        optionLabel="label"
+                        optionValue="value"
+                        placeholder="Selecione um idioma"
+                    ></p-select>
+                </div>
+
                 <div class="flex mt-4">
                     <p-button type="submit" label="Salvar" [disabled]="form.invalid || pending">
                         <i *ngIf="pending" class="pi pi-spin pi-spinner"></i>
@@ -68,6 +97,7 @@ export class NewPeerPage implements OnInit {
     form!: FormGroup;
     pending = false;
     showError = false;
+    languageOptions = languageSelectOptions();
 
     constructor(
         private readonly fb: FormBuilder,
@@ -75,27 +105,23 @@ export class NewPeerPage implements OnInit {
         private readonly peerService: PeerService
     ) {}
 
-    get name() {
-        return this.form.get('name');
-    }
-    get peer() {
-        return this.form.get('peer');
-    }
-
     ngOnInit(): void {
         this.form = this.fb.group({
             name: ['', [Validators.required]],
             peer: [
                 '',
                 [Validators.required, Validators.minLength(2), Validators.maxLength(4), Validators.pattern('[0-9]+')]
-            ]
-            // featurePassword: ['', [Validators.required]],
-            // language: ['', [Validators.required]],
-            // peerTransportEnums: ['', [Validators.required]],
-            // qualify: ['', [Validators.required]],
-            // nat: [false, [Validators.required]],
-            // dtmfModeEnum: ['', [Validators.required]],
-            // callLimit: [0, [Validators.required]]
+            ],
+            featurePassword: [
+                '1234',
+                [Validators.required, Validators.minLength(2), Validators.maxLength(4), Validators.pattern('[0-9]+')]
+            ],
+            language: [LanguageEnum.pt_BR, [Validators.required]],
+            peerTransportEnums: ['', [Validators.required]],
+            qualify: ['', [Validators.required]],
+            nat: [false, [Validators.required]],
+            dtmfModeEnum: ['', [Validators.required]],
+            callLimit: [0, [Validators.required]]
         });
     }
 
@@ -109,5 +135,24 @@ export class NewPeerPage implements OnInit {
         //         this.showError = true;
         //     })
         //     .finally(() => (this.pending = false));
+    }
+
+    get name() {
+        return this.form.get('name');
+    }
+    get peer() {
+        return this.form.get('peer');
+    }
+    get featurePassword() {
+        return this.form.get('featurePassword');
+    }
+    get language() {
+        return this.form.get('language');
+    }
+    get peerTransportEnums() {
+        return this.form.get('peerTransportEnums');
+    }
+    get qualify() {
+        return this.form.get('qualify');
     }
 }

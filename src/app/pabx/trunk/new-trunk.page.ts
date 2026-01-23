@@ -13,6 +13,7 @@ import { SelectButton } from 'primeng/selectbutton';
 import { Accordion, AccordionContent, AccordionHeader, AccordionPanel } from 'primeng/accordion';
 import { NgForOf } from '@angular/common';
 import { Tooltip } from 'primeng/tooltip';
+import { languageSelectOptions } from '@/pabx/utils';
 
 /**
  * @author Jefferson Alves Reis (jefaokpta)
@@ -318,12 +319,7 @@ export class NewTrunkPage implements OnInit {
         { label: 'INBAND', value: DtmfModeEnum.INBAND }
     ];
 
-    languageOptions = [
-        { label: 'Português', value: LanguageEnum.pt_BR },
-        { label: 'Inglês', value: LanguageEnum.en },
-        { label: 'Espanhol', value: LanguageEnum.es },
-        { label: 'Francês', value: LanguageEnum.fr }
-    ];
+    languageOptions = languageSelectOptions();
 
     get codecs() {
         return this.form.get('codecs') as FormArray;
