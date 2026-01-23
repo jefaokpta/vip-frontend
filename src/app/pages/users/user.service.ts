@@ -149,8 +149,10 @@ export class UserService {
         return executeRequest(this.http.post(`${this.BACKEND}/auth/forgot-password`, { email }, httpHeaders()));
     }
 
-    confirmUserEmail(email: string, code: string) {
-        return executeRequest(this.http.post(`${this.BACKEND}/auth/confirmation`, { email, code }, httpHeaders()));
+    confirmForgotPassword(confirmation: { email: string; code: string; password: string }) {
+        return executeRequest(
+            this.http.post(`${this.BACKEND}/auth/confirm-forgot-password`, confirmation, httpHeaders())
+        );
     }
 
     createFirstPassword(payload: { email: string; password: string }): Promise<LoginResponse> {
