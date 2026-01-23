@@ -85,6 +85,16 @@ import { UserService } from '@/pages/users/user.service';
                             <p-button fluid label="Redefinir" type="submit" [disabled]="form.invalid"></p-button>
                         </div>
 
+                        <p-button
+                            class="mt-4"
+                            fluid
+                            label="Validar Código"
+                            link
+                            size="small"
+                            outlined
+                            routerLink="/auth/verification"
+                        />
+
                         <small *ngIf="submitSuccess" class="mt-2">
                             <i class="pi pi-check text-green-600"></i>
                             Enviamos um email com instrucões para redefinir sua senha

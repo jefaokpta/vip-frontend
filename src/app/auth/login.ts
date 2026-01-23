@@ -69,8 +69,8 @@ import { UserService } from '@/pages/users/user.service';
             >
                 <div class="mb-6">
                     <div class="mb-4">
-                        <a href="https://iasmin.io/" target="_blank" class="app-logo">
-                            <p-image src="layout/images/iasmin-black.png" alt="logo iasmin" width="190rem"></p-image>
+                        <a href="https://www.vipsolutions.com.br/" target="_blank" class="app-logo">
+                            <p-image src="layout/images/vip-white.png" alt="logo vipsolutions" width="120rem"></p-image>
                         </a>
                     </div>
                     <span class="text-surface-600 dark:text-surface-200 font-medium">Entre com suas credencias</span>
