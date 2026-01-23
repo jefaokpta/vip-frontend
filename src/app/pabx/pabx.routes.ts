@@ -19,22 +19,26 @@ import { PeerPage } from '@/pabx/peer/peer.page';
 
 export default [
     { path: 'peers', component: PeerPage, data: { breadcrumb: 'Ramais' } },
-    { path: 'peers/new', component: NewPeerPage, data: { breadcrumb: 'Novo' } },
+    { path: 'peers/new', component: NewPeerPage, data: { breadcrumb: 'Ramais > Novo' } },
     { path: 'aliases', component: AliasPage, data: { breadcrumb: 'Alias de Discagem' } },
-    { path: 'aliases/new', component: NewAliasPage, data: { breadcrumb: 'Novo' } },
-    { path: 'aliases/edit/:id', component: EditAliasPage, data: { breadcrumb: 'Editar' } },
+    { path: 'aliases/new', component: NewAliasPage, data: { breadcrumb: 'Alias > Novo' } },
+    { path: 'aliases/edit/:id', component: EditAliasPage, data: { breadcrumb: 'Alias > Editar' } },
     { path: 'dialplans', component: DialplanPage, data: { breadcrumb: 'Regras de Discagem' } },
-    { path: 'dialplans/new', component: NewDialplanPage, data: { breadcrumb: 'Nova' } },
-    { path: 'dialplans/edit/:id', component: EditDialplanPage, data: { breadcrumb: 'Editar' } },
+    { path: 'dialplans/new', component: NewDialplanPage, data: { breadcrumb: 'Regras de Discagem > Nova' } },
+    { path: 'dialplans/edit/:id', component: EditDialplanPage, data: { breadcrumb: 'Regras de Discagem > Editar' } },
     { path: 'accountcodes', component: AccountCodePage, data: { breadcrumb: 'Centro de Custos' } },
-    { path: 'accountcodes/new', component: NewAccountCodePage, data: { breadcrumb: 'Novo' } },
-    { path: 'accountcodes/edit/:id', component: EditAccountCodePage, data: { breadcrumb: 'Editar' } },
+    { path: 'accountcodes/new', component: NewAccountCodePage, data: { breadcrumb: 'Centro de Custos > Novo' } },
+    {
+        path: 'accountcodes/edit/:id',
+        component: EditAccountCodePage,
+        data: { breadcrumb: 'Centro de Custos > Editar' }
+    },
     { path: 'trunks', component: TrunkPage, data: { breadcrumb: 'Troncos' } },
-    { path: 'trunks/new', component: NewTrunkPage, data: { breadcrumb: 'Novo' } },
-    { path: 'trunks/edit/:id', component: EditTrunkPage, data: { breadcrumb: 'Editar' } },
+    { path: 'trunks/new', component: NewTrunkPage, data: { breadcrumb: 'Troncos > Novo' } },
+    { path: 'trunks/edit/:id', component: EditTrunkPage, data: { breadcrumb: 'Troncos > Editar' } },
     { path: 'routes', component: RoutePage, data: { breadcrumb: 'Rotas' } },
-    { path: 'routes/new', component: NewRoutePage, data: { breadcrumb: 'Nova' } },
-    { path: 'routes/edit/:id', component: EditRoutePage, data: { breadcrumb: 'Editar' } },
+    { path: 'routes/new', component: NewRoutePage, data: { breadcrumb: 'Rotas > Nova' } },
+    { path: 'routes/edit/:id', component: EditRoutePage, data: { breadcrumb: 'Rotas > Editar' } },
 
     { path: '**', redirectTo: '/notfound' }
 ] as Routes;

@@ -6,9 +6,12 @@ import { CardModule } from 'primeng/card';
 import { NgIf } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { PeerService } from '@/pabx/peer/peer.service';
-import { LanguageEnum } from '@/pabx/types';
+import { DtmfModeEnum, LanguageEnum } from '@/pabx/types';
 import { Select } from 'primeng/select';
-import { languageSelectOptions } from '@/pabx/utils';
+import { dtmfSelectOptions, languageSelectOptions } from '@/pabx/utils';
+import { ToggleSwitch } from 'primeng/toggleswitch';
+import { InputNumber } from 'primeng/inputnumber';
+import { Accordion, AccordionContent, AccordionHeader, AccordionPanel } from 'primeng/accordion';
 
 /**
  * @author Jefferson Alves Reis (jefaokpta)
@@ -18,7 +21,21 @@ import { languageSelectOptions } from '@/pabx/utils';
 @Component({
     selector: 'app-new-peer-page',
     standalone: true,
-    imports: [InputTextModule, ButtonModule, CardModule, NgIf, ReactiveFormsModule, RouterLink, Select],
+    imports: [
+        InputTextModule,
+        ButtonModule,
+        CardModule,
+        NgIf,
+        ReactiveFormsModule,
+        RouterLink,
+        Select,
+        ToggleSwitch,
+        InputNumber,
+        Accordion,
+        AccordionContent,
+        AccordionHeader,
+        AccordionPanel
+    ],
     template: `
         <p-card>
             <ng-template #title>
@@ -81,6 +98,50 @@ import { languageSelectOptions } from '@/pabx/utils';
                     ></p-select>
                 </div>
 
+                <p-accordion>
+                    <p-accordion-panel value="0">
+                        <p-accordion-header>Configurações Avançadas</p-accordion-header>
+                        <p-accordion-content>
+                            <div class="field mb-4">
+                                <label for="dtmfMode" class="block mb-2">Tipo de DTMF *</label>
+                                <p-select
+                                    id="dtmfMode"
+                                    [options]="dtmfOptions"
+                                    formControlName="dtmfModeEnum"
+                                    optionLabel="label"
+                                    optionValue="value"
+                                    placeholder="Selecione um tipo de origem"
+                                ></p-select>
+                            </div>
+
+                            <div class="field mb-4">
+                                <label for="callLimit" class="block mb-2">Limite de Chamadas *</label>
+                                <p-input-number
+                                    id="callLimit"
+                                    mode="decimal"
+                                    useGrouping="false"
+                                    formControlName="callLimit"
+                                />
+                                @if (callLimit?.invalid && (callLimit?.dirty || callLimit?.touched)) {
+                                    <small class="p-error block mt-2">
+                                        <span class="text-red-500">Limite de chamadas é obrigatório.</span>
+                                    </small>
+                                }
+                            </div>
+
+                            <div class="field">
+                                <label for="qualify" class="block mb-2">Testar Alcance</label>
+                                <p-toggleswitch formControlName="qualify" />
+                            </div>
+
+                            <div class="field">
+                                <label for="nat" class="block mb-2">Usar NAT</label>
+                                <p-toggleswitch formControlName="nat" />
+                            </div>
+                        </p-accordion-content>
+                    </p-accordion-panel>
+                </p-accordion>
+
                 <div class="flex mt-4">
                     <p-button type="submit" label="Salvar" [disabled]="form.invalid || pending">
                         <i *ngIf="pending" class="pi pi-spin pi-spinner"></i>
@@ -98,6 +159,7 @@ export class NewPeerPage implements OnInit {
     pending = false;
     showError = false;
     languageOptions = languageSelectOptions();
+    dtmfOptions = dtmfSelectOptions();
 
     constructor(
         private readonly fb: FormBuilder,
@@ -118,10 +180,10 @@ export class NewPeerPage implements OnInit {
             ],
             language: [LanguageEnum.pt_BR, [Validators.required]],
             peerTransportEnums: ['', [Validators.required]],
-            qualify: ['', [Validators.required]],
-            nat: [false, [Validators.required]],
-            dtmfModeEnum: ['', [Validators.required]],
-            callLimit: [0, [Validators.required]]
+            qualify: [false, [Validators.required]],
+            nat: [true, [Validators.required]],
+            dtmfModeEnum: [DtmfModeEnum.RFC4733, [Validators.required]],
+            callLimit: [1, [Validators.required]]
         });
     }
 
@@ -146,13 +208,7 @@ export class NewPeerPage implements OnInit {
     get featurePassword() {
         return this.form.get('featurePassword');
     }
-    get language() {
-        return this.form.get('language');
-    }
-    get peerTransportEnums() {
-        return this.form.get('peerTransportEnums');
-    }
-    get qualify() {
-        return this.form.get('qualify');
+    get callLimit() {
+        return this.form.get('callLimit');
     }
 }

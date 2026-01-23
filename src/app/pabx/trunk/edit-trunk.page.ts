@@ -13,7 +13,7 @@ import { SelectButton } from 'primeng/selectbutton';
 import { Accordion, AccordionContent, AccordionHeader, AccordionPanel } from 'primeng/accordion';
 import { NgForOf } from '@angular/common';
 import { Tooltip } from 'primeng/tooltip';
-import { languageSelectOptions } from '@/pabx/utils';
+import { dtmfSelectOptions, languageSelectOptions } from '@/pabx/utils';
 
 /**
  * @author Jefferson Alves Reis (jefaokpta)
@@ -325,11 +325,7 @@ export class EditTrunkPage implements OnInit {
         { label: CodecEnum.GSM, value: CodecEnum.GSM }
     ];
 
-    dtmfOptions = [
-        { label: 'RFC4733', value: DtmfModeEnum.RFC4733 },
-        { label: 'INFO', value: DtmfModeEnum.INFO },
-        { label: 'INBAND', value: DtmfModeEnum.INBAND }
-    ];
+    dtmfOptions = dtmfSelectOptions();
 
     languageOptions = languageSelectOptions();
 
