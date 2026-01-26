@@ -6,12 +6,14 @@ import { CardModule } from 'primeng/card';
 import { NgIf } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { PeerService } from '@/pabx/peer/peer.service';
-import { DtmfModeEnum, LanguageEnum } from '@/pabx/types';
+import { DtmfModeEnum, LanguageEnum, PeerTransportEnum } from '@/pabx/types';
 import { Select } from 'primeng/select';
 import { dtmfSelectOptions, languageSelectOptions } from '@/pabx/utils';
 import { ToggleSwitch } from 'primeng/toggleswitch';
 import { InputNumber } from 'primeng/inputnumber';
 import { Accordion, AccordionContent, AccordionHeader, AccordionPanel } from 'primeng/accordion';
+import { Password } from 'primeng/password';
+import { SelectButton } from 'primeng/selectbutton';
 
 /**
  * @author Jefferson Alves Reis (jefaokpta)
@@ -34,7 +36,9 @@ import { Accordion, AccordionContent, AccordionHeader, AccordionPanel } from 'pr
         Accordion,
         AccordionContent,
         AccordionHeader,
-        AccordionPanel
+        AccordionPanel,
+        Password,
+        SelectButton
     ],
     template: `
         <p-card>
@@ -80,9 +84,21 @@ import { Accordion, AccordionContent, AccordionHeader, AccordionPanel } from 'pr
                         class="p-error block mt-2"
                     >
                         <div *ngIf="featurePassword?.errors?.['required']">Senha é obrigatória.</div>
-                        <div *ngIf="featurePassword?.errors?.['minlength']">Senha deve ter pelo menos 2 dígitos.</div>
+                        <div *ngIf="featurePassword?.errors?.['minlength']">Senha deve ter ao menos 2 dígitos.</div>
                         <div *ngIf="featurePassword?.errors?.['maxlength']">Senha deve ter no máximo 4 dígitos.</div>
                         <div *ngIf="featurePassword?.errors?.['pattern']">Senha deve ter apenas números.</div>
+                    </small>
+                </div>
+
+                <div class="field mb-4">
+                    <label for="md5Secret" class="block mb-2">Senha de Registro *</label>
+                    <p-password formControlName="md5Secret" [toggleMask]="true" feedback="false" />
+                    <small
+                        *ngIf="md5Secret?.invalid && (md5Secret?.dirty || md5Secret?.touched)"
+                        class="p-error block mt-2"
+                    >
+                        <div *ngIf="md5Secret?.errors?.['required']">Senha é obrigatória.</div>
+                        <div *ngIf="md5Secret?.errors?.['minlength']">Senha deve ter ao menos 2 dígitos.</div>
                     </small>
                 </div>
 
@@ -138,6 +154,23 @@ import { Accordion, AccordionContent, AccordionHeader, AccordionPanel } from 'pr
                                 <label for="nat" class="block mb-2">Usar NAT</label>
                                 <p-toggleswitch formControlName="nat" />
                             </div>
+
+                            <div class="field mb-4">
+                                <label for="peerTransportEnums" class="block mb-2">Tecnologias *</label>
+                                <p-select-button
+                                    id="peerTransportEnums"
+                                    [options]="transportsOptions"
+                                    formControlName="peerTransportEnums"
+                                    [multiple]="true"
+                                    optionLabel="label"
+                                    optionValue="value"
+                                />
+                                @if (peerTransportEnums?.invalid) {
+                                    <small class="p-error block mt-2">
+                                        <span class="text-red-500">Ao menos 1 tecnologia é obrigatória.</span>
+                                    </small>
+                                }
+                            </div>
                         </p-accordion-content>
                     </p-accordion-panel>
                 </p-accordion>
@@ -167,6 +200,8 @@ export class NewPeerPage implements OnInit {
         private readonly peerService: PeerService
     ) {}
 
+    transportsOptions = Object.values(PeerTransportEnum).map((value) => ({ label: value, value }));
+
     ngOnInit(): void {
         this.form = this.fb.group({
             name: ['', [Validators.required]],
@@ -179,24 +214,25 @@ export class NewPeerPage implements OnInit {
                 [Validators.required, Validators.minLength(2), Validators.maxLength(4), Validators.pattern('[0-9]+')]
             ],
             language: [LanguageEnum.pt_BR, [Validators.required]],
-            peerTransportEnums: ['', [Validators.required]],
+            peerTransportEnums: [[PeerTransportEnum.UDP], [Validators.required]],
             qualify: [false, [Validators.required]],
             nat: [true, [Validators.required]],
             dtmfModeEnum: [DtmfModeEnum.RFC4733, [Validators.required]],
-            callLimit: [1, [Validators.required]]
+            callLimit: [1, [Validators.required]],
+            md5Secret: ['', [Validators.required, Validators.minLength(2)]]
         });
     }
 
     onSubmit() {
         this.pending = true;
         this.showError = false;
-        console.log(this.form.value);
-        // this.peerService.create(alias)
-        //     .then(() => this.router.navigate(['/pabx/peers']))
-        //     .catch(() => {
-        //         this.showError = true;
-        //     })
-        //     .finally(() => (this.pending = false));
+        this.peerService
+            .create(this.form.value)
+            .then(() => this.router.navigate(['/pabx/peers']))
+            .catch(() => {
+                this.showError = true;
+            })
+            .finally(() => (this.pending = false));
     }
 
     get name() {
@@ -210,5 +246,11 @@ export class NewPeerPage implements OnInit {
     }
     get callLimit() {
         return this.form.get('callLimit');
+    }
+    get md5Secret() {
+        return this.form.get('md5Secret');
+    }
+    get peerTransportEnums() {
+        return this.form.get('peerTransportEnums');
     }
 }
