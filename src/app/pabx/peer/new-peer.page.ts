@@ -182,7 +182,7 @@ import { SelectButton } from 'primeng/selectbutton';
                     </p-button>
                 </div>
 
-                <small *ngIf="showError" class="text-red-500"> Erro ao salvar o ramal </small>
+                <small *ngIf="errorMessage" class="text-red-500"> {{ errorMessage }} </small>
             </form>
         </p-card>
     `
@@ -190,7 +190,7 @@ import { SelectButton } from 'primeng/selectbutton';
 export class NewPeerPage implements OnInit {
     form!: FormGroup;
     pending = false;
-    showError = false;
+    errorMessage = '';
     languageOptions = languageSelectOptions();
     dtmfOptions = dtmfSelectOptions();
 
@@ -225,14 +225,20 @@ export class NewPeerPage implements OnInit {
 
     onSubmit() {
         this.pending = true;
-        this.showError = false;
+        this.errorMessage = '';
         this.peerService
             .create(this.form.value)
             .then(() => this.router.navigate(['/pabx/peers']))
-            .catch(() => {
-                this.showError = true;
+            .catch((err) => {
+                this.errorMessage = this.handleErrorMessage(err.error?.message);
             })
             .finally(() => (this.pending = false));
+    }
+
+    private handleErrorMessage(errorMessage?: string): string {
+        if (!errorMessage) return 'Erro ao salvar o ramal.';
+        if (errorMessage.includes('Duplicate')) return `Ramal ${this.peer?.value} já existe.`;
+        return 'Erro ao salvar o ramal.';
     }
 
     get name() {
