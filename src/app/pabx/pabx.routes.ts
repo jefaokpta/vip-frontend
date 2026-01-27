@@ -16,10 +16,12 @@ import { EditRoutePage } from '@/pabx/route/edit-route.page';
 import { EditDialplanPage } from '@/pabx/dialplan/edit-dialplan/edit-dialplan.page';
 import { NewPeerPage } from '@/pabx/peer/new-peer.page';
 import { PeerPage } from '@/pabx/peer/peer.page';
+import { EditPeerPage } from '@/pabx/peer/edit-peer.page';
 
 export default [
     { path: 'peers', component: PeerPage, data: { breadcrumb: 'Ramais' } },
     { path: 'peers/new', component: NewPeerPage, data: { breadcrumb: 'Ramais > Novo' } },
+    { path: 'peers/edit/:id', component: EditPeerPage, data: { breadcrumb: 'Ramais > Editar' } },
     { path: 'aliases', component: AliasPage, data: { breadcrumb: 'Alias de Discagem' } },
     { path: 'aliases/new', component: NewAliasPage, data: { breadcrumb: 'Alias > Novo' } },
     { path: 'aliases/edit/:id', component: EditAliasPage, data: { breadcrumb: 'Alias > Editar' } },

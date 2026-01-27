@@ -22,7 +22,7 @@ export class PeerService {
         return executeRequest(this.http.post(`${this.BACKEND}/peers`, peer, httpHeaders()));
     }
 
-    findById(id: number) {
+    findById(id: string) {
         return executeRequest(this.http.get<Peer>(`${this.BACKEND}/peers/${id}`, httpHeaders()));
     }
 
