@@ -3,12 +3,12 @@
  * @email jefaokpta@hotmail.com
  * @create 5/2/25
  */
-import {Injectable, signal} from '@angular/core';
-import {UA, WebSocketInterface} from 'jssip';
-import {environment} from '../../environments/environment';
-import {PhoneState, PhoneStateEnum} from '@/types/types';
-import {RTCSession} from 'jssip/lib/RTCSession';
-import {RTCSessionEvent, UnRegisteredEvent} from 'jssip/lib/UA';
+import { Injectable, signal } from '@angular/core';
+import { UA, WebSocketInterface } from 'jssip';
+import { environment } from '../../environments/environment';
+import { PhoneState, PhoneStateEnum } from '@/types/types';
+import { RTCSession } from 'jssip/lib/RTCSession';
+import { RTCSessionEvent, UnRegisteredEvent } from 'jssip/lib/UA';
 
 @Injectable({
     providedIn: 'root'
@@ -31,6 +31,7 @@ export class WebphoneService {
         const config = {
             uri: `sip:web@${this.PABX_URL}`,
             password: `jefao123`,
+            authorization_user: 'credencial',
             sockets: [socket],
             register: true
         };
