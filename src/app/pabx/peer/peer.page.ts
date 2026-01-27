@@ -60,12 +60,16 @@ import { PeerService } from '@/pabx/peer/peer.service';
                 [value]="peers"
                 [paginator]="true"
                 [rows]="15"
-                [globalFilterFields]="['name']"
+                [globalFilterFields]="['name', 'peer']"
                 [tableStyle]="{ 'min-width': '40rem' }"
                 stripedRows
             >
                 <ng-template pTemplate="header">
                     <tr>
+                        <th pSortableColumn="peer">
+                            Ramal
+                            <p-sortIcon field="peer"></p-sortIcon>
+                        </th>
                         <th pSortableColumn="name">
                             Nome
                             <p-sortIcon field="name"></p-sortIcon>
@@ -76,6 +80,7 @@ import { PeerService } from '@/pabx/peer/peer.service';
 
                 <ng-template pTemplate="body" let-peer>
                     <tr>
+                        <td>{{ peer.peer }}</td>
                         <td>{{ peer.name }}</td>
                         <td>
                             <div class="flex gap-2">
