@@ -119,6 +119,23 @@ import { SelectButton } from 'primeng/selectbutton';
                         <p-accordion-header>Configurações Avançadas</p-accordion-header>
                         <p-accordion-content>
                             <div class="field mb-4">
+                                <label for="peerTransportEnums" class="block mb-2">Tecnologias *</label>
+                                <p-select-button
+                                    id="peerTransportEnums"
+                                    [options]="transportsOptions"
+                                    formControlName="peerTransportEnums"
+                                    [multiple]="true"
+                                    optionLabel="label"
+                                    optionValue="value"
+                                />
+                                @if (peerTransportEnums?.invalid) {
+                                    <small class="p-error block mt-2">
+                                        <span class="text-red-500">Ao menos 1 tecnologia é obrigatória.</span>
+                                    </small>
+                                }
+                            </div>
+
+                            <div class="field mb-4">
                                 <label for="dtmfMode" class="block mb-2">Tipo de DTMF *</label>
                                 <p-select
                                     id="dtmfMode"
@@ -153,23 +170,6 @@ import { SelectButton } from 'primeng/selectbutton';
                             <div class="field">
                                 <label for="nat" class="block mb-2">Usar NAT</label>
                                 <p-toggleswitch formControlName="nat" />
-                            </div>
-
-                            <div class="field mb-4">
-                                <label for="peerTransportEnums" class="block mb-2">Tecnologias *</label>
-                                <p-select-button
-                                    id="peerTransportEnums"
-                                    [options]="transportsOptions"
-                                    formControlName="peerTransportEnums"
-                                    [multiple]="true"
-                                    optionLabel="label"
-                                    optionValue="value"
-                                />
-                                @if (peerTransportEnums?.invalid) {
-                                    <small class="p-error block mt-2">
-                                        <span class="text-red-500">Ao menos 1 tecnologia é obrigatória.</span>
-                                    </small>
-                                }
                             </div>
                         </p-accordion-content>
                     </p-accordion-panel>

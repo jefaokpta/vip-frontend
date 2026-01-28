@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
@@ -91,15 +91,24 @@ import { SelectButton } from 'primeng/selectbutton';
                 </div>
 
                 <div class="field mb-4">
-                    <label for="md5Secret" class="block mb-2">Senha de Registro *</label>
-                    <p-password formControlName="md5Secret" [toggleMask]="true" feedback="false" />
-                    <small
-                        *ngIf="md5Secret?.invalid && (md5Secret?.dirty || md5Secret?.touched)"
-                        class="p-error block mt-2"
-                    >
-                        <div *ngIf="md5Secret?.errors?.['required']">Senha é obrigatória.</div>
-                        <div *ngIf="md5Secret?.errors?.['minlength']">Senha deve ter ao menos 2 dígitos.</div>
-                    </small>
+                    <label for="isShowPassword" class="block mb-2">Alterar Senha de Registro</label>
+                    <div class="flex gap-4 items-center">
+                        <p-toggleswitch formControlName="isShowPassword" (onChange)="toggleMd5Secret()" />
+                        @if (md5Secret) {
+                            <div class="field">
+                                <p-password formControlName="md5Secret" [toggleMask]="true" feedback="false" />
+                                <small
+                                    *ngIf="md5Secret?.invalid && (md5Secret?.dirty || md5Secret?.touched)"
+                                    class="p-error block mt-2"
+                                >
+                                    <div *ngIf="md5Secret?.errors?.['required']">Senha é obrigatória.</div>
+                                    <div *ngIf="md5Secret?.errors?.['minlength']">
+                                        Senha deve ter ao menos 2 dígitos.
+                                    </div>
+                                </small>
+                            </div>
+                        }
+                    </div>
                 </div>
 
                 <div class="field mb-4">
@@ -118,6 +127,23 @@ import { SelectButton } from 'primeng/selectbutton';
                     <p-accordion-panel value="0">
                         <p-accordion-header>Configurações Avançadas</p-accordion-header>
                         <p-accordion-content>
+                            <div class="field mb-4">
+                                <label for="peerTransportEnums" class="block mb-2">Tecnologias *</label>
+                                <p-select-button
+                                    id="peerTransportEnums"
+                                    [options]="transportsOptions"
+                                    formControlName="peerTransportEnums"
+                                    [multiple]="true"
+                                    optionLabel="label"
+                                    optionValue="value"
+                                />
+                                @if (peerTransportEnums?.invalid) {
+                                    <small class="p-error block mt-2">
+                                        <span class="text-red-500">Ao menos 1 tecnologia é obrigatória.</span>
+                                    </small>
+                                }
+                            </div>
+
                             <div class="field mb-4">
                                 <label for="dtmfMode" class="block mb-2">Tipo de DTMF *</label>
                                 <p-select
@@ -153,23 +179,6 @@ import { SelectButton } from 'primeng/selectbutton';
                             <div class="field">
                                 <label for="nat" class="block mb-2">Usar NAT</label>
                                 <p-toggleswitch formControlName="nat" />
-                            </div>
-
-                            <div class="field mb-4">
-                                <label for="peerTransportEnums" class="block mb-2">Tecnologias *</label>
-                                <p-select-button
-                                    id="peerTransportEnums"
-                                    [options]="transportsOptions"
-                                    formControlName="peerTransportEnums"
-                                    [multiple]="true"
-                                    optionLabel="label"
-                                    optionValue="value"
-                                />
-                                @if (peerTransportEnums?.invalid) {
-                                    <small class="p-error block mt-2">
-                                        <span class="text-red-500">Ao menos 1 tecnologia é obrigatória.</span>
-                                    </small>
-                                }
                             </div>
                         </p-accordion-content>
                     </p-accordion-panel>
@@ -220,10 +229,17 @@ export class EditPeerPage implements OnInit {
             nat: [true, [Validators.required]],
             dtmfModeEnum: [DtmfModeEnum.RFC4733, [Validators.required]],
             callLimit: [1, [Validators.required]],
-            md5Secret: ['', [Validators.required, Validators.minLength(2)]]
+            isShowPassword: [false]
         });
         const id = this.activatedRoute.snapshot.paramMap.get('id')!;
         this.peerService.findById(id).then((peer) => this.form.patchValue(peer));
+    }
+
+    toggleMd5Secret() {
+        this.form.removeControl('md5Secret');
+        if (this.isShowPassword?.value) {
+            this.form.addControl('md5Secret', new FormControl('', [Validators.required, Validators.minLength(2)]));
+        }
     }
 
     onSubmit() {
@@ -262,5 +278,8 @@ export class EditPeerPage implements OnInit {
     }
     get peerTransportEnums() {
         return this.form.get('peerTransportEnums');
+    }
+    get isShowPassword() {
+        return this.form.get('isShowPassword');
     }
 }
