@@ -214,6 +214,7 @@ export class EditPeerPage implements OnInit {
 
     ngOnInit(): void {
         this.form = this.fb.group({
+            id: [null, [Validators.required]],
             name: ['', [Validators.required]],
             peer: [
                 { value: '', disabled: true },
@@ -245,14 +246,13 @@ export class EditPeerPage implements OnInit {
     onSubmit() {
         this.pending = true;
         this.errorMessage = '';
-        console.log(this.form.value);
-        // this.peerService
-        //     .create(this.form.value)
-        //     .then(() => this.router.navigate(['/pabx/peers']))
-        //     .catch((err) => {
-        //         this.errorMessage = this.handleErrorMessage(err.error?.message);
-        //     })
-        //     .finally(() => (this.pending = false));
+        this.peerService
+            .update(this.form.value)
+            .then(() => this.router.navigate(['/pabx/peers']))
+            .catch((err) => {
+                this.errorMessage = this.handleErrorMessage(err.error?.message);
+            })
+            .finally(() => (this.pending = false));
     }
 
     private handleErrorMessage(errorMessage?: string): string {
