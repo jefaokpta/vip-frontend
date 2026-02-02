@@ -1,16 +1,16 @@
-import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
-import {Router, RouterModule} from '@angular/router';
-import {CommonModule} from '@angular/common';
-import {StyleClassModule} from 'primeng/styleclass';
-import {LayoutService} from '@/layout/service/layout.service';
-import {AppBreadcrumb} from './app.breadcrumb';
-import {InputTextModule} from 'primeng/inputtext';
-import {ButtonModule} from 'primeng/button';
-import {IconFieldModule} from 'primeng/iconfield';
-import {InputIconModule} from 'primeng/inputicon';
-import {Avatar} from 'primeng/avatar';
-import {WebphoneTopbarComponent} from '@/webphone/webphone-topbar.component';
-import {UserService} from "@/pages/users/user.service";
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Router, RouterModule } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { StyleClassModule } from 'primeng/styleclass';
+import { LayoutService } from '@/layout/service/layout.service';
+import { AppBreadcrumb } from './app.breadcrumb';
+import { InputTextModule } from 'primeng/inputtext';
+import { ButtonModule } from 'primeng/button';
+import { IconFieldModule } from 'primeng/iconfield';
+import { InputIconModule } from 'primeng/inputicon';
+import { Avatar } from 'primeng/avatar';
+import { WebphoneTopbarComponent } from '@/webphone/webphone-topbar.component';
+import { UserService } from '@/pages/users/user.service';
 
 @Component({
     selector: '[app-topbar]',
@@ -52,16 +52,9 @@ import {UserService} from "@/pages/users/user.service";
                     </p-button>
                 </li>
                 <li class="ml-3">
-                    <ng-container *ngIf="user().isExpired; else webphone">
-                        <p-button severity="secondary" outlined disabled>
-                            <i class="pi pi-phone"></i>
-                            <span class="ml-2">Indisponível</span>
-                            <i class="pi pi-circle-fill text-red-400"></i>
-                        </p-button>
-                    </ng-container>
-                    <ng-template #webphone>
+                    @if (isWebphoneActivated) {
                         <app-webphone-topbar />
-                    </ng-template>
+                    }
                 </li>
                 <li class="ml-3">
                     <p-button
@@ -87,6 +80,7 @@ import {UserService} from "@/pages/users/user.service";
 export class AppTopbar implements OnInit {
     @ViewChild('menubutton')
     menuButton!: ElementRef;
+    isWebphoneActivated = false;
 
     constructor(
         public layoutService: LayoutService,
