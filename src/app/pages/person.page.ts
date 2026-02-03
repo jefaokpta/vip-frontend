@@ -33,7 +33,7 @@ import { UserService } from '@/pages/users/user.service';
         <p-card>
             <ng-template #title>
                 <div class="flex justify-between">
-                    <span class="font-semibold text-2xl">Perfil de Usuário</span>
+                    <span class="font-semibold text-2xl">Perfil de {{ name?.value }}</span>
                 </div>
             </ng-template>
 

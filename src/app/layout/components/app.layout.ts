@@ -1,4 +1,4 @@
-import { Component, Renderer2, ViewChild } from '@angular/core';
+import { Component, OnInit, Renderer2, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { filter, Subscription } from 'rxjs';
@@ -8,11 +8,20 @@ import { LayoutService } from '@/layout/service/layout.service';
 import { AppConfigurator } from './app.configurator';
 import { AppProfileSidebar } from './app.profilesidebar';
 import { WebphoneSidebarComponent } from '@/webphone/webphone-sidebar.component';
+import { UserService } from '@/pages/users/user.service';
 
 @Component({
     selector: 'app-layout',
     standalone: true,
-    imports: [CommonModule, AppTopbar, AppSidebar, RouterModule, AppConfigurator, AppProfileSidebar, WebphoneSidebarComponent],
+    imports: [
+        CommonModule,
+        AppTopbar,
+        AppSidebar,
+        RouterModule,
+        AppConfigurator,
+        AppProfileSidebar,
+        WebphoneSidebarComponent
+    ],
     template: `<div class="layout-container" [ngClass]="containerClass">
         <div app-sidebar></div>
         <div class="layout-content-wrapper">
@@ -22,12 +31,14 @@ import { WebphoneSidebarComponent } from '@/webphone/webphone-sidebar.component'
             </div>
         </div>
         <div app-profilesidebar></div>
-        <app-webphone-sidebar />
+        @if (isWebphoneActivated) {
+            <app-webphone-sidebar />
+        }
         <app-configurator></app-configurator>
         <div class="layout-mask animate-fadein"></div>
     </div> `
 })
-export class AppLayout {
+export class AppLayout implements OnInit {
     overlayMenuOpenSubscription: Subscription;
 
     menuOutsideClickListener: any;
@@ -38,10 +49,13 @@ export class AppLayout {
 
     @ViewChild(AppTopbar) appTopBar!: AppTopbar;
 
+    isWebphoneActivated = false;
+
     constructor(
         public layoutService: LayoutService,
         public renderer: Renderer2,
-        public router: Router
+        public router: Router,
+        private readonly userService: UserService
     ) {
         this.overlayMenuOpenSubscription = this.layoutService.overlayOpen$.subscribe(() => {
             if (!this.menuOutsideClickListener) {
@@ -51,12 +65,19 @@ export class AppLayout {
                     }
                 });
             }
-            if ((this.layoutService.isHorizontal() || this.layoutService.isSlim() || this.layoutService.isSlimPlus()) && !this.menuScrollListener) {
-                this.menuScrollListener = this.renderer.listen(this.appSidebar.menuContainer.nativeElement, 'scroll', (event) => {
-                    if (this.layoutService.isDesktop()) {
-                        this.hideMenu();
+            if (
+                (this.layoutService.isHorizontal() || this.layoutService.isSlim() || this.layoutService.isSlimPlus()) &&
+                !this.menuScrollListener
+            ) {
+                this.menuScrollListener = this.renderer.listen(
+                    this.appSidebar.menuContainer.nativeElement,
+                    'scroll',
+                    (event) => {
+                        if (this.layoutService.isDesktop()) {
+                            this.hideMenu();
+                        }
                     }
-                });
+                );
             }
             if (this.layoutService.layoutState().staticMenuMobileActive) {
                 this.blockBodyScroll();
@@ -68,11 +89,22 @@ export class AppLayout {
         });
     }
 
+    ngOnInit() {
+        this.userService
+            .getWebphoneRegistration()
+            .then((registration) => (this.isWebphoneActivated = registration.peer !== null));
+    }
+
     isOutsideClicked(event: any) {
         const sidebarEl = document.querySelector('.layout-sidebar');
         const topbarButtonEl = document.querySelector('.topbar-menubutton');
 
-        return !(sidebarEl?.isSameNode(event.target) || sidebarEl?.contains(event.target) || topbarButtonEl?.isSameNode(event.target) || topbarButtonEl?.contains(event.target));
+        return !(
+            sidebarEl?.isSameNode(event.target) ||
+            sidebarEl?.contains(event.target) ||
+            topbarButtonEl?.isSameNode(event.target) ||
+            topbarButtonEl?.contains(event.target)
+        );
     }
 
     hideMenu() {
@@ -108,7 +140,10 @@ export class AppLayout {
         if (document.body.classList) {
             document.body.classList.remove('blocked-scroll');
         } else {
-            document.body.className = document.body.className.replace(new RegExp('(^|\\b)' + 'blocked-scroll'.split(' ').join('|') + '(\\b|$)', 'gi'), ' ');
+            document.body.className = document.body.className.replace(
+                new RegExp('(^|\\b)' + 'blocked-scroll'.split(' ').join('|') + '(\\b|$)', 'gi'),
+                ' '
+            );
         }
     }
 
