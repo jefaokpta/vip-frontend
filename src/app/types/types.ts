@@ -95,4 +95,9 @@ export interface Worker {
     readonly channelIds: string[],
 }
 
+export interface WebphoneRegistration {
+    readonly peer?: string;
+    readonly secret?: string;
+}
+
 

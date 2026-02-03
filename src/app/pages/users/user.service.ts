@@ -6,7 +6,7 @@
 
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
-import { LoginResponse, User } from '@/types/types';
+import { LoginResponse, User, WebphoneRegistration } from '@/types/types';
 import { Injectable, signal } from '@angular/core';
 import { executeRequest, httpHeaders } from '@/util/utils';
 import { jwtDecode } from 'jwt-decode';
@@ -127,6 +127,10 @@ export class UserService {
 
     private validateToken() {
         return executeRequest(this.http.get<{ token: string }>(`${this.BACKEND}/security/validate`, httpHeaders()));
+    }
+
+    getWebphoneRegistration(): Promise<WebphoneRegistration> {
+        return executeRequest(this.http.get<WebphoneRegistration>(`${this.BACKEND}/users/webphone`, httpHeaders()));
     }
 
     findAll(): Promise<User[]> {

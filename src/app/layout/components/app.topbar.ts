@@ -96,6 +96,9 @@ export class AppTopbar implements OnInit {
                 darkTheme: userSettings.darkMode
             }));
         }
+        this.userService
+            .getWebphoneRegistration()
+            .then((registration) => (this.isWebphoneActivated = registration.peer !== undefined));
     }
 
     get user() {
