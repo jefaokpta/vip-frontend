@@ -17,6 +17,7 @@ import { jwtDecode } from 'jwt-decode';
 export class UserService {
     private readonly user = signal(this.extractUserFromToken());
     private readonly BACKEND = environment.API_BACKEND_URL;
+    private webphoneRegister?: WebphoneRegistration;
 
     constructor(private readonly http: HttpClient) {}
 
@@ -129,8 +130,13 @@ export class UserService {
         return executeRequest(this.http.get<{ token: string }>(`${this.BACKEND}/security/validate`, httpHeaders()));
     }
 
-    getWebphoneRegistration(): Promise<WebphoneRegistration> {
-        return executeRequest(this.http.get<WebphoneRegistration>(`${this.BACKEND}/users/webphone`, httpHeaders()));
+    async getWebphoneRegistration(): Promise<WebphoneRegistration> {
+        if (this.webphoneRegister) return this.webphoneRegister;
+        const webphoneRegistration = await executeRequest(
+            this.http.get<WebphoneRegistration>(`${this.BACKEND}/users/webphone`, httpHeaders())
+        );
+        this.webphoneRegister = webphoneRegistration;
+        return webphoneRegistration;
     }
 
     findAll(): Promise<User[]> {
