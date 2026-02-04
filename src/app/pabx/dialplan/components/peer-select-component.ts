@@ -1,8 +1,10 @@
 // peer-select.component.ts
-import {Component, forwardRef, Input, OnInit} from '@angular/core';
-import {ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule} from '@angular/forms';
-import {Select} from 'primeng/select';
-import {NgIf} from '@angular/common';
+import { Component, forwardRef, Input, OnInit } from '@angular/core';
+import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
+import { Select } from 'primeng/select';
+import { NgIf } from '@angular/common';
+import { PeerService } from '@/pabx/peer/peer.service';
+import { PeerTransportEnum } from '@/pabx/types';
 
 @Component({
     selector: 'app-peer-select-component',
@@ -30,35 +32,32 @@ import {NgIf} from '@angular/common';
                 placeholder="Selecione um ramal"
                 appendTo="body"
             ></p-select>
-            <small *ngIf="showError" class="p-error block mt-2">
-                Ramal é obrigatório.
-            </small>
+            <small *ngIf="showError" class="p-error block mt-2"> Ramal é obrigatório. </small>
         </div>
     `
 })
 export class PeerSelectComponent implements ControlValueAccessor, OnInit {
     @Input() showError = false;
     @Input() isShowLabel = true;
+    @Input() isOnlyWSS = false;
 
     value: string = '';
     peerOptions: { label: string; value: string }[] = [];
 
-    private onChange: (value: string) => void = () => {
-    };
-    private onTouched: () => void = () => {
-    };
+    constructor(private readonly peerService: PeerService) {}
+
+    private onChange: (value: string) => void = () => {};
+    private onTouched: () => void = () => {};
 
     ngOnInit() {
-        // Carregue as opções de ramais do seu serviço aqui
-        this.peerOptions = [
-            {label: 'Ramal 1929', value: '1929'},
-            {label: 'Ramal 1928', value: '1928'},
-            {label: 'Ramal 1927', value: '1927'},
-            {label: 'Ramal 1926', value: '1926'},
-            {label: 'Ramal 1925', value: '1925'},
-            {label: 'Ramal 1924', value: '1924'},
-            {label: 'Ramal 1923', value: '1923'},
-        ];
+        this.peerService.findAll().then((peers) => {
+            this.peerOptions = peers.map((peer) => ({ label: `${peer.name} (${peer.peer})`, value: peer.peer }));
+            if (this.isOnlyWSS) {
+                this.peerOptions = peers
+                    .filter((peer) => peer.peerTransportEnums.includes(PeerTransportEnum.WSS))
+                    .map((peer) => ({ label: `${peer.name} (${peer.peer})`, value: peer.peer }));
+            }
+        });
     }
 
     writeValue(value: string): void {
