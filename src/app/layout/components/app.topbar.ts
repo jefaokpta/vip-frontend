@@ -92,7 +92,7 @@ import { ActivatePeerDialogComponent } from '@/layout/components/activate-peer-d
                 </ul>
             </div>
         </div>
-        <app-activate-peer [(isPeerFormDialogVisible)]="isPeerFormDialogVisible" /> `
+        <app-activate-peer-dialog-component [(isPeerFormDialogVisible)]="isPeerFormDialogVisible" /> `
 })
 export class AppTopbar implements OnInit {
     @ViewChild('menubutton')
