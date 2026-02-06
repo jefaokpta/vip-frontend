@@ -1,4 +1,4 @@
-import { Component, OnInit, Renderer2, ViewChild } from '@angular/core';
+import { Component, Renderer2, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { filter, Subscription } from 'rxjs';
@@ -31,14 +31,14 @@ import { UserService } from '@/pages/users/user.service';
             </div>
         </div>
         <div app-profilesidebar></div>
-        @if (isWebphoneActivated) {
+        @if (isWebphoneActivated()) {
             <app-webphone-sidebar />
         }
         <app-configurator></app-configurator>
         <div class="layout-mask animate-fadein"></div>
     </div> `
 })
-export class AppLayout implements OnInit {
+export class AppLayout {
     overlayMenuOpenSubscription: Subscription;
 
     menuOutsideClickListener: any;
@@ -48,8 +48,6 @@ export class AppLayout implements OnInit {
     @ViewChild(AppSidebar) appSidebar!: AppSidebar;
 
     @ViewChild(AppTopbar) appTopBar!: AppTopbar;
-
-    isWebphoneActivated = false;
 
     constructor(
         public layoutService: LayoutService,
@@ -89,10 +87,8 @@ export class AppLayout implements OnInit {
         });
     }
 
-    ngOnInit() {
-        this.userService
-            .getWebphoneRegistration()
-            .then((registration) => (this.isWebphoneActivated = registration.peer !== null));
+    get isWebphoneActivated() {
+        return this.userService.isWebphoneActivatedSignal();
     }
 
     isOutsideClicked(event: any) {

@@ -1,10 +1,10 @@
-import {Component, computed} from '@angular/core';
-import {ButtonModule} from 'primeng/button';
-import {DrawerModule} from 'primeng/drawer';
-import {BadgeModule} from 'primeng/badge';
-import {LayoutService} from '@/layout/service/layout.service';
-import {RouterLink} from '@angular/router';
-import {UserService} from "@/pages/users/user.service";
+import { Component, computed } from '@angular/core';
+import { ButtonModule } from 'primeng/button';
+import { DrawerModule } from 'primeng/drawer';
+import { BadgeModule } from 'primeng/badge';
+import { LayoutService } from '@/layout/service/layout.service';
+import { RouterLink } from '@angular/router';
+import { UserService } from '@/pages/users/user.service';
 
 @Component({
     selector: '[app-profilesidebar]',
@@ -75,7 +75,7 @@ export class AppProfileSidebar {
 
     visible = computed(() => this.layoutService.layoutState().profileSidebarVisible);
     get user() {
-        return this.userService.getUserReactive();
+        return this.userService.getUserSignal();
     }
 
     onDrawerHide() {

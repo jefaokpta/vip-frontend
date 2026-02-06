@@ -62,7 +62,7 @@ import { ActivatePeerDialogComponent } from '@/layout/components/activate-peer-d
                         </p-button>
                     </li>
                     <li class="ml-3">
-                        @if (isWebphoneActivated) {
+                        @if (isWebphoneActivated()) {
                             <app-webphone-topbar />
                         } @else {
                             <p-button severity="secondary" outlined (onClick)="isPeerFormDialogVisible = true">
@@ -97,7 +97,6 @@ import { ActivatePeerDialogComponent } from '@/layout/components/activate-peer-d
 export class AppTopbar implements OnInit {
     @ViewChild('menubutton')
     menuButton!: ElementRef;
-    isWebphoneActivated = false; //TODO: transformar em signal
     isPeerFormDialogVisible = false;
 
     constructor(
@@ -114,13 +113,14 @@ export class AppTopbar implements OnInit {
                 darkTheme: userSettings.darkMode
             }));
         }
-        this.userService
-            .getWebphoneRegistration()
-            .then((registration) => (this.isWebphoneActivated = registration.peer !== null));
     }
 
     get user() {
-        return this.userService.getUserReactive();
+        return this.userService.getUserSignal();
+    }
+
+    get isWebphoneActivated() {
+        return this.userService.isWebphoneActivatedSignal();
     }
 
     exitManagingCompany() {

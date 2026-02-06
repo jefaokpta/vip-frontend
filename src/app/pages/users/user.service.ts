@@ -7,7 +7,7 @@
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { LoginResponse, User, WebphoneRegistration } from '@/types/types';
-import { Injectable, signal } from '@angular/core';
+import { computed, Injectable, signal } from '@angular/core';
 import { executeRequest, httpHeaders } from '@/util/utils';
 import { jwtDecode } from 'jwt-decode';
 
@@ -17,12 +17,19 @@ import { jwtDecode } from 'jwt-decode';
 export class UserService {
     private readonly user = signal(this.extractUserFromToken());
     private readonly BACKEND = environment.API_BACKEND_URL;
-    private webphoneRegister?: WebphoneRegistration;
+    private readonly webphoneRegister = signal<WebphoneRegistration>({});
+    private readonly isWebphoneActivated = computed(() => !!this.webphoneRegister().peer);
 
-    constructor(private readonly http: HttpClient) {}
+    constructor(private readonly http: HttpClient) {
+        this.getWebphoneRegistration();
+    }
 
-    getUserReactive() {
+    getUserSignal() {
         return this.user.asReadonly();
+    }
+
+    isWebphoneActivatedSignal() {
+        return this.isWebphoneActivated;
     }
 
     getUser() {
@@ -130,13 +137,14 @@ export class UserService {
         return executeRequest(this.http.get<{ token: string }>(`${this.BACKEND}/security/validate`, httpHeaders()));
     }
 
-    async getWebphoneRegistration(): Promise<WebphoneRegistration> {
-        if (this.webphoneRegister) return this.webphoneRegister;
-        const webphoneRegistration = await executeRequest(
-            this.http.get<WebphoneRegistration>(`${this.BACKEND}/users/webphone`, httpHeaders())
+    private getWebphoneRegistration() {
+        executeRequest(this.http.get<WebphoneRegistration>(`${this.BACKEND}/users/webphone`, httpHeaders())).then(
+            (response) => this.webphoneRegister.set(response)
         );
-        this.webphoneRegister = webphoneRegistration;
-        return webphoneRegistration;
+    }
+
+    setWebphoneRegistration(webphoneRegistration: WebphoneRegistration) {
+        this.webphoneRegister.set(webphoneRegistration);
     }
 
     findAll(): Promise<User[]> {
