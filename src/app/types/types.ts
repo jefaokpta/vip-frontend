@@ -97,7 +97,7 @@ export interface Worker {
 
 export interface WebphoneRegistration {
     readonly peer?: string;
-    readonly secret?: string;
+    readonly peerSecret?: string;
 }
 
 

@@ -9,6 +9,7 @@ import { environment } from '../../environments/environment';
 import { PhoneState, PhoneStateEnum } from '@/types/types';
 import { RTCSession } from 'jssip/lib/RTCSession';
 import { RTCSessionEvent, UnRegisteredEvent } from 'jssip/lib/UA';
+import { UserService } from '@/pages/users/user.service';
 
 @Injectable({
     providedIn: 'root'
@@ -26,12 +27,13 @@ export class WebphoneService {
     }
     readonly phoneState$ = this.phoneState.asReadonly();
 
-    constructor() {
+    constructor(private readonly userService: UserService) {
+        const user = this.userService.getWebphoneRegisterSignal();
         const socket = new WebSocketInterface(`wss://${this.PABX_URL}:8089/ws`);
         const config = {
-            uri: `sip:web@${this.PABX_URL}`,
-            password: `jefao123`,
-            authorization_user: 'credencial',
+            uri: `sip:${user.peer}_WSS@${this.PABX_URL}`,
+            password: user.peerSecret,
+            authorization_user: user.peer,
             sockets: [socket],
             register: true
         };

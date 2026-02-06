@@ -32,6 +32,10 @@ export class UserService {
         return this.isWebphoneActivated;
     }
 
+    getWebphoneRegisterSignal(): WebphoneRegistration {
+        return this.webphoneRegister();
+    }
+
     getUser() {
         return this.extractUserFromToken();
     }
