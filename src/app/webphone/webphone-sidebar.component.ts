@@ -1,23 +1,35 @@
-import {Component, computed} from '@angular/core';
-import {ButtonModule} from 'primeng/button';
-import {DrawerModule} from 'primeng/drawer';
-import {BadgeModule} from 'primeng/badge';
-import {LayoutService} from '@/layout/service/layout.service';
-import {Card} from 'primeng/card';
-import {InputTextModule} from 'primeng/inputtext';
-import {FormsModule} from '@angular/forms';
-import {WebphoneService} from '@/webphone/webphone.service';
-import {NgClass, NgIf} from '@angular/common';
-import {TableModule} from 'primeng/table';
-import {telephoneFormat} from './utils';
-import {handleCalleId} from '@/webphone/utils';
-import {Cdr, UserFieldEnum} from "@/pabx/types";
-import {User} from "@/types/types";
-import {UserService} from "@/pages/users/user.service";
+import { Component, computed } from '@angular/core';
+import { ButtonModule } from 'primeng/button';
+import { DrawerModule } from 'primeng/drawer';
+import { BadgeModule } from 'primeng/badge';
+import { LayoutService } from '@/layout/service/layout.service';
+import { Card } from 'primeng/card';
+import { InputTextModule } from 'primeng/inputtext';
+import { FormsModule } from '@angular/forms';
+import { WebphoneService } from '@/webphone/webphone.service';
+import { NgClass, NgIf } from '@angular/common';
+import { TableModule } from 'primeng/table';
+import { telephoneFormat } from './utils';
+import { handleCalleId } from '@/webphone/utils';
+import { Cdr, UserFieldEnum } from '@/pabx/types';
+import { User } from '@/types/types';
+import { UserService } from '@/pages/users/user.service';
+import { SplitButton } from 'primeng/splitbutton';
 
 @Component({
     selector: 'app-webphone-sidebar',
-    imports: [ButtonModule, DrawerModule, BadgeModule, Card, InputTextModule, FormsModule, NgIf, TableModule, NgClass],
+    imports: [
+        ButtonModule,
+        DrawerModule,
+        BadgeModule,
+        Card,
+        InputTextModule,
+        FormsModule,
+        NgIf,
+        TableModule,
+        NgClass,
+        SplitButton
+    ],
     template: `
         <p-drawer
             [visible]="visible()"
@@ -26,23 +38,36 @@ import {UserService} from "@/pages/users/user.service";
             [transitionOptions]="'.3s cubic-bezier(0, 0, 0.2, 1)'"
             styleClass="!w-full md:!w-80 lg:!w-[30rem]"
         >
+            <div class="flex justify-end mb-2">
+                <p-split-button size="small" icon="pi pi-cog" dropdownIcon="pi pi-angle-down" outlined />
+            </div>
             <p-card class="text-center">
-                <ng-template #header>
-                    <p class="text-xl font-semibold">Telefone</p>
-                </ng-template>
                 <div class="mb-2">
                     <p>{{ phoneStatus().state }}</p>
                     <p>{{ telephoneFormat(handleCalleId(phoneStatus().session?.remote_identity?.uri?.user)) }}</p>
                     <p *ngIf="phoneStatus().session">{{ timer }}</p>
                 </div>
-                <input *ngIf="!phoneStatus().session" type="text" pInputText [(ngModel)]="telephoneNumber" (keydown.enter)="dial()" />
+                <input
+                    *ngIf="!phoneStatus().session"
+                    type="text"
+                    pInputText
+                    [(ngModel)]="telephoneNumber"
+                    (keydown.enter)="dial()"
+                />
                 <div class="flex mt-4 justify-center">
                     <ng-container *ngIf="!phoneStatus().session; else hasSession">
                         <p-button icon="pi pi-phone" severity="success" (click)="dial()" rounded outlined />
                     </ng-container>
                     <ng-template #hasSession>
                         <p-button icon="pi pi-phone" severity="danger" (click)="hangup()" rounded outlined />
-                        <p-button class="ml-4" icon="pi pi-calculator" severity="secondary" (click)="toogleDialpad()" rounded outlined />
+                        <p-button
+                            class="ml-4"
+                            icon="pi pi-calculator"
+                            severity="secondary"
+                            (click)="toogleDialpad()"
+                            rounded
+                            outlined
+                        />
                         <p-button
                             class="ml-4"
                             icon="pi pi-microphone"
@@ -54,7 +79,10 @@ import {UserService} from "@/pages/users/user.service";
                         />
                     </ng-template>
                 </div>
-                <div *ngIf="dialpadVisible && phoneStatus().session" class="flex flex-col mt-4 items-center transition-colors duration-150">
+                <div
+                    *ngIf="dialpadVisible && phoneStatus().session"
+                    class="flex flex-col mt-4 items-center transition-colors duration-150"
+                >
                     <div class="flex">
                         <p-button (click)="sendDTMF('1')" severity="secondary" rounded outlined>
                             <span class="w-4">1</span>
@@ -119,17 +147,27 @@ import {UserService} from "@/pages/users/user.service";
                         <ng-template pTemplate="body" let-cdr>
                             <tr>
                                 <div class="flex items-center gap-2">
-                                    <i *ngIf="cdr.userfield === UserFieldEnum.UPLOAD" class="pi pi-upload text-blue-500" title="Upload"></i>
+                                    <i
+                                        *ngIf="cdr.userfield === UserFieldEnum.UPLOAD"
+                                        class="pi pi-upload text-blue-500"
+                                        title="Upload"
+                                    ></i>
                                     <i
                                         *ngIf="cdr.userfield === UserFieldEnum.OUTBOUND"
                                         class="pi pi-arrow-up"
-                                        [ngClass]="{ 'text-green-500': cdr.disposition == 'ANSWERED', 'text-red-500': cdr.disposition != 'ANSWERED' }"
+                                        [ngClass]="{
+                                            'text-green-500': cdr.disposition == 'ANSWERED',
+                                            'text-red-500': cdr.disposition != 'ANSWERED'
+                                        }"
                                         title="Saída"
                                     ></i>
                                     <i
                                         *ngIf="cdr.userfield === UserFieldEnum.INBOUND"
                                         class="pi pi-arrow-down"
-                                        [ngClass]="{ 'text-green-500': cdr.disposition == 'ANSWERED', 'text-red-500': cdr.disposition != 'ANSWERED' }"
+                                        [ngClass]="{
+                                            'text-green-500': cdr.disposition == 'ANSWERED',
+                                            'text-red-500': cdr.disposition != 'ANSWERED'
+                                        }"
                                         title="Entrada"
                                     ></i>
                                     <p-button
@@ -152,14 +190,14 @@ export class WebphoneSidebarComponent {
     telephoneNumber?: string = undefined;
     dialpadVisible = false;
     cdrs: Cdr[] = [];
-    user: User
+    user: User;
 
     constructor(
         public layoutService: LayoutService,
         private readonly webphoneService: WebphoneService,
         private readonly userService: UserService
     ) {
-        this.user = this.userService.getUser()
+        this.user = this.userService.getUser();
     }
 
     get phoneStatus() {
@@ -210,7 +248,9 @@ export class WebphoneSidebarComponent {
         return uniqueDestinations.map((destination) =>
             cdrs
                 .filter((cdr) => cdr.destination === destination)
-                .reduce((latest, current) => (new Date(latest.startTime) > new Date(current.startTime) ? latest : current))
+                .reduce((latest, current) =>
+                    new Date(latest.startTime) > new Date(current.startTime) ? latest : current
+                )
         );
     }
 

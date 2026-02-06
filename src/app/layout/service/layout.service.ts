@@ -41,7 +41,7 @@ export class LayoutService {
     _config: layoutConfig = {
         ripple: false,
         preset: 'Aura',
-        primary: 'orange',
+        primary: 'teal',
         inputStyle: 'outlined',
         surface: null,
         darkTheme: false,
@@ -97,7 +97,11 @@ export class LayoutService {
 
     isSidebarStateChanged = computed(() => {
         const layoutConfig = this.layoutConfig();
-        return layoutConfig.menuMode === 'horizontal' || layoutConfig.menuMode === 'slim' || layoutConfig.menuMode === 'slim-plus';
+        return (
+            layoutConfig.menuMode === 'horizontal' ||
+            layoutConfig.menuMode === 'slim' ||
+            layoutConfig.menuMode === 'slim-plus'
+        );
     });
 
     private initialized = false;
@@ -175,9 +179,15 @@ export class LayoutService {
         }
 
         if (this.isDesktop()) {
-            this.layoutState.update((prev) => ({ ...prev, staticMenuDesktopInactive: !this.layoutState().staticMenuDesktopInactive }));
+            this.layoutState.update((prev) => ({
+                ...prev,
+                staticMenuDesktopInactive: !this.layoutState().staticMenuDesktopInactive
+            }));
         } else {
-            this.layoutState.update((prev) => ({ ...prev, staticMenuMobileActive: !this.layoutState().staticMenuMobileActive }));
+            this.layoutState.update((prev) => ({
+                ...prev,
+                staticMenuMobileActive: !this.layoutState().staticMenuMobileActive
+            }));
 
             if (this.layoutState().staticMenuMobileActive) {
                 this.overlayOpen.next(null);
