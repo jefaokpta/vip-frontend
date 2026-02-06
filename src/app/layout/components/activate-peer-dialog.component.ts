@@ -5,15 +5,17 @@ import { NgIf } from '@angular/common';
 import { PeerSelectComponent } from '@/pabx/dialplan/components/peer-select-component';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Password } from 'primeng/password';
+import { UserService } from '@/pages/users/user.service';
+import { Message } from 'primeng/message';
 
 @Component({
     selector: 'app-activate-peer-dialog-component',
     standalone: true,
-    imports: [Button, Dialog, NgIf, PeerSelectComponent, ReactiveFormsModule, Password],
+    imports: [Button, Dialog, NgIf, PeerSelectComponent, ReactiveFormsModule, Password, Message],
     template: `
         <ng-container *ngIf="isPeerFormDialogVisible">
             <p-dialog header="Ative seu ramal" [visible]="true" [modal]="true" [closable]="false">
-                <form [formGroup]="form" (submit)="submit()" class="p-fluid">
+                <form [formGroup]="form" (submit)="onSubmit()" class="p-fluid">
                     <div class="field mb-4">
                         <app-peer-select-component formControlName="peer" [isOnlyWSS]="true" [showError]="true" />
                     </div>
@@ -28,9 +30,20 @@ import { Password } from 'primeng/password';
                         </small>
                     </div>
                     <div class="flex justify-end">
-                        <p-button label="Salvar" icon="fa fa-save" class="mr-2" [disabled]="form.invalid"></p-button>
+                        <p-button
+                            label="Salvar"
+                            type="submit"
+                            icon="fa fa-save"
+                            class="mr-2"
+                            [disabled]="form.invalid"
+                        ></p-button>
                         <p-button label="Cancelar" (click)="closePeerFormDialog()" class="p-button-outlined"></p-button>
                     </div>
+                    @if (errorMessages) {
+                        <div class="mt-2">
+                            <p-message size="small" severity="error" text="{{ errorMessages }}"></p-message>
+                        </div>
+                    }
                 </form>
             </p-dialog>
         </ng-container>
@@ -40,10 +53,15 @@ export class ActivatePeerDialogComponent implements OnInit {
     form!: FormGroup;
     @Input() isPeerFormDialogVisible = false;
     @Output() isPeerFormDialogVisibleChange = new EventEmitter<boolean>();
+    errorMessages?: string = undefined;
 
-    constructor(private readonly fb: FormBuilder) {}
+    constructor(
+        private readonly fb: FormBuilder,
+        private readonly usersService: UserService
+    ) {}
 
     ngOnInit(): void {
+        this.errorMessages = undefined;
         this.form = this.fb.group({
             peer: ['', [Validators.required]],
             peerSecret: ['', [Validators.required]]
@@ -58,8 +76,15 @@ export class ActivatePeerDialogComponent implements OnInit {
         this.isPeerFormDialogVisibleChange.emit(false);
     }
 
-    submit() {
-        console.log(this.form.value);
+    onSubmit() {
+        this.usersService
+            .updateWebphoneRegistration(this.form.value)
+            .then(() => {
+                this.closePeerFormDialog();
+            })
+            .catch((e) => {
+                this.errorMessages = e.error.message;
+            });
     }
 
     get peerSecret() {

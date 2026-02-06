@@ -174,4 +174,8 @@ export class UserService {
     delete(id: number) {
         return executeRequest(this.http.delete(`${this.BACKEND}/users/${id}`, httpHeaders()));
     }
+
+    updateWebphoneRegistration(webphoneRegistration: WebphoneRegistration) {
+        return executeRequest(this.http.put(`${this.BACKEND}/users/webphone`, webphoneRegistration, httpHeaders()));
+    }
 }
