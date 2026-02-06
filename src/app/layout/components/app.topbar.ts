@@ -97,7 +97,7 @@ import { ActivatePeerDialogComponent } from '@/layout/components/activate-peer-d
 export class AppTopbar implements OnInit {
     @ViewChild('menubutton')
     menuButton!: ElementRef;
-    isWebphoneActivated = false;
+    isWebphoneActivated = false; //TODO: transformar em signal
     isPeerFormDialogVisible = false;
 
     constructor(
