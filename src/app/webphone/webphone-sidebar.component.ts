@@ -12,7 +12,7 @@ import { TableModule } from 'primeng/table';
 import { telephoneFormat } from './utils';
 import { handleCalleId } from '@/webphone/utils';
 import { Cdr, UserFieldEnum } from '@/pabx/types';
-import { User } from '@/types/types';
+import { User, WebphoneRegistration } from '@/types/types';
 import { UserService } from '@/pages/users/user.service';
 import { SplitButton } from 'primeng/splitbutton';
 
@@ -39,7 +39,14 @@ import { SplitButton } from 'primeng/splitbutton';
             styleClass="!w-full md:!w-80 lg:!w-[30rem]"
         >
             <div class="flex justify-end mb-2">
-                <p-split-button size="small" icon="pi pi-cog" dropdownIcon="pi pi-angle-down" outlined />
+                <p-split-button
+                    size="small"
+                    [label]="buttonLabel"
+                    icon="pi pi-phone"
+                    [model]="menuItems"
+                    dropdownIcon="pi pi-angle-down"
+                    outlined
+                />
             </div>
             <p-card class="text-center">
                 <div class="mb-2">
@@ -191,6 +198,16 @@ export class WebphoneSidebarComponent {
     dialpadVisible = false;
     cdrs: Cdr[] = [];
     user: User;
+    wr: WebphoneRegistration;
+    menuItems = [
+        {
+            label: 'Desativar Ramal',
+            icon: 'pi pi-power-off',
+            command: () => {
+                this.deactivatePeer();
+            }
+        }
+    ];
 
     constructor(
         public layoutService: LayoutService,
@@ -198,6 +215,15 @@ export class WebphoneSidebarComponent {
         private readonly userService: UserService
     ) {
         this.user = this.userService.getUser();
+        this.wr = this.userService.getWebphoneRegisterSignal();
+    }
+
+    deactivatePeer() {
+        this.userService.deactivateWebphoneRegistration().then(() => this.userService.setWebphoneRegistration({}));
+    }
+
+    get buttonLabel() {
+        return `${this.wr.name} (${this.wr.peer?.split('_')[0]})`;
     }
 
     get phoneStatus() {

@@ -151,6 +151,14 @@ export class UserService {
         this.webphoneRegister.set(webphoneRegistration);
     }
 
+    updateWebphoneRegistration(webphoneRegistration: WebphoneRegistration) {
+        return executeRequest(this.http.put(`${this.BACKEND}/users/webphone`, webphoneRegistration, httpHeaders()));
+    }
+
+    deactivateWebphoneRegistration() {
+        return executeRequest(this.http.delete(`${this.BACKEND}/users/webphone`, httpHeaders()));
+    }
+
     findAll(): Promise<User[]> {
         return executeRequest(this.http.get<User[]>(`${this.BACKEND}/users`, httpHeaders()));
     }
@@ -185,9 +193,5 @@ export class UserService {
 
     delete(id: number) {
         return executeRequest(this.http.delete(`${this.BACKEND}/users/${id}`, httpHeaders()));
-    }
-
-    updateWebphoneRegistration(webphoneRegistration: WebphoneRegistration) {
-        return executeRequest(this.http.put(`${this.BACKEND}/users/webphone`, webphoneRegistration, httpHeaders()));
     }
 }

@@ -96,6 +96,8 @@ export interface Worker {
 }
 
 export interface WebphoneRegistration {
+    readonly id?: string;
+    readonly name?: string;
     readonly peer?: string;
     readonly peerSecret?: string;
 }
