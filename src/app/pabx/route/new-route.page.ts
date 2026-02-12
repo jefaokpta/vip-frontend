@@ -173,11 +173,11 @@ export class NewRoutePage implements OnInit {
             })
         );
         this.trunkService.findAll().then((trunks) => {
-            this.trunkOptions = trunks.map((trunk) => ({ label: trunk.name, value: trunk.username }));
+            this.trunkOptions = trunks.map((trunk) => ({ label: trunk.name, value: trunk.id }));
         });
     }
 
-    trunkOptions: { label: string; value: string }[] = [];
+    trunkOptions: { label: string; value: number }[] = [];
 
     private addRouteTrunk(accountCode: string) {
         const routeTrunkRow = this.fb.group({

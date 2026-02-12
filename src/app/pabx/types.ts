@@ -190,9 +190,9 @@ export interface ExtraConfig {
 }
 export interface RouteTrunk {
     readonly accountCode: string;
-    readonly trunk1: string;
-    readonly trunk2: string;
-    readonly trunk3: string;
+    readonly trunk1: number;
+    readonly trunk2: number;
+    readonly trunk3: number;
 }
 
 export interface Route {
