@@ -132,6 +132,7 @@ export class EditDialplanPage implements OnInit {
             actions: this.fb.array([], [Validators.required])
         });
         this.dialPlanService.findById(this.id).then((dialplan) => {
+            //TODO: dst == null tem alias
             this.form.patchValue(dialplan);
             this.manageSrcValue(dialplan);
             this.loadActions(dialplan.actions);
@@ -189,7 +190,6 @@ export class EditDialplanPage implements OnInit {
         this.showError = false;
         const dialplan = this.form.value;
         dialplan.actions = this.actions.value.map((action: any, index: any) => ({ ...action, priority: index }));
-        console.log(dialplan.actions);
         this.dialPlanService
             .update(dialplan)
             .then(() => this.router.navigate(['/pabx/dialplans']))
