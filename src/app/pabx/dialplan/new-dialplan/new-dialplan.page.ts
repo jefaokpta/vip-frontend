@@ -167,7 +167,7 @@ export class NewDialplanPage implements OnInit {
             .finally(() => (this.pending = false));
     }
 
-    protected isDstUsingAlias(event: any) {
+    protected toggleDstAlias(event: any) {
         if (event.checked) {
             this.form.removeControl('dst');
             this.form.addControl('dstAlias', this.fb.control('', [Validators.required]));

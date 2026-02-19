@@ -20,6 +20,7 @@ import { HangupActionComponent } from '@/pabx/dialplan/components/hangup-action-
 import { PlaybackActionComponent } from '@/pabx/dialplan/components/playback-action.component';
 import { VariableActionComponent } from '@/pabx/dialplan/components/variable-action.component';
 import { AccountCodeActionComponent } from '@/pabx/dialplan/components/accountcode-action.component';
+import { isNumber } from 'chart.js/helpers';
 
 /**
  * @author Jefferson Alves Reis (jefaokpta)
@@ -132,9 +133,9 @@ export class EditDialplanPage implements OnInit {
             actions: this.fb.array([], [Validators.required])
         });
         this.dialPlanService.findById(this.id).then((dialplan) => {
-            //TODO: dst == null tem alias
             this.form.patchValue(dialplan);
             this.manageSrcValue(dialplan);
+            this.manageDstValue(dialplan);
             this.loadActions(dialplan.actions);
         });
     }
@@ -199,7 +200,18 @@ export class EditDialplanPage implements OnInit {
             .finally(() => (this.pending = false));
     }
 
-    protected isDstUsingAlias(event: any) {
+    private manageDstValue(dialplan: DialPlan) {
+        if (isNumber(dialplan.dstAlias)) {
+            this.form.removeControl('dst');
+            this.form.addControl('dstAlias', this.fb.control(dialplan.dstAlias.toString(), [Validators.required]));
+            this.dstToggle?.setValue(true);
+        } else {
+            this.form.removeControl('dstAlias');
+            this.form.addControl('dst', this.fb.control(dialplan.dst, [Validators.required]));
+        }
+    }
+
+    protected toggleDstAlias(event: any) {
         if (event.checked) {
             this.form.removeControl('dst');
             this.form.addControl('dstAlias', this.fb.control('', [Validators.required]));
