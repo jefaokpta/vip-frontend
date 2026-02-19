@@ -180,6 +180,10 @@ export class EditDialplanPage implements OnInit {
         this.actions.removeAt(index);
     }
 
+    onRowReorder(_event: any) {
+        this.actions.updateValueAndValidity();
+    }
+
     onSubmit() {
         this.pending = true;
         this.showError = false;

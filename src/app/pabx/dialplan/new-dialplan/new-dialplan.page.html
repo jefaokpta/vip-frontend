@@ -130,7 +130,8 @@
                 </div>
 
                 <div class="flex flex-col gap-2" formArrayName="actions">
-                    <p-table [value]="actions.controls" [tableStyle]="{'min-width': '50rem'}">
+                    <p-table [value]="actions.controls" (onRowReorder)="onRowReorder($event)"
+                             [tableStyle]="{'min-width': '50rem'}">
                         <ng-template #header>
                             <tr>
                                 <th style="width: 1rem"></th>
@@ -150,9 +151,6 @@
                                             (flagsChange)="action.get('arg2').setValue($event)"
                                             [showError]="action.get('arg1').errors?.['required']"
                                         ></app-peer-action-component>
-                                    </ng-container>
-                                    <ng-container *ngIf="action.get('actionEnum').value == 'DIAL_AGENT'">
-                                        <app-agent-action-component formControlName="arg1"/>
                                     </ng-container>
                                     <ng-container *ngIf="action.get('actionEnum').value == 'ACCOUNT_CODE'">
                                         <app-account-code-action-component
