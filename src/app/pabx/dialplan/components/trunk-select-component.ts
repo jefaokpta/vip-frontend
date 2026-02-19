@@ -1,7 +1,8 @@
-import {Component, forwardRef, Input, OnInit} from '@angular/core';
-import {ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule} from '@angular/forms';
-import {Select} from 'primeng/select';
-import {NgIf} from '@angular/common';
+import { Component, forwardRef, Input, OnInit } from '@angular/core';
+import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
+import { Select } from 'primeng/select';
+import { NgIf } from '@angular/common';
+import { TrunkService } from '@/pabx/trunk/trunk.service';
 
 @Component({
     selector: 'app-trunk-select-component',
@@ -26,9 +27,7 @@ import {NgIf} from '@angular/common';
                 optionValue="value"
                 placeholder="Selecione um tronco"
             ></p-select>
-            <small *ngIf="showError" class="p-error block mt-2">
-                Tronco é obrigatório.
-            </small>
+            <small *ngIf="showError" class="p-error block mt-2"> Tronco é obrigatório. </small>
         </div>
     `
 })
@@ -37,21 +36,17 @@ export class TrunkSelectComponent implements ControlValueAccessor, OnInit {
     value: string = '';
     trunkOptions: { label: string; value: string }[] = [];
 
-    constructor() {
-    }
+    constructor(private readonly trunkService: TrunkService) {}
 
     ngOnInit() {
-        this.trunkOptions = [
-            {label: 'Jupiter', value: '1'},
-            {label: 'Tronco 2', value: '2'}
-        ];
+        this.trunkService.findAll().then((trunks) => {
+            this.trunkOptions = trunks.map((trunk) => ({ label: trunk.name, value: trunk.id.toString() }));
+        });
     }
 
-    private onChange: (value: string) => void = () => {
-    };
+    private onChange: (value: string) => void = () => {};
 
-    private onTouched: () => void = () => {
-    };
+    private onTouched: () => void = () => {};
 
     writeValue(value: string): void {
         this.value = value;
