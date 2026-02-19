@@ -55,12 +55,6 @@
                         [showError]="srcValue?.errors?.['required']"
                     ></app-peer-select-component>
 
-                    <app-agent-select-component
-                        *ngIf="srcEnum?.value == 'AGENT'"
-                        formControlName="srcValue"
-                        [showError]="srcValue?.errors?.['required']"
-                    ></app-agent-select-component>
-
                     <app-alias-select-component
                         *ngIf="srcEnum?.value == 'ALIAS'"
                         formControlName="srcValue"

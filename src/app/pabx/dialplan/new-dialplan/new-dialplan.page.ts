@@ -8,7 +8,6 @@ import { Router, RouterLink } from '@angular/router';
 import { DialPlanService } from '../dial-plan.service';
 import { DialPlanActionEnum, SrcEnum } from '@/pabx/types';
 import { Select } from 'primeng/select';
-import { AgentSelectComponent } from '@/pabx/dialplan/components/agent-select-component';
 import { PeerSelectComponent } from '@/pabx/dialplan/components/peer-select-component';
 import { AliasSelectComponent } from '@/pabx/dialplan/components/alias-select-component';
 import { TrunkSelectComponent } from '@/pabx/dialplan/components/trunk-select-component';
@@ -16,7 +15,6 @@ import { ToggleSwitch } from 'primeng/toggleswitch';
 import { TableModule } from 'primeng/table';
 import { PeerActionComponent } from '@/pabx/dialplan/components/peer-action.component';
 import { RouteActionComponent } from '@/pabx/dialplan/components/route-action.component';
-import { AgentActionComponent } from '@/pabx/dialplan/components/agent-action.component';
 import { AnswerActionComponent } from '@/pabx/dialplan/components/answer-action-component';
 import { HangupActionComponent } from '@/pabx/dialplan/components/hangup-action-component';
 import { PlaybackActionComponent } from '@/pabx/dialplan/components/playback-action.component';
@@ -39,7 +37,6 @@ import { AccountCodeActionComponent } from '@/pabx/dialplan/components/accountco
         ReactiveFormsModule,
         RouterLink,
         Select,
-        AgentSelectComponent,
         PeerSelectComponent,
         AliasSelectComponent,
         TrunkSelectComponent,
@@ -48,7 +45,6 @@ import { AccountCodeActionComponent } from '@/pabx/dialplan/components/accountco
         TableModule,
         PeerActionComponent,
         RouteActionComponent,
-        AgentActionComponent,
         AnswerActionComponent,
         HangupActionComponent,
         PlaybackActionComponent,
@@ -65,7 +61,6 @@ export class NewDialplanPage implements OnInit {
     srcOptions = [
         { label: 'Qualquer', value: SrcEnum.ANY },
         { label: 'Ramal', value: SrcEnum.PEER },
-        { label: 'Agente', value: SrcEnum.AGENT },
         { label: 'Expressão Regular', value: SrcEnum.EXPRESSION },
         { label: 'Alias', value: SrcEnum.ALIAS },
         { label: 'Tronco', value: SrcEnum.TRUNK }
@@ -76,7 +71,6 @@ export class NewDialplanPage implements OnInit {
         { label: 'Desligar', value: DialPlanActionEnum.HANGUP },
         { label: 'Centro de Custo', value: DialPlanActionEnum.ACCOUNT_CODE },
         { label: 'Ramal', value: DialPlanActionEnum.DIAL_PEER },
-        { label: 'Agente', value: DialPlanActionEnum.DIAL_AGENT },
         { label: 'Rota', value: DialPlanActionEnum.DIAL_ROUTE },
         { label: 'Tocar Audio', value: DialPlanActionEnum.PLAYBACK },
         { label: 'Definir Variável', value: DialPlanActionEnum.SET_VARIABLE }

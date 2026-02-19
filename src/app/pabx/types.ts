@@ -16,7 +16,6 @@ export interface AliasExpression {
 export enum SrcEnum {
     ANY = 'ANY',
     PEER = 'PEER',
-    AGENT = 'AGENT',
     ALIAS = 'ALIAS',
     EXPRESSION = 'EXPRESSION',
     TRUNK = 'TRUNK'
@@ -29,7 +28,6 @@ export enum DialPlanActionEnum {
     SET_VARIABLE = 'SET_VARIABLE',
     DIAL_ROUTE = 'DIAL_ROUTE',
     DIAL_PEER = 'DIAL_PEER',
-    DIAL_AGENT = 'DIAL_AGENT',
     ACCOUNT_CODE = 'ACCOUNT_CODE'
 }
 

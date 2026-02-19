@@ -6,9 +6,8 @@ import { CardModule } from 'primeng/card';
 import { NgIf } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { DialPlanService } from '../dial-plan.service';
-import { DialPlanAction, DialPlanActionEnum, SrcEnum } from '@/pabx/types';
+import { DialPlan, DialPlanAction, DialPlanActionEnum, SrcEnum } from '@/pabx/types';
 import { Select } from 'primeng/select';
-import { AgentSelectComponent } from '@/pabx/dialplan/components/agent-select-component';
 import { PeerSelectComponent } from '@/pabx/dialplan/components/peer-select-component';
 import { AliasSelectComponent } from '@/pabx/dialplan/components/alias-select-component';
 import { TrunkSelectComponent } from '@/pabx/dialplan/components/trunk-select-component';
@@ -16,7 +15,6 @@ import { ToggleSwitch } from 'primeng/toggleswitch';
 import { TableModule } from 'primeng/table';
 import { PeerActionComponent } from '@/pabx/dialplan/components/peer-action.component';
 import { RouteActionComponent } from '@/pabx/dialplan/components/route-action.component';
-import { AgentActionComponent } from '@/pabx/dialplan/components/agent-action.component';
 import { AnswerActionComponent } from '@/pabx/dialplan/components/answer-action-component';
 import { HangupActionComponent } from '@/pabx/dialplan/components/hangup-action-component';
 import { PlaybackActionComponent } from '@/pabx/dialplan/components/playback-action.component';
@@ -39,7 +37,6 @@ import { AccountCodeActionComponent } from '@/pabx/dialplan/components/accountco
         ReactiveFormsModule,
         RouterLink,
         Select,
-        AgentSelectComponent,
         PeerSelectComponent,
         AliasSelectComponent,
         TrunkSelectComponent,
@@ -48,7 +45,6 @@ import { AccountCodeActionComponent } from '@/pabx/dialplan/components/accountco
         TableModule,
         PeerActionComponent,
         RouteActionComponent,
-        AgentActionComponent,
         AnswerActionComponent,
         HangupActionComponent,
         PlaybackActionComponent,
@@ -66,7 +62,6 @@ export class EditDialplanPage implements OnInit {
     srcOptions = [
         { label: 'Qualquer', value: SrcEnum.ANY },
         { label: 'Ramal', value: SrcEnum.PEER },
-        { label: 'Agente', value: SrcEnum.AGENT },
         { label: 'Expressão Regular', value: SrcEnum.EXPRESSION },
         { label: 'Alias', value: SrcEnum.ALIAS },
         { label: 'Tronco', value: SrcEnum.TRUNK }
@@ -77,7 +72,6 @@ export class EditDialplanPage implements OnInit {
         { label: 'Desligar', value: DialPlanActionEnum.HANGUP },
         { label: 'Centro de Custo', value: DialPlanActionEnum.ACCOUNT_CODE },
         { label: 'Ramal', value: DialPlanActionEnum.DIAL_PEER },
-        { label: 'Agente', value: DialPlanActionEnum.DIAL_AGENT },
         { label: 'Rota', value: DialPlanActionEnum.DIAL_ROUTE },
         { label: 'Tocar Audio', value: DialPlanActionEnum.PLAYBACK },
         { label: 'Definir Variável', value: DialPlanActionEnum.SET_VARIABLE }
@@ -139,14 +133,18 @@ export class EditDialplanPage implements OnInit {
         });
         this.dialPlanService.findById(this.id).then((dialplan) => {
             this.form.patchValue(dialplan);
+            this.manageSrcValue(dialplan);
             this.loadActions(dialplan.actions);
         });
     }
 
-    manageSrcValue() {
+    manageSrcValue(dialplan?: DialPlan) {
         this.form.removeControl('srcValue');
         if (this.srcEnum?.value != 'ANY') {
-            this.form.addControl('srcValue', this.fb.control('', [Validators.required]));
+            this.form.addControl(
+                'srcValue',
+                this.fb.control(dialplan?.srcValue ? dialplan.srcValue : '', [Validators.required])
+            );
         }
     }
 
@@ -157,8 +155,11 @@ export class EditDialplanPage implements OnInit {
                 this.actions.push(
                     this.fb.group({
                         actionEnum: action.actionEnum,
-                        arg1: ['', this.actionHasArg1(action.actionEnum)],
-                        arg2: ['', action.actionEnum === DialPlanActionEnum.SET_VARIABLE ? [Validators.required] : []]
+                        arg1: [action.arg1, this.actionHasArg1(action.actionEnum)],
+                        arg2: [
+                            action.arg2,
+                            action.actionEnum === DialPlanActionEnum.SET_VARIABLE ? [Validators.required] : []
+                        ]
                     })
                 );
             });
