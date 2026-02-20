@@ -52,6 +52,7 @@
                     <app-peer-select-component
                         *ngIf="srcEnum?.value == 'PEER'"
                         formControlName="srcValue"
+                        [isShowAnyPeerLabel]=true
                         [showError]="srcValue?.errors?.['required']"
                     ></app-peer-select-component>
 

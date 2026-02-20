@@ -40,6 +40,7 @@ export class PeerSelectComponent implements ControlValueAccessor, OnInit {
     @Input() showError = false;
     @Input() isShowLabel = true;
     @Input() isOnlyWSS = false;
+    @Input() isShowAnyPeerLabel = false;
 
     value: string = '';
     peerOptions: { label: string; value: string }[] = [];
@@ -52,6 +53,7 @@ export class PeerSelectComponent implements ControlValueAccessor, OnInit {
     ngOnInit() {
         this.peerService.findAll().then((peers) => {
             this.peerOptions = peers.map((peer) => ({ label: `${peer.name} (${peer.peer})`, value: peer.peer }));
+            if (this.isShowAnyPeerLabel) this.peerOptions.unshift({ label: 'TODOS', value: 'ANY' });
             if (this.isOnlyWSS) {
                 this.peerOptions = peers
                     .filter((peer) => peer.peerTransportEnums.includes(PeerTransportEnum.WSS))
