@@ -8,7 +8,7 @@ import { RouterLink } from '@angular/router';
 import { ProgressSpinner } from 'primeng/progressspinner';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { Toast } from 'primeng/toast';
-import { DialPlan, SrcEnum } from '@/pabx/types';
+import { Alias, DialPlan, SrcEnum, Trunk } from '@/pabx/types';
 import { NgIf } from '@angular/common';
 import { Tooltip } from 'primeng/tooltip';
 import { InputText } from 'primeng/inputtext';
@@ -16,6 +16,7 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { DialPlanService } from '@/pabx/dialplan/dial-plan.service';
 import { dialplanSrcLabel } from '@/pabx/dialplan/utils';
 import { TrunkService } from '@/pabx/trunk/trunk.service';
+import { AliasService } from '@/pabx/alias/alias.service';
 
 @Component({
     selector: 'app-dialplan-page',
@@ -122,22 +123,29 @@ export class DialplanPage implements OnInit {
     dialplans: DialPlan[] = [];
     @ViewChild('dataTable') dt!: Table;
     loading = true;
+    private readonly trunkMap = new Map<string, string>();
+    private readonly aliasMap = new Map<string, string>();
 
     constructor(
         private readonly confirmationService: ConfirmationService,
         private readonly messageService: MessageService,
         private readonly dialplanService: DialPlanService,
-        private readonly trunkService: TrunkService
+        private readonly trunkService: TrunkService,
+        private readonly aliasService: AliasService
     ) {}
 
     ngOnInit(): void {
-        this.dialplanService.findAll().then((dialplans) => {
-            this.dialplans = dialplans;
-            this.loading = false;
-        });
+        Promise.all([this.dialplanService.findAll(), this.trunkService.findAll(), this.aliasService.findAll()]).then(
+            ([dialplans, trunks, aliases]: [DialPlan[], Trunk[], Alias[]]) => {
+                trunks.forEach((trunk) => this.trunkMap.set(String(trunk.id), trunk.name));
+                aliases.forEach((alias) => this.aliasMap.set(String(alias.id), alias.name));
+                this.dialplans = dialplans;
+                this.loading = false;
+            }
+        );
     }
 
-    async srcLabel(dialplan: DialPlan): Promise<string> {
+    srcLabel(dialplan: DialPlan): string {
         switch (dialplan.srcEnum) {
             case SrcEnum.ANY:
                 return 'TODOS';
@@ -148,19 +156,22 @@ export class DialplanPage implements OnInit {
                 return `${dialplanSrcLabel(dialplan.srcEnum)} -> ${dialplan.srcValue}`;
             }
             case SrcEnum.ALIAS: {
-                return `${dialplanSrcLabel(dialplan.srcEnum)} -> ${dialplan.srcValue}`;
+                return `${dialplanSrcLabel(dialplan.srcEnum)} -> ${this.findAliasName(dialplan.srcValue!)}`;
             }
             case SrcEnum.TRUNK: {
-                return `${dialplanSrcLabel(dialplan.srcEnum)} -> ${dialplan.srcValue == 'ANY' ? 'TODOS' : await this.findTrunkById(dialplan.srcValue!!)}`;
+                return `${dialplanSrcLabel(dialplan.srcEnum)} -> ${dialplan.srcValue == 'ANY' ? 'TODOS' : this.findTrunkName(dialplan.srcValue!)}`;
             }
             default:
                 return 'Desconhecido';
         }
     }
 
-    private async findTrunkById(id: string): Promise<string> {
-        const trunk = await this.trunkService.findById(id);
-        return trunk.name;
+    private findTrunkName(id: string): string {
+        return this.trunkMap.get(id) ?? id;
+    }
+
+    private findAliasName(id: string): string {
+        return this.aliasMap.get(id) ?? id;
     }
 
     onFilterGlobal(event: Event) {
