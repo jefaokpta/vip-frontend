@@ -33,6 +33,7 @@ import { TrunkService } from '@/pabx/trunk/trunk.service';
 })
 export class TrunkSelectComponent implements ControlValueAccessor, OnInit {
     @Input() showError = false;
+    @Input() isShowAnyTrunkLabel = false;
     value: string = '';
     trunkOptions: { label: string; value: string }[] = [];
 
@@ -41,6 +42,7 @@ export class TrunkSelectComponent implements ControlValueAccessor, OnInit {
     ngOnInit() {
         this.trunkService.findAll().then((trunks) => {
             this.trunkOptions = trunks.map((trunk) => ({ label: trunk.name, value: trunk.id.toString() }));
+            if (this.isShowAnyTrunkLabel) this.trunkOptions.unshift({ label: 'TODOS', value: 'ANY' });
         });
     }
 

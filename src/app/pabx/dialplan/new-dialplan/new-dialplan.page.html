@@ -65,6 +65,7 @@
                     <app-trunk-select-component
                         *ngIf="srcEnum?.value == 'TRUNK'"
                         formControlName="srcValue"
+                        [isShowAnyTrunkLabel]=true
                         [showError]="srcValue?.errors?.['required']"
                     ></app-trunk-select-component>
 
