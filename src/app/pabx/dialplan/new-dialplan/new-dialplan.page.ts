@@ -6,7 +6,7 @@ import { CardModule } from 'primeng/card';
 import { NgIf } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { DialPlanService } from '../dial-plan.service';
-import { DialPlanActionEnum, SrcEnum } from '@/pabx/types';
+import { DialPlanActionEnum } from '@/pabx/types';
 import { Select } from 'primeng/select';
 import { PeerSelectComponent } from '@/pabx/dialplan/components/peer-select-component';
 import { AliasSelectComponent } from '@/pabx/dialplan/components/alias-select-component';
@@ -20,6 +20,7 @@ import { HangupActionComponent } from '@/pabx/dialplan/components/hangup-action-
 import { PlaybackActionComponent } from '@/pabx/dialplan/components/playback-action.component';
 import { VariableActionComponent } from '@/pabx/dialplan/components/variable-action.component';
 import { AccountCodeActionComponent } from '@/pabx/dialplan/components/accountcode-action.component';
+import { dialplanSrcOptions } from '@/pabx/dialplan/utils';
 
 /**
  * @author Jefferson Alves Reis (jefaokpta)
@@ -58,13 +59,7 @@ export class NewDialplanPage implements OnInit {
     pending = false;
     showError = false;
 
-    srcOptions = [
-        { label: 'Qualquer', value: SrcEnum.ANY },
-        { label: 'Ramal', value: SrcEnum.PEER },
-        { label: 'Expressão Regular', value: SrcEnum.EXPRESSION },
-        { label: 'Alias', value: SrcEnum.ALIAS },
-        { label: 'Tronco', value: SrcEnum.TRUNK }
-    ];
+    srcOptions = dialplanSrcOptions();
 
     actionOptions = [
         { label: 'Atender', value: DialPlanActionEnum.ANSWER },

@@ -1,19 +1,21 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
-import {Card} from "primeng/card";
-import {IconField} from "primeng/iconfield";
-import {InputIcon} from "primeng/inputicon";
-import {Button} from "primeng/button";
-import {Table, TableModule} from "primeng/table";
-import {RouterLink} from "@angular/router";
-import {ProgressSpinner} from "primeng/progressspinner";
-import {ConfirmDialog} from "primeng/confirmdialog";
-import {Toast} from "primeng/toast";
-import {DialPlan} from "@/pabx/types";
-import {NgIf} from "@angular/common";
-import {Tooltip} from "primeng/tooltip";
-import {InputText} from "primeng/inputtext";
-import {ConfirmationService, MessageService} from "primeng/api";
-import {DialPlanService} from "@/pabx/dialplan/dial-plan.service";
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { Card } from 'primeng/card';
+import { IconField } from 'primeng/iconfield';
+import { InputIcon } from 'primeng/inputicon';
+import { Button } from 'primeng/button';
+import { Table, TableModule } from 'primeng/table';
+import { RouterLink } from '@angular/router';
+import { ProgressSpinner } from 'primeng/progressspinner';
+import { ConfirmDialog } from 'primeng/confirmdialog';
+import { Toast } from 'primeng/toast';
+import { DialPlan, SrcEnum } from '@/pabx/types';
+import { NgIf } from '@angular/common';
+import { Tooltip } from 'primeng/tooltip';
+import { InputText } from 'primeng/inputtext';
+import { ConfirmationService, MessageService } from 'primeng/api';
+import { DialPlanService } from '@/pabx/dialplan/dial-plan.service';
+import { dialplanSrcLabel } from '@/pabx/dialplan/utils';
+import { TrunkService } from '@/pabx/trunk/trunk.service';
 
 @Component({
     selector: 'app-dialplan-page',
@@ -42,7 +44,7 @@ import {DialPlanService} from "@/pabx/dialplan/dial-plan.service";
                     </h2>
                     <div class="inline-flex items-center">
                         <p-iconfield>
-                            <p-inputicon class="pi pi-search"/>
+                            <p-inputicon class="pi pi-search" />
                             <input
                                 pInputText
                                 type="text"
@@ -52,7 +54,7 @@ import {DialPlanService} from "@/pabx/dialplan/dial-plan.service";
                                 class="w-full"
                             />
                         </p-iconfield>
-                        <p-button icon="pi pi-plus" label="Regra" routerLink="new" outlined class="mx-4" rounded/>
+                        <p-button icon="pi pi-plus" label="Regra" routerLink="new" outlined class="mx-4" rounded />
                     </div>
                 </div>
             </ng-template>
@@ -72,6 +74,7 @@ import {DialPlanService} from "@/pabx/dialplan/dial-plan.service";
                             Nome
                             <p-sortIcon field="name"></p-sortIcon>
                         </th>
+                        <th>Origem</th>
                         <th style="width: 10%">Ações</th>
                     </tr>
                 </ng-template>
@@ -79,6 +82,7 @@ import {DialPlanService} from "@/pabx/dialplan/dial-plan.service";
                 <ng-template pTemplate="body" let-dialplan>
                     <tr>
                         <td>{{ dialplan.name }}</td>
+                        <td>{{ srcLabel(dialplan) }}</td>
                         <td>
                             <div class="flex gap-2">
                                 <p-button
@@ -103,15 +107,15 @@ import {DialPlanService} from "@/pabx/dialplan/dial-plan.service";
                 </ng-template>
 
                 <ng-template pTemplate="emptymessage">
-                    <p-progress-spinner *ngIf="loading" [style]="{ width: '2rem', height: '2rem' }"/>
+                    <p-progress-spinner *ngIf="loading" [style]="{ width: '2rem', height: '2rem' }" />
                     <tr>
                         <td colspan="8" *ngIf="!loading" class="text-center p-4">Nenhuma regra encontrada.</td>
                     </tr>
                 </ng-template>
             </p-table>
         </p-card>
-        <p-confirm-dialog/>
-        <p-toast/>
+        <p-confirm-dialog />
+        <p-toast />
     `
 })
 export class DialplanPage implements OnInit {
@@ -122,15 +126,41 @@ export class DialplanPage implements OnInit {
     constructor(
         private readonly confirmationService: ConfirmationService,
         private readonly messageService: MessageService,
-        private readonly dialplanService: DialPlanService
-    ) {
-    }
+        private readonly dialplanService: DialPlanService,
+        private readonly trunkService: TrunkService
+    ) {}
 
     ngOnInit(): void {
         this.dialplanService.findAll().then((dialplans) => {
             this.dialplans = dialplans;
             this.loading = false;
         });
+    }
+
+    async srcLabel(dialplan: DialPlan): Promise<string> {
+        switch (dialplan.srcEnum) {
+            case SrcEnum.ANY:
+                return 'TODOS';
+            case SrcEnum.PEER: {
+                return `${dialplanSrcLabel(dialplan.srcEnum)} -> ${dialplan.srcValue == 'ANY' ? 'TODOS' : dialplan.srcValue}`;
+            }
+            case SrcEnum.EXPRESSION: {
+                return `${dialplanSrcLabel(dialplan.srcEnum)} -> ${dialplan.srcValue}`;
+            }
+            case SrcEnum.ALIAS: {
+                return `${dialplanSrcLabel(dialplan.srcEnum)} -> ${dialplan.srcValue}`;
+            }
+            case SrcEnum.TRUNK: {
+                return `${dialplanSrcLabel(dialplan.srcEnum)} -> ${dialplan.srcValue == 'ANY' ? 'TODOS' : await this.findTrunkById(dialplan.srcValue!!)}`;
+            }
+            default:
+                return 'Desconhecido';
+        }
+    }
+
+    private async findTrunkById(id: string): Promise<string> {
+        const trunk = await this.trunkService.findById(id);
+        return trunk.name;
     }
 
     onFilterGlobal(event: Event) {
@@ -157,7 +187,8 @@ export class DialplanPage implements OnInit {
                 outlined: true
             },
             accept: () => {
-                this.dialplanService.delete(dialplan.id)
+                this.dialplanService
+                    .delete(dialplan.id)
                     .then(() => {
                         this.dialplans = this.dialplans.filter((a) => a.id !== dialplan.id);
                         this.messageService.add({
@@ -165,15 +196,18 @@ export class DialplanPage implements OnInit {
                             summary: 'Regra removida com sucesso',
                             life: 15_000
                         });
-                    }).catch(() => {
-                    this.messageService.add({
-                        severity: 'error',
-                        summary: 'Desculpe não foi possível remover a regra',
-                        detail: 'Tente novamente mais tarde.',
-                        life: 15_000
+                    })
+                    .catch(() => {
+                        this.messageService.add({
+                            severity: 'error',
+                            summary: 'Desculpe não foi possível remover a regra',
+                            detail: 'Tente novamente mais tarde.',
+                            life: 15_000
+                        });
                     });
-                });
             }
         });
     }
+
+    protected readonly dialplanSrcLabel = dialplanSrcLabel;
 }
