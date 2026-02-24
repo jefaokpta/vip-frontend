@@ -1,22 +1,22 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
-import {Card} from 'primeng/card';
-import {IconField} from 'primeng/iconfield';
-import {InputIcon} from 'primeng/inputicon';
-import {Button} from 'primeng/button';
-import {Table, TableModule} from 'primeng/table';
-import {RouterLink} from '@angular/router';
-import {ProgressSpinner} from 'primeng/progressspinner';
-import {ConfirmDialog} from 'primeng/confirmdialog';
-import {Toast} from 'primeng/toast';
-import {Alias, DialPlan, SrcEnum, Trunk} from '@/pabx/types';
-import {NgIf} from '@angular/common';
-import {Tooltip} from 'primeng/tooltip';
-import {InputText} from 'primeng/inputtext';
-import {ConfirmationService, MessageService} from 'primeng/api';
-import {DialPlanService} from '@/pabx/dialplan/dial-plan.service';
-import {dialplanSrcLabel} from '@/pabx/dialplan/utils';
-import {TrunkService} from '@/pabx/trunk/trunk.service';
-import {AliasService} from '@/pabx/alias/alias.service';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { Card } from 'primeng/card';
+import { IconField } from 'primeng/iconfield';
+import { InputIcon } from 'primeng/inputicon';
+import { Button } from 'primeng/button';
+import { Table, TableModule } from 'primeng/table';
+import { RouterLink } from '@angular/router';
+import { ProgressSpinner } from 'primeng/progressspinner';
+import { ConfirmDialog } from 'primeng/confirmdialog';
+import { Toast } from 'primeng/toast';
+import { Alias, DialPlan, SrcEnum, Trunk } from '@/pabx/types';
+import { NgIf } from '@angular/common';
+import { Tooltip } from 'primeng/tooltip';
+import { InputText } from 'primeng/inputtext';
+import { ConfirmationService, MessageService } from 'primeng/api';
+import { DialPlanService } from '@/pabx/dialplan/dial-plan.service';
+import { dialplanSrcLabel } from '@/pabx/dialplan/utils';
+import { TrunkService } from '@/pabx/trunk/trunk.service';
+import { AliasService } from '@/pabx/alias/alias.service';
 
 @Component({
     selector: 'app-dialplan-page',
@@ -77,6 +77,7 @@ import {AliasService} from '@/pabx/alias/alias.service';
                         </th>
                         <th>Origem</th>
                         <th>Destino</th>
+                        <th>Ativo</th>
                         <th style="width: 10%">Ações</th>
                     </tr>
                 </ng-template>
@@ -86,6 +87,13 @@ import {AliasService} from '@/pabx/alias/alias.service';
                         <td>{{ dialplan.name }}</td>
                         <td>{{ srcLabel(dialplan) }}</td>
                         <td>{{ dstLabel(dialplan) }}</td>
+                        <td>
+                            @if (dialplan.isActive) {
+                                <i class="pi pi-check text-green-500"></i>
+                            } @else {
+                                <i class="pi pi-times text-red-500"></i>
+                            }
+                        </td>
                         <td>
                             <div class="flex gap-2">
                                 <p-button
@@ -141,7 +149,7 @@ export class DialplanPage implements OnInit {
             ([dialplans, trunks, aliases]: [DialPlan[], Trunk[], Alias[]]) => {
                 trunks.forEach((trunk) => this.trunkMap.set(String(trunk.id), trunk.name));
                 aliases.forEach((alias) => this.aliasMap.set(String(alias.id), alias.name));
-                this.dialplans = dialplans;
+                this.dialplans = dialplans.sort((a, b) => a.dst?.localeCompare(b.dst ?? 'z') ?? 0);
                 this.loading = false;
             }
         );
