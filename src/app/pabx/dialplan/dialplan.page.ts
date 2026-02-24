@@ -1,22 +1,22 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { Card } from 'primeng/card';
-import { IconField } from 'primeng/iconfield';
-import { InputIcon } from 'primeng/inputicon';
-import { Button } from 'primeng/button';
-import { Table, TableModule } from 'primeng/table';
-import { RouterLink } from '@angular/router';
-import { ProgressSpinner } from 'primeng/progressspinner';
-import { ConfirmDialog } from 'primeng/confirmdialog';
-import { Toast } from 'primeng/toast';
-import { Alias, DialPlan, SrcEnum, Trunk } from '@/pabx/types';
-import { NgIf } from '@angular/common';
-import { Tooltip } from 'primeng/tooltip';
-import { InputText } from 'primeng/inputtext';
-import { ConfirmationService, MessageService } from 'primeng/api';
-import { DialPlanService } from '@/pabx/dialplan/dial-plan.service';
-import { dialplanSrcLabel } from '@/pabx/dialplan/utils';
-import { TrunkService } from '@/pabx/trunk/trunk.service';
-import { AliasService } from '@/pabx/alias/alias.service';
+import {Component, OnInit, ViewChild} from '@angular/core';
+import {Card} from 'primeng/card';
+import {IconField} from 'primeng/iconfield';
+import {InputIcon} from 'primeng/inputicon';
+import {Button} from 'primeng/button';
+import {Table, TableModule} from 'primeng/table';
+import {RouterLink} from '@angular/router';
+import {ProgressSpinner} from 'primeng/progressspinner';
+import {ConfirmDialog} from 'primeng/confirmdialog';
+import {Toast} from 'primeng/toast';
+import {Alias, DialPlan, SrcEnum, Trunk} from '@/pabx/types';
+import {NgIf} from '@angular/common';
+import {Tooltip} from 'primeng/tooltip';
+import {InputText} from 'primeng/inputtext';
+import {ConfirmationService, MessageService} from 'primeng/api';
+import {DialPlanService} from '@/pabx/dialplan/dial-plan.service';
+import {dialplanSrcLabel} from '@/pabx/dialplan/utils';
+import {TrunkService} from '@/pabx/trunk/trunk.service';
+import {AliasService} from '@/pabx/alias/alias.service';
 
 @Component({
     selector: 'app-dialplan-page',
@@ -76,6 +76,7 @@ import { AliasService } from '@/pabx/alias/alias.service';
                             <p-sortIcon field="name"></p-sortIcon>
                         </th>
                         <th>Origem</th>
+                        <th>Destino</th>
                         <th style="width: 10%">Ações</th>
                     </tr>
                 </ng-template>
@@ -84,6 +85,7 @@ import { AliasService } from '@/pabx/alias/alias.service';
                     <tr>
                         <td>{{ dialplan.name }}</td>
                         <td>{{ srcLabel(dialplan) }}</td>
+                        <td>{{ dstLabel(dialplan) }}</td>
                         <td>
                             <div class="flex gap-2">
                                 <p-button
@@ -164,6 +166,11 @@ export class DialplanPage implements OnInit {
             default:
                 return 'Desconhecido';
         }
+    }
+
+    dstLabel(dialplan: DialPlan): string {
+        if (dialplan.dst) return dialplan.dst;
+        return this.findAliasName(dialplan.dstAlias!.toString());
     }
 
     private findTrunkName(id: string): string {
