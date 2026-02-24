@@ -226,6 +226,4 @@ export class DialplanPage implements OnInit {
             }
         });
     }
-
-    protected readonly dialplanSrcLabel = dialplanSrcLabel;
 }
