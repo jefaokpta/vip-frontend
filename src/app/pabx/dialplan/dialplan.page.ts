@@ -80,7 +80,7 @@ import { FormsModule } from '@angular/forms';
                         <th>Origem</th>
                         <th>Destino</th>
                         <th style="width: 10%">Ativo</th>
-<!--                        <th style="width: 10%">Prioridade</th>-->
+                        <!--                        <th style="width: 10%">Prioridade</th>-->
                         <th style="width: 10%">Ações</th>
                     </tr>
                 </ng-template>
@@ -97,17 +97,17 @@ import { FormsModule } from '@angular/forms';
                                 <i class="pi pi-times text-red-500"></i>
                             }
                         </td>
-<!--                        <td>-->
-<!--                            <p-select-->
-<!--                                [options]="priorityOptions"-->
-<!--                                [(ngModel)]="dialplan.priority"-->
-<!--                                (onChange)="onChangePriority(dialplan)"-->
-<!--                                optionLabel="label"-->
-<!--                                optionValue="value"-->
-<!--                                size="small"-->
-<!--                            >-->
-<!--                            </p-select>-->
-<!--                        </td>-->
+                        <!--                        <td>-->
+                        <!--                            <p-select-->
+                        <!--                                [options]="priorityOptions"-->
+                        <!--                                [(ngModel)]="dialplan.priority"-->
+                        <!--                                (onChange)="onChangePriority(dialplan)"-->
+                        <!--                                optionLabel="label"-->
+                        <!--                                optionValue="value"-->
+                        <!--                                size="small"-->
+                        <!--                            >-->
+                        <!--                            </p-select>-->
+                        <!--                        </td>-->
                         <td>
                             <div class="flex gap-2">
                                 <p-button
