@@ -103,7 +103,7 @@ import { FormsModule } from '@angular/forms';
                             <p-select
                                 [options]="priorityOptions"
                                 [(ngModel)]="dialplan.priority"
-                                (onChange)="onChangePriority()"
+                                (onChange)="onChangePriority(dialplan)"
                                 optionLabel="label"
                                 optionValue="value"
                                 size="small"
@@ -220,9 +220,15 @@ export class DialplanPage implements OnInit {
         { value: 4, label: '4' }
     ];
 
-    onChangePriority() {
-        console.log('reordering');
+    onChangePriority(dialplan: DialPlan) {
         this.dialplans = this.sortDialplansByDstAndPriority(this.dialplans);
+        this.dialplanService.updatePriority(dialplan).then(() => {
+            this.messageService.add({
+                severity: 'success',
+                summary: 'Prioridade atualizada com sucesso',
+                life: 15_000
+            });
+        });
     }
 
     private sortDialplansByDstAndPriority(dialplans: DialPlan[]): DialPlan[] {

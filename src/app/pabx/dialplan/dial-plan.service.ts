@@ -29,4 +29,10 @@ export class DialPlanService {
     update(dialplan: DialPlan) {
         return executeRequest(this.http.put(`${this.BACKEND}/dialplans/${dialplan.id}`, dialplan, httpHeaders()));
     }
+
+    updatePriority(dialplan: DialPlan) {
+        return executeRequest(
+            this.http.put(`${this.BACKEND}/dialplans/${dialplan.id}/priority`, dialplan, httpHeaders())
+        );
+    }
 }
