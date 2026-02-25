@@ -226,7 +226,11 @@ export class DialplanPage implements OnInit {
     }
 
     private sortDialplansByDstAndPriority(dialplans: DialPlan[]): DialPlan[] {
-        return dialplans.sort((a, b) => a.priority + b.priority).sort((a, b) => a.dst?.localeCompare(b.dst ?? '') ?? 0);
+        return dialplans.sort((a, b) => {
+            const dstCompare = (a.dst ?? '').localeCompare(b.dst ?? '');
+            if (dstCompare !== 0) return dstCompare;
+            return b.priority - a.priority;
+        });
     }
 
     confirmDelete(dialplan: DialPlan) {
