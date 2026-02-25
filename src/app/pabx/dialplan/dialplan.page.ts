@@ -17,6 +17,8 @@ import { DialPlanService } from '@/pabx/dialplan/dial-plan.service';
 import { dialplanSrcLabel } from '@/pabx/dialplan/utils';
 import { TrunkService } from '@/pabx/trunk/trunk.service';
 import { AliasService } from '@/pabx/alias/alias.service';
+import { Select } from 'primeng/select';
+import { FormsModule } from '@angular/forms';
 
 @Component({
     selector: 'app-dialplan-page',
@@ -33,7 +35,9 @@ import { AliasService } from '@/pabx/alias/alias.service';
         Toast,
         NgIf,
         Tooltip,
-        InputText
+        InputText,
+        Select,
+        FormsModule
     ],
     providers: [ConfirmationService, MessageService],
     template: `
@@ -77,7 +81,8 @@ import { AliasService } from '@/pabx/alias/alias.service';
                         </th>
                         <th>Origem</th>
                         <th>Destino</th>
-                        <th>Ativo</th>
+                        <th style="width: 10%">Ativo</th>
+                        <th style="width: 10%">Prioridade</th>
                         <th style="width: 10%">Ações</th>
                     </tr>
                 </ng-template>
@@ -93,6 +98,17 @@ import { AliasService } from '@/pabx/alias/alias.service';
                             } @else {
                                 <i class="pi pi-times text-red-500"></i>
                             }
+                        </td>
+                        <td>
+                            <p-select
+                                [options]="priorityOptions"
+                                [(ngModel)]="dialplan.priority"
+                                (onChange)="onChangePriority()"
+                                optionLabel="label"
+                                optionValue="value"
+                                size="small"
+                            >
+                            </p-select>
                         </td>
                         <td>
                             <div class="flex gap-2">
@@ -149,7 +165,7 @@ export class DialplanPage implements OnInit {
             ([dialplans, trunks, aliases]: [DialPlan[], Trunk[], Alias[]]) => {
                 trunks.forEach((trunk) => this.trunkMap.set(String(trunk.id), trunk.name));
                 aliases.forEach((alias) => this.aliasMap.set(String(alias.id), alias.name));
-                this.dialplans = dialplans.sort((a, b) => a.dst?.localeCompare(b.dst ?? 'z') ?? 0);
+                this.dialplans = this.sortDialplansByDstAndPriority(dialplans);
                 this.loading = false;
             }
         );
@@ -194,6 +210,23 @@ export class DialplanPage implements OnInit {
         if (target) {
             this.dt.filterGlobal(target.value, 'contains');
         }
+    }
+
+    priorityOptions = [
+        { value: 0, label: '0' },
+        { value: 1, label: '1' },
+        { value: 2, label: '2' },
+        { value: 3, label: '3' },
+        { value: 4, label: '4' }
+    ];
+
+    onChangePriority() {
+        console.log('reordering');
+        this.dialplans = this.sortDialplansByDstAndPriority(this.dialplans);
+    }
+
+    private sortDialplansByDstAndPriority(dialplans: DialPlan[]): DialPlan[] {
+        return dialplans.sort((a, b) => a.priority + b.priority).sort((a, b) => a.dst?.localeCompare(b.dst ?? '') ?? 0);
     }
 
     confirmDelete(dialplan: DialPlan) {
