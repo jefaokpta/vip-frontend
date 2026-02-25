@@ -121,6 +121,7 @@ export class EditDialplanPage implements OnInit {
             name: ['', [Validators.required]],
             srcEnum: ['', [Validators.required]],
             dst: ['', [Validators.required]],
+            priority: ['', [Validators.required]],
             isAlwaysActive: [true],
             isActive: [true],
             dstToggle: [false],

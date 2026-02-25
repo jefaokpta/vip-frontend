@@ -41,6 +41,7 @@ export class PeerSelectComponent implements ControlValueAccessor, OnInit {
     @Input() isShowLabel = true;
     @Input() isOnlyWSS = false;
     @Input() isShowAnyPeerLabel = false;
+    @Input() isOnDialplanAction = false;
 
     value: string = '';
     peerOptions: { label: string; value: string }[] = [];
@@ -59,6 +60,7 @@ export class PeerSelectComponent implements ControlValueAccessor, OnInit {
                     .filter((peer) => peer.peerTransportEnums.includes(PeerTransportEnum.WSS))
                     .map((peer) => ({ label: `${peer.name} (${peer.peer})`, value: peer.peer }));
             }
+            if (this.isOnDialplanAction) this.peerOptions.unshift({ label: 'DESTINO', value: 'DST' });
         });
     }
 

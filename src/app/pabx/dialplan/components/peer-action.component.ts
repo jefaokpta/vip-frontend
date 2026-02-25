@@ -1,8 +1,8 @@
-import {Component, EventEmitter, forwardRef, Input, Output} from '@angular/core';
-import {ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule} from '@angular/forms';
-import {Panel} from "primeng/panel";
-import {PeerSelectComponent} from "@/pabx/dialplan/components/peer-select-component";
-import {InputText} from "primeng/inputtext";
+import { Component, EventEmitter, forwardRef, Input, Output } from '@angular/core';
+import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
+import { Panel } from 'primeng/panel';
+import { PeerSelectComponent } from '@/pabx/dialplan/components/peer-select-component';
+import { InputText } from 'primeng/inputtext';
 
 @Component({
     selector: 'app-peer-action-component',
@@ -18,15 +18,24 @@ import {InputText} from "primeng/inputtext";
     template: `
         <p-panel header="Chamar Ramal" [toggleable]="true" toggler="header" collapsed>
             <div class="flex flex-col gap-4">
-                <app-peer-select-component [(ngModel)]="value" (ngModelChange)="onValueChange($event)"
-                                           [isShowLabel]="false" [showError]="showError"/>
+                <app-peer-select-component
+                    [(ngModel)]="value"
+                    (ngModelChange)="onValueChange($event)"
+                    [isShowLabel]="false"
+                    [showError]="showError"
+                    [isOnDialplanAction]="true"
+                />
                 <div class="field">
                     <label for="flags" class="block">Flags de controle</label>
-                    <input id="flags" pInputText class="p-inputtext" [(ngModel)]="flags"
-                           (ngModelChange)="onFlagsChange($event)"/>
+                    <input
+                        id="flags"
+                        pInputText
+                        class="p-inputtext"
+                        [(ngModel)]="flags"
+                        (ngModelChange)="onFlagsChange($event)"
+                    />
                 </div>
             </div>
-
         </p-panel>
     `
 })
@@ -36,14 +45,11 @@ export class PeerActionComponent implements ControlValueAccessor {
     value: string = '';
     flags: string = '';
 
-    constructor() {
-    }
+    constructor() {}
 
-    private onChange: (value: string) => void = () => {
-    };
+    private onChange: (value: string) => void = () => {};
 
-    private onTouched: () => void = () => {
-    };
+    private onTouched: () => void = () => {};
 
     writeValue(value: string): void {
         this.value = value;

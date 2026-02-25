@@ -69,6 +69,7 @@ export class NewDialplanPage implements OnInit {
         { label: 'Rota', value: DialPlanActionEnum.DIAL_ROUTE },
         { label: 'Tocar Audio', value: DialPlanActionEnum.PLAYBACK },
         { label: 'Definir Variável', value: DialPlanActionEnum.SET_VARIABLE }
+        //TODO: edita destino, fila de atendimento, grupo de ramais, ura de atendimento
     ];
 
     constructor(
