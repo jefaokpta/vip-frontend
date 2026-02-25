@@ -17,7 +17,6 @@ import { DialPlanService } from '@/pabx/dialplan/dial-plan.service';
 import { dialplanSrcLabel } from '@/pabx/dialplan/utils';
 import { TrunkService } from '@/pabx/trunk/trunk.service';
 import { AliasService } from '@/pabx/alias/alias.service';
-import { Select } from 'primeng/select';
 import { FormsModule } from '@angular/forms';
 
 @Component({
@@ -36,7 +35,6 @@ import { FormsModule } from '@angular/forms';
         NgIf,
         Tooltip,
         InputText,
-        Select,
         FormsModule
     ],
     providers: [ConfirmationService, MessageService],
@@ -82,7 +80,7 @@ import { FormsModule } from '@angular/forms';
                         <th>Origem</th>
                         <th>Destino</th>
                         <th style="width: 10%">Ativo</th>
-                        <th style="width: 10%">Prioridade</th>
+<!--                        <th style="width: 10%">Prioridade</th>-->
                         <th style="width: 10%">Ações</th>
                     </tr>
                 </ng-template>
@@ -99,17 +97,17 @@ import { FormsModule } from '@angular/forms';
                                 <i class="pi pi-times text-red-500"></i>
                             }
                         </td>
-                        <td>
-                            <p-select
-                                [options]="priorityOptions"
-                                [(ngModel)]="dialplan.priority"
-                                (onChange)="onChangePriority(dialplan)"
-                                optionLabel="label"
-                                optionValue="value"
-                                size="small"
-                            >
-                            </p-select>
-                        </td>
+<!--                        <td>-->
+<!--                            <p-select-->
+<!--                                [options]="priorityOptions"-->
+<!--                                [(ngModel)]="dialplan.priority"-->
+<!--                                (onChange)="onChangePriority(dialplan)"-->
+<!--                                optionLabel="label"-->
+<!--                                optionValue="value"-->
+<!--                                size="small"-->
+<!--                            >-->
+<!--                            </p-select>-->
+<!--                        </td>-->
                         <td>
                             <div class="flex gap-2">
                                 <p-button
