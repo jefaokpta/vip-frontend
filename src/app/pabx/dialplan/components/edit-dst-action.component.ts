@@ -3,12 +3,13 @@ import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModu
 import { Panel } from 'primeng/panel';
 import { InputText } from 'primeng/inputtext';
 import { Message } from 'primeng/message';
-import { NgIf } from '@angular/common';
+import { ToggleSwitch } from 'primeng/toggleswitch';
+import { InputNumber } from 'primeng/inputnumber';
 
 @Component({
     selector: 'app-edit-dst-action-component',
     standalone: true,
-    imports: [ReactiveFormsModule, FormsModule, Panel, InputText, Message, NgIf],
+    imports: [ReactiveFormsModule, FormsModule, Panel, InputText, Message, ToggleSwitch, InputNumber],
     providers: [
         {
             provide: NG_VALUE_ACCESSOR,
@@ -19,23 +20,31 @@ import { NgIf } from '@angular/common';
     template: `
         <p-panel header="Editar Destino" [toggleable]="true" toggler="header" collapsed>
             <div class="flex flex-col gap-4">
-                <div class="field">
-                    <label for="addNumber" class="block">Número a ser adicionado</label>
-                    <input
-                        id="addNumber"
-                        pInputText
-                        class="p-inputtext"
-                        [(ngModel)]="addNumber"
-                        (ngModelChange)="onAddNumberChange($event)"
-                    />
-                    <small *ngIf="showError" class="p-error block mt-2"> Número é obrigatório. </small>
+                <div class="flex gap-4 items-center">
+                    <div class="field">
+                        <label for="addNumber" class="block">Adicionar</label>
+                        <input
+                            id="addNumber"
+                            pInputText
+                            class="p-inputtext"
+                            [(ngModel)]="addNumber"
+                            (ngModelChange)="onAddNumberChange($event)"
+                        />
+                    </div>
+                    <div class="field">
+                        <label for="isReplaceAllDst" class="block">Substituir todo destino</label>
+                        <p-toggleswitch
+                            [(ngModel)]="isReplaceAllDst"
+                            (ngModelChange)="onIsReplaceAllDstChange($event)"
+                        />
+                    </div>
                 </div>
+
                 <div class="field">
-                    <label for="cutNumber" class="block">Números cortados</label>
-                    <input
+                    <label for="cutNumber" class="block">Cortar</label>
+                    <p-input-number
                         id="cutNumber"
-                        pInputText
-                        class="p-inputtext"
+                        [useGrouping]="false"
                         [(ngModel)]="cutNumber"
                         (ngModelChange)="onCutNumberChange($event)"
                     />
@@ -49,6 +58,8 @@ export class EditDstActionComponent implements ControlValueAccessor {
     @Input() showError = false;
     @Input() cutNumber: string = '';
     @Output() cutNumberChange = new EventEmitter<string>();
+    @Input() isReplaceAllDst = false;
+    @Output() isReplaceAllDstChange = new EventEmitter<boolean>();
     addNumber: string = '';
 
     private onChange: (value: string) => void = () => {};
@@ -76,5 +87,10 @@ export class EditDstActionComponent implements ControlValueAccessor {
     onCutNumberChange(cutNumber: string): void {
         this.cutNumber = cutNumber;
         this.cutNumberChange.emit(cutNumber);
+    }
+
+    onIsReplaceAllDstChange(isReplaceAllNumber: boolean): void {
+        this.isReplaceAllDst = isReplaceAllNumber;
+        this.isReplaceAllDstChange.emit(isReplaceAllNumber);
     }
 }

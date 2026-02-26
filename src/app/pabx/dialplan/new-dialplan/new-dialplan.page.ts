@@ -20,7 +20,7 @@ import { HangupActionComponent } from '@/pabx/dialplan/components/hangup-action-
 import { PlaybackActionComponent } from '@/pabx/dialplan/components/playback-action.component';
 import { VariableActionComponent } from '@/pabx/dialplan/components/variable-action.component';
 import { AccountCodeActionComponent } from '@/pabx/dialplan/components/accountcode-action.component';
-import { dialplanSrcOptions } from '@/pabx/dialplan/utils';
+import { dialplanActionOptions, dialplanSrcOptions } from '@/pabx/dialplan/utils';
 
 /**
  * @author Jefferson Alves Reis (jefaokpta)
@@ -61,16 +61,8 @@ export class NewDialplanPage implements OnInit {
 
     srcOptions = dialplanSrcOptions();
 
-    actionOptions = [
-        { label: 'Atender', value: DialPlanActionEnum.ANSWER },
-        { label: 'Desligar', value: DialPlanActionEnum.HANGUP },
-        { label: 'Centro de Custo', value: DialPlanActionEnum.ACCOUNT_CODE },
-        { label: 'Ramal', value: DialPlanActionEnum.DIAL_PEER },
-        { label: 'Rota', value: DialPlanActionEnum.DIAL_ROUTE },
-        { label: 'Tocar Audio', value: DialPlanActionEnum.PLAYBACK },
-        { label: 'Definir Variável', value: DialPlanActionEnum.SET_VARIABLE }
-        //TODO: edita destino, fila de atendimento, grupo de ramais, ura de atendimento
-    ];
+    //TODO: fila de atendimento, grupo de ramais, ura de atendimento
+    actionOptions = dialplanActionOptions();
 
     constructor(
         private readonly fb: FormBuilder,

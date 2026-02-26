@@ -21,7 +21,7 @@ import { PlaybackActionComponent } from '@/pabx/dialplan/components/playback-act
 import { VariableActionComponent } from '@/pabx/dialplan/components/variable-action.component';
 import { AccountCodeActionComponent } from '@/pabx/dialplan/components/accountcode-action.component';
 import { isNumber } from 'chart.js/helpers';
-import { dialplanSrcOptions } from '@/pabx/dialplan/utils';
+import { dialplanActionOptions, dialplanSrcOptions } from '@/pabx/dialplan/utils';
 import { EditDstActionComponent } from '@/pabx/dialplan/components/edit-dst-action.component';
 
 /**
@@ -65,16 +65,7 @@ export class EditDialplanPage implements OnInit {
 
     srcOptions = dialplanSrcOptions();
 
-    actionOptions = [
-        { label: 'Atender', value: DialPlanActionEnum.ANSWER },
-        { label: 'Desligar', value: DialPlanActionEnum.HANGUP },
-        { label: 'Centro de Custo', value: DialPlanActionEnum.ACCOUNT_CODE },
-        { label: 'Ramal', value: DialPlanActionEnum.DIAL_PEER },
-        { label: 'Rota', value: DialPlanActionEnum.DIAL_ROUTE },
-        { label: 'Tocar Audio', value: DialPlanActionEnum.PLAYBACK },
-        { label: 'Definir Variável', value: DialPlanActionEnum.SET_VARIABLE },
-        { label: 'Editar Destino', value: DialPlanActionEnum.EDIT_DST }
-    ];
+    actionOptions = dialplanActionOptions();
 
     constructor(
         private readonly fb: FormBuilder,
@@ -160,7 +151,8 @@ export class EditDialplanPage implements OnInit {
                         arg2: [
                             action.arg2,
                             action.actionEnum === DialPlanActionEnum.SET_VARIABLE ? [Validators.required] : []
-                        ]
+                        ],
+                        arg3: [action.arg3]
                     })
                 );
             });
@@ -221,7 +213,12 @@ export class EditDialplanPage implements OnInit {
     }
 
     private actionHasArg1(selectedAction: DialPlanActionEnum): Validators[] {
-        if (selectedAction === DialPlanActionEnum.ANSWER || selectedAction === DialPlanActionEnum.HANGUP) return [];
+        if (
+            selectedAction === DialPlanActionEnum.ANSWER ||
+            selectedAction === DialPlanActionEnum.HANGUP ||
+            selectedAction === DialPlanActionEnum.EDIT_DST
+        )
+            return [];
         return [Validators.required];
     }
 }

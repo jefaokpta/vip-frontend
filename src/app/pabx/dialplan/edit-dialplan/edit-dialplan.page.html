@@ -188,9 +188,10 @@
                                     <ng-container *ngIf="action.get('actionEnum').value == 'EDIT_DST'">
                                         <app-edit-dst-action-component
                                             formControlName="arg1"
-                                            [showError]="action.get('arg1').errors?.['required']"
                                             [cutNumber]="action.get('arg2').value"
                                             (cutNumberChange)="action.get('arg2').setValue($event)"
+                                            [isReplaceAllDst]="action.get('arg3').value.toString() === 'true'"
+                                            (isReplaceAllDstChange)="action.get('arg3').setValue($event)"
                                         />
                                     </ng-container>
                                 </td>
