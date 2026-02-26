@@ -183,6 +183,13 @@
                                             [showVarValueError]="action.get('arg2').errors?.['required']"
                                         />
                                     </ng-container>
+                                    <ng-container *ngIf="action.get('actionEnum').value == 'EDIT_DST'">
+                                        <app-edit-dst-action-component
+                                            formControlName="arg1"
+                                            [showError]="action.get('arg1').errors?.['required']"
+                                            (cutNumberChange)="action.get('arg2').setValue($event)"
+                                        />
+                                    </ng-container>
                                 </td>
                                 <td>
                                     <p-button icon="pi pi-trash" severity="danger" outlined

@@ -22,6 +22,7 @@ import { VariableActionComponent } from '@/pabx/dialplan/components/variable-act
 import { AccountCodeActionComponent } from '@/pabx/dialplan/components/accountcode-action.component';
 import { isNumber } from 'chart.js/helpers';
 import { dialplanSrcOptions } from '@/pabx/dialplan/utils';
+import { EditDstActionComponent } from '@/pabx/dialplan/components/edit-dst-action.component';
 
 /**
  * @author Jefferson Alves Reis (jefaokpta)
@@ -51,7 +52,8 @@ import { dialplanSrcOptions } from '@/pabx/dialplan/utils';
         HangupActionComponent,
         PlaybackActionComponent,
         VariableActionComponent,
-        AccountCodeActionComponent
+        AccountCodeActionComponent,
+        EditDstActionComponent
     ],
     templateUrl: './edit-dialplan.page.html'
 })
@@ -70,7 +72,8 @@ export class EditDialplanPage implements OnInit {
         { label: 'Ramal', value: DialPlanActionEnum.DIAL_PEER },
         { label: 'Rota', value: DialPlanActionEnum.DIAL_ROUTE },
         { label: 'Tocar Audio', value: DialPlanActionEnum.PLAYBACK },
-        { label: 'Definir Variável', value: DialPlanActionEnum.SET_VARIABLE }
+        { label: 'Definir Variável', value: DialPlanActionEnum.SET_VARIABLE },
+        { label: 'Editar Destino', value: DialPlanActionEnum.EDIT_DST }
     ];
 
     constructor(
