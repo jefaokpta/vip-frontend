@@ -47,9 +47,9 @@ import { NgIf } from '@angular/common';
 })
 export class EditDstActionComponent implements ControlValueAccessor {
     @Input() showError = false;
+    @Input() cutNumber: string = '';
     @Output() cutNumberChange = new EventEmitter<string>();
     addNumber: string = '';
-    cutNumber: string = '';
 
     private onChange: (value: string) => void = () => {};
 
@@ -73,8 +73,8 @@ export class EditDstActionComponent implements ControlValueAccessor {
         this.onTouched();
     }
 
-    onCutNumberChange(flags: string): void {
-        this.cutNumber = flags;
-        this.cutNumberChange.emit(flags);
+    onCutNumberChange(cutNumber: string): void {
+        this.cutNumber = cutNumber;
+        this.cutNumberChange.emit(cutNumber);
     }
 }

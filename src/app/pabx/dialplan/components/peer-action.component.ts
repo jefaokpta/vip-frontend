@@ -41,9 +41,9 @@ import { InputText } from 'primeng/inputtext';
 })
 export class PeerActionComponent implements ControlValueAccessor {
     @Input() showError = false;
+    @Input() flags: string = '';
     @Output() flagsChange = new EventEmitter<string>();
     value: string = '';
-    flags: string = '';
 
     constructor() {}
 
