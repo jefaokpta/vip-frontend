@@ -190,8 +190,10 @@
                                             formControlName="arg1"
                                             [cutNumber]="action.get('arg2').value"
                                             (cutNumberChange)="action.get('arg2').setValue($event)"
-                                            [isReplaceAllDst]="action.get('arg3').value.toString() === 'true'"
+                                            [isReplaceAllDst]="action.get('arg3').value?.toString() === 'true'"
                                             (isReplaceAllDstChange)="action.get('arg3').setValue($event)"
+                                            [isCutInPipe]="action.get('arg4').value?.toString() === 'true'"
+                                            (isCutInPipeChange)="action.get('arg4').setValue($event)"
                                         />
                                     </ng-container>
                                 </td>

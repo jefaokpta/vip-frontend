@@ -152,7 +152,8 @@ export class EditDialplanPage implements OnInit {
                             action.arg2,
                             action.actionEnum === DialPlanActionEnum.SET_VARIABLE ? [Validators.required] : []
                         ],
-                        arg3: [action.arg3]
+                        arg3: [action.arg3],
+                        arg4: [action.arg4]
                     })
                 );
             });
@@ -164,7 +165,9 @@ export class EditDialplanPage implements OnInit {
             this.fb.group({
                 actionEnum: this.selectedAction?.value,
                 arg1: ['', this.actionHasArg1(this.selectedAction?.value)],
-                arg2: ['', this.selectedAction.value === DialPlanActionEnum.SET_VARIABLE ? [Validators.required] : []]
+                arg2: ['', this.selectedAction.value === DialPlanActionEnum.SET_VARIABLE ? [Validators.required] : []],
+                arg3: [''],
+                arg4: ['']
             })
         );
     }

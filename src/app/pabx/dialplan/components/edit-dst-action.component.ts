@@ -40,14 +40,20 @@ import { InputNumber } from 'primeng/inputnumber';
                     </div>
                 </div>
 
-                <div class="field">
-                    <label for="cutNumber" class="block">Cortar</label>
-                    <p-input-number
-                        id="cutNumber"
-                        [useGrouping]="false"
-                        [(ngModel)]="cutNumber"
-                        (ngModelChange)="onCutNumberChange($event)"
-                    />
+                <div class="flex gap-4 items-center">
+                    <div class="field">
+                        <label for="cutNumber" class="block">Cortar</label>
+                        <p-input-number
+                            id="cutNumber"
+                            [useGrouping]="false"
+                            [(ngModel)]="cutNumber"
+                            (ngModelChange)="onCutNumberChange($event)"
+                        />
+                    </div>
+                    <div class="field">
+                        <label for="isCutInPipe" class="block">Cortar no pipe (|)</label>
+                        <p-toggleswitch [(ngModel)]="isCutInPipe" (ngModelChange)="onIsCutInPipeChange($event)" />
+                    </div>
                 </div>
                 <p-message severity="info">Edita número de destino</p-message>
             </div>
@@ -60,6 +66,8 @@ export class EditDstActionComponent implements ControlValueAccessor {
     @Output() cutNumberChange = new EventEmitter<string>();
     @Input() isReplaceAllDst = false;
     @Output() isReplaceAllDstChange = new EventEmitter<boolean>();
+    @Input() isCutInPipe = false;
+    @Output() isCutInPipeChange = new EventEmitter<boolean>();
     addNumber: string = '';
 
     private onChange: (value: string) => void = () => {};
@@ -92,5 +100,10 @@ export class EditDstActionComponent implements ControlValueAccessor {
     onIsReplaceAllDstChange(isReplaceAllNumber: boolean): void {
         this.isReplaceAllDst = isReplaceAllNumber;
         this.isReplaceAllDstChange.emit(isReplaceAllNumber);
+    }
+
+    onIsCutInPipeChange(isCutInPipe: boolean): void {
+        this.isCutInPipe = isCutInPipe;
+        this.isCutInPipeChange.emit(isCutInPipe);
     }
 }
