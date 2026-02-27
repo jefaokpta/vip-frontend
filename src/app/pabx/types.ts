@@ -52,15 +52,6 @@ export interface DialPlan {
     readonly isActive: boolean;
     readonly priority: number;
     readonly companyId: string;
-    readonly startTime?: Date;
-    readonly endTime?: Date;
-    readonly monday?: boolean;
-    readonly tuesday?: boolean;
-    readonly wednesday?: boolean;
-    readonly thursday?: boolean;
-    readonly friday?: boolean;
-    readonly saturday?: boolean;
-    readonly sunday?: boolean;
     readonly dstAlias?: number;
     readonly actions: DialPlanAction[];
 }
@@ -201,4 +192,32 @@ export interface Route {
     readonly timeout: number;
     readonly flags: string;
     readonly routeTrunks: RouteTrunk[];
+}
+
+export enum CalendarTypeEnum {
+    BY_DATE = 'BY_DATE',
+    BY_WEEKDAY = 'BY_WEEKDAY'
+}
+
+export enum WeekDayEnum {
+    SUNDAY = 'SUNDAY',
+    MONDAY = 'MONDAY',
+    TUESDAY = 'TUESDAY',
+    WEDNESDAY = 'WEDNESDAY',
+    THURSDAY = 'THURSDAY',
+    FRIDAY = 'FRIDAY',
+    SATURDAY = 'SATURDAY'
+}
+
+export interface Calendar {
+    readonly id: number;
+    readonly companyId: string;
+    readonly name: string;
+    readonly calendarType: CalendarTypeEnum;
+    readonly startDate?: string;
+    readonly endDate?: string;
+    readonly startWeekDay?: WeekDayEnum;
+    readonly endWeekDay?: WeekDayEnum;
+    readonly startTime: string;
+    readonly endTime: string;
 }

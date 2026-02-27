@@ -17,6 +17,9 @@ import { EditDialplanPage } from '@/pabx/dialplan/edit-dialplan/edit-dialplan.pa
 import { NewPeerPage } from '@/pabx/peer/new-peer.page';
 import { PeerPage } from '@/pabx/peer/peer.page';
 import { EditPeerPage } from '@/pabx/peer/edit-peer.page';
+import { CalendarPage } from '@/pabx/calendar/calendar.page';
+import { NewCalendarPage } from '@/pabx/calendar/new-calendar.page';
+import { EditCalendarPage } from '@/pabx/calendar/edit-calendar.page';
 
 export default [
     { path: 'peers', component: PeerPage, data: { breadcrumb: 'Ramais' } },
@@ -41,6 +44,9 @@ export default [
     { path: 'routes', component: RoutePage, data: { breadcrumb: 'Rotas' } },
     { path: 'routes/new', component: NewRoutePage, data: { breadcrumb: 'Rotas > Nova' } },
     { path: 'routes/edit/:id', component: EditRoutePage, data: { breadcrumb: 'Rotas > Editar' } },
+    { path: 'calendars', component: CalendarPage, data: { breadcrumb: 'Calendários' } },
+    { path: 'calendars/new', component: NewCalendarPage, data: { breadcrumb: 'Calendários > Novo' } },
+    { path: 'calendars/edit/:id', component: EditCalendarPage, data: { breadcrumb: 'Calendários > Editar' } },
 
     { path: '**', redirectTo: '/notfound' }
 ] as Routes;

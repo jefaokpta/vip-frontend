@@ -51,6 +51,11 @@ export class AppMenu implements OnInit {
                             routerLink: ['/pabx/dialplans']
                         },
                         {
+                            label: 'Calendários',
+                            icon: 'pi pi-fw pi-calendar',
+                            routerLink: ['/pabx/calendars']
+                        },
+                        {
                             label: 'Alias de Discagem',
                             icon: 'pi pi-fw pi-list',
                             routerLink: ['/pabx/aliases']
