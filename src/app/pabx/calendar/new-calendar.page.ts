@@ -10,6 +10,7 @@ import { DatePicker } from 'primeng/datepicker';
 import { SelectButton } from 'primeng/selectbutton';
 import { Calendar, CalendarTypeEnum, WeekDayEnum } from '@/pabx/types';
 import { CalendarService } from '@/pabx/calendar/calendar.service';
+import { calendarTypeOptions } from '@/pabx/calendar/utils';
 
 @Component({
     selector: 'app-new-calendar-page',
@@ -66,7 +67,7 @@ import { CalendarService } from '@/pabx/calendar/calendar.service';
                 </div>
 
                 <div
-                    *ngIf="form.get('calendarType')?.value === 'BY_DATE'"
+                    *ngIf="form.get('calendarType')?.value === CalendarTypeEnum.DATES"
                     class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4"
                 >
                     <div class="field">
@@ -82,7 +83,7 @@ import { CalendarService } from '@/pabx/calendar/calendar.service';
                     </div>
                 </div>
 
-                <div *ngIf="form.get('calendarType')?.value === 'BY_WEEKDAY'" class="mb-4">
+                <div *ngIf="form.get('calendarType')?.value === CalendarTypeEnum.WEEKDAYS" class="mb-4">
                     <div class="field mb-4">
                         <label for="weekDays" class="block mb-2">Dias da Semana *</label>
                         <p-select-button
@@ -136,10 +137,7 @@ export class NewCalendarPage implements OnInit {
     pending = false;
     showError = false;
 
-    calendarTypes = [
-        { label: 'Por Data', value: CalendarTypeEnum.BY_DATE },
-        { label: 'Por Dia da Semana', value: CalendarTypeEnum.BY_WEEKDAY }
-    ];
+    calendarTypes = calendarTypeOptions;
 
     weekDays = [
         { label: 'Dom', value: WeekDayEnum.SUNDAY },
@@ -160,7 +158,7 @@ export class NewCalendarPage implements OnInit {
     ngOnInit(): void {
         this.form = this.fb.group({
             name: ['', [Validators.required]],
-            calendarType: [CalendarTypeEnum.BY_DATE, [Validators.required]],
+            calendarType: [CalendarTypeEnum.WEEKDAYS, [Validators.required]],
             rangeDates: [[]],
             weekDays: [[]],
             startTime: [new Date(new Date().setHours(0, 0, 0, 0)), [Validators.required]],
@@ -190,19 +188,20 @@ export class NewCalendarPage implements OnInit {
             companyId: '',
             id: 0,
             name: formValue.name,
-            calendarType: formValue.calendarType,
+            calendarTypeEnum: formValue.calendarType,
             rangeDates: formValue.rangeDates,
             weekDays: formValue.weekDays,
             startTime: this.formatTime(formValue.startTime),
             endTime: this.formatTime(formValue.endTime)
         };
-        console.log(calendar);
-        // this.calendarService
-        //     .create(calendar as any)
-        //     .then(() => this.router.navigate(['/pabx/calendars']))
-        //     .catch(() => {
-        //         this.showError = true;
-        //     })
-        //     .finally(() => (this.pending = false));
+        this.calendarService
+            .create(calendar)
+            .then(() => this.router.navigate(['/pabx/calendars']))
+            .catch(() => {
+                this.showError = true;
+            })
+            .finally(() => (this.pending = false));
     }
+
+    protected readonly CalendarTypeEnum = CalendarTypeEnum;
 }

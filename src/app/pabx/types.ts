@@ -195,8 +195,8 @@ export interface Route {
 }
 
 export enum CalendarTypeEnum {
-    BY_DATE = 'BY_DATE',
-    BY_WEEKDAY = 'BY_WEEKDAY'
+    DATES = 'DATES',
+    WEEKDAYS = 'WEEKDAYS'
 }
 
 export enum WeekDayEnum {
@@ -213,7 +213,7 @@ export interface Calendar {
     readonly id: number;
     readonly companyId: string;
     readonly name: string;
-    readonly calendarType: CalendarTypeEnum;
+    readonly calendarTypeEnum: CalendarTypeEnum;
     readonly rangeDates?: Date[];
     readonly weekDays?: WeekDayEnum[];
     readonly startTime: string;

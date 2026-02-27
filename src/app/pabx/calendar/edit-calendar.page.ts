@@ -10,6 +10,7 @@ import { DatePicker } from 'primeng/datepicker';
 import { SelectButton } from 'primeng/selectbutton';
 import { Calendar, CalendarTypeEnum, WeekDayEnum } from '@/pabx/types';
 import { CalendarService } from '@/pabx/calendar/calendar.service';
+import { calendarTypeOptions } from '@/pabx/calendar/utils';
 
 @Component({
     selector: 'app-edit-calendar-page',
@@ -147,10 +148,7 @@ export class EditCalendarPage implements OnInit {
     showError = false;
     private calendar: Calendar | undefined;
 
-    calendarTypes = [
-        { label: 'Por Data', value: CalendarTypeEnum.BY_DATE },
-        { label: 'Por Dia da Semana', value: CalendarTypeEnum.BY_WEEKDAY }
-    ];
+    calendarTypes = calendarTypeOptions;
 
     weekDays = [
         { label: 'Dom', value: WeekDayEnum.SUNDAY },
@@ -172,7 +170,7 @@ export class EditCalendarPage implements OnInit {
     ngOnInit(): void {
         this.form = this.fb.group({
             name: ['', [Validators.required]],
-            calendarType: [CalendarTypeEnum.BY_DATE, [Validators.required]],
+            calendarType: [CalendarTypeEnum.WEEKDAYS, [Validators.required]],
             rangeDates: [[]],
             weekDays: [[]],
             startTime: [null, [Validators.required]],
@@ -185,7 +183,7 @@ export class EditCalendarPage implements OnInit {
                 this.calendar = calendar;
                 this.form.patchValue({
                     name: calendar.name,
-                    calendarType: calendar.calendarType,
+                    calendarType: calendar.calendarTypeEnum,
                     rangeDates: calendar.rangeDates,
                     weekDays: calendar.weekDays || [],
                     startTime: this.parseTime(calendar.startTime),
@@ -221,14 +219,12 @@ export class EditCalendarPage implements OnInit {
         this.pending = true;
         this.showError = false;
         const formValue = this.form.value;
-        const calendar = {
+        const calendar: Calendar = {
             ...this.calendar!,
             name: formValue.name,
-            calendarType: formValue.calendarType,
-            startDate: formValue.startDate ? this.formatDate(formValue.startDate) : undefined,
-            endDate: formValue.endDate ? this.formatDate(formValue.endDate) : undefined,
-            startWeekDay: formValue.calendarType === CalendarTypeEnum.BY_WEEKDAY ? formValue.startWeekDay : undefined,
-            endWeekDay: formValue.calendarType === CalendarTypeEnum.BY_WEEKDAY ? formValue.endWeekDay : undefined,
+            calendarTypeEnum: formValue.calendarType,
+            rangeDates: formValue.rangeDates,
+            weekDays: formValue.weekDays,
             startTime: this.formatTime(formValue.startTime),
             endTime: this.formatTime(formValue.endTime)
         };

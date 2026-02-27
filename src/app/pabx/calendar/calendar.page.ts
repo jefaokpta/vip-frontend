@@ -147,7 +147,7 @@ export class CalendarPage implements OnInit {
     }
 
     formatType(type: CalendarTypeEnum): string {
-        return type === CalendarTypeEnum.BY_DATE ? 'Por Data' : 'Por Dia da Semana';
+        return type === CalendarTypeEnum.DATES ? 'Datas' : 'Dias da Semana';
     }
 
     confirmDelete(calendar: Calendar) {
