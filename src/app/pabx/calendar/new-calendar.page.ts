@@ -7,13 +7,24 @@ import { NgIf } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { Select } from 'primeng/select';
 import { DatePicker } from 'primeng/datepicker';
-import { CalendarTypeEnum, WeekDayEnum } from '@/pabx/types';
+import { SelectButton } from 'primeng/selectbutton';
+import { Calendar, CalendarTypeEnum, WeekDayEnum } from '@/pabx/types';
 import { CalendarService } from '@/pabx/calendar/calendar.service';
 
 @Component({
     selector: 'app-new-calendar-page',
     standalone: true,
-    imports: [InputTextModule, ButtonModule, CardModule, NgIf, ReactiveFormsModule, RouterLink, Select, DatePicker],
+    imports: [
+        InputTextModule,
+        ButtonModule,
+        CardModule,
+        NgIf,
+        ReactiveFormsModule,
+        RouterLink,
+        Select,
+        DatePicker,
+        SelectButton
+    ],
     template: `
         <p-card>
             <ng-template #title>
@@ -59,52 +70,29 @@ import { CalendarService } from '@/pabx/calendar/calendar.service';
                     class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4"
                 >
                     <div class="field">
-                        <label for="startDate" class="block mb-2">Data Início *</label>
+                        <label for="rangeDates" class="block mb-2">Datas *</label>
                         <p-datepicker
-                            id="startDate"
-                            formControlName="startDate"
+                            id="rangeDates"
+                            formControlName="rangeDates"
+                            selectionMode="range"
+                            [readonlyInput]="true"
                             dateFormat="dd/mm/yy"
                             [showIcon]="true"
-                            appendTo="body"
-                        ></p-datepicker>
-                    </div>
-                    <div class="field">
-                        <label for="endDate" class="block mb-2">Data Fim</label>
-                        <p-datepicker
-                            id="endDate"
-                            formControlName="endDate"
-                            dateFormat="dd/mm/yy"
-                            [showIcon]="true"
-                            appendTo="body"
                         ></p-datepicker>
                     </div>
                 </div>
 
-                <div
-                    *ngIf="form.get('calendarType')?.value === 'BY_WEEKDAY'"
-                    class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4"
-                >
-                    <div class="field">
-                        <label for="startWeekDay" class="block mb-2">Dia da Semana Início *</label>
-                        <p-select
-                            id="startWeekDay"
-                            formControlName="startWeekDay"
+                <div *ngIf="form.get('calendarType')?.value === 'BY_WEEKDAY'" class="mb-4">
+                    <div class="field mb-4">
+                        <label for="weekDays" class="block mb-2">Dias da Semana *</label>
+                        <p-select-button
+                            id="weekDays"
                             [options]="weekDays"
+                            formControlName="weekDays"
+                            [multiple]="true"
                             optionLabel="label"
                             optionValue="value"
-                            placeholder="Selecione o dia"
-                        ></p-select>
-                    </div>
-                    <div class="field">
-                        <label for="endWeekDay" class="block mb-2">Dia da Semana Fim</label>
-                        <p-select
-                            id="endWeekDay"
-                            formControlName="endWeekDay"
-                            [options]="weekDays"
-                            optionLabel="label"
-                            optionValue="value"
-                            placeholder="Selecione o dia"
-                        ></p-select>
+                        />
                     </div>
                 </div>
 
@@ -117,7 +105,6 @@ import { CalendarService } from '@/pabx/calendar/calendar.service';
                             [timeOnly]="true"
                             [showTime]="true"
                             [showIcon]="true"
-                            appendTo="body"
                         ></p-datepicker>
                     </div>
                     <div class="field">
@@ -128,7 +115,6 @@ import { CalendarService } from '@/pabx/calendar/calendar.service';
                             [timeOnly]="true"
                             [showTime]="true"
                             [showIcon]="true"
-                            appendTo="body"
                         ></p-datepicker>
                     </div>
                 </div>
@@ -156,13 +142,13 @@ export class NewCalendarPage implements OnInit {
     ];
 
     weekDays = [
-        { label: 'Domingo', value: WeekDayEnum.SUNDAY },
-        { label: 'Segunda-feira', value: WeekDayEnum.MONDAY },
-        { label: 'Terça-feira', value: WeekDayEnum.TUESDAY },
-        { label: 'Quarta-feira', value: WeekDayEnum.WEDNESDAY },
-        { label: 'Quinta-feira', value: WeekDayEnum.THURSDAY },
-        { label: 'Sexta-feira', value: WeekDayEnum.FRIDAY },
-        { label: 'Sábado', value: WeekDayEnum.SATURDAY }
+        { label: 'Dom', value: WeekDayEnum.SUNDAY },
+        { label: 'Seg', value: WeekDayEnum.MONDAY },
+        { label: 'Ter', value: WeekDayEnum.TUESDAY },
+        { label: 'Qua', value: WeekDayEnum.WEDNESDAY },
+        { label: 'Qui', value: WeekDayEnum.THURSDAY },
+        { label: 'Sex', value: WeekDayEnum.FRIDAY },
+        { label: 'Sáb', value: WeekDayEnum.SATURDAY }
     ];
 
     constructor(
@@ -175,12 +161,10 @@ export class NewCalendarPage implements OnInit {
         this.form = this.fb.group({
             name: ['', [Validators.required]],
             calendarType: [CalendarTypeEnum.BY_DATE, [Validators.required]],
-            startDate: [null],
-            endDate: [null],
-            startWeekDay: [null],
-            endWeekDay: [null],
-            startTime: [null, [Validators.required]],
-            endTime: [null, [Validators.required]]
+            rangeDates: [[]],
+            weekDays: [[]],
+            startTime: [new Date(), [Validators.required]],
+            endTime: [new Date().setHours(23, 59, 59, 999), [Validators.required]]
         });
     }
 
@@ -201,13 +185,14 @@ export class NewCalendarPage implements OnInit {
         this.pending = true;
         this.showError = false;
         const formValue = this.form.value;
-        const calendar = {
+        console.log(formValue);
+        const calendar: Calendar = {
+            companyId: '',
+            id: 0,
             name: formValue.name,
             calendarType: formValue.calendarType,
-            startDate: formValue.startDate ? this.formatDate(formValue.startDate) : undefined,
-            endDate: formValue.endDate ? this.formatDate(formValue.endDate) : undefined,
-            startWeekDay: formValue.calendarType === CalendarTypeEnum.BY_WEEKDAY ? formValue.startWeekDay : undefined,
-            endWeekDay: formValue.calendarType === CalendarTypeEnum.BY_WEEKDAY ? formValue.endWeekDay : undefined,
+            rangeDates: formValue.rangeDates,
+            weekDays: formValue.weekDays,
             startTime: this.formatTime(formValue.startTime),
             endTime: this.formatTime(formValue.endTime)
         };

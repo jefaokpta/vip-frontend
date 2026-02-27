@@ -7,13 +7,24 @@ import { NgIf } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Select } from 'primeng/select';
 import { DatePicker } from 'primeng/datepicker';
+import { SelectButton } from 'primeng/selectbutton';
 import { Calendar, CalendarTypeEnum, WeekDayEnum } from '@/pabx/types';
 import { CalendarService } from '@/pabx/calendar/calendar.service';
 
 @Component({
     selector: 'app-edit-calendar-page',
     standalone: true,
-    imports: [InputTextModule, ButtonModule, CardModule, NgIf, ReactiveFormsModule, RouterLink, Select, DatePicker],
+    imports: [
+        InputTextModule,
+        ButtonModule,
+        CardModule,
+        NgIf,
+        ReactiveFormsModule,
+        RouterLink,
+        Select,
+        DatePicker,
+        SelectButton
+    ],
     template: `
         <p-card>
             <ng-template #title>
@@ -80,31 +91,16 @@ import { CalendarService } from '@/pabx/calendar/calendar.service';
                     </div>
                 </div>
 
-                <div
-                    *ngIf="form.get('calendarType')?.value === 'BY_WEEKDAY'"
-                    class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4"
-                >
-                    <div class="field">
+                <div *ngIf="form.get('calendarType')?.value === 'BY_WEEKDAY'" class="mb-4">
+                    <div class="field mb-4">
                         <label for="startWeekDay" class="block mb-2">Dia da Semana Início *</label>
-                        <p-select
+                        <p-select-button
                             id="startWeekDay"
+                            [options]="weekDays"
                             formControlName="startWeekDay"
-                            [options]="weekDays"
                             optionLabel="label"
                             optionValue="value"
-                            placeholder="Selecione o dia"
-                        ></p-select>
-                    </div>
-                    <div class="field">
-                        <label for="endWeekDay" class="block mb-2">Dia da Semana Fim</label>
-                        <p-select
-                            id="endWeekDay"
-                            formControlName="endWeekDay"
-                            [options]="weekDays"
-                            optionLabel="label"
-                            optionValue="value"
-                            placeholder="Selecione o dia"
-                        ></p-select>
+                        />
                     </div>
                 </div>
 
@@ -157,13 +153,13 @@ export class EditCalendarPage implements OnInit {
     ];
 
     weekDays = [
-        { label: 'Domingo', value: WeekDayEnum.SUNDAY },
-        { label: 'Segunda-feira', value: WeekDayEnum.MONDAY },
-        { label: 'Terça-feira', value: WeekDayEnum.TUESDAY },
-        { label: 'Quarta-feira', value: WeekDayEnum.WEDNESDAY },
-        { label: 'Quinta-feira', value: WeekDayEnum.THURSDAY },
-        { label: 'Sexta-feira', value: WeekDayEnum.FRIDAY },
-        { label: 'Sábado', value: WeekDayEnum.SATURDAY }
+        { label: 'Dom', value: WeekDayEnum.SUNDAY },
+        { label: 'Seg', value: WeekDayEnum.MONDAY },
+        { label: 'Ter', value: WeekDayEnum.TUESDAY },
+        { label: 'Qua', value: WeekDayEnum.WEDNESDAY },
+        { label: 'Qui', value: WeekDayEnum.THURSDAY },
+        { label: 'Sex', value: WeekDayEnum.FRIDAY },
+        { label: 'Sáb', value: WeekDayEnum.SATURDAY }
     ];
 
     constructor(
@@ -177,10 +173,8 @@ export class EditCalendarPage implements OnInit {
         this.form = this.fb.group({
             name: ['', [Validators.required]],
             calendarType: [CalendarTypeEnum.BY_DATE, [Validators.required]],
-            startDate: [null],
-            endDate: [null],
-            startWeekDay: [null],
-            endWeekDay: [null],
+            rangeDates: [[]],
+            weekDays: [[]],
             startTime: [null, [Validators.required]],
             endTime: [null, [Validators.required]]
         });
@@ -192,10 +186,8 @@ export class EditCalendarPage implements OnInit {
                 this.form.patchValue({
                     name: calendar.name,
                     calendarType: calendar.calendarType,
-                    startDate: calendar.startDate ? new Date(calendar.startDate + 'T00:00:00') : null,
-                    endDate: calendar.endDate ? new Date(calendar.endDate + 'T00:00:00') : null,
-                    startWeekDay: calendar.startWeekDay || null,
-                    endWeekDay: calendar.endWeekDay || null,
+                    rangeDates: calendar.rangeDates,
+                    weekDays: calendar.weekDays || [],
                     startTime: this.parseTime(calendar.startTime),
                     endTime: this.parseTime(calendar.endTime)
                 });

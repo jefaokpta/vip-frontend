@@ -214,10 +214,8 @@ export interface Calendar {
     readonly companyId: string;
     readonly name: string;
     readonly calendarType: CalendarTypeEnum;
-    readonly startDate?: string;
-    readonly endDate?: string;
-    readonly startWeekDay?: WeekDayEnum;
-    readonly endWeekDay?: WeekDayEnum;
+    readonly rangeDates?: Date[];
+    readonly weekDays?: WeekDayEnum[];
     readonly startTime: string;
     readonly endTime: string;
 }
