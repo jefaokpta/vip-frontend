@@ -163,8 +163,8 @@ export class NewCalendarPage implements OnInit {
             calendarType: [CalendarTypeEnum.BY_DATE, [Validators.required]],
             rangeDates: [[]],
             weekDays: [[]],
-            startTime: [new Date(), [Validators.required]],
-            endTime: [new Date().setHours(23, 59, 59, 999), [Validators.required]]
+            startTime: [new Date(new Date().setHours(0, 0, 0, 0)), [Validators.required]],
+            endTime: [new Date(new Date().setHours(23, 59, 0, 0)), [Validators.required]]
         });
     }
 
