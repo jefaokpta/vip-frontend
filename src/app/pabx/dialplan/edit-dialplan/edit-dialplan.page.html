@@ -196,6 +196,15 @@
                                             (isCutInPipeChange)="action.get('arg4').setValue($event)"
                                         />
                                     </ng-container>
+                                    <ng-container *ngIf="action.get('actionEnum').value == 'CALENDAR'">
+                                        <app-calendar-action-component
+                                            formControlName="arg1"
+                                            [arg2]="action.get('arg2').value"
+                                            (arg2Change)="action.get('arg2').setValue($event)"
+                                            [arg3]="action.get('arg3').value"
+                                            (arg3Change)="action.get('arg3').setValue($event)"
+                                        />
+                                    </ng-container>
                                 </td>
                                 <td>
                                     <p-button icon="pi pi-trash" severity="danger" outlined

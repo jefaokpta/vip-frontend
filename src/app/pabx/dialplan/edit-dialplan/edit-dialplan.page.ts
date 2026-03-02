@@ -23,6 +23,7 @@ import { AccountCodeActionComponent } from '@/pabx/dialplan/components/accountco
 import { isNumber } from 'chart.js/helpers';
 import { dialplanActionOptions, dialplanSrcOptions } from '@/pabx/dialplan/utils';
 import { EditDstActionComponent } from '@/pabx/dialplan/components/edit-dst-action.component';
+import { CalendarActionComponent } from '@/pabx/dialplan/components/calendar-action.component';
 
 /**
  * @author Jefferson Alves Reis (jefaokpta)
@@ -53,7 +54,8 @@ import { EditDstActionComponent } from '@/pabx/dialplan/components/edit-dst-acti
         PlaybackActionComponent,
         VariableActionComponent,
         AccountCodeActionComponent,
-        EditDstActionComponent
+        EditDstActionComponent,
+        CalendarActionComponent
     ],
     templateUrl: './edit-dialplan.page.html'
 })
@@ -147,7 +149,7 @@ export class EditDialplanPage implements OnInit {
                 this.actions.push(
                     this.fb.group({
                         actionEnum: action.actionEnum,
-                        arg1: [action.arg1, this.actionHasArg1(action.actionEnum)],
+                        arg1: [action.arg1, this.hasValidatorOnArg1(action.actionEnum)],
                         arg2: [
                             action.arg2,
                             action.actionEnum === DialPlanActionEnum.SET_VARIABLE ? [Validators.required] : []
@@ -164,7 +166,7 @@ export class EditDialplanPage implements OnInit {
         this.actions.push(
             this.fb.group({
                 actionEnum: this.selectedAction?.value,
-                arg1: ['', this.actionHasArg1(this.selectedAction?.value)],
+                arg1: ['', this.hasValidatorOnArg1(this.selectedAction?.value)],
                 arg2: ['', this.selectedAction.value === DialPlanActionEnum.SET_VARIABLE ? [Validators.required] : []],
                 arg3: [''],
                 arg4: ['']
@@ -215,7 +217,7 @@ export class EditDialplanPage implements OnInit {
         }
     }
 
-    private actionHasArg1(selectedAction: DialPlanActionEnum): Validators[] {
+    private hasValidatorOnArg1(selectedAction: DialPlanActionEnum): Validators[] {
         if (
             selectedAction === DialPlanActionEnum.ANSWER ||
             selectedAction === DialPlanActionEnum.HANGUP ||
