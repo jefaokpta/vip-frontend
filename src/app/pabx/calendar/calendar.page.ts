@@ -74,10 +74,7 @@ import { Badge } from 'primeng/badge';
                             Nome
                             <p-sortIcon field="name"></p-sortIcon>
                         </th>
-                        <th pSortableColumn="calendarType">
-                            Tipo
-                            <p-sortIcon field="calendarType"></p-sortIcon>
-                        </th>
+                        <th>Datas</th>
                         <th>Horário</th>
                         <th style="width: 10%">Ações</th>
                     </tr>
@@ -86,13 +83,24 @@ import { Badge } from 'primeng/badge';
                 <ng-template pTemplate="body" let-calendar>
                     <tr>
                         <td>{{ calendar.name }}</td>
-                        <td>{{ formatType(calendar.calendarType) }}</td>
                         <td>
-                            @if (calendar.startTime == '00:00:00' && calendar.endTime == '23:59:00') {
-                                <p-badge value="24h" severity="success" />
+                            @if (calendar.calendarType == CalendarTypeEnum.WEEKDAYS) {
+                                @for (weekday of calendar.weekDays; track weekday) {
+                                    <p-badge [value]="weekday.toString()"></p-badge>
+                                }
                             } @else {
-                                <p-badge [value]="calendar.startTime" severity="info" />
-                                <p-badge [value]="calendar.endTime" severity="secondary" />
+                                {{ calendar.rangeDates.join(', ') }}
+                            }
+                        </td>
+                        <td>
+                            @if (
+                                calendar.startTime.toString().substring(0, 5) == '00:00' &&
+                                calendar.endTime.toString().substring(0, 5) == '23:59'
+                            ) {
+                                <p-badge value="24h" />
+                            } @else {
+                                <p-badge [value]="calendar.startTime.toString().substring(0, 5)" />
+                                <p-badge [value]="calendar.endTime.toString().substring(0, 5)" severity="secondary" />
                             }
                         </td>
                         <td>
@@ -155,10 +163,6 @@ export class CalendarPage implements OnInit {
         }
     }
 
-    formatType(type: CalendarTypeEnum): string {
-        return type === CalendarTypeEnum.DATES ? 'Datas' : 'Dias da Semana';
-    }
-
     confirmDelete(calendar: Calendar) {
         this.confirmationService.confirm({
             message: `Deletar ${calendar.name}?`,
@@ -197,4 +201,6 @@ export class CalendarPage implements OnInit {
             }
         });
     }
+
+    protected readonly CalendarTypeEnum = CalendarTypeEnum;
 }
