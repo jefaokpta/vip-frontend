@@ -14,6 +14,7 @@ import { Toast } from 'primeng/toast';
 import { Calendar, CalendarTypeEnum } from '@/pabx/types';
 import { NgIf } from '@angular/common';
 import { Tooltip } from 'primeng/tooltip';
+import { Badge } from 'primeng/badge';
 
 @Component({
     selector: 'app-calendar-page',
@@ -31,7 +32,8 @@ import { Tooltip } from 'primeng/tooltip';
         ConfirmDialog,
         Toast,
         NgIf,
-        Tooltip
+        Tooltip,
+        Badge
     ],
     template: `
         <p-card>
@@ -85,7 +87,14 @@ import { Tooltip } from 'primeng/tooltip';
                     <tr>
                         <td>{{ calendar.name }}</td>
                         <td>{{ formatType(calendar.calendarType) }}</td>
-                        <td>{{ calendar.startTime }} - {{ calendar.endTime }}</td>
+                        <td>
+                            @if (calendar.startTime == '00:00:00' && calendar.endTime == '23:59:00') {
+                                <p-badge value="24h" severity="success" />
+                            } @else {
+                                <p-badge [value]="calendar.startTime" severity="info" />
+                                <p-badge [value]="calendar.endTime" severity="secondary" />
+                            }
+                        </td>
                         <td>
                             <div class="flex gap-2">
                                 <p-button
