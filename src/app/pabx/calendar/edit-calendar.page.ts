@@ -5,7 +5,6 @@ import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { NgIf } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { Select } from 'primeng/select';
 import { DatePicker } from 'primeng/datepicker';
 import { SelectButton } from 'primeng/selectbutton';
 import { Calendar, CalendarTypeEnum } from '@/pabx/types';
@@ -22,7 +21,6 @@ import { calendarTypeOptions, calendarWeekDays } from '@/pabx/calendar/utils';
         NgIf,
         ReactiveFormsModule,
         RouterLink,
-        Select,
         DatePicker,
         SelectButton
     ],
@@ -55,15 +53,14 @@ import { calendarTypeOptions, calendarWeekDays } from '@/pabx/calendar/utils';
                 </div>
 
                 <div class="field mb-4">
-                    <label for="calendarType" class="block mb-2">Tipo *</label>
-                    <p-select
+                    <label for="calendarType" class="block mb-2">Agendamento *</label>
+                    <p-select-button
                         id="calendarType"
                         formControlName="calendarType"
                         [options]="calendarTypes"
                         optionLabel="label"
                         optionValue="value"
-                        placeholder="Selecione o tipo"
-                    ></p-select>
+                    ></p-select-button>
                 </div>
 
                 <div
