@@ -6,11 +6,11 @@ export const calendarTypeOptions = [
 ];
 
 export const calendarWeekDays = [
-    { label: 'Dom', value: WeekDayEnum.SUNDAY },
     { label: 'Seg', value: WeekDayEnum.MONDAY },
     { label: 'Ter', value: WeekDayEnum.TUESDAY },
     { label: 'Qua', value: WeekDayEnum.WEDNESDAY },
     { label: 'Qui', value: WeekDayEnum.THURSDAY },
     { label: 'Sex', value: WeekDayEnum.FRIDAY },
-    { label: 'Sáb', value: WeekDayEnum.SATURDAY }
+    { label: 'Sáb', value: WeekDayEnum.SATURDAY },
+    { label: 'Dom', value: WeekDayEnum.SUNDAY }
 ];

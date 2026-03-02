@@ -200,13 +200,13 @@ export enum CalendarTypeEnum {
 }
 
 export enum WeekDayEnum {
-    SUNDAY = 'SUNDAY',
     MONDAY = 'MONDAY',
     TUESDAY = 'TUESDAY',
     WEDNESDAY = 'WEDNESDAY',
     THURSDAY = 'THURSDAY',
     FRIDAY = 'FRIDAY',
-    SATURDAY = 'SATURDAY'
+    SATURDAY = 'SATURDAY',
+    SUNDAY = 'SUNDAY'
 }
 
 export interface Calendar {

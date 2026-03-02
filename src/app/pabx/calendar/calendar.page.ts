@@ -76,7 +76,7 @@ import { calendarWeekDays } from '@/pabx/calendar/utils';
                             <p-sortIcon field="name"></p-sortIcon>
                         </th>
                         <th>Datas</th>
-                        <th>Horário</th>
+                        <th>Horários</th>
                         <th style="width: 10%">Ações</th>
                     </tr>
                 </ng-template>
@@ -86,11 +86,17 @@ import { calendarWeekDays } from '@/pabx/calendar/utils';
                         <td>{{ calendar.name }}</td>
                         <td>
                             @if (calendar.calendarTypeEnum == CalendarTypeEnum.WEEKDAYS) {
-                                <div class="flex gap-1">
-                                    @for (weekday of calendar.weekDays; track weekday) {
-                                        <p-badge [value]="weekdayByEnum(weekday)" severity="secondary"></p-badge>
-                                    }
-                                </div>
+                                @if (isOnlyWorkDays(calendar.weekDays)) {
+                                    <span>Seg a Sex</span>
+                                } @else if (wholeWeek(calendar.weekDays)) {
+                                    <span>Semana Inteira</span>
+                                } @else {
+                                    <div class="flex gap-1">
+                                        @for (weekday of calendar.weekDays; track weekday) {
+                                            <p-badge [value]="weekdayByEnum(weekday)" severity="secondary"></p-badge>
+                                        }
+                                    </div>
+                                }
                             } @else {
                                 {{ formatRangeDates(calendar.rangeDates) }}
                             }
@@ -173,6 +179,38 @@ export class CalendarPage implements OnInit {
                 return `${day}/${month}`;
             })
             .join(' a ');
+    }
+
+    isOnlyWorkDays(weekDays: WeekDayEnum[]): boolean {
+        return (
+            weekDays.length === 5 &&
+            weekDays.every((weekday) =>
+                [
+                    WeekDayEnum.MONDAY,
+                    WeekDayEnum.TUESDAY,
+                    WeekDayEnum.WEDNESDAY,
+                    WeekDayEnum.THURSDAY,
+                    WeekDayEnum.FRIDAY
+                ].includes(weekday)
+            )
+        );
+    }
+
+    wholeWeek(weekDays: WeekDayEnum[]): boolean {
+        return (
+            weekDays.length === 7 &&
+            weekDays.every((weekday) =>
+                [
+                    WeekDayEnum.MONDAY,
+                    WeekDayEnum.TUESDAY,
+                    WeekDayEnum.WEDNESDAY,
+                    WeekDayEnum.THURSDAY,
+                    WeekDayEnum.FRIDAY,
+                    WeekDayEnum.SATURDAY,
+                    WeekDayEnum.SUNDAY
+                ].includes(weekday)
+            )
+        );
     }
 
     onFilterGlobal(event: Event) {
