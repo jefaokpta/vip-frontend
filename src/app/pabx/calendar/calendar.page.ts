@@ -92,7 +92,7 @@ import { calendarWeekDays } from '@/pabx/calendar/utils';
                                     }
                                 </div>
                             } @else {
-                                {{ calendar.rangeDates.join(', ') }}
+                                {{ formatRangeDates(calendar.rangeDates) }}
                             }
                         </td>
                         <td>
@@ -161,6 +161,18 @@ export class CalendarPage implements OnInit {
 
     weekdayByEnum(weekdayEnum: WeekDayEnum): string {
         return calendarWeekDays.find((weekday) => weekday.value === weekdayEnum)?.label || '';
+    }
+
+    formatRangeDates(dates?: Date[]): string {
+        if (!dates || dates.length === 0) return '';
+        return dates
+            .map((d) => {
+                const date = new Date(d);
+                const day = date.getDate().toString().padStart(2, '0');
+                const month = (date.getMonth() + 1).toString().padStart(2, '0');
+                return `${day}/${month}`;
+            })
+            .join(' a ');
     }
 
     onFilterGlobal(event: Event) {
