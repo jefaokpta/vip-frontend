@@ -8,9 +8,9 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Select } from 'primeng/select';
 import { DatePicker } from 'primeng/datepicker';
 import { SelectButton } from 'primeng/selectbutton';
-import { Calendar, CalendarTypeEnum, WeekDayEnum } from '@/pabx/types';
+import { Calendar, CalendarTypeEnum } from '@/pabx/types';
 import { CalendarService } from '@/pabx/calendar/calendar.service';
-import { calendarTypeOptions } from '@/pabx/calendar/utils';
+import { calendarTypeOptions, calendarWeekDays } from '@/pabx/calendar/utils';
 
 @Component({
     selector: 'app-edit-calendar-page',
@@ -30,7 +30,7 @@ import { calendarTypeOptions } from '@/pabx/calendar/utils';
         <p-card>
             <ng-template #title>
                 <div class="flex justify-between">
-                    <span class="font-semibold text-2xl">Editar Calendário</span>
+                    <span class="font-semibold text-2xl">Editar {{ form.get('name')?.value }}</span>
                     <p-button
                         type="button"
                         label="Voltar"
@@ -67,38 +67,30 @@ import { calendarTypeOptions } from '@/pabx/calendar/utils';
                 </div>
 
                 <div
-                    *ngIf="form.get('calendarType')?.value === 'BY_DATE'"
+                    *ngIf="form.get('calendarType')?.value === CalendarTypeEnum.DATES"
                     class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4"
                 >
                     <div class="field">
-                        <label for="startDate" class="block mb-2">Data Início *</label>
+                        <label for="rangeDates" class="block mb-2">Datas *</label>
                         <p-datepicker
-                            id="startDate"
-                            formControlName="startDate"
+                            id="rangeDates"
+                            formControlName="rangeDates"
+                            selectionMode="range"
+                            [readonlyInput]="true"
                             dateFormat="dd/mm/yy"
                             [showIcon]="true"
-                            appendTo="body"
-                        ></p-datepicker>
-                    </div>
-                    <div class="field">
-                        <label for="endDate" class="block mb-2">Data Fim</label>
-                        <p-datepicker
-                            id="endDate"
-                            formControlName="endDate"
-                            dateFormat="dd/mm/yy"
-                            [showIcon]="true"
-                            appendTo="body"
                         ></p-datepicker>
                     </div>
                 </div>
 
-                <div *ngIf="form.get('calendarType')?.value === 'BY_WEEKDAY'" class="mb-4">
+                <div *ngIf="form.get('calendarType')?.value === CalendarTypeEnum.WEEKDAYS" class="mb-4">
                     <div class="field mb-4">
-                        <label for="startWeekDay" class="block mb-2">Dia da Semana Início *</label>
+                        <label for="weekDays" class="block mb-2">Dias da Semana *</label>
                         <p-select-button
-                            id="startWeekDay"
+                            id="weekDays"
                             [options]="weekDays"
-                            formControlName="startWeekDay"
+                            formControlName="weekDays"
+                            [multiple]="true"
                             optionLabel="label"
                             optionValue="value"
                         />
@@ -114,7 +106,6 @@ import { calendarTypeOptions } from '@/pabx/calendar/utils';
                             [timeOnly]="true"
                             [showTime]="true"
                             [showIcon]="true"
-                            appendTo="body"
                         ></p-datepicker>
                     </div>
                     <div class="field">
@@ -125,7 +116,6 @@ import { calendarTypeOptions } from '@/pabx/calendar/utils';
                             [timeOnly]="true"
                             [showTime]="true"
                             [showIcon]="true"
-                            appendTo="body"
                         ></p-datepicker>
                     </div>
                 </div>
@@ -146,19 +136,10 @@ export class EditCalendarPage implements OnInit {
     form!: FormGroup;
     pending = false;
     showError = false;
-    private calendar: Calendar | undefined;
 
     calendarTypes = calendarTypeOptions;
 
-    weekDays = [
-        { label: 'Dom', value: WeekDayEnum.SUNDAY },
-        { label: 'Seg', value: WeekDayEnum.MONDAY },
-        { label: 'Ter', value: WeekDayEnum.TUESDAY },
-        { label: 'Qua', value: WeekDayEnum.WEDNESDAY },
-        { label: 'Qui', value: WeekDayEnum.THURSDAY },
-        { label: 'Sex', value: WeekDayEnum.FRIDAY },
-        { label: 'Sáb', value: WeekDayEnum.SATURDAY }
-    ];
+    weekDays = calendarWeekDays;
 
     constructor(
         private readonly fb: FormBuilder,
@@ -169,30 +150,28 @@ export class EditCalendarPage implements OnInit {
 
     ngOnInit(): void {
         this.form = this.fb.group({
+            id: [null, [Validators.required]],
+            companyId: [null, [Validators.required]],
             name: ['', [Validators.required]],
             calendarType: [CalendarTypeEnum.WEEKDAYS, [Validators.required]],
             rangeDates: [[]],
             weekDays: [[]],
-            startTime: [null, [Validators.required]],
-            endTime: [null, [Validators.required]]
+            startTime: [new Date(new Date().setHours(0, 0, 0, 0)), [Validators.required]],
+            endTime: [new Date(new Date().setHours(23, 59, 59, 0)), [Validators.required]]
         });
-
-        this.calendarService
-            .findById(this.activatedRoute.snapshot.params['id'])
-            .then((calendar) => {
-                this.calendar = calendar;
-                this.form.patchValue({
-                    name: calendar.name,
-                    calendarType: calendar.calendarTypeEnum,
-                    rangeDates: calendar.rangeDates,
-                    weekDays: calendar.weekDays || [],
-                    startTime: this.parseTime(calendar.startTime),
-                    endTime: this.parseTime(calendar.endTime)
-                });
-            })
-            .catch(() => {
-                this.router.navigate(['/pabx/calendars']);
+        const id = this.activatedRoute.snapshot.paramMap.get('id')!;
+        this.calendarService.findById(Number(id)).then((calendar) => {
+            this.form.patchValue({
+                id: calendar.id,
+                companyId: calendar.companyId,
+                name: calendar.name,
+                calendarType: calendar.calendarTypeEnum,
+                rangeDates: calendar.rangeDates?.map((d) => new Date(d)),
+                weekDays: calendar.weekDays,
+                startTime: this.parseTime(calendar.startTime),
+                endTime: this.parseTime(calendar.endTime)
             });
+        });
     }
 
     private parseTime(time: string): Date {
@@ -208,19 +187,13 @@ export class EditCalendarPage implements OnInit {
         return `${hours}:${minutes}`;
     }
 
-    private formatDate(date: Date): string {
-        const year = date.getFullYear();
-        const month = (date.getMonth() + 1).toString().padStart(2, '0');
-        const day = date.getDate().toString().padStart(2, '0');
-        return `${year}-${month}-${day}`;
-    }
-
     onSubmit() {
         this.pending = true;
         this.showError = false;
         const formValue = this.form.value;
         const calendar: Calendar = {
-            ...this.calendar!,
+            id: formValue.id,
+            companyId: formValue.companyId,
             name: formValue.name,
             calendarTypeEnum: formValue.calendarType,
             rangeDates: formValue.rangeDates,
@@ -229,11 +202,13 @@ export class EditCalendarPage implements OnInit {
             endTime: this.formatTime(formValue.endTime)
         };
         this.calendarService
-            .update(calendar as any)
+            .update(calendar)
             .then(() => this.router.navigate(['/pabx/calendars']))
             .catch(() => {
                 this.showError = true;
             })
             .finally(() => (this.pending = false));
     }
+
+    protected readonly CalendarTypeEnum = CalendarTypeEnum;
 }
