@@ -63,6 +63,7 @@ export class CalendarActionComponent implements ControlValueAccessor, OnInit {
     selectedOption: string = '';
     calendarOptions: { label: string; value: string; id: string }[] = [];
     selectedCalendars: { id: string; name: string }[] = [];
+    private pendingArg1: string = '';
 
     constructor(private readonly calendarService: CalendarService) {}
 
@@ -73,23 +74,33 @@ export class CalendarActionComponent implements ControlValueAccessor, OnInit {
                 value: c.id.toString(),
                 id: c.id.toString()
             }));
+            this.applyPendingValues();
         });
     }
 
+    private applyPendingValues(): void {
+        const args = [this.pendingArg1, this.arg2, this.arg3].filter((a) => !!a);
+        this.selectedCalendars = [];
+        for (const arg of args) {
+            const option = this.calendarOptions.find((o) => o.value === arg);
+            if (option && !this.selectedCalendars.some((c) => c.id === arg)) {
+                this.selectedCalendars.push({ id: arg, name: option.label });
+            }
+        }
+    }
+
     get availableCalendarOptions() {
-        const selectedIds = this.selectedCalendars.map((c) => c.id);
-        return this.calendarOptions.filter((o) => !selectedIds.includes(o.id));
+        const selectedIds = new Set(this.selectedCalendars.map((c) => c.id));
+        return this.calendarOptions.filter((o) => !selectedIds.has(o.id));
     }
 
     private onChange: (value: string) => void = () => {};
     private onTouched: () => void = () => {};
 
     writeValue(value: string): void {
+        this.pendingArg1 = value || '';
         if (value && this.calendarOptions.length > 0) {
-            const option = this.calendarOptions.find((o) => o.value === value);
-            if (option && !this.selectedCalendars.some((c) => c.id === value)) {
-                this.selectedCalendars = [{ id: value, name: option.label }];
-            }
+            this.applyPendingValues();
         }
     }
 

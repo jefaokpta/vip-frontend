@@ -196,6 +196,7 @@
                                     <ng-container *ngIf="action.get('actionEnum').value == 'CALENDAR'">
                                         <app-calendar-action-component
                                             formControlName="arg1"
+                                            [showError]="action.get('arg1').errors?.['required']"
                                             [arg2]="action.get('arg2').value"
                                             (arg2Change)="action.get('arg2').setValue($event)"
                                             [arg3]="action.get('arg3').value"
