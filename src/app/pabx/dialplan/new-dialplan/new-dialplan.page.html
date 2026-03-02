@@ -183,6 +183,23 @@
                                             [showVarValueError]="action.get('arg2').errors?.['required']"
                                         />
                                     </ng-container>
+                                    <ng-container *ngIf="action.get('actionEnum').value == 'EDIT_DST'">
+                                        <app-edit-dst-action-component
+                                            formControlName="arg1"
+                                            (cutNumberChange)="action.get('arg2').setValue($event)"
+                                            [isReplaceAllDst]="action.get('arg3').value?.toString() === 'true'"
+                                            (isReplaceAllDstChange)="action.get('arg3').setValue($event)"
+                                            [isCutInPipe]="action.get('arg4').value?.toString() === 'true'"
+                                            (isCutInPipeChange)="action.get('arg4').setValue($event)"
+                                        />
+                                    </ng-container>
+                                    <ng-container *ngIf="action.get('actionEnum').value == 'CALENDAR'">
+                                        <app-calendar-action-component
+                                            formControlName="arg1"
+                                            [arg2]="action.get('arg2').value"
+                                            [arg3]="action.get('arg3').value"
+                                        />
+                                    </ng-container>
                                 </td>
                                 <td>
                                     <p-button icon="pi pi-trash" severity="danger" outlined

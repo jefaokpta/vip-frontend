@@ -29,6 +29,7 @@ export function dialplanActionOptions() {
         { label: 'Rota', value: DialPlanActionEnum.DIAL_ROUTE },
         { label: 'Tocar Audio', value: DialPlanActionEnum.PLAYBACK },
         { label: 'Definir Variável', value: DialPlanActionEnum.SET_VARIABLE },
-        { label: 'Editar Destino', value: DialPlanActionEnum.EDIT_DST }
+        { label: 'Editar Destino', value: DialPlanActionEnum.EDIT_DST },
+        { label: 'Calendário', value: DialPlanActionEnum.CALENDAR }
     ];
 }

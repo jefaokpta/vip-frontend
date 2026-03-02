@@ -21,6 +21,8 @@ import { PlaybackActionComponent } from '@/pabx/dialplan/components/playback-act
 import { VariableActionComponent } from '@/pabx/dialplan/components/variable-action.component';
 import { AccountCodeActionComponent } from '@/pabx/dialplan/components/accountcode-action.component';
 import { dialplanActionOptions, dialplanSrcOptions } from '@/pabx/dialplan/utils';
+import { EditDstActionComponent } from '@/pabx/dialplan/components/edit-dst-action.component';
+import { CalendarActionComponent } from '@/pabx/dialplan/components/calendar-action.component';
 
 /**
  * @author Jefferson Alves Reis (jefaokpta)
@@ -50,7 +52,9 @@ import { dialplanActionOptions, dialplanSrcOptions } from '@/pabx/dialplan/utils
         HangupActionComponent,
         PlaybackActionComponent,
         VariableActionComponent,
-        AccountCodeActionComponent
+        AccountCodeActionComponent,
+        EditDstActionComponent,
+        CalendarActionComponent
     ],
     templateUrl: './new-dialplan.page.html'
 })
@@ -128,7 +132,9 @@ export class NewDialplanPage implements OnInit {
             this.fb.group({
                 actionEnum: this.selectedAction?.value,
                 arg1: ['', this.actionHasArg1(this.selectedAction?.value)],
-                arg2: ['', this.selectedAction.value === DialPlanActionEnum.SET_VARIABLE ? [Validators.required] : []]
+                arg2: ['', this.selectedAction.value === DialPlanActionEnum.SET_VARIABLE ? [Validators.required] : []],
+                arg3: [''],
+                arg4: ['']
             })
         );
     }
@@ -146,6 +152,8 @@ export class NewDialplanPage implements OnInit {
         this.showError = false;
         const dialplan = this.form.value;
         dialplan.actions = this.actions.value.map((action: any, index: any) => ({ ...action, priority: index }));
+        console.log(dialplan);
+        return;
         this.dialPlanService
             .create(dialplan)
             .then(() => this.router.navigate(['/pabx/dialplans']))
