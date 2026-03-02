@@ -8,9 +8,9 @@ import { Router, RouterLink } from '@angular/router';
 import { Select } from 'primeng/select';
 import { DatePicker } from 'primeng/datepicker';
 import { SelectButton } from 'primeng/selectbutton';
-import { Calendar, CalendarTypeEnum, WeekDayEnum } from '@/pabx/types';
+import { Calendar, CalendarTypeEnum } from '@/pabx/types';
 import { CalendarService } from '@/pabx/calendar/calendar.service';
-import { calendarTypeOptions } from '@/pabx/calendar/utils';
+import { calendarTypeOptions, calendarWeekDays } from '@/pabx/calendar/utils';
 
 @Component({
     selector: 'app-new-calendar-page',
@@ -139,15 +139,7 @@ export class NewCalendarPage implements OnInit {
 
     calendarTypes = calendarTypeOptions;
 
-    weekDays = [
-        { label: 'Dom', value: WeekDayEnum.SUNDAY },
-        { label: 'Seg', value: WeekDayEnum.MONDAY },
-        { label: 'Ter', value: WeekDayEnum.TUESDAY },
-        { label: 'Qua', value: WeekDayEnum.WEDNESDAY },
-        { label: 'Qui', value: WeekDayEnum.THURSDAY },
-        { label: 'Sex', value: WeekDayEnum.FRIDAY },
-        { label: 'Sáb', value: WeekDayEnum.SATURDAY }
-    ];
+    weekDays = calendarWeekDays;
 
     constructor(
         private readonly fb: FormBuilder,

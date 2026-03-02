@@ -11,10 +11,11 @@ import { RouterLink } from '@angular/router';
 import { ProgressSpinner } from 'primeng/progressspinner';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { Toast } from 'primeng/toast';
-import { Calendar, CalendarTypeEnum } from '@/pabx/types';
+import { Calendar, CalendarTypeEnum, WeekDayEnum } from '@/pabx/types';
 import { NgIf } from '@angular/common';
 import { Tooltip } from 'primeng/tooltip';
 import { Badge } from 'primeng/badge';
+import { calendarWeekDays } from '@/pabx/calendar/utils';
 
 @Component({
     selector: 'app-calendar-page',
@@ -84,10 +85,12 @@ import { Badge } from 'primeng/badge';
                     <tr>
                         <td>{{ calendar.name }}</td>
                         <td>
-                            @if (calendar.calendarType == CalendarTypeEnum.WEEKDAYS) {
-                                @for (weekday of calendar.weekDays; track weekday) {
-                                    <p-badge [value]="weekday.toString()"></p-badge>
-                                }
+                            @if (calendar.calendarTypeEnum == CalendarTypeEnum.WEEKDAYS) {
+                                <div class="flex gap-1">
+                                    @for (weekday of calendar.weekDays; track weekday) {
+                                        <p-badge [value]="weekdayByEnum(weekday)" severity="secondary"></p-badge>
+                                    }
+                                </div>
                             } @else {
                                 {{ calendar.rangeDates.join(', ') }}
                             }
@@ -154,6 +157,10 @@ export class CalendarPage implements OnInit {
             this.calendars = calendars;
             this.loading = false;
         });
+    }
+
+    weekdayByEnum(weekdayEnum: WeekDayEnum): string {
+        return calendarWeekDays.find((weekday) => weekday.value === weekdayEnum)?.label || '';
     }
 
     onFilterGlobal(event: Event) {
