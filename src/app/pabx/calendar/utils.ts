@@ -14,3 +14,10 @@ export const calendarWeekDays = [
     { label: 'Sáb', value: WeekDayEnum.SATURDAY },
     { label: 'Dom', value: WeekDayEnum.SUNDAY }
 ];
+
+export function calendarValidateRangeDates(rangeDates: Date[]) {
+    if (rangeDates && rangeDates[1] == null) {
+        rangeDates[1] = rangeDates[0];
+    }
+    return rangeDates;
+}

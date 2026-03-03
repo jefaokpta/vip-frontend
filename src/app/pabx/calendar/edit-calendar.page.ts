@@ -3,13 +3,14 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
-import { NgIf } from '@angular/common';
+import { NgForOf, NgIf } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { DatePicker } from 'primeng/datepicker';
 import { SelectButton } from 'primeng/selectbutton';
 import { Calendar, CalendarTypeEnum } from '@/pabx/types';
 import { CalendarService } from '@/pabx/calendar/calendar.service';
-import { calendarTypeOptions, calendarWeekDays } from '@/pabx/calendar/utils';
+import { calendarTypeOptions, calendarValidateRangeDates, calendarWeekDays } from '@/pabx/calendar/utils';
+import { RadioButton } from 'primeng/radiobutton';
 
 @Component({
     selector: 'app-edit-calendar-page',
@@ -22,7 +23,9 @@ import { calendarTypeOptions, calendarWeekDays } from '@/pabx/calendar/utils';
         ReactiveFormsModule,
         RouterLink,
         DatePicker,
-        SelectButton
+        SelectButton,
+        NgForOf,
+        RadioButton
     ],
     template: `
         <p-card>
@@ -53,18 +56,23 @@ import { calendarTypeOptions, calendarWeekDays } from '@/pabx/calendar/utils';
                 </div>
 
                 <div class="field mb-4">
-                    <label for="calendarType" class="block mb-2">Tipo de Agendamento *</label>
-                    <p-select-button
-                        id="calendarType"
-                        formControlName="calendarType"
-                        [options]="calendarTypes"
-                        optionLabel="label"
-                        optionValue="value"
-                    ></p-select-button>
+                    <label for="calendarTypeEnum" class="block mb-2">Tipo de Agendamento *</label>
+                    <div class="flex gap-4">
+                        <div *ngFor="let type of calendarTypes" class="field-checkbox">
+                            <p-radiobutton
+                                [inputId]="type.label"
+                                [value]="type.value"
+                                formControlName="calendarTypeEnum"
+                                (onClick)="onCalendarTypeChange()"
+                            >
+                            </p-radiobutton>
+                            <label [for]="type.label" class="ml-2">{{ type.label }}</label>
+                        </div>
+                    </div>
                 </div>
 
                 <div
-                    *ngIf="form.get('calendarType')?.value === CalendarTypeEnum.DATES"
+                    *ngIf="form.get('calendarTypeEnum')?.value === CalendarTypeEnum.DATES"
                     class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4"
                 >
                     <div class="field">
@@ -80,12 +88,12 @@ import { calendarTypeOptions, calendarWeekDays } from '@/pabx/calendar/utils';
                     </div>
                 </div>
 
-                <div *ngIf="form.get('calendarType')?.value === CalendarTypeEnum.WEEKDAYS" class="mb-4">
+                <div *ngIf="form.get('calendarTypeEnum')?.value === CalendarTypeEnum.WEEKDAYS" class="mb-4">
                     <div class="field mb-4">
                         <label for="weekDays" class="block mb-2">Dias da Semana *</label>
                         <p-select-button
                             id="weekDays"
-                            [options]="weekDays"
+                            [options]="calendarWeekDays"
                             formControlName="weekDays"
                             [multiple]="true"
                             optionLabel="label"
@@ -136,7 +144,7 @@ export class EditCalendarPage implements OnInit {
 
     calendarTypes = calendarTypeOptions;
 
-    weekDays = calendarWeekDays;
+    calendarWeekDays = calendarWeekDays;
 
     constructor(
         private readonly fb: FormBuilder,
@@ -150,9 +158,7 @@ export class EditCalendarPage implements OnInit {
             id: [null, [Validators.required]],
             companyId: [null, [Validators.required]],
             name: ['', [Validators.required]],
-            calendarType: [CalendarTypeEnum.WEEKDAYS, [Validators.required]],
-            rangeDates: [[]],
-            weekDays: [[]],
+            calendarTypeEnum: [null, [Validators.required]],
             startTime: [new Date(new Date().setHours(0, 0, 0, 0)), [Validators.required]],
             endTime: [new Date(new Date().setHours(23, 59, 59, 0)), [Validators.required]]
         });
@@ -162,12 +168,15 @@ export class EditCalendarPage implements OnInit {
                 id: calendar.id,
                 companyId: calendar.companyId,
                 name: calendar.name,
-                calendarType: calendar.calendarTypeEnum,
-                rangeDates: calendar.rangeDates?.map((d) => new Date(d)),
-                weekDays: calendar.weekDays,
+                calendarTypeEnum: calendar.calendarTypeEnum,
                 startTime: this.parseTime(calendar.startTime),
                 endTime: this.parseTime(calendar.endTime)
             });
+            if (calendar.calendarTypeEnum === CalendarTypeEnum.DATES) {
+                this.onCalendarTypeChange(calendar.rangeDates!.map((d) => new Date(d)));
+            } else {
+                this.onCalendarTypeChange(calendar.weekDays!);
+            }
         });
     }
 
@@ -184,6 +193,22 @@ export class EditCalendarPage implements OnInit {
         return `${hours}:${minutes}`;
     }
 
+    protected onCalendarTypeChange(defaultValue?: any) {
+        if (this.calendarTypeEnum.value === CalendarTypeEnum.DATES) {
+            this.form.removeControl('weekDays');
+            this.form.addControl(
+                'rangeDates',
+                this.fb.control(defaultValue, [Validators.required, Validators.minLength(1)])
+            );
+        } else {
+            this.form.removeControl('rangeDates');
+            this.form.addControl(
+                'weekDays',
+                this.fb.control(defaultValue, [Validators.required, Validators.minLength(1)])
+            );
+        }
+    }
+
     onSubmit() {
         this.pending = true;
         this.showError = false;
@@ -192,8 +217,8 @@ export class EditCalendarPage implements OnInit {
             id: formValue.id,
             companyId: formValue.companyId,
             name: formValue.name,
-            calendarTypeEnum: formValue.calendarType,
-            rangeDates: formValue.rangeDates,
+            calendarTypeEnum: formValue.calendarTypeEnum,
+            rangeDates: calendarValidateRangeDates(formValue.rangeDates),
             weekDays: formValue.weekDays,
             startTime: this.formatTime(formValue.startTime),
             endTime: this.formatTime(formValue.endTime)
@@ -205,6 +230,16 @@ export class EditCalendarPage implements OnInit {
                 this.showError = true;
             })
             .finally(() => (this.pending = false));
+    }
+
+    get rangeDates() {
+        return this.form.get('rangeDates')!;
+    }
+    get weekDays() {
+        return this.form.get('weekDays')!;
+    }
+    get calendarTypeEnum() {
+        return this.form.get('calendarTypeEnum')!;
     }
 
     protected readonly CalendarTypeEnum = CalendarTypeEnum;

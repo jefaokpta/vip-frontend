@@ -9,7 +9,7 @@ import { DatePicker } from 'primeng/datepicker';
 import { SelectButton } from 'primeng/selectbutton';
 import { Calendar, CalendarTypeEnum } from '@/pabx/types';
 import { CalendarService } from '@/pabx/calendar/calendar.service';
-import { calendarTypeOptions, calendarWeekDays } from '@/pabx/calendar/utils';
+import { calendarTypeOptions, calendarValidateRangeDates, calendarWeekDays } from '@/pabx/calendar/utils';
 import { RadioButton } from 'primeng/radiobutton';
 
 @Component({
@@ -193,7 +193,7 @@ export class NewCalendarPage implements OnInit {
             id: 0,
             name: formValue.name,
             calendarTypeEnum: formValue.calendarTypeEnum,
-            rangeDates: this.validateRangeDates(formValue.rangeDates),
+            rangeDates: calendarValidateRangeDates(formValue.rangeDates),
             weekDays: formValue.weekDays,
             startTime: this.formatTime(formValue.startTime),
             endTime: this.formatTime(formValue.endTime)
@@ -205,13 +205,6 @@ export class NewCalendarPage implements OnInit {
                 this.showError = true;
             })
             .finally(() => (this.pending = false));
-    }
-
-    private validateRangeDates(rangeDates: Date[]) {
-        if (rangeDates && rangeDates[1] == null) {
-            rangeDates[1] = rangeDates[0];
-        }
-        return rangeDates;
     }
 
     get rangeDates() {
