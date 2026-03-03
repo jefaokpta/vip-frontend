@@ -98,7 +98,11 @@ import { calendarWeekDays } from '@/pabx/calendar/utils';
                                     </div>
                                 }
                             } @else {
-                                {{ formatRangeDates(calendar.rangeDates) }}
+                                @if (isEqualDays(calendar.rangeDates)) {
+                                    {{ formatDate(calendar.rangeDates[0]) }}
+                                } @else {
+                                    {{ formatRangeDates(calendar.rangeDates) }}
+                                }
                             }
                         </td>
                         <td>
@@ -173,12 +177,16 @@ export class CalendarPage implements OnInit {
         if (!dates || dates.length === 0) return '';
         return dates
             .map((d) => {
-                const date = new Date(d);
-                const day = date.getDate().toString().padStart(2, '0');
-                const month = (date.getMonth() + 1).toString().padStart(2, '0');
-                return `${day}/${month}`;
+                return this.formatDate(d);
             })
             .join(' a ');
+    }
+
+    formatDate(d: Date): string {
+        const date = new Date(d);
+        const day = date.getDate().toString().padStart(2, '0');
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        return `${day}/${month}`;
     }
 
     isOnlyWorkDays(weekDays: WeekDayEnum[]): boolean {
@@ -260,4 +268,8 @@ export class CalendarPage implements OnInit {
     }
 
     protected readonly CalendarTypeEnum = CalendarTypeEnum;
+
+    protected isEqualDays(rangeDates: string): boolean {
+        return rangeDates[0] === rangeDates[1];
+    }
 }

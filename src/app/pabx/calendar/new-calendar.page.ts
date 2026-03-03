@@ -188,13 +188,12 @@ export class NewCalendarPage implements OnInit {
         this.pending = true;
         this.showError = false;
         const formValue = this.form.value;
-        console.log(formValue);
         const calendar: Calendar = {
             companyId: '',
             id: 0,
             name: formValue.name,
-            calendarTypeEnum: formValue.calendarType,
-            rangeDates: formValue.rangeDates,
+            calendarTypeEnum: formValue.calendarTypeEnum,
+            rangeDates: this.validateRangeDates(formValue.rangeDates),
             weekDays: formValue.weekDays,
             startTime: this.formatTime(formValue.startTime),
             endTime: this.formatTime(formValue.endTime)
@@ -206,6 +205,13 @@ export class NewCalendarPage implements OnInit {
                 this.showError = true;
             })
             .finally(() => (this.pending = false));
+    }
+
+    private validateRangeDates(rangeDates: Date[]) {
+        if (rangeDates && rangeDates[1] == null) {
+            rangeDates[1] = rangeDates[0];
+        }
+        return rangeDates;
     }
 
     get rangeDates() {
