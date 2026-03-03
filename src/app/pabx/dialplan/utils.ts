@@ -33,3 +33,11 @@ export function dialplanActionOptions() {
         { label: 'Calendário', value: DialPlanActionEnum.CALENDAR }
     ];
 }
+
+export function calendarActionOptions() {
+    //todo: fila de atendimento, grupo de ramais, ura de atendimento
+    return [
+        { label: 'Ramal', value: DialPlanActionEnum.DIAL_PEER },
+        { label: 'Tocar Audio', value: DialPlanActionEnum.PLAYBACK }
+    ];
+}

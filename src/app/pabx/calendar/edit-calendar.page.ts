@@ -221,7 +221,8 @@ export class EditCalendarPage implements OnInit {
             rangeDates: calendarValidateRangeDates(formValue.rangeDates),
             weekDays: formValue.weekDays,
             startTime: this.formatTime(formValue.startTime),
-            endTime: this.formatTime(formValue.endTime)
+            endTime: this.formatTime(formValue.endTime),
+            actions: []
         };
         this.calendarService
             .update(calendar)

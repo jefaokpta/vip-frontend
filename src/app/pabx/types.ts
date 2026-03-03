@@ -219,4 +219,5 @@ export interface Calendar {
     readonly weekDays?: WeekDayEnum[];
     readonly startTime: string;
     readonly endTime: string;
+    readonly actions: DialPlanAction[];
 }
