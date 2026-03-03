@@ -7,7 +7,7 @@ import { NgForOf, NgIf } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { DatePicker } from 'primeng/datepicker';
 import { SelectButton } from 'primeng/selectbutton';
-import { Calendar, CalendarTypeEnum, DialPlanActionEnum } from '@/pabx/types';
+import { Calendar, CalendarTypeEnum } from '@/pabx/types';
 import { CalendarService } from '@/pabx/calendar/calendar.service';
 import { calendarTypeOptions, calendarValidateRangeDates, calendarWeekDays } from '@/pabx/calendar/utils';
 import { RadioButton } from 'primeng/radiobutton';
@@ -16,6 +16,7 @@ import { TableModule } from 'primeng/table';
 import { PeerActionComponent } from '@/pabx/dialplan/components/peer-action.component';
 import { PlaybackActionComponent } from '@/pabx/dialplan/components/playback-action.component';
 import { calendarActionOptions } from '@/pabx/dialplan/utils';
+import { actionArg2HasDefaultValue, actionHasArg1 } from '@/pabx/utils';
 
 @Component({
     selector: 'app-new-calendar-page',
@@ -180,8 +181,9 @@ import { calendarActionOptions } from '@/pabx/dialplan/utils';
                                         <ng-container *ngIf="action.get('actionEnum').value == 'DIAL_PEER'">
                                             <app-peer-action-component
                                                 formControlName="arg1"
-                                                (flagsChange)="action.get('arg2').setValue($event)"
                                                 [showError]="action.get('arg1').errors?.['required']"
+                                                (flagsChange)="action.get('arg2').setValue($event)"
+                                                [flags]="action.get('arg2').value"
                                             ></app-peer-action-component>
                                         </ng-container>
                                         <ng-container *ngIf="action.get('actionEnum').value == 'PLAYBACK'">
@@ -263,8 +265,8 @@ export class NewCalendarPage implements OnInit {
         this.actions.push(
             this.fb.group({
                 actionEnum: this.selectedAction?.value,
-                arg1: ['', this.actionHasArg1(this.selectedAction?.value)],
-                arg2: ['', this.selectedAction.value === DialPlanActionEnum.SET_VARIABLE ? [Validators.required] : []],
+                arg1: ['', actionHasArg1(this.selectedAction?.value)],
+                arg2: [actionArg2HasDefaultValue(this.selectedAction?.value)],
                 arg3: [''],
                 arg4: ['']
             })
@@ -277,11 +279,6 @@ export class NewCalendarPage implements OnInit {
 
     onRowReorder(_event: any) {
         this.actions.updateValueAndValidity();
-    }
-
-    private actionHasArg1(selectedAction: DialPlanActionEnum): Validators[] {
-        if (selectedAction === DialPlanActionEnum.ANSWER || selectedAction === DialPlanActionEnum.HANGUP) return [];
-        return [Validators.required];
     }
 
     onSubmit() {

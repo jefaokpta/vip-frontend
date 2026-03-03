@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
@@ -11,6 +11,12 @@ import { Calendar, CalendarTypeEnum } from '@/pabx/types';
 import { CalendarService } from '@/pabx/calendar/calendar.service';
 import { calendarTypeOptions, calendarValidateRangeDates, calendarWeekDays } from '@/pabx/calendar/utils';
 import { RadioButton } from 'primeng/radiobutton';
+import { Select } from 'primeng/select';
+import { TableModule } from 'primeng/table';
+import { PeerActionComponent } from '@/pabx/dialplan/components/peer-action.component';
+import { PlaybackActionComponent } from '@/pabx/dialplan/components/playback-action.component';
+import { calendarActionOptions } from '@/pabx/dialplan/utils';
+import { actionArg2HasDefaultValue, actionHasArg1 } from '@/pabx/utils';
 
 @Component({
     selector: 'app-edit-calendar-page',
@@ -25,7 +31,11 @@ import { RadioButton } from 'primeng/radiobutton';
         DatePicker,
         SelectButton,
         NgForOf,
-        RadioButton
+        RadioButton,
+        Select,
+        TableModule,
+        PeerActionComponent,
+        PlaybackActionComponent
     ],
     template: `
         <p-card>
@@ -125,6 +135,67 @@ import { RadioButton } from 'primeng/radiobutton';
                     </div>
                 </div>
 
+                <p-card header="Configurar Ações" class="mb-4">
+                    <div class="flex gap-4">
+                        <div class="field">
+                            <p-select
+                                id="selectedAction"
+                                [options]="actionOptions"
+                                formControlName="selectedAction"
+                                optionLabel="label"
+                                optionValue="value"
+                                placeholder="Selecione uma ação"
+                            ></p-select>
+                        </div>
+                        <p-button outlined label="Adicionar" icon="pi pi-plus" (onClick)="addAction()"></p-button>
+                    </div>
+
+                    <div class="flex flex-col gap-2" formArrayName="actions">
+                        <p-table
+                            [value]="actions.controls"
+                            (onRowReorder)="onRowReorder($event)"
+                            [tableStyle]="{ 'min-width': '50rem' }"
+                        >
+                            <ng-template #header>
+                                <tr>
+                                    <th style="width: 1rem"></th>
+                                    <th></th>
+                                    <th style="width: 1rem"></th>
+                                </tr>
+                            </ng-template>
+                            <ng-template #body let-action let-index="rowIndex">
+                                <tr [formGroupName]="index" [pReorderableRow]="index">
+                                    <td>
+                                        <span class="pi pi-bars" pReorderableRowHandle></span>
+                                    </td>
+                                    <td>
+                                        <ng-container *ngIf="action.get('actionEnum').value == 'DIAL_PEER'">
+                                            <app-peer-action-component
+                                                formControlName="arg1"
+                                                [showError]="action.get('arg1').errors?.['required']"
+                                                (flagsChange)="action.get('arg2').setValue($event)"
+                                                [flags]="action.get('arg2').value"
+                                            ></app-peer-action-component>
+                                        </ng-container>
+                                        <ng-container *ngIf="action.get('actionEnum').value == 'PLAYBACK'">
+                                            <app-playback-action-component formControlName="arg1" />
+                                        </ng-container>
+                                    </td>
+                                    <td>
+                                        <p-button
+                                            icon="pi pi-trash"
+                                            severity="danger"
+                                            outlined
+                                            (onClick)="removeAction(index)"
+                                        >
+                                        </p-button>
+                                    </td>
+                                </tr>
+                            </ng-template>
+                        </p-table>
+                    </div>
+                </p-card>
+
                 <div class="flex mt-4">
                     <p-button type="submit" label="Salvar" [disabled]="form.invalid || pending">
                         <i *ngIf="pending" class="pi pi-spin pi-spinner"></i>
@@ -146,6 +217,8 @@ export class EditCalendarPage implements OnInit {
 
     calendarWeekDays = calendarWeekDays;
 
+    actionOptions = calendarActionOptions();
+
     constructor(
         private readonly fb: FormBuilder,
         private readonly router: Router,
@@ -160,7 +233,9 @@ export class EditCalendarPage implements OnInit {
             name: ['', [Validators.required]],
             calendarTypeEnum: [null, [Validators.required]],
             startTime: [new Date(new Date().setHours(0, 0, 0, 0)), [Validators.required]],
-            endTime: [new Date(new Date().setHours(23, 59, 59, 0)), [Validators.required]]
+            endTime: [new Date(new Date().setHours(23, 59, 59, 0)), [Validators.required]],
+            selectedAction: [''],
+            actions: this.fb.array([], [Validators.required])
         });
         const id = this.activatedRoute.snapshot.paramMap.get('id')!;
         this.calendarService.findById(Number(id)).then((calendar) => {
@@ -177,7 +252,23 @@ export class EditCalendarPage implements OnInit {
             } else {
                 this.onCalendarTypeChange(calendar.weekDays!);
             }
+            this.loadActions(calendar);
         });
+    }
+
+    private loadActions(calendar: Calendar) {
+        const sortedActions = [...calendar.actions].sort((a, b) => a.priority - b.priority);
+        for (const action of sortedActions) {
+            this.actions.push(
+                this.fb.group({
+                    actionEnum: action.actionEnum,
+                    arg1: [action.arg1 ?? '', actionHasArg1(action.actionEnum)],
+                    arg2: [action.arg2 ?? ''],
+                    arg3: [action.arg3 ?? ''],
+                    arg4: [action.arg4 ?? '']
+                })
+            );
+        }
     }
 
     private parseTime(time: string): Date {
@@ -191,6 +282,35 @@ export class EditCalendarPage implements OnInit {
         const hours = date.getHours().toString().padStart(2, '0');
         const minutes = date.getMinutes().toString().padStart(2, '0');
         return `${hours}:${minutes}`;
+    }
+
+    get selectedAction() {
+        return this.form.get('selectedAction');
+    }
+
+    get actions() {
+        return this.form.get('actions') as FormArray;
+    }
+
+    addAction() {
+        if (!this.selectedAction?.value) return;
+        this.actions.push(
+            this.fb.group({
+                actionEnum: this.selectedAction?.value,
+                arg1: ['', actionHasArg1(this.selectedAction?.value)],
+                arg2: [actionArg2HasDefaultValue(this.selectedAction?.value)],
+                arg3: [''],
+                arg4: ['']
+            })
+        );
+    }
+
+    removeAction(index: number) {
+        this.actions.removeAt(index);
+    }
+
+    onRowReorder(_event: any) {
+        this.actions.updateValueAndValidity();
     }
 
     protected onCalendarTypeChange(defaultValue?: any) {
@@ -222,7 +342,7 @@ export class EditCalendarPage implements OnInit {
             weekDays: formValue.weekDays,
             startTime: this.formatTime(formValue.startTime),
             endTime: this.formatTime(formValue.endTime),
-            actions: []
+            actions: this.actions.value.map((action: any, index: number) => ({ ...action, priority: index }))
         };
         this.calendarService
             .update(calendar)

@@ -150,8 +150,9 @@
                                     <ng-container *ngIf="action.get('actionEnum').value == 'DIAL_PEER'">
                                         <app-peer-action-component
                                             formControlName="arg1"
-                                            (flagsChange)="action.get('arg2').setValue($event)"
                                             [showError]="action.get('arg1').errors?.['required']"
+                                            (flagsChange)="action.get('arg2').setValue($event)"
+                                            [flags]="action.get('arg2').value"
                                         ></app-peer-action-component>
                                     </ng-container>
                                     <ng-container *ngIf="action.get('actionEnum').value == 'ACCOUNT_CODE'">

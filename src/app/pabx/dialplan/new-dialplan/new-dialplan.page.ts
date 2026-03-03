@@ -23,6 +23,7 @@ import { AccountCodeActionComponent } from '@/pabx/dialplan/components/accountco
 import { dialplanActionOptions, dialplanSrcOptions } from '@/pabx/dialplan/utils';
 import { EditDstActionComponent } from '@/pabx/dialplan/components/edit-dst-action.component';
 import { CalendarActionComponent } from '@/pabx/dialplan/components/calendar-action.component';
+import { actionArg2HasDefaultValue, actionHasArg1 } from '@/pabx/utils';
 
 /**
  * @author Jefferson Alves Reis (jefaokpta)
@@ -131,8 +132,11 @@ export class NewDialplanPage implements OnInit {
         this.actions.push(
             this.fb.group({
                 actionEnum: this.selectedAction?.value,
-                arg1: ['', this.actionHasArg1(this.selectedAction?.value)],
-                arg2: ['', this.selectedAction.value === DialPlanActionEnum.SET_VARIABLE ? [Validators.required] : []],
+                arg1: ['', actionHasArg1(this.selectedAction?.value)],
+                arg2: [
+                    actionArg2HasDefaultValue(this.selectedAction?.value),
+                    this.selectedAction.value === DialPlanActionEnum.SET_VARIABLE ? [Validators.required] : []
+                ],
                 arg3: [''],
                 arg4: ['']
             })
@@ -171,8 +175,4 @@ export class NewDialplanPage implements OnInit {
         }
     }
 
-    private actionHasArg1(selectedAction: DialPlanActionEnum): Validators[] {
-        if (selectedAction === DialPlanActionEnum.ANSWER || selectedAction === DialPlanActionEnum.HANGUP) return [];
-        return [Validators.required];
-    }
 }
