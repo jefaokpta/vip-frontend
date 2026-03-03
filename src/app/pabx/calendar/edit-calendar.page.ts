@@ -53,7 +53,7 @@ import { calendarTypeOptions, calendarWeekDays } from '@/pabx/calendar/utils';
                 </div>
 
                 <div class="field mb-4">
-                    <label for="calendarType" class="block mb-2">Agendamento *</label>
+                    <label for="calendarType" class="block mb-2">Tipo de Agendamento *</label>
                     <p-select-button
                         id="calendarType"
                         formControlName="calendarType"
