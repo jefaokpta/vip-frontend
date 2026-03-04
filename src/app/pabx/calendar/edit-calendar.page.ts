@@ -17,6 +17,7 @@ import { PeerActionComponent } from '@/pabx/dialplan/components/peer-action.comp
 import { PlaybackActionComponent } from '@/pabx/dialplan/components/playback-action.component';
 import { calendarActionOptions } from '@/pabx/dialplan/utils';
 import { actionArg2HasDefaultValue, actionHasArg1 } from '@/pabx/utils';
+import { HangupActionComponent } from '@/pabx/dialplan/components/hangup-action-component';
 
 @Component({
     selector: 'app-edit-calendar-page',
@@ -35,7 +36,8 @@ import { actionArg2HasDefaultValue, actionHasArg1 } from '@/pabx/utils';
         Select,
         TableModule,
         PeerActionComponent,
-        PlaybackActionComponent
+        PlaybackActionComponent,
+        HangupActionComponent
     ],
     template: `
         <p-card>
@@ -179,6 +181,9 @@ import { actionArg2HasDefaultValue, actionHasArg1 } from '@/pabx/utils';
                                         </ng-container>
                                         <ng-container *ngIf="action.get('actionEnum').value == 'PLAYBACK'">
                                             <app-playback-action-component formControlName="arg1" />
+                                        </ng-container>
+                                        <ng-container *ngIf="action.get('actionEnum').value == 'HANGUP'">
+                                            <app-hangup-action-component />
                                         </ng-container>
                                     </td>
                                     <td>

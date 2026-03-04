@@ -22,15 +22,15 @@ export function dialplanSrcLabel(srcEnum: SrcEnum): string {
 export function dialplanActionOptions() {
     //todo: fila de atendimento, grupo de ramais, ura de atendimento
     return [
-        { label: 'Atender', value: DialPlanActionEnum.ANSWER },
-        { label: 'Desligar', value: DialPlanActionEnum.HANGUP },
         { label: 'Centro de Custo', value: DialPlanActionEnum.ACCOUNT_CODE },
         { label: 'Ramal', value: DialPlanActionEnum.DIAL_PEER },
         { label: 'Rota', value: DialPlanActionEnum.DIAL_ROUTE },
         { label: 'Tocar Audio', value: DialPlanActionEnum.PLAYBACK },
         { label: 'Definir Variável', value: DialPlanActionEnum.SET_VARIABLE },
         { label: 'Editar Destino', value: DialPlanActionEnum.EDIT_DST },
-        { label: 'Calendário', value: DialPlanActionEnum.CALENDAR }
+        { label: 'Calendário', value: DialPlanActionEnum.CALENDAR },
+        { label: 'Atender', value: DialPlanActionEnum.ANSWER },
+        { label: 'Desligar', value: DialPlanActionEnum.HANGUP }
     ];
 }
 
@@ -38,6 +38,7 @@ export function calendarActionOptions() {
     //todo: fila de atendimento, grupo de ramais, ura de atendimento
     return [
         { label: 'Ramal', value: DialPlanActionEnum.DIAL_PEER },
-        { label: 'Tocar Audio', value: DialPlanActionEnum.PLAYBACK }
+        { label: 'Tocar Audio', value: DialPlanActionEnum.PLAYBACK },
+        { label: 'Desligar', value: DialPlanActionEnum.HANGUP }
     ];
 }
