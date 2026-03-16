@@ -20,7 +20,7 @@ export class MohService {
     }
 
     async create(name: string, file: File): Promise<Moh> {
-        const body = { name, fileName: file.name, contentType: file.type || 'audio/mpeg' };
+        const body = { name, fileName: file.name, contentType: file.type || 'audio/mpeg', fileSize: file.size };
         const { moh, uploadUrl } = await executeRequest(
             this.http.post<{ moh: Moh; uploadUrl: string }>(`${this.BACKEND}/mohs`, body, httpHeaders())
         );

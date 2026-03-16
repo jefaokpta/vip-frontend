@@ -101,6 +101,10 @@ export class NewMohPage implements OnInit {
             this.fileError = 'Apenas arquivos mp3 e wav são aceitos.';
             return;
         }
+        if (file.size > 10 * 1024 * 1024) {
+            this.fileError = 'O arquivo não pode ultrapassar 10 MB.';
+            return;
+        }
         this.selectedFile = file;
     }
 
