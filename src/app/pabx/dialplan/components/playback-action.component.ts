@@ -1,8 +1,9 @@
-import {Component, forwardRef, Input, OnInit} from '@angular/core';
-import {ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule} from '@angular/forms';
-import {Panel} from "primeng/panel";
-import {NgIf} from "@angular/common";
-import {Select} from "primeng/select";
+import { Component, forwardRef, Input, OnInit } from '@angular/core';
+import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
+import { Panel } from 'primeng/panel';
+import { NgIf } from '@angular/common';
+import { Select } from 'primeng/select';
+import { MohService } from '@/pabx/moh/moh.service';
 
 @Component({
     selector: 'app-playback-action-component',
@@ -31,31 +32,27 @@ import {Select} from "primeng/select";
                         placeholder="Selecione um audio"
                         appendTo="body"
                     ></p-select>
-                    <small *ngIf="showError" class="p-error block mt-2">
-                        Audio é obrigatório.
-                    </small>
+                    <small *ngIf="showError" class="p-error block mt-2"> Audio é obrigatório. </small>
                 </div>
             </div>
         </p-panel>
     `
 })
 export class PlaybackActionComponent implements ControlValueAccessor, OnInit {
+    constructor(private readonly mohService: MohService) {}
+
     ngOnInit(): void {
-        this.playbackOptions = [
-            {label: 'Audio 1', value: 'audio1'},
-            {label: 'Audio 2', value: 'audio2'},
-            {label: 'Audio 3', value: 'audio3'},
-        ];
+        this.mohService.findAll().then((mohs) => {
+            this.playbackOptions = mohs.map((moh) => ({ label: moh.name, value: moh.id.toString() }));
+        });
     }
 
     @Input() showError = false;
     value: string = '';
 
-    private onChange: (value: string) => void = () => {
-    };
+    private onChange: (value: string) => void = () => {};
 
-    private onTouched: () => void = () => {
-    };
+    private onTouched: () => void = () => {};
     protected playbackOptions: { label: string; value: string }[] = [];
 
     writeValue(value: string): void {
@@ -75,5 +72,4 @@ export class PlaybackActionComponent implements ControlValueAccessor, OnInit {
         this.onChange(value);
         this.onTouched();
     }
-
 }
