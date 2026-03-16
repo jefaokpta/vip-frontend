@@ -210,6 +210,13 @@ export enum WeekDayEnum {
     SUNDAY = 'SUNDAY'
 }
 
+export interface Moh {
+    readonly id: number;
+    readonly name: string;
+    readonly companyId: string;
+    readonly fileName: string;
+}
+
 export interface Calendar {
     readonly id: number;
     readonly companyId: string;
