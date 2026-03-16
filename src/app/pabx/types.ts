@@ -217,6 +217,10 @@ export interface Moh {
     readonly fileName: string;
 }
 
+export interface CompanySettings {
+    readonly defaultMohId: number | null;
+}
+
 export interface Calendar {
     readonly id: number;
     readonly companyId: string;

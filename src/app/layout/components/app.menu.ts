@@ -79,6 +79,11 @@ export class AppMenu implements OnInit {
                             label: 'Audios do Sistema',
                             icon: 'fa fa-music',
                             routerLink: ['/pabx/mohs']
+                        },
+                        {
+                            label: 'Definições Gerais',
+                            icon: 'pi pi-fw pi-cog',
+                            routerLink: ['/pabx/settings']
                         }
                     ]
                 },

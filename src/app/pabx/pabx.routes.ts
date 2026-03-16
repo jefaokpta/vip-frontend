@@ -23,6 +23,7 @@ import { EditCalendarPage } from '@/pabx/calendar/edit-calendar.page';
 import { MohsPage } from '@/pabx/moh/mohs.page';
 import { NewMohPage } from '@/pabx/moh/new-moh.page';
 import { EditMohPage } from '@/pabx/moh/edit-moh.page';
+import { SettingsPage } from '@/pabx/settings/settings.page';
 
 export default [
     { path: 'peers', component: PeerPage, data: { breadcrumb: 'Ramais' } },
@@ -53,6 +54,7 @@ export default [
     { path: 'mohs', component: MohsPage, data: { breadcrumb: 'Audios do Sistema' } },
     { path: 'mohs/new', component: NewMohPage, data: { breadcrumb: 'Audios do Sistema > Novo' } },
     { path: 'mohs/edit/:id', component: EditMohPage, data: { breadcrumb: 'Audios do Sistema > Editar' } },
+    { path: 'settings', component: SettingsPage, data: { breadcrumb: 'Definições Gerais' } },
 
     { path: '**', redirectTo: '/notfound' }
 ] as Routes;
