@@ -3,6 +3,7 @@ import { MessageService } from 'primeng/api';
 import { Card } from 'primeng/card';
 import { Select } from 'primeng/select';
 import { Toast } from 'primeng/toast';
+import { Button } from 'primeng/button';
 import { FormsModule } from '@angular/forms';
 import { Moh } from '@/pabx/types';
 import { MohService } from '@/pabx/moh/moh.service';
@@ -12,7 +13,7 @@ import { CompanySettingsService } from '@/pabx/settings/company-settings.service
     selector: 'app-settings-page',
     standalone: true,
     providers: [MessageService],
-    imports: [Card, Select, Toast, FormsModule],
+    imports: [Card, Select, Toast, Button, FormsModule],
     template: `
         <p-card>
             <ng-template #title>
@@ -28,9 +29,10 @@ import { CompanySettingsService } from '@/pabx/settings/company-settings.service
                     optionValue="value"
                     placeholder="Selecione um MOH"
                     [style]="{ 'min-width': '20rem' }"
-                    (onChange)="onMohChange()"
                 ></p-select>
             </div>
+
+            <p-button label="Salvar" icon="pi pi-save" [loading]="pending" (onClick)="save()"></p-button>
         </p-card>
         <p-toast />
     `
@@ -38,6 +40,7 @@ import { CompanySettingsService } from '@/pabx/settings/company-settings.service
 export class SettingsPage implements OnInit {
     mohOptions: { label: string; value: number | null }[] = [];
     selectedMohId: number | null = null;
+    pending = false;
 
     constructor(
         private readonly mohService: MohService,
@@ -55,7 +58,8 @@ export class SettingsPage implements OnInit {
         });
     }
 
-    onMohChange(): void {
+    save(): void {
+        this.pending = true;
         this.settingsService
             .update(this.selectedMohId)
             .then(() => {
@@ -72,6 +76,7 @@ export class SettingsPage implements OnInit {
                     detail: 'Tente novamente mais tarde.',
                     life: 5000
                 });
-            });
+            })
+            .finally(() => (this.pending = false));
     }
 }
