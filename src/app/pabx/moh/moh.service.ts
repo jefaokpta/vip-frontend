@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { executeRequest, httpHeaders } from '@/util/utils';
 import { Moh } from '@/pabx/types';
+import { firstValueFrom } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class MohService {
@@ -18,11 +19,15 @@ export class MohService {
         return executeRequest(this.http.get<Moh>(`${this.BACKEND}/mohs/${id}`, httpHeaders()));
     }
 
-    create(name: string, file: File): Promise<Moh> {
-        const formData = new FormData();
-        formData.append('name', name);
-        formData.append('file', file);
-        return executeRequest(this.http.post<Moh>(`${this.BACKEND}/mohs`, formData, httpHeaders()), 30_000);
+    async create(name: string, file: File): Promise<Moh> {
+        const body = { name, fileName: file.name, contentType: file.type || 'audio/mpeg' };
+        const { moh, uploadUrl } = await executeRequest(
+            this.http.post<{ moh: Moh; uploadUrl: string }>(`${this.BACKEND}/mohs`, body, httpHeaders())
+        );
+        await firstValueFrom(
+            this.http.put(uploadUrl, file, { headers: new HttpHeaders({ 'Content-Type': file.type || 'audio/mpeg' }) })
+        );
+        return moh;
     }
 
     update(id: number, name: string): Promise<Moh> {
