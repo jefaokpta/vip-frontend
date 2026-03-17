@@ -6,8 +6,9 @@ import { CardModule } from 'primeng/card';
 import { NgIf } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { PeerService } from '@/pabx/peer/peer.service';
-import { DtmfModeEnum, LanguageEnum, PeerTransportEnum } from '@/pabx/types';
+import { DtmfModeEnum, LanguageEnum, PeerTransportEnum, PickupGroup } from '@/pabx/types';
 import { Select } from 'primeng/select';
+import { PickupGroupService } from '@/pabx/pickup-group/pickup-group.service';
 import { dtmfSelectOptions, languageSelectOptions } from '@/pabx/utils';
 import { ToggleSwitch } from 'primeng/toggleswitch';
 import { InputNumber } from 'primeng/inputnumber';
@@ -123,6 +124,19 @@ import { SelectButton } from 'primeng/selectbutton';
                     ></p-select>
                 </div>
 
+                <div class="field mb-4">
+                    <label for="pickUpGroup" class="block mb-2">Grupo de Captura</label>
+                    <p-select
+                        id="pickUpGroup"
+                        [options]="pickUpGroupOptions"
+                        formControlName="pickUpGroup"
+                        optionLabel="name"
+                        optionValue="id"
+                        placeholder="Selecione um grupo"
+                        [showClear]="true"
+                    ></p-select>
+                </div>
+
                 <p-accordion>
                     <p-accordion-panel value="0">
                         <p-accordion-header>Configurações Avançadas</p-accordion-header>
@@ -202,12 +216,14 @@ export class EditPeerPage implements OnInit {
     errorMessage = '';
     languageOptions = languageSelectOptions();
     dtmfOptions = dtmfSelectOptions();
+    pickUpGroupOptions: PickupGroup[] = [];
 
     constructor(
         private readonly fb: FormBuilder,
         private readonly router: Router,
         private readonly peerService: PeerService,
-        private readonly activatedRoute: ActivatedRoute
+        private readonly activatedRoute: ActivatedRoute,
+        private readonly pickupGroupService: PickupGroupService
     ) {}
 
     transportsOptions = Object.values(PeerTransportEnum).map((value) => ({ label: value, value }));
@@ -225,6 +241,7 @@ export class EditPeerPage implements OnInit {
                 [Validators.required, Validators.minLength(2), Validators.maxLength(4), Validators.pattern('[0-9]+')]
             ],
             language: [LanguageEnum.pt_BR, [Validators.required]],
+            pickUpGroup: [null],
             peerTransportEnums: [[PeerTransportEnum.UDP], [Validators.required]],
             qualify: [false, [Validators.required]],
             nat: [true, [Validators.required]],
@@ -233,7 +250,13 @@ export class EditPeerPage implements OnInit {
             isShowPassword: [false]
         });
         const id = this.activatedRoute.snapshot.paramMap.get('id')!;
-        this.peerService.findById(id).then((peer) => this.form.patchValue(peer));
+        this.peerService.findById(id).then((peer) => {
+            this.form.patchValue(peer);
+            this.form.patchValue({
+                pickUpGroup: Number(peer.pickUpGroup) || null
+            });
+        });
+        this.pickupGroupService.findAll().then((groups) => (this.pickUpGroupOptions = groups));
     }
 
     toggleMd5Secret() {

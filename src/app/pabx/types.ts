@@ -83,8 +83,7 @@ export interface Peer {
     readonly companyId: string;
     readonly featurePassword: string;
     readonly language: LanguageEnum;
-    readonly pickUpGroup: string;
-    readonly callGroup: string;
+    readonly pickUpGroup?: string;
     readonly peerTransportEnums: PeerTransportEnum[];
     readonly qualify: boolean;
     readonly nat: boolean;
@@ -219,6 +218,12 @@ export interface Moh {
 
 export interface CompanySettings {
     readonly defaultMohId: number | null;
+}
+
+export interface PickupGroup {
+    readonly id: number;
+    readonly name: string;
+    readonly companyId: string;
 }
 
 export interface Calendar {

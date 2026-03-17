@@ -46,6 +46,11 @@ export class AppMenu implements OnInit {
                             routerLink: ['/pabx/peers']
                         },
                         {
+                            label: 'Grupos de Captura',
+                            icon: 'pi pi-fw pi-users',
+                            routerLink: ['/pabx/pickup-groups']
+                        },
+                        {
                             label: 'Regras de Discagem',
                             icon: 'pi pi-fw pi-list',
                             routerLink: ['/pabx/dialplans']
