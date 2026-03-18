@@ -29,7 +29,7 @@ export function dialplanActionOptions() {
         { label: 'Definir Variável', value: DialPlanActionEnum.SET_VARIABLE },
         { label: 'Editar Destino', value: DialPlanActionEnum.EDIT_DST },
         { label: 'Calendário', value: DialPlanActionEnum.CALENDAR },
-        { label: 'Grupo de Chamada', value: DialPlanActionEnum.DIAL_CALL_GROUP },
+        { label: 'Grupo de Chamada', value: DialPlanActionEnum.CALL_GROUP },
         { label: 'Atender', value: DialPlanActionEnum.ANSWER },
         { label: 'Desligar', value: DialPlanActionEnum.HANGUP }
     ];

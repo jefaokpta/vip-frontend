@@ -159,7 +159,7 @@ export class EditCallGroupPage implements OnInit {
                 callGroupStrategyEnum: group.callGroupStrategyEnum,
                 timeout: group.timeout
             });
-            this.selectedPeers = peers.filter((p) => group.peerIds.includes(p.id));
+            this.selectedPeers = group.peerIds.map((id) => peers.find((p) => p.id === id)!);
             this.availablePeers = peers.filter((p) => !group.peerIds.includes(p.id));
         });
     }
