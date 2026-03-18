@@ -28,7 +28,7 @@ import { PickList } from 'primeng/picklist';
         <p-card>
             <ng-template #title>
                 <div class="flex justify-between">
-                    <span class="font-semibold text-2xl">Novo Grupo de Chamadas</span>
+                    <span class="font-semibold text-2xl">Novo Grupo de Chamada</span>
                     <p-button
                         type="button"
                         label="Voltar"

@@ -68,12 +68,12 @@ export default [
         component: EditPickupGroupPage,
         data: { breadcrumb: 'Grupos de Captura > Editar' }
     },
-    { path: 'call-groups', component: CallGroupsPage, data: { breadcrumb: 'Grupos de Chamadas' } },
-    { path: 'call-groups/new', component: NewCallGroupPage, data: { breadcrumb: 'Grupos de Chamadas > Novo' } },
+    { path: 'call-groups', component: CallGroupsPage, data: { breadcrumb: 'Grupos de Chamada' } },
+    { path: 'call-groups/new', component: NewCallGroupPage, data: { breadcrumb: 'Grupos de Chamada > Novo' } },
     {
         path: 'call-groups/edit/:id',
         component: EditCallGroupPage,
-        data: { breadcrumb: 'Grupos de Chamadas > Editar' }
+        data: { breadcrumb: 'Grupos de Chamada > Editar' }
     },
 
     { path: '**', redirectTo: '/notfound' }

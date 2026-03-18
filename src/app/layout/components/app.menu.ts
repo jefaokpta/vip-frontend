@@ -51,7 +51,7 @@ export class AppMenu implements OnInit {
                             routerLink: ['/pabx/pickup-groups']
                         },
                         {
-                            label: 'Grupos de Chamadas',
+                            label: 'Grupos de Chamada',
                             icon: 'pi pi-fw pi-phone',
                             routerLink: ['/pabx/call-groups']
                         },
