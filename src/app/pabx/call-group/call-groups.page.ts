@@ -71,7 +71,6 @@ import { CallGroupService } from '@/pabx/call-group/call-group.service';
                             <p-sortIcon field="name"></p-sortIcon>
                         </th>
                         <th>Estratégia</th>
-                        <th>Timeout (s)</th>
                         <th>Qtd Ramais</th>
                         <th style="width: 10%">Ações</th>
                     </tr>
@@ -81,7 +80,6 @@ import { CallGroupService } from '@/pabx/call-group/call-group.service';
                     <tr>
                         <td>{{ group.name }}</td>
                         <td>{{ strategyLabel(group.callGroupStrategyEnum) }}</td>
-                        <td>{{ group.timeout }}</td>
                         <td>{{ group.peerIds.length }}</td>
                         <td>
                             <div class="flex gap-2">
