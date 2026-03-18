@@ -52,19 +52,19 @@ import { PickList } from 'primeng/picklist';
                 </div>
 
                 <div class="field mb-4">
-                    <label for="strategy" class="block mb-2">Estratégia *</label>
+                    <label for="strategy" class="block mb-2">Distribuição *</label>
                     <p-select
                         id="strategy"
                         [options]="strategyOptions"
                         formControlName="callGroupStrategyEnum"
                         optionLabel="label"
                         optionValue="value"
-                        placeholder="Selecione uma estratégia"
+                        placeholder="Selecione uma distribuição"
                     ></p-select>
                 </div>
 
                 <div class="field mb-4">
-                    <label for="timeout" class="block mb-2">Timeout (segundos) *</label>
+                    <label for="timeout" class="block mb-2">Tempo de chamada (segundos) *</label>
                     <p-input-number id="timeout" mode="decimal" useGrouping="false" formControlName="timeout" />
                 </div>
 
@@ -95,8 +95,18 @@ import { PickList } from 'primeng/picklist';
                     </p-picklist>
                 </div>
 
+                @if (selectedPeers.length === 0) {
+                    <small class="p-error block mb-2">
+                        <span class="text-red-500">Ao menos 1 ramal deve ser selecionado.</span>
+                    </small>
+                }
+
                 <div class="flex mt-4">
-                    <p-button type="submit" label="Salvar" [disabled]="form.invalid || pending">
+                    <p-button
+                        type="submit"
+                        label="Salvar"
+                        [disabled]="form.invalid || pending || selectedPeers.length === 0"
+                    >
                         @if (pending) {
                             <i class="pi pi-spin pi-spinner"></i>
                         } @else {
