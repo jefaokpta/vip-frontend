@@ -226,6 +226,21 @@ export interface PickupGroup {
     readonly companyId: string;
 }
 
+export enum CallGroupStrategyEnum {
+    ALL = 'ALL',
+    SEQUENTIAL = 'SEQUENTIAL',
+    RANDOM = 'RANDOM'
+}
+
+export interface CallGroup {
+    readonly id: number;
+    readonly name: string;
+    readonly companyId: string;
+    readonly callGroupStrategyEnum: CallGroupStrategyEnum;
+    readonly peerIds: number[];
+    readonly timeout: number;
+}
+
 export interface Calendar {
     readonly id: number;
     readonly companyId: string;

@@ -27,6 +27,9 @@ import { SettingsPage } from '@/pabx/settings/settings.page';
 import { PickupGroupsPage } from '@/pabx/pickup-group/pickup-groups.page';
 import { NewPickupGroupPage } from '@/pabx/pickup-group/new-pickup-group.page';
 import { EditPickupGroupPage } from '@/pabx/pickup-group/edit-pickup-group.page';
+import { CallGroupsPage } from '@/pabx/call-group/call-groups.page';
+import { NewCallGroupPage } from '@/pabx/call-group/new-call-group.page';
+import { EditCallGroupPage } from '@/pabx/call-group/edit-call-group.page';
 
 export default [
     { path: 'peers', component: PeerPage, data: { breadcrumb: 'Ramais' } },
@@ -64,6 +67,13 @@ export default [
         path: 'pickup-groups/edit/:id',
         component: EditPickupGroupPage,
         data: { breadcrumb: 'Grupos de Captura > Editar' }
+    },
+    { path: 'call-groups', component: CallGroupsPage, data: { breadcrumb: 'Grupos de Chamadas' } },
+    { path: 'call-groups/new', component: NewCallGroupPage, data: { breadcrumb: 'Grupos de Chamadas > Novo' } },
+    {
+        path: 'call-groups/edit/:id',
+        component: EditCallGroupPage,
+        data: { breadcrumb: 'Grupos de Chamadas > Editar' }
     },
 
     { path: '**', redirectTo: '/notfound' }
