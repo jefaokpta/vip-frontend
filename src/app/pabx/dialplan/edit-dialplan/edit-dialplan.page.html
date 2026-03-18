@@ -199,6 +199,12 @@
                                             (arg3Change)="action.get('arg3').setValue($event)"
                                         />
                                     </ng-container>
+                                    <ng-container *ngIf="action.get('actionEnum').value == 'DIAL_CALL_GROUP'">
+                                        <app-call-group-action-component
+                                            formControlName="arg1"
+                                            [showError]="action.get('arg1').errors?.['required']"
+                                        />
+                                    </ng-container>
                                 </td>
                                 <td>
                                     <p-button icon="pi pi-trash" severity="danger" outlined

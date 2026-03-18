@@ -23,6 +23,7 @@ import { AccountCodeActionComponent } from '@/pabx/dialplan/components/accountco
 import { dialplanActionOptions, dialplanSrcOptions } from '@/pabx/dialplan/utils';
 import { EditDstActionComponent } from '@/pabx/dialplan/components/edit-dst-action.component';
 import { CalendarActionComponent } from '@/pabx/dialplan/components/calendar-action.component';
+import { CallGroupActionComponent } from '@/pabx/dialplan/components/call-group-action.component';
 import { actionArg2HasDefaultValue, actionHasArg1 } from '@/pabx/utils';
 
 /**
@@ -55,7 +56,8 @@ import { actionArg2HasDefaultValue, actionHasArg1 } from '@/pabx/utils';
         VariableActionComponent,
         AccountCodeActionComponent,
         EditDstActionComponent,
-        CalendarActionComponent
+        CalendarActionComponent,
+        CallGroupActionComponent
     ],
     templateUrl: './new-dialplan.page.html'
 })
@@ -66,7 +68,7 @@ export class NewDialplanPage implements OnInit {
 
     srcOptions = dialplanSrcOptions();
 
-    //TODO: fila de atendimento, grupo de ramais, ura de atendimento
+    //TODO: fila de atendimento, ura de atendimento
     actionOptions = dialplanActionOptions();
 
     constructor(
@@ -174,5 +176,4 @@ export class NewDialplanPage implements OnInit {
             this.form.addControl('dst', this.fb.control('', [Validators.required]));
         }
     }
-
 }

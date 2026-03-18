@@ -24,6 +24,7 @@ import { isNumber } from 'chart.js/helpers';
 import { dialplanActionOptions, dialplanSrcOptions } from '@/pabx/dialplan/utils';
 import { EditDstActionComponent } from '@/pabx/dialplan/components/edit-dst-action.component';
 import { CalendarActionComponent } from '@/pabx/dialplan/components/calendar-action.component';
+import { CallGroupActionComponent } from '@/pabx/dialplan/components/call-group-action.component';
 
 /**
  * @author Jefferson Alves Reis (jefaokpta)
@@ -55,7 +56,8 @@ import { CalendarActionComponent } from '@/pabx/dialplan/components/calendar-act
         VariableActionComponent,
         AccountCodeActionComponent,
         EditDstActionComponent,
-        CalendarActionComponent
+        CalendarActionComponent,
+        CallGroupActionComponent
     ],
     templateUrl: './edit-dialplan.page.html'
 })
