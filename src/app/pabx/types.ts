@@ -240,6 +240,7 @@ export interface CallGroup {
     readonly callGroupStrategyEnum: CallGroupStrategyEnum;
     readonly peerIds: number[];
     readonly timeout: number;
+    readonly groupTimeout: number;
 }
 
 export interface Calendar {

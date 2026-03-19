@@ -69,6 +69,16 @@ import { PickList } from 'primeng/picklist';
                 </div>
 
                 <div class="field mb-4">
+                    <label for="groupTimeout" class="block mb-2">Tempo total do grupo (segundos) *</label>
+                    <p-input-number
+                        id="groupTimeout"
+                        mode="decimal"
+                        useGrouping="false"
+                        formControlName="groupTimeout"
+                    />
+                </div>
+
+                <div class="field mb-4">
                     <label class="block mb-2">Ramais</label>
                     <p-picklist
                         [source]="availablePeers"
@@ -145,7 +155,8 @@ export class NewCallGroupPage implements OnInit {
         this.form = this.fb.group({
             name: ['', [Validators.required]],
             callGroupStrategyEnum: [CallGroupStrategyEnum.ALL, [Validators.required]],
-            timeout: [30, [Validators.required]]
+            timeout: [30, [Validators.required]],
+            groupTimeout: [60, [Validators.required]]
         });
         this.peerService.findAll().then((peers) => (this.availablePeers = peers));
     }
