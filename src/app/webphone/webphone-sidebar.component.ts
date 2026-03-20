@@ -249,7 +249,7 @@ export class WebphoneSidebarComponent {
 
     private sanitizePhone(input?: string): string | undefined {
         if (!input) return undefined;
-        const digits = input.replaceAll(/\D/g, '');
+        const digits = input.replaceAll(/[^\d*]/g, '');
         return digits.length ? digits : undefined;
     }
 
