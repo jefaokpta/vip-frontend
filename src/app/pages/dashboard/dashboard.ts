@@ -93,6 +93,7 @@ export class Dashboard implements OnDestroy, OnInit {
         this.subscriptions.push(
             this.webSocketService.watch(`/topic/peerregistries/${companyId}`).subscribe((message) => {
                 const pr: PeerRegistry = JSON.parse(message.body);
+                console.log(pr); //todo: remove this
                 this.peerRegistriesMap.update((map) => {
                     map.set(pr.peer.peer, pr);
                     return new Map(map);
