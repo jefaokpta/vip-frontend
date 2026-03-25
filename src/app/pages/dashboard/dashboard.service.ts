@@ -4,12 +4,11 @@
  * @create 4/22/25
  */
 
-import {HttpClient} from '@angular/common/http';
-import {environment} from '../../../environments/environment';
-import {Worker} from '@/types/types';
-import {Injectable} from '@angular/core';
-import {executeRequest, httpHeaders} from "@/util/utils";
-import {Peer} from "@/pabx/types";
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
+import { Injectable } from '@angular/core';
+import { executeRequest, httpHeaders } from '@/util/utils';
+import { CallState, PeerRegistry } from '@/pabx/types';
 
 @Injectable({
     providedIn: 'root'
@@ -17,15 +16,13 @@ import {Peer} from "@/pabx/types";
 export class DashboardService {
     private readonly BACKEND = environment.API_BACKEND_URL;
 
-    constructor(private readonly http: HttpClient) {
+    constructor(private readonly http: HttpClient) {}
+
+    findPeerRegistries(): Promise<PeerRegistry[]> {
+        return executeRequest(this.http.get<PeerRegistry[]>(`${this.BACKEND}/peerregistries`, httpHeaders()));
     }
 
-    findWorkers(): Promise<Worker[]> {
-        return executeRequest(this.http.get<Worker[]>(`${this.BACKEND}/workers`, httpHeaders()));
+    findCallStates(): Promise<CallState[]> {
+        return executeRequest(this.http.get<CallState[]>(`${this.BACKEND}/callstates`, httpHeaders()));
     }
-
-    findPeersByCompany(companyId: string): Promise<Peer[]> {
-        return executeRequest(this.http.get<Peer[]>(`${this.BACKEND}/peers/${companyId}`, httpHeaders()));
-    }
-
 }

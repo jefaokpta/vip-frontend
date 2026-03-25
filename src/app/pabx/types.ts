@@ -243,6 +243,32 @@ export interface CallGroup {
     readonly groupTimeout: number;
 }
 
+export interface PeerRegistry {
+    readonly id: string;
+    readonly peer: Peer;
+    readonly registerId: string | null;
+}
+
+export enum ChannelStateEnum {
+    UP = 'UP',
+    DOWN = 'DOWN',
+    RINGING = 'RINGING'
+}
+
+export interface Channel {
+    readonly uniqueId: string;
+    readonly peer: string;
+    readonly channelStateEnum: ChannelStateEnum;
+    readonly isLeader: boolean;
+    readonly record: string | null;
+}
+
+export interface CallState {
+    readonly uniqueId: string;
+    readonly companyId: string;
+    readonly channels: Channel[];
+}
+
 export interface Calendar {
     readonly id: number;
     readonly companyId: string;
