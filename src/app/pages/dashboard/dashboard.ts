@@ -2,7 +2,7 @@ import { Component, computed, OnDestroy, OnInit, signal } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { WebsocketService } from '@/websocket/stomp/websocket.service';
 import { rxStompServiceFactory } from '@/websocket/stomp/rx-stomp-service-factory';
-import { CallState, Channel, ChannelStateEnum, PeerRegistry } from '@/pabx/types';
+import { CallState, Channel, ChannelStateEnum, ContactStatusEventEnum, PeerRegistry } from '@/pabx/types';
 import { DashboardService } from '@/pages/dashboard/dashboard.service';
 import { UserService } from '@/pages/users/user.service';
 import { NgClass, NgForOf } from '@angular/common';
@@ -77,7 +77,16 @@ export class Dashboard implements OnDestroy, OnInit {
         return ringing;
     });
 
-    readonly registeredCount = computed(() => this.peerRegistries().filter((pr) => !!pr.registerId).length);
+    readonly registeredCount = computed(
+        () =>
+            this.peerRegistries().filter(
+                (pr) =>
+                    pr.contactStatusEventEnum === ContactStatusEventEnum.REACHABLE ||
+                    pr.contactStatusEventEnum === ContactStatusEventEnum.CREATED ||
+                    pr.contactStatusEventEnum === ContactStatusEventEnum.UPDATED ||
+                    pr.contactStatusEventEnum === ContactStatusEventEnum.NONQUALIFIED
+            ).length
+    );
     readonly busyCount = computed(() => this.busyPeers().size);
     readonly ringingCount = computed(() => this.ringingPeers().size);
 
@@ -128,17 +137,37 @@ export class Dashboard implements OnDestroy, OnInit {
     }
 
     peerCardClass(pr: PeerRegistry): string {
-        if (!pr.registerId) return 'bg-gray-200 text-gray-700';
+        const active =
+            pr.contactStatusEventEnum === ContactStatusEventEnum.REACHABLE ||
+            pr.contactStatusEventEnum === ContactStatusEventEnum.CREATED ||
+            pr.contactStatusEventEnum === ContactStatusEventEnum.UPDATED ||
+            pr.contactStatusEventEnum === ContactStatusEventEnum.NONQUALIFIED;
+
+        if (!active) {
+            if (pr.contactStatusEventEnum === ContactStatusEventEnum.UNREACHABLE) return 'bg-orange-400 text-white';
+            return 'bg-gray-200 text-gray-700';
+        }
         if (this.busyPeers().has(pr.peer.peer)) return 'bg-red-400 text-white';
         if (this.ringingPeers().has(pr.peer.peer)) return 'bg-yellow-300 text-yellow-900';
         return 'bg-green-400 text-white';
     }
 
     peerStatusLabel(pr: PeerRegistry): string {
-        if (!pr.registerId) return 'Não registrado';
-        if (this.busyPeers().has(pr.peer.peer)) return 'Em chamada';
-        if (this.ringingPeers().has(pr.peer.peer)) return 'Chamando';
-        return 'Disponível';
+        switch (pr.contactStatusEventEnum) {
+            case ContactStatusEventEnum.REACHABLE:
+            case ContactStatusEventEnum.CREATED:
+            case ContactStatusEventEnum.UPDATED:
+            case ContactStatusEventEnum.NONQUALIFIED:
+                if (this.busyPeers().has(pr.peer.peer)) return 'Em chamada';
+                if (this.ringingPeers().has(pr.peer.peer)) return 'Chamando';
+                return 'Disponível';
+            case ContactStatusEventEnum.UNREACHABLE:
+                return 'Inacessível';
+            case ContactStatusEventEnum.REMOVED:
+                return 'Removido';
+            default:
+                return 'Desconhecido';
+        }
     }
 
     ngOnDestroy(): void {
