@@ -30,12 +30,8 @@ import { NgClass, NgForOf } from '@angular/common';
                     <span class="font-bold text-3xl text-green-600">{{ registeredCount() }}</span>
                 </div>
                 <div class="bg-white rounded-xl shadow p-4 flex flex-col items-center min-w-32">
-                    <span class="text-sm text-gray-500">Em chamada</span>
-                    <span class="font-bold text-3xl text-red-600">33</span>
-                </div>
-                <div class="bg-white rounded-xl shadow p-4 flex flex-col items-center min-w-32">
-                    <span class="text-sm text-gray-500">Chamando</span>
-                    <span class="font-bold text-3xl text-yellow-600">22</span>
+                    <span class="text-sm text-gray-500">Ocupados</span>
+                    <span class="font-bold text-3xl text-red-600">{{ busyChannelsCount() }}</span>
                 </div>
             </div>
 
@@ -59,6 +55,11 @@ export class Dashboard implements OnDestroy, OnInit {
     private readonly peerRegistriesMap = signal(new Map<string, PeerRegistry>());
 
     readonly peerRegistries = computed(() => Array.from(this.peerRegistriesMap().values()));
+    readonly channels = computed(() => this.peerRegistries().flatMap((pr) => pr.callState?.channels ?? []));
+
+    readonly busyChannelsCount = computed(
+        () => this.channels().filter((ch) => ch.channelStateEnum === ChannelStateEnum.UP).length
+    );
 
     readonly registeredCount = computed(
         () =>
