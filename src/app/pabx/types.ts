@@ -1,4 +1,4 @@
-import { CallAnalyzeStatusEnum, SentimentEnum, TemperatureEnum } from '@/types/types';
+import {CallAnalyzeStatusEnum, SentimentEnum, TemperatureEnum} from '@/types/types';
 
 export interface Alias {
     readonly id: number;
@@ -246,13 +246,24 @@ export interface CallGroup {
 export interface PeerRegistry {
     readonly id: string;
     readonly peer: Peer;
-    readonly registerId: string | null;
+    readonly registerId?: string;
+    readonly contactStatusEventEnum: ContactStatusEventEnum;
 }
 
 export enum ChannelStateEnum {
     UP = 'UP',
     DOWN = 'DOWN',
     RINGING = 'RINGING'
+}
+
+export enum ContactStatusEventEnum {
+    CREATED = 'CREATED',
+    REACHABLE = 'REACHABLE',
+    REMOVED = 'REMOVED',
+    UNKNOWN = 'UNKNOWN',
+    UNREACHABLE = 'UNREACHABLE',
+    UPDATED = 'UPDATED',
+    NONQUALIFIED = 'NONQUALIFIED'
 }
 
 export interface Channel {
