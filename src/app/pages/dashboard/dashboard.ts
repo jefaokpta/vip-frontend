@@ -2,7 +2,14 @@ import { Component, computed, OnDestroy, OnInit, signal } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { WebsocketService } from '@/websocket/stomp/websocket.service';
 import { rxStompServiceFactory } from '@/websocket/stomp/rx-stomp-service-factory';
-import { CallMessageActionEnum, CallState, CallStateMessage, ContactStatusEventEnum, PeerRegistry } from '@/pabx/types';
+import {
+    CallMessageActionEnum,
+    CallState,
+    CallStateMessage,
+    ChannelStateEnum,
+    ContactStatusEventEnum,
+    PeerRegistry
+} from '@/pabx/types';
 import { DashboardService } from '@/pages/dashboard/dashboard.service';
 import { UserService } from '@/pages/users/user.service';
 import { NgClass, NgForOf } from '@angular/common';
@@ -36,7 +43,7 @@ import { NgClass, NgForOf } from '@angular/common';
                 <div
                     *ngFor="let pr of peerRegistries()"
                     class="rounded-xl shadow px-4 py-3 min-w-28 flex flex-col items-center transition-colors duration-300"
-                    [ngClass]="peerCardClass(pr)"
+                    [ngClass]="peerCardClass(pr, pr.peer.peer)"
                 >
                     <span class="font-bold text-lg">{{ pr.peer.peer }}</span>
                     <span class="text-sm opacity-80">{{ pr.peer.name }}</span>
@@ -125,7 +132,8 @@ export class Dashboard implements OnDestroy, OnInit {
         });
     }
 
-    peerCardClass(pr: PeerRegistry): string {
+    peerCardClass(pr: PeerRegistry, peer: string): string {
+        if (pr.callState) return this.peerCardClassOnCall(pr.callState, peer);
         const active =
             pr.contactStatusEventEnum === ContactStatusEventEnum.REACHABLE ||
             pr.contactStatusEventEnum === ContactStatusEventEnum.CREATED ||
@@ -137,6 +145,21 @@ export class Dashboard implements OnDestroy, OnInit {
             return 'bg-gray-200 text-gray-700';
         }
         return 'bg-green-400 text-white';
+    }
+
+    peerCardClassOnCall(callState: CallState, peer: string): string {
+        const channel = callState.channels.find((ch) => ch.peer === peer);
+        if (!channel) return 'bg-gray-200 text-gray-700';
+        switch (channel.channelStateEnum) {
+            case ChannelStateEnum.RINGING:
+                return 'bg-yellow-400 text-white';
+            case ChannelStateEnum.UP:
+                return 'bg-red-400 text-white';
+            case ChannelStateEnum.DOWN:
+                return 'bg-gray-400 text-gray-700';
+            default:
+                return 'bg-green-400 text-white';
+        }
     }
 
     peerStatusLabel(pr: PeerRegistry): string {
