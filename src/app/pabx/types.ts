@@ -1,4 +1,4 @@
-import {CallAnalyzeStatusEnum, SentimentEnum, TemperatureEnum} from '@/types/types';
+import { CallAnalyzeStatusEnum, SentimentEnum, TemperatureEnum } from '@/types/types';
 
 export interface Alias {
     readonly id: number;
