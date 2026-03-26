@@ -2,7 +2,7 @@ import { Component, computed, OnDestroy, OnInit, signal } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { WebsocketService } from '@/websocket/stomp/websocket.service';
 import { rxStompServiceFactory } from '@/websocket/stomp/rx-stomp-service-factory';
-import { CallState, Channel, ChannelStateEnum, ContactStatusEventEnum, PeerRegistry } from '@/pabx/types';
+import { CallState, ContactStatusEventEnum, PeerRegistry } from '@/pabx/types';
 import { DashboardService } from '@/pages/dashboard/dashboard.service';
 import { UserService } from '@/pages/users/user.service';
 import { NgClass, NgForOf } from '@angular/common';
@@ -24,11 +24,11 @@ import { NgClass, NgForOf } from '@angular/common';
                 </div>
                 <div class="bg-white rounded-xl shadow p-4 flex flex-col items-center min-w-32">
                     <span class="text-sm text-gray-500">Em chamada</span>
-                    <span class="font-bold text-3xl text-red-600">{{ busyCount() }}</span>
+                    <span class="font-bold text-3xl text-red-600">33</span>
                 </div>
                 <div class="bg-white rounded-xl shadow p-4 flex flex-col items-center min-w-32">
                     <span class="text-sm text-gray-500">Chamando</span>
-                    <span class="font-bold text-3xl text-yellow-600">{{ ringingCount() }}</span>
+                    <span class="font-bold text-3xl text-yellow-600">22</span>
                 </div>
             </div>
 
@@ -41,6 +41,7 @@ import { NgClass, NgForOf } from '@angular/common';
                     <span class="font-bold text-lg">{{ pr.peer.peer }}</span>
                     <span class="text-sm opacity-80">{{ pr.peer.name }}</span>
                     <span class="text-xs mt-1 font-medium">{{ peerStatusLabel(pr) }}</span>
+                    <span class="text-xs mt-1 font-medium">{{ pr.callState?.channels?.length ?? 0 }}</span>
                 </div>
             </div>
         </div>
@@ -49,33 +50,33 @@ import { NgClass, NgForOf } from '@angular/common';
 export class Dashboard implements OnDestroy, OnInit {
     private readonly subscriptions: Subscription[] = [];
     private readonly peerRegistriesMap = signal(new Map<string, PeerRegistry>());
-    private readonly callStatesMap = signal(new Map<string, CallState>());
+    // private readonly callStatesMap = signal(new Map<string, CallState>());
 
     readonly peerRegistries = computed(() => Array.from(this.peerRegistriesMap().values()));
 
-    readonly busyPeers = computed(() => {
-        const busy = new Set<string>();
-        for (const cs of this.callStatesMap().values()) {
-            for (const ch of cs.channels) {
-                if (ch.channelStateEnum === ChannelStateEnum.UP) {
-                    busy.add(ch.peer);
-                }
-            }
-        }
-        return busy;
-    });
-
-    readonly ringingPeers = computed(() => {
-        const ringing = new Set<string>();
-        for (const cs of this.callStatesMap().values()) {
-            for (const ch of cs.channels) {
-                if (ch.channelStateEnum === ChannelStateEnum.RINGING) {
-                    ringing.add(ch.peer);
-                }
-            }
-        }
-        return ringing;
-    });
+    // readonly busyPeers = computed(() => {
+    //     const busy = new Set<string>();
+    //     for (const cs of this.callStatesMap().values()) {
+    //         for (const ch of cs.channels) {
+    //             if (ch.channelStateEnum === ChannelStateEnum.UP) {
+    //                 busy.add(ch.peer);
+    //             }
+    //         }
+    //     }
+    //     return busy;
+    // });
+    //
+    // readonly ringingPeers = computed(() => {
+    //     const ringing = new Set<string>();
+    //     for (const cs of this.callStatesMap().values()) {
+    //         for (const ch of cs.channels) {
+    //             if (ch.channelStateEnum === ChannelStateEnum.RINGING) {
+    //                 ringing.add(ch.peer);
+    //             }
+    //         }
+    //     }
+    //     return ringing;
+    // });
 
     readonly registeredCount = computed(
         () =>
@@ -87,8 +88,8 @@ export class Dashboard implements OnDestroy, OnInit {
                     pr.contactStatusEventEnum === ContactStatusEventEnum.NONQUALIFIED
             ).length
     );
-    readonly busyCount = computed(() => this.busyPeers().size);
-    readonly ringingCount = computed(() => this.ringingPeers().size);
+    // readonly busyCount = computed(() => this.busyPeers().size);
+    // readonly ringingCount = computed(() => this.ringingPeers().size);
 
     constructor(
         private readonly webSocketService: WebsocketService,
@@ -111,19 +112,9 @@ export class Dashboard implements OnDestroy, OnInit {
 
         this.subscriptions.push(
             this.webSocketService.watch(`/topic/callstates/${companyId}`).subscribe((message) => {
-                const cs: CallState = JSON.parse(message.body);
-                console.log(cs); //todo: remove this
-                this.callStatesMap.update((map) => {
-                    const allChannelsDown = cs.channels.every(
-                        (ch: Channel) => ch.channelStateEnum === ChannelStateEnum.DOWN
-                    );
-                    if (allChannelsDown) {
-                        map.delete(cs.uniqueId);
-                    } else {
-                        map.set(cs.uniqueId, cs);
-                    }
-                    return new Map(map);
-                });
+                const callState: CallState = JSON.parse(message.body);
+                console.log(callState); //todo: remove this
+                this.addCallStateOnPeerRegistries(callState);
             })
         );
 
@@ -131,8 +122,21 @@ export class Dashboard implements OnDestroy, OnInit {
             this.peerRegistriesMap.set(new Map(list.map((pr) => [pr.peer.peer, pr])));
         });
 
-        this.dashboardService.findCallStates().then((list) => {
-            this.callStatesMap.set(new Map(list.map((cs) => [cs.uniqueId, cs])));
+        this.dashboardService.findCallStates().then((callStates) => {
+            callStates.forEach(this.addCallStateOnPeerRegistries);
+        });
+    }
+
+    private addCallStateOnPeerRegistries(callState: CallState) {
+        console.log('ADD Call state'); //todo: remove
+        this.peerRegistriesMap.update((map) => {
+            callState.channels.forEach((ch) => {
+                const pr = map.get(ch.peer);
+                if (pr != undefined) {
+                    pr.callState = callState;
+                }
+            });
+            return map;
         });
     }
 
@@ -147,8 +151,8 @@ export class Dashboard implements OnDestroy, OnInit {
             if (pr.contactStatusEventEnum === ContactStatusEventEnum.UNREACHABLE) return 'bg-orange-400 text-white';
             return 'bg-gray-200 text-gray-700';
         }
-        if (this.busyPeers().has(pr.peer.peer)) return 'bg-red-400 text-white';
-        if (this.ringingPeers().has(pr.peer.peer)) return 'bg-yellow-300 text-yellow-900';
+        // if (this.busyPeers().has(pr.peer.peer)) return 'bg-red-400 text-white';
+        // if (this.ringingPeers().has(pr.peer.peer)) return 'bg-yellow-300 text-yellow-900';
         return 'bg-green-400 text-white';
     }
 
@@ -158,8 +162,8 @@ export class Dashboard implements OnDestroy, OnInit {
             case ContactStatusEventEnum.CREATED:
             case ContactStatusEventEnum.UPDATED:
             case ContactStatusEventEnum.NONQUALIFIED:
-                if (this.busyPeers().has(pr.peer.peer)) return 'Em chamada';
-                if (this.ringingPeers().has(pr.peer.peer)) return 'Chamando';
+                // if (this.busyPeers().has(pr.peer.peer)) return 'Em chamada';
+                // if (this.ringingPeers().has(pr.peer.peer)) return 'Chamando';
                 return 'Disponível';
             case ContactStatusEventEnum.UNREACHABLE:
                 return 'Inacessível';

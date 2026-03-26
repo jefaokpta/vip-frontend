@@ -248,6 +248,7 @@ export interface PeerRegistry {
     readonly peer: Peer;
     readonly registerId?: string;
     readonly contactStatusEventEnum: ContactStatusEventEnum;
+    callState?: CallState;
 }
 
 export enum ChannelStateEnum {
@@ -271,7 +272,7 @@ export interface Channel {
     readonly peer: string;
     readonly channelStateEnum: ChannelStateEnum;
     readonly isLeader: boolean;
-    readonly record: string | null;
+    readonly record?: string;
 }
 
 export interface CallState {
