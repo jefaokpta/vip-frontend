@@ -50,33 +50,8 @@ import { NgClass, NgForOf } from '@angular/common';
 export class Dashboard implements OnDestroy, OnInit {
     private readonly subscriptions: Subscription[] = [];
     private readonly peerRegistriesMap = signal(new Map<string, PeerRegistry>());
-    // private readonly callStatesMap = signal(new Map<string, CallState>());
 
     readonly peerRegistries = computed(() => Array.from(this.peerRegistriesMap().values()));
-
-    // readonly busyPeers = computed(() => {
-    //     const busy = new Set<string>();
-    //     for (const cs of this.callStatesMap().values()) {
-    //         for (const ch of cs.channels) {
-    //             if (ch.channelStateEnum === ChannelStateEnum.UP) {
-    //                 busy.add(ch.peer);
-    //             }
-    //         }
-    //     }
-    //     return busy;
-    // });
-    //
-    // readonly ringingPeers = computed(() => {
-    //     const ringing = new Set<string>();
-    //     for (const cs of this.callStatesMap().values()) {
-    //         for (const ch of cs.channels) {
-    //             if (ch.channelStateEnum === ChannelStateEnum.RINGING) {
-    //                 ringing.add(ch.peer);
-    //             }
-    //         }
-    //     }
-    //     return ringing;
-    // });
 
     readonly registeredCount = computed(
         () =>
@@ -88,8 +63,6 @@ export class Dashboard implements OnDestroy, OnInit {
                     pr.contactStatusEventEnum === ContactStatusEventEnum.NONQUALIFIED
             ).length
     );
-    // readonly busyCount = computed(() => this.busyPeers().size);
-    // readonly ringingCount = computed(() => this.ringingPeers().size);
 
     constructor(
         private readonly webSocketService: WebsocketService,
@@ -151,8 +124,6 @@ export class Dashboard implements OnDestroy, OnInit {
             if (pr.contactStatusEventEnum === ContactStatusEventEnum.UNREACHABLE) return 'bg-orange-400 text-white';
             return 'bg-gray-200 text-gray-700';
         }
-        // if (this.busyPeers().has(pr.peer.peer)) return 'bg-red-400 text-white';
-        // if (this.ringingPeers().has(pr.peer.peer)) return 'bg-yellow-300 text-yellow-900';
         return 'bg-green-400 text-white';
     }
 
@@ -162,8 +133,6 @@ export class Dashboard implements OnDestroy, OnInit {
             case ContactStatusEventEnum.CREATED:
             case ContactStatusEventEnum.UPDATED:
             case ContactStatusEventEnum.NONQUALIFIED:
-                // if (this.busyPeers().has(pr.peer.peer)) return 'Em chamada';
-                // if (this.ringingPeers().has(pr.peer.peer)) return 'Chamando';
                 return 'Disponível';
             case ContactStatusEventEnum.UNREACHABLE:
                 return 'Inacessível';
