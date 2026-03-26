@@ -102,7 +102,6 @@ export class Dashboard implements OnDestroy, OnInit {
         this.subscriptions.push(
             this.webSocketService.watch(`/topic/peerregistries/${companyId}`).subscribe((message) => {
                 const pr: PeerRegistry = JSON.parse(message.body);
-                console.log(pr); //todo: remove this
                 this.peerRegistriesMap.update((map) => {
                     map.set(pr.peer.peer, pr);
                     return new Map(map);
@@ -113,6 +112,7 @@ export class Dashboard implements OnDestroy, OnInit {
         this.subscriptions.push(
             this.webSocketService.watch(`/topic/callstates/${companyId}`).subscribe((message) => {
                 const cs: CallState = JSON.parse(message.body);
+                console.log(cs); //todo: remove this
                 this.callStatesMap.update((map) => {
                     const allChannelsDown = cs.channels.every(
                         (ch: Channel) => ch.channelStateEnum === ChannelStateEnum.DOWN
