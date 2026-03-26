@@ -120,8 +120,12 @@ export class Dashboard implements OnDestroy, OnInit {
     }
 
     private addCallStateOnPeerRegistries(callState: CallState) {
+        //todo: mostrar tempo da chamada
         console.log('ADD Call state'); //todo: remove
         this.peerRegistriesMap.update((map) => {
+            this.peerRegistries() // zerando todas as chamadas deste callstate, caso channels tenham deixado a call (transferencia)
+                .filter((pr) => pr.callState?.uniqueId == callState.uniqueId)
+                .forEach((pr) => (pr.callState = undefined));
             callState.channels.forEach((ch) => {
                 const pr = map.get(ch.peer);
                 if (pr != undefined) {
