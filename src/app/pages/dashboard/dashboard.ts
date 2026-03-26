@@ -57,9 +57,15 @@ export class Dashboard implements OnDestroy, OnInit {
     readonly peerRegistries = computed(() => Array.from(this.peerRegistriesMap().values()));
     readonly channels = computed(() => this.peerRegistries().flatMap((pr) => pr.callState?.channels ?? []));
 
-    readonly busyChannelsCount = computed(
-        () => this.channels().filter((ch) => ch.channelStateEnum === ChannelStateEnum.UP).length
-    );
+    readonly busyChannelsCount = computed(() => {
+        const seen = new Set<string>();
+        return this.channels().filter(
+            (ch) =>
+                ch.channelStateEnum === ChannelStateEnum.UP &&
+                !seen.has(ch.uniqueId) &&
+                seen.add(ch.uniqueId) !== undefined
+        ).length;
+    });
 
     readonly registeredCount = computed(
         () =>
@@ -116,7 +122,7 @@ export class Dashboard implements OnDestroy, OnInit {
         });
 
         this.dashboardService.findCallStates().then((callStateMessages) => {
-            callStateMessages.map((csm) => csm.callState).forEach(this.addCallStateOnPeerRegistries);
+            callStateMessages.map((csm) => csm.callState).forEach((cs) => this.addCallStateOnPeerRegistries(cs));
         });
     }
 
@@ -133,7 +139,7 @@ export class Dashboard implements OnDestroy, OnInit {
                     pr.callState = callState;
                 }
             });
-            return map;
+            return new Map(map);
         });
     }
 
