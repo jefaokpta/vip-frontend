@@ -8,7 +8,7 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { Injectable } from '@angular/core';
 import { executeRequest, httpHeaders } from '@/util/utils';
-import { CallState, PeerRegistry } from '@/pabx/types';
+import { CallStateMessage, PeerRegistry } from '@/pabx/types';
 
 @Injectable({
     providedIn: 'root'
@@ -22,7 +22,7 @@ export class DashboardService {
         return executeRequest(this.http.get<PeerRegistry[]>(`${this.BACKEND}/peerregistries`, httpHeaders()));
     }
 
-    findCallStates(): Promise<CallState[]> {
-        return executeRequest(this.http.get<CallState[]>(`${this.BACKEND}/callstates`, httpHeaders()));
+    findCallStates(): Promise<CallStateMessage[]> {
+        return executeRequest(this.http.get<CallStateMessage[]>(`${this.BACKEND}/callstates`, httpHeaders()));
     }
 }

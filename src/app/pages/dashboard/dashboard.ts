@@ -2,7 +2,7 @@ import { Component, computed, OnDestroy, OnInit, signal } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { WebsocketService } from '@/websocket/stomp/websocket.service';
 import { rxStompServiceFactory } from '@/websocket/stomp/rx-stomp-service-factory';
-import { CallState, ContactStatusEventEnum, PeerRegistry } from '@/pabx/types';
+import { CallMessageActionEnum, CallState, CallStateMessage, ContactStatusEventEnum, PeerRegistry } from '@/pabx/types';
 import { DashboardService } from '@/pages/dashboard/dashboard.service';
 import { UserService } from '@/pages/users/user.service';
 import { NgClass, NgForOf } from '@angular/common';
@@ -85,9 +85,21 @@ export class Dashboard implements OnDestroy, OnInit {
 
         this.subscriptions.push(
             this.webSocketService.watch(`/topic/callstates/${companyId}`).subscribe((message) => {
-                const callState: CallState = JSON.parse(message.body);
-                console.log(callState); //todo: remove this
-                this.addCallStateOnPeerRegistries(callState);
+                const callStateMessage: CallStateMessage = JSON.parse(message.body);
+                console.log(callStateMessage); //todo: remove this
+                if (callStateMessage.callMessageActionEnum == CallMessageActionEnum.REMOVE) {
+                    this.peerRegistriesMap.update((map) => {
+                        callStateMessage.callState.channels.forEach((ch) => {
+                            const pr = map.get(ch.peer);
+                            if (pr != undefined) {
+                                pr.callState = undefined;
+                            }
+                        });
+                        return new Map(map);
+                    });
+                    return;
+                }
+                this.addCallStateOnPeerRegistries(callStateMessage.callState);
             })
         );
 
@@ -95,8 +107,8 @@ export class Dashboard implements OnDestroy, OnInit {
             this.peerRegistriesMap.set(new Map(list.map((pr) => [pr.peer.peer, pr])));
         });
 
-        this.dashboardService.findCallStates().then((callStates) => {
-            callStates.forEach(this.addCallStateOnPeerRegistries);
+        this.dashboardService.findCallStates().then((callStateMessages) => {
+            callStateMessages.map((csm) => csm.callState).forEach(this.addCallStateOnPeerRegistries);
         });
     }
 

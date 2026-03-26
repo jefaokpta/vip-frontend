@@ -281,6 +281,18 @@ export interface CallState {
     readonly channels: Channel[];
 }
 
+export enum CallMessageActionEnum {
+    UPDATE = 'UPDATE',
+    REMOVE = 'REMOVE'
+}
+
+export interface CallStateMessage {
+    workerId: string;
+    callMessageActionEnum: CallMessageActionEnum;
+    callState: CallState;
+    timestamp: number;
+}
+
 export interface Calendar {
     readonly id: number;
     readonly companyId: string;
