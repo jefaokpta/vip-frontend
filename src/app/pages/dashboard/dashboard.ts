@@ -38,14 +38,30 @@ import { NgClass, NgForOf } from '@angular/common';
             <div class="flex flex-wrap gap-3">
                 <div
                     *ngFor="let pr of peerRegistries()"
-                    class="rounded-xl shadow px-4 py-3 min-w-28 flex flex-col items-center transition-colors duration-300"
-                    [ngClass]="peerCardClass(pr, pr.peer.peer)"
+                    class="bg-white rounded-xl shadow px-4 py-3 w-56 flex flex-col gap-1 transition-all duration-300 border-l-4"
+                    [ngClass]="peerCardBorderClass(pr)"
                 >
-                    <span class="font-bold text-lg">{{ pr.peer.peer }}</span>
-                    <span class="text-sm opacity-80">{{ pr.peer.name }}</span>
-                    @if (pr.callState) {
-                        <span class="text-xs mt-1 font-medium">{{ getOtherPeer(pr) }}</span>
-                        <span class="text-xs mt-1 font-medium">{{ getCallDuration(pr) }}</span>
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-semibold uppercase tracking-wide" [ngClass]="peerStatusTextClass(pr)">
+                            {{ peerStatusLabel(pr) }}
+                            @if (pr.callState) {
+                                &bull; {{ getCallDuration(pr) }}
+                            }
+                        </span>
+                        <span class="text-xs font-bold px-2 py-0.5 rounded" [ngClass]="peerBadgeClass(pr)">
+                            {{ peerBadgeLabel(pr) }}
+                        </span>
+                    </div>
+                    <span class="font-bold text-base text-gray-800">{{ pr.peer.peer }}</span>
+                    <span class="text-sm text-gray-500">{{ pr.peer.name }}</span>
+                    @if (pr.callState && getOtherPeer(pr)) {
+                        <div class="flex items-center justify-between mt-1">
+                            <div>
+                                <span class="text-xs text-gray-400 uppercase tracking-wide">Destination</span>
+                                <div class="text-sm font-medium text-gray-700">{{ getOtherPeer(pr) }}</div>
+                            </div>
+                            <span class="text-red-400">📞</span>
+                        </div>
                     }
                 </div>
             </div>
@@ -145,34 +161,71 @@ export class Dashboard implements OnDestroy, OnInit {
         });
     }
 
-    peerCardClass(pr: PeerRegistry, peer: string): string {
-        if (pr.callState) return this.peerCardClassOnCall(pr.callState, peer);
-        const active =
+    private isActive(pr: PeerRegistry): boolean {
+        return (
             pr.contactStatusEventEnum === ContactStatusEventEnum.REACHABLE ||
             pr.contactStatusEventEnum === ContactStatusEventEnum.CREATED ||
             pr.contactStatusEventEnum === ContactStatusEventEnum.UPDATED ||
-            pr.contactStatusEventEnum === ContactStatusEventEnum.NONQUALIFIED;
-
-        if (!active) {
-            if (pr.contactStatusEventEnum === ContactStatusEventEnum.UNREACHABLE) return 'bg-orange-400 text-white';
-            return 'bg-gray-200 text-gray-700';
-        }
-        return 'bg-green-400 text-white';
+            pr.contactStatusEventEnum === ContactStatusEventEnum.NONQUALIFIED
+        );
     }
 
-    peerCardClassOnCall(callState: CallState, peer: string): string {
-        const channel = callState.channels.find((ch) => ch.peer === peer);
-        if (!channel) return 'bg-gray-200 text-gray-700';
-        switch (channel.channelStateEnum) {
-            case ChannelStateEnum.RINGING:
-                return 'bg-yellow-400 text-white';
-            case ChannelStateEnum.UP:
-                return 'bg-red-400 text-white';
-            case ChannelStateEnum.DOWN:
-                return 'bg-gray-400 text-gray-700';
-            default:
-                return 'bg-green-400 text-white';
+    private getChannelState(pr: PeerRegistry): ChannelStateEnum | null {
+        if (!pr.callState) return null;
+        return pr.callState.channels.find((ch) => ch.peer === pr.peer.peer)?.channelStateEnum ?? null;
+    }
+
+    peerCardBorderClass(pr: PeerRegistry): string {
+        const state = this.getChannelState(pr);
+        if (state === ChannelStateEnum.UP) return 'border-red-500';
+        if (state === ChannelStateEnum.RINGING) return 'border-yellow-400';
+        if (!this.isActive(pr)) {
+            if (pr.contactStatusEventEnum === ContactStatusEventEnum.UNREACHABLE) return 'border-orange-400';
+            return 'border-gray-200';
         }
+        return 'border-green-500';
+    }
+
+    peerStatusTextClass(pr: PeerRegistry): string {
+        const state = this.getChannelState(pr);
+        if (state === ChannelStateEnum.UP) return 'text-red-500';
+        if (state === ChannelStateEnum.RINGING) return 'text-yellow-500';
+        if (!this.isActive(pr)) {
+            if (pr.contactStatusEventEnum === ContactStatusEventEnum.UNREACHABLE) return 'text-orange-500';
+            return 'text-gray-400';
+        }
+        return 'text-green-600';
+    }
+
+    peerStatusLabel(pr: PeerRegistry): string {
+        const state = this.getChannelState(pr);
+        if (state === ChannelStateEnum.UP) return 'OCUPADO';
+        if (state === ChannelStateEnum.RINGING) return 'TOCANDO';
+        if (!this.isActive(pr)) {
+            if (pr.contactStatusEventEnum === ContactStatusEventEnum.UNREACHABLE) return 'INALCANÇÁVEL';
+            return 'INATIVO';
+        }
+        return 'DISPONÍVEL';
+    }
+
+    peerBadgeClass(pr: PeerRegistry): string {
+        const state = this.getChannelState(pr);
+        if (state === ChannelStateEnum.UP) return 'bg-red-100 text-red-600';
+        if (state === ChannelStateEnum.RINGING) return 'bg-yellow-100 text-yellow-700';
+        if (!this.isActive(pr)) {
+            if (pr.contactStatusEventEnum === ContactStatusEventEnum.UNREACHABLE)
+                return 'bg-orange-100 text-orange-600';
+            return 'bg-gray-100 text-gray-500';
+        }
+        return 'bg-green-100 text-green-700';
+    }
+
+    peerBadgeLabel(pr: PeerRegistry): string {
+        const state = this.getChannelState(pr);
+        if (state === ChannelStateEnum.UP) return '';
+        if (state === ChannelStateEnum.RINGING) return '';
+        if (!this.isActive(pr)) return 'INATIVO';
+        return 'REGISTRADO';
     }
 
     getOtherPeer(pr: PeerRegistry): string | null {
