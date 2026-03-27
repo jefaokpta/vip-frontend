@@ -13,32 +13,30 @@ import {
 import { DashboardService } from '@/pages/dashboard/dashboard.service';
 import { UserService } from '@/pages/users/user.service';
 import { NgClass, NgForOf } from '@angular/common';
+import { Card } from 'primeng/card';
 
 @Component({
     selector: 'app-components-dashboard',
     providers: [{ provide: WebsocketService, useFactory: rxStompServiceFactory }],
-    imports: [NgForOf, NgClass],
+    imports: [NgForOf, NgClass, Card],
     template: `
         <div class="flex flex-col gap-4 p-4">
-            <div class="flex gap-6 mb-2">
-                <div class="bg-white rounded-xl shadow p-4 flex flex-col items-center min-w-32">
-                    <span class="text-sm text-gray-500">Ramais</span>
+            <div class="flex gap-6 mb-2 justify-around ">
+                <p-card header="Ramais">
                     <span class="font-bold text-3xl">{{ peerRegistries().length }}</span>
-                </div>
-                <div class="bg-white rounded-xl shadow p-4 flex flex-col items-center min-w-32">
-                    <span class="text-sm text-gray-500">Registrados</span>
+                </p-card>
+                <p-card header="Registrados">
                     <span class="font-bold text-3xl text-green-600">{{ registeredCount() }}</span>
-                </div>
-                <div class="bg-white rounded-xl shadow p-4 flex flex-col items-center min-w-32">
-                    <span class="text-sm text-gray-500">Ocupados</span>
+                </p-card>
+                <p-card header="Ocupados">
                     <span class="font-bold text-3xl text-red-600">{{ busyChannelsCount() }}</span>
-                </div>
+                </p-card>
             </div>
 
             <div class="flex flex-wrap gap-3">
                 <div
                     *ngFor="let pr of peerRegistries()"
-                    class="bg-white rounded-xl shadow px-4 py-3 w-56 flex flex-col gap-1 transition-all duration-300 border-l-4"
+                    class="rounded-xl shadow px-4 py-3 w-56 flex flex-col gap-1 transition-all duration-300 border-l-4"
                     [ngClass]="peerCardBorderClass(pr)"
                 >
                     <div class="flex items-center justify-between">
@@ -52,15 +50,14 @@ import { NgClass, NgForOf } from '@angular/common';
                             {{ peerBadgeLabel(pr) }}
                         </span>
                     </div>
-                    <span class="font-bold text-base text-gray-800">{{ pr.peer.peer }}</span>
-                    <span class="text-sm text-gray-500">{{ pr.peer.name }}</span>
+                    <span class="font-bold text-base">{{ pr.peer.peer }}</span>
+                    <span class="text-sm">{{ pr.peer.name }}</span>
                     @if (pr.callState && getOtherPeer(pr)) {
-                        <div class="flex items-center justify-between mt-1">
+                        <div class="flex items-center gap-2 mt-1">
+                            <i class="fas fa-phone"></i>
                             <div>
-                                <span class="text-xs text-gray-400 uppercase tracking-wide">Destination</span>
-                                <div class="text-sm font-medium text-gray-700">{{ getOtherPeer(pr) }}</div>
+                                <div class="text-sm font-medium">{{ getOtherPeer(pr) }}</div>
                             </div>
-                            <span class="text-red-400">📞</span>
                         </div>
                     }
                 </div>
@@ -203,7 +200,7 @@ export class Dashboard implements OnDestroy, OnInit {
         if (state === ChannelStateEnum.RINGING) return 'TOCANDO';
         if (!this.isActive(pr)) {
             if (pr.contactStatusEventEnum === ContactStatusEventEnum.UNREACHABLE) return 'INALCANÇÁVEL';
-            return 'INATIVO';
+            return '';
         }
         return 'DISPONÍVEL';
     }
