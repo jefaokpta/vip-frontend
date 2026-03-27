@@ -20,49 +20,60 @@ import { Card } from 'primeng/card';
     providers: [{ provide: WebsocketService, useFactory: rxStompServiceFactory }],
     imports: [NgForOf, NgClass, Card],
     template: `
-        <div class="flex flex-col gap-4 p-4">
-            <div class="flex gap-6 mb-2 justify-around ">
-                <p-card header="Ramais">
-                    <span class="font-bold text-3xl">{{ peerRegistries().length }}</span>
-                </p-card>
-                <p-card header="Registrados">
-                    <span class="font-bold text-3xl text-green-600">{{ registeredCount() }}</span>
-                </p-card>
-                <p-card header="Ocupados">
-                    <span class="font-bold text-3xl text-red-600">{{ busyChannelsCount() }}</span>
-                </p-card>
-            </div>
+        <p-card>
+            <ng-template #title>
+                <div class="flex justify-between">
+                    <span class="font-semibold text-2xl">Controle de Ramais</span>
+                </div>
+            </ng-template>
 
-            <div class="flex flex-wrap gap-3">
-                <div
-                    *ngFor="let pr of peerRegistries()"
-                    class="rounded-xl shadow px-4 py-3 w-56 flex flex-col gap-1 transition-all duration-300 border-l-4"
-                    [ngClass]="peerCardBorderClass(pr)"
-                >
-                    <div class="flex items-center justify-between">
-                        <span class="text-xs font-semibold uppercase tracking-wide" [ngClass]="peerStatusTextClass(pr)">
-                            {{ peerStatusLabel(pr) }}
-                            @if (pr.callState) {
-                                &bull; {{ getCallDuration(pr) }}
-                            }
-                        </span>
-                        <span class="text-xs font-bold px-2 py-0.5 rounded" [ngClass]="peerBadgeClass(pr)">
-                            {{ peerBadgeLabel(pr) }}
-                        </span>
-                    </div>
-                    <span class="font-bold text-base">{{ pr.peer.peer }}</span>
-                    <span class="text-sm">{{ pr.peer.name }}</span>
-                    @if (pr.callState && getOtherPeer(pr)) {
-                        <div class="flex items-center gap-2 mt-1">
-                            <i class="fas fa-phone"></i>
-                            <div>
-                                <div class="text-sm font-medium">{{ getOtherPeer(pr) }}</div>
-                            </div>
+            <div class="flex flex-col gap-4 p-4">
+                <div class="flex gap-6 mb-2 justify-around ">
+                    <p-card header="Ramais" class="text-center">
+                        <span class="font-bold text-3xl">{{ peerRegistries().length }}</span>
+                    </p-card>
+                    <p-card header="Registrados" class="text-center">
+                        <span class="font-bold text-3xl text-green-600">{{ registeredCount() }}</span>
+                    </p-card>
+                    <p-card header="Ocupados" class="text-center">
+                        <span class="font-bold text-3xl text-red-600">{{ busyChannelsCount() }}</span>
+                    </p-card>
+                </div>
+
+                <div class="flex flex-wrap gap-3">
+                    <div
+                        *ngFor="let pr of peerRegistries()"
+                        class="rounded-xl shadow px-4 py-3 w-56 flex flex-col gap-1 transition-all duration-300 border-l-4"
+                        [ngClass]="peerCardBorderClass(pr)"
+                    >
+                        <div class="flex items-center justify-between">
+                            <span
+                                class="text-xs font-semibold uppercase tracking-wide"
+                                [ngClass]="peerStatusTextClass(pr)"
+                            >
+                                {{ peerStatusLabel(pr) }}
+                                @if (pr.callState) {
+                                    &bull; {{ getCallDuration(pr) }}
+                                }
+                            </span>
+                            <span class="text-xs font-bold px-2 py-0.5 rounded" [ngClass]="peerBadgeClass(pr)">
+                                {{ peerBadgeLabel(pr) }}
+                            </span>
                         </div>
-                    }
+                        <span class="font-bold text-base">{{ pr.peer.peer }}</span>
+                        <span class="text-sm">{{ pr.peer.name }}</span>
+                        @if (pr.callState && getOtherPeer(pr)) {
+                            <div class="flex items-center gap-2 mt-1">
+                                <i class="fas fa-phone"></i>
+                                <div>
+                                    <div class="text-sm font-medium">{{ getOtherPeer(pr) }}</div>
+                                </div>
+                            </div>
+                        }
+                    </div>
                 </div>
             </div>
-        </div>
+        </p-card>
     `
 })
 export class Dashboard implements OnDestroy, OnInit {
@@ -176,6 +187,7 @@ export class Dashboard implements OnDestroy, OnInit {
         const state = this.getChannelState(pr);
         if (state === ChannelStateEnum.UP) return 'border-red-500';
         if (state === ChannelStateEnum.RINGING) return 'border-yellow-400';
+        if (state === ChannelStateEnum.DIALING) return 'border-yellow-400';
         if (!this.isActive(pr)) {
             if (pr.contactStatusEventEnum === ContactStatusEventEnum.UNREACHABLE) return 'border-orange-400';
             return 'border-gray-200';
@@ -187,6 +199,7 @@ export class Dashboard implements OnDestroy, OnInit {
         const state = this.getChannelState(pr);
         if (state === ChannelStateEnum.UP) return 'text-red-500';
         if (state === ChannelStateEnum.RINGING) return 'text-yellow-500';
+        if (state === ChannelStateEnum.DIALING) return 'text-yellow-500';
         if (!this.isActive(pr)) {
             if (pr.contactStatusEventEnum === ContactStatusEventEnum.UNREACHABLE) return 'text-orange-500';
             return 'text-gray-400';
@@ -198,6 +211,7 @@ export class Dashboard implements OnDestroy, OnInit {
         const state = this.getChannelState(pr);
         if (state === ChannelStateEnum.UP) return 'OCUPADO';
         if (state === ChannelStateEnum.RINGING) return 'TOCANDO';
+        if (state === ChannelStateEnum.DIALING) return 'DISCANDO';
         if (!this.isActive(pr)) {
             if (pr.contactStatusEventEnum === ContactStatusEventEnum.UNREACHABLE) return 'INALCANÇÁVEL';
             return '';
@@ -221,6 +235,7 @@ export class Dashboard implements OnDestroy, OnInit {
         const state = this.getChannelState(pr);
         if (state === ChannelStateEnum.UP) return '';
         if (state === ChannelStateEnum.RINGING) return '';
+        if (state === ChannelStateEnum.DIALING) return '';
         if (!this.isActive(pr)) return 'INATIVO';
         return 'REGISTRADO';
     }

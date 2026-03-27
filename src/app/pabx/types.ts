@@ -254,7 +254,8 @@ export interface PeerRegistry {
 export enum ChannelStateEnum {
     UP = 'UP',
     DOWN = 'DOWN',
-    RINGING = 'RINGING'
+    RINGING = 'RINGING',
+    DIALING = 'DIALING'
 }
 
 export enum ContactStatusEventEnum {
