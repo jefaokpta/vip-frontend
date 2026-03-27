@@ -272,6 +272,7 @@ export interface Channel {
     readonly peer: string;
     readonly channelStateEnum: ChannelStateEnum;
     readonly isLeader: boolean;
+    readonly timestamp: number;
     readonly record?: string;
 }
 
