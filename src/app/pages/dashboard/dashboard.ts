@@ -1,7 +1,7 @@
-import {Component, computed, OnDestroy, OnInit, signal} from '@angular/core';
-import {Subscription} from 'rxjs';
-import {WebsocketService} from '@/websocket/stomp/websocket.service';
-import {rxStompServiceFactory} from '@/websocket/stomp/rx-stomp-service-factory';
+import { Component, computed, OnDestroy, OnInit, signal } from '@angular/core';
+import { Subscription } from 'rxjs';
+import { WebsocketService } from '@/websocket/stomp/websocket.service';
+import { rxStompServiceFactory } from '@/websocket/stomp/rx-stomp-service-factory';
 import {
     CallMessageActionEnum,
     CallState,
@@ -10,10 +10,10 @@ import {
     ContactStatusEventEnum,
     PeerRegistry
 } from '@/pabx/types';
-import {DashboardService} from '@/pages/dashboard/dashboard.service';
-import {UserService} from '@/pages/users/user.service';
-import {NgClass, NgForOf} from '@angular/common';
-import {Card} from 'primeng/card';
+import { DashboardService } from '@/pages/dashboard/dashboard.service';
+import { UserService } from '@/pages/users/user.service';
+import { NgClass, NgForOf } from '@angular/common';
+import { Card } from 'primeng/card';
 
 @Component({
     selector: 'app-components-dashboard',
