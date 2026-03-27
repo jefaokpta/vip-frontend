@@ -1,7 +1,7 @@
-import { Component, computed, OnDestroy, OnInit, signal } from '@angular/core';
-import { Subscription } from 'rxjs';
-import { WebsocketService } from '@/websocket/stomp/websocket.service';
-import { rxStompServiceFactory } from '@/websocket/stomp/rx-stomp-service-factory';
+import {Component, computed, OnDestroy, OnInit, signal} from '@angular/core';
+import {Subscription} from 'rxjs';
+import {WebsocketService} from '@/websocket/stomp/websocket.service';
+import {rxStompServiceFactory} from '@/websocket/stomp/rx-stomp-service-factory';
 import {
     CallMessageActionEnum,
     CallState,
@@ -10,35 +10,44 @@ import {
     ContactStatusEventEnum,
     PeerRegistry
 } from '@/pabx/types';
-import { DashboardService } from '@/pages/dashboard/dashboard.service';
-import { UserService } from '@/pages/users/user.service';
-import { NgClass, NgForOf } from '@angular/common';
-import { Card } from 'primeng/card';
+import {DashboardService} from '@/pages/dashboard/dashboard.service';
+import {UserService} from '@/pages/users/user.service';
+import {NgClass, NgForOf} from '@angular/common';
+import {Card} from 'primeng/card';
 
 @Component({
     selector: 'app-components-dashboard',
     providers: [{ provide: WebsocketService, useFactory: rxStompServiceFactory }],
     imports: [NgForOf, NgClass, Card],
     template: `
-        <p-card>
-            <ng-template #title>
-                <div class="flex justify-between">
-                    <span class="font-semibold text-2xl">Controle de Ramais</span>
-                </div>
-            </ng-template>
+        <div class="flex flex-col gap-4">
+            <p-card>
+                <ng-template #title>
+                    <div class="flex justify-between">
+                        <span class="font-semibold text-2xl">Painel de Ramais</span>
+                    </div>
+                </ng-template>
 
-            <div class="flex flex-col gap-4 p-4">
-                <div class="flex gap-6 mb-2 justify-around ">
-                    <p-card header="Ramais" class="text-center">
-                        <span class="font-bold text-3xl">{{ peerRegistries().length }}</span>
-                    </p-card>
-                    <p-card header="Registrados" class="text-center">
-                        <span class="font-bold text-3xl text-green-600">{{ registeredCount() }}</span>
-                    </p-card>
-                    <p-card header="Ocupados" class="text-center">
-                        <span class="font-bold text-3xl text-red-600">{{ busyChannelsCount() }}</span>
-                    </p-card>
+                <div class="flex flex-col gap-4 p-4">
+                    <div class="flex gap-6 mb-2 justify-around ">
+                        <p-card header="Ramais" class="text-center">
+                            <span class="font-bold text-3xl">{{ peerRegistries().length }}</span>
+                        </p-card>
+                        <p-card header="Registrados" class="text-center">
+                            <span class="font-bold text-3xl text-green-600">{{ registeredCount() }}</span>
+                        </p-card>
+                        <p-card header="Ocupados" class="text-center">
+                            <span class="font-bold text-3xl text-red-600">{{ busyChannelsCount() }}</span>
+                        </p-card>
+                    </div>
                 </div>
+            </p-card>
+            <p-card>
+                <ng-template #title>
+                    <div class="flex justify-between">
+                        <span class="font-semibold">Monitoramento de Ramais</span>
+                    </div>
+                </ng-template>
 
                 <div class="flex flex-wrap gap-3">
                     <div
@@ -72,8 +81,8 @@ import { Card } from 'primeng/card';
                         }
                     </div>
                 </div>
-            </div>
-        </p-card>
+            </p-card>
+        </div>
     `
 })
 export class Dashboard implements OnDestroy, OnInit {
@@ -123,10 +132,7 @@ export class Dashboard implements OnDestroy, OnInit {
                     map.set(pr.peer.peer, pr);
                     return new Map(map);
                 });
-            })
-        );
-
-        this.subscriptions.push(
+            }),
             this.webSocketService.watch(`/topic/callstates/${companyId}`).subscribe((message) => {
                 const callStateMessage: CallStateMessage = JSON.parse(message.body);
                 if (callStateMessage.callMessageActionEnum == CallMessageActionEnum.REMOVE) {
