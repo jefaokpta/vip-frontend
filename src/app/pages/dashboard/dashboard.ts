@@ -43,8 +43,10 @@ import { NgClass, NgForOf } from '@angular/common';
                 >
                     <span class="font-bold text-lg">{{ pr.peer.peer }}</span>
                     <span class="text-sm opacity-80">{{ pr.peer.name }}</span>
-                    <span class="text-xs mt-1 font-medium">{{ peerStatusLabel(pr) }}</span>
-                    <span class="text-xs mt-1 font-medium">{{ pr.callState?.channels?.length ?? 0 }}</span>
+                    @if (pr.callState) {
+                        <span class="text-xs mt-1 font-medium">{{ getOtherPeer(pr) }}</span>
+                        <span class="text-xs mt-1 font-medium">{{ getCallDuration(pr) }}</span>
+                    }
                 </div>
             </div>
         </div>
@@ -53,6 +55,8 @@ import { NgClass, NgForOf } from '@angular/common';
 export class Dashboard implements OnDestroy, OnInit {
     private readonly subscriptions: Subscription[] = [];
     private readonly peerRegistriesMap = signal(new Map<string, PeerRegistry>());
+    private readonly now = signal(Date.now());
+    private clockInterval?: ReturnType<typeof setInterval>;
 
     readonly peerRegistries = computed(() => Array.from(this.peerRegistriesMap().values()));
     readonly channels = computed(() => this.peerRegistries().flatMap((pr) => pr.callState?.channels ?? []));
@@ -85,6 +89,7 @@ export class Dashboard implements OnDestroy, OnInit {
     ) {}
 
     ngOnInit() {
+        this.clockInterval = setInterval(() => this.now.set(Date.now()), 1000);
         const companyId = this.userService.getUser().companyId;
 
         this.subscriptions.push(
@@ -100,7 +105,6 @@ export class Dashboard implements OnDestroy, OnInit {
         this.subscriptions.push(
             this.webSocketService.watch(`/topic/callstates/${companyId}`).subscribe((message) => {
                 const callStateMessage: CallStateMessage = JSON.parse(message.body);
-                console.log(callStateMessage); //todo: remove this
                 if (callStateMessage.callMessageActionEnum == CallMessageActionEnum.REMOVE) {
                     this.peerRegistriesMap.update((map) => {
                         callStateMessage.callState.channels.forEach((ch) => {
@@ -127,8 +131,6 @@ export class Dashboard implements OnDestroy, OnInit {
     }
 
     private addCallStateOnPeerRegistries(callState: CallState) {
-        //todo: mostrar tempo da chamada
-        console.log('ADD Call state'); //todo: remove
         this.peerRegistriesMap.update((map) => {
             this.peerRegistries() // zerando todas as chamadas deste callstate, caso channels tenham deixado a call (transferencia)
                 .filter((pr) => pr.callState?.uniqueId == callState.uniqueId)
@@ -173,23 +175,27 @@ export class Dashboard implements OnDestroy, OnInit {
         }
     }
 
-    peerStatusLabel(pr: PeerRegistry): string {
-        switch (pr.contactStatusEventEnum) {
-            case ContactStatusEventEnum.REACHABLE:
-            case ContactStatusEventEnum.CREATED:
-            case ContactStatusEventEnum.UPDATED:
-            case ContactStatusEventEnum.NONQUALIFIED:
-                return 'Disponível';
-            case ContactStatusEventEnum.UNREACHABLE:
-                return 'Inacessível';
-            case ContactStatusEventEnum.REMOVED:
-                return 'Removido';
-            default:
-                return 'Desconhecido';
-        }
+    getOtherPeer(pr: PeerRegistry): string | null {
+        if (!pr.callState) return null;
+        const other = pr.callState.channels.find((ch) => ch.peer !== pr.peer.peer);
+        return other?.peer ?? null;
+    }
+
+    getCallDuration(pr: PeerRegistry): string {
+        if (!pr.callState) return '';
+        const ownChannel = pr.callState.channels.find((ch) => ch.peer === pr.peer.peer);
+        if (!ownChannel) return '';
+        const elapsedMs = this.now() - ownChannel.timestamp;
+        const totalSeconds = Math.max(0, Math.floor(elapsedMs / 1000));
+        const mm = Math.floor(totalSeconds / 60)
+            .toString()
+            .padStart(2, '0');
+        const ss = (totalSeconds % 60).toString().padStart(2, '0');
+        return `${mm}:${ss}`;
     }
 
     ngOnDestroy(): void {
         this.subscriptions.forEach((s) => s.unsubscribe());
+        clearInterval(this.clockInterval);
     }
 }
