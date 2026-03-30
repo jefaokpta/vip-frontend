@@ -1,5 +1,11 @@
 import { CallAnalyzeStatusEnum, SentimentEnum, TemperatureEnum } from '@/types/types';
 
+export interface Ddr {
+    readonly id: number;
+    readonly companyId: string;
+    readonly ddr: string;
+}
+
 export interface Alias {
     readonly id: number;
     readonly name: string;

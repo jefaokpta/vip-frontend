@@ -71,6 +71,11 @@ export class AppMenu implements OnInit {
                             routerLink: ['/pabx/aliases']
                         },
                         {
+                            label: 'DDRs',
+                            icon: 'pi pi-fw pi-phone',
+                            routerLink: ['/pabx/ddrs']
+                        },
+                        {
                             label: 'Centro de Custo',
                             icon: 'pi pi-fw pi-list',
                             routerLink: ['/pabx/accountcodes']

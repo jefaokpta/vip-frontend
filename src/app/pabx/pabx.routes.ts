@@ -1,4 +1,7 @@
 import { Routes } from '@angular/router';
+import { DdrPage } from '@/pabx/ddr/ddr.page';
+import { NewDdrPage } from '@/pabx/ddr/new-ddr.page';
+import { EditDdrPage } from '@/pabx/ddr/edit-ddr.page';
 import { DialplanPage } from '@/pabx/dialplan/dialplan.page';
 import { AliasPage } from '@/pabx/alias/alias.page';
 import { NewAliasPage } from '@/pabx/alias/new-alias.page';
@@ -38,6 +41,9 @@ export default [
     { path: 'aliases', component: AliasPage, data: { breadcrumb: 'Alias de Discagem' } },
     { path: 'aliases/new', component: NewAliasPage, data: { breadcrumb: 'Alias > Novo' } },
     { path: 'aliases/edit/:id', component: EditAliasPage, data: { breadcrumb: 'Alias > Editar' } },
+    { path: 'ddrs', component: DdrPage, data: { breadcrumb: 'DDRs' } },
+    { path: 'ddrs/new', component: NewDdrPage, data: { breadcrumb: 'DDRs > Novo' } },
+    { path: 'ddrs/edit/:id', component: EditDdrPage, data: { breadcrumb: 'DDRs > Editar' } },
     { path: 'dialplans', component: DialplanPage, data: { breadcrumb: 'Regras de Discagem' } },
     { path: 'dialplans/new', component: NewDialplanPage, data: { breadcrumb: 'Regras de Discagem > Nova' } },
     { path: 'dialplans/edit/:id', component: EditDialplanPage, data: { breadcrumb: 'Regras de Discagem > Editar' } },
