@@ -71,7 +71,7 @@ export class AppMenu implements OnInit {
                             routerLink: ['/pabx/aliases']
                         },
                         {
-                            label: 'DDRs',
+                            label: 'DDR',
                             icon: 'pi pi-fw pi-phone',
                             routerLink: ['/pabx/ddrs']
                         },
