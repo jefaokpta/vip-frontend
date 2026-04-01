@@ -254,22 +254,28 @@ export class NewUraPage implements OnInit {
             digitTimeout: [2, [Validators.required, Validators.min(1)]],
             soundId: [null, [Validators.required]],
             isEnableDialPeer: [false],
-            invalidAction: this.fb.group({
-                option: [-2],
-                uraActionEnum: [UraActionEnum.RETURN_TO_START, [Validators.required]],
-                target: [null]
-            }),
-            timeoutAction: this.fb.group({
-                option: [-1],
-                uraActionEnum: [UraActionEnum.RETURN_TO_START, [Validators.required]],
-                target: [null]
-            }),
+            invalidAction: this.fb.group(
+                { option: [-2], uraActionEnum: [UraActionEnum.RETURN_TO_START, [Validators.required]], target: [null] },
+                { validators: [NewUraPage.requireTargetForDialpeer] }
+            ),
+            timeoutAction: this.fb.group(
+                { option: [-1], uraActionEnum: [UraActionEnum.RETURN_TO_START, [Validators.required]], target: [null] },
+                { validators: [NewUraPage.requireTargetForDialpeer] }
+            ),
             actions: this.fb.array([], [Validators.minLength(1), NewUraPage.noDuplicateOptions])
         });
 
         this.mohService.findAll().then((mohs: Moh[]) => {
             this.mohOptions = mohs.map((m) => ({ label: m.name, value: m.id }));
         });
+    }
+
+    static requireTargetForDialpeer(control: AbstractControl) {
+        const group = control as FormGroup;
+        if (group.get('uraActionEnum')?.value === UraActionEnum.DIALPEER && !group.get('target')?.value) {
+            return { targetRequired: true };
+        }
+        return null;
     }
 
     static noDuplicateOptions(control: AbstractControl) {
@@ -284,11 +290,14 @@ export class NewUraPage implements OnInit {
 
     addAction(): void {
         this.actions.push(
-            this.fb.group({
-                option: [null, [Validators.required, Validators.min(0), Validators.max(9)]],
-                uraActionEnum: [UraActionEnum.HANGUP, [Validators.required]],
-                target: [null]
-            })
+            this.fb.group(
+                {
+                    option: [null, [Validators.required, Validators.min(0), Validators.max(9)]],
+                    uraActionEnum: [UraActionEnum.HANGUP, [Validators.required]],
+                    target: [null]
+                },
+                { validators: [NewUraPage.requireTargetForDialpeer] }
+            )
         );
     }
 

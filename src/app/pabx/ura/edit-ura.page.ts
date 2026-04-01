@@ -292,11 +292,22 @@ export class EditUraPage implements OnInit {
     }
 
     private buildActionGroup(action: UraAction): FormGroup {
-        return this.fb.group({
-            option: [action.option, [Validators.required]],
-            uraActionEnum: [action.uraActionEnum, [Validators.required]],
-            target: [action.target ?? null]
-        });
+        return this.fb.group(
+            {
+                option: [action.option, [Validators.required]],
+                uraActionEnum: [action.uraActionEnum, [Validators.required]],
+                target: [action.target ?? null]
+            },
+            { validators: [EditUraPage.requireTargetForDialpeer] }
+        );
+    }
+
+    static requireTargetForDialpeer(control: AbstractControl) {
+        const group = control as FormGroup;
+        if (group.get('uraActionEnum')?.value === UraActionEnum.DIALPEER && !group.get('target')?.value) {
+            return { targetRequired: true };
+        }
+        return null;
     }
 
     static noDuplicateOptions(control: AbstractControl) {
@@ -311,11 +322,14 @@ export class EditUraPage implements OnInit {
 
     addAction(): void {
         this.actions.push(
-            this.fb.group({
-                option: [null, [Validators.required, Validators.min(0), Validators.max(9)]],
-                uraActionEnum: [UraActionEnum.HANGUP, [Validators.required]],
-                target: [null]
-            })
+            this.fb.group(
+                {
+                    option: [null, [Validators.required, Validators.min(0), Validators.max(9)]],
+                    uraActionEnum: [UraActionEnum.HANGUP, [Validators.required]],
+                    target: [null]
+                },
+                { validators: [EditUraPage.requireTargetForDialpeer] }
+            )
         );
     }
 
