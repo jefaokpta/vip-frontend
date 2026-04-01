@@ -33,6 +33,9 @@ import { EditPickupGroupPage } from '@/pabx/pickup-group/edit-pickup-group.page'
 import { CallGroupsPage } from '@/pabx/call-group/call-groups.page';
 import { NewCallGroupPage } from '@/pabx/call-group/new-call-group.page';
 import { EditCallGroupPage } from '@/pabx/call-group/edit-call-group.page';
+import { UrasPage } from '@/pabx/ura/uras.page';
+import { NewUraPage } from '@/pabx/ura/new-ura.page';
+import { EditUraPage } from '@/pabx/ura/edit-ura.page';
 
 export default [
     { path: 'peers', component: PeerPage, data: { breadcrumb: 'Ramais' } },
@@ -81,6 +84,10 @@ export default [
         component: EditCallGroupPage,
         data: { breadcrumb: 'Grupos de Chamada > Editar' }
     },
+
+    { path: 'uras', component: UrasPage, data: { breadcrumb: 'URA' } },
+    { path: 'uras/new', component: NewUraPage, data: { breadcrumb: 'URA > Nova' } },
+    { path: 'uras/edit/:id', component: EditUraPage, data: { breadcrumb: 'URA > Editar' } },
 
     { path: '**', redirectTo: '/notfound' }
 ] as Routes;

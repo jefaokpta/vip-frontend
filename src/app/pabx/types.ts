@@ -227,6 +227,31 @@ export interface CompanySettings {
     readonly defaultMohId: number | null;
 }
 
+export enum UraActionEnum {
+    HANGUP = 'HANGUP',
+    DIALPEER = 'DIALPEER',
+    RETURN_TO_START = 'RETURN_TO_START'
+}
+
+export interface UraAction {
+    readonly option: number;
+    readonly uraActionEnum: UraActionEnum;
+    readonly target?: string;
+}
+
+export interface Ura {
+    readonly id: number;
+    readonly name: string;
+    readonly companyId: string;
+    readonly interactionTimeout: number;
+    readonly digitTimeout: number;
+    readonly soundId: number;
+    readonly isEnableDialPeer: boolean;
+    readonly invalidAction: UraAction;
+    readonly timeoutAction: UraAction;
+    readonly actions: UraAction[];
+}
+
 export interface PickupGroup {
     readonly id: number;
     readonly name: string;
