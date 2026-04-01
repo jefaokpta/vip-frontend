@@ -172,8 +172,11 @@ import { PeerSelectComponent } from '@/pabx/dialplan/components/peer-select-comp
                                 outlined
                                 size="small"
                             />
-                            @if (actions.invalid && actions.touched) {
+                            @if (actions.errors?.['minlength'] && actions.touched) {
                                 <small class="p-error">Ao menos 1 ação é obrigatória.</small>
+                            }
+                            @if (actions.errors?.['duplicateOptions']) {
+                                <small class="p-error">Dígitos repetidos não são permitidos.</small>
                             }
                         </div>
 
@@ -283,7 +286,7 @@ export class EditUraPage implements OnInit {
             timeoutAction: this.buildActionGroup(ura.timeoutAction),
             actions: this.fb.array(
                 ura.actions.map((a) => this.buildActionGroup(a)),
-                [Validators.minLength(1)]
+                [Validators.minLength(1), EditUraPage.noDuplicateOptions]
             )
         });
     }
@@ -294,6 +297,12 @@ export class EditUraPage implements OnInit {
             uraActionEnum: [action.uraActionEnum, [Validators.required]],
             target: [action.target ?? null]
         });
+    }
+
+    static noDuplicateOptions(control: AbstractControl) {
+        const array = control as FormArray;
+        const options = array.controls.map((c) => c.get('option')?.value).filter((v) => v !== null && v !== undefined);
+        return options.length === new Set(options).size ? null : { duplicateOptions: true };
     }
 
     get actions(): FormArray {

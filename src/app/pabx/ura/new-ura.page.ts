@@ -164,8 +164,11 @@ import { PeerSelectComponent } from '@/pabx/dialplan/components/peer-select-comp
                             outlined
                             size="small"
                         />
-                        @if (actions.invalid && actions.touched) {
+                        @if (actions.errors?.['minlength'] && actions.touched) {
                             <small class="p-error">Ao menos 1 ação é obrigatória.</small>
+                        }
+                        @if (actions.errors?.['duplicateOptions']) {
+                            <small class="p-error">Dígitos repetidos não são permitidos.</small>
                         }
                     </div>
 
@@ -261,12 +264,18 @@ export class NewUraPage implements OnInit {
                 uraActionEnum: [UraActionEnum.RETURN_TO_START, [Validators.required]],
                 target: [null]
             }),
-            actions: this.fb.array([], [Validators.minLength(1)])
+            actions: this.fb.array([], [Validators.minLength(1), NewUraPage.noDuplicateOptions])
         });
 
         this.mohService.findAll().then((mohs: Moh[]) => {
             this.mohOptions = mohs.map((m) => ({ label: m.name, value: m.id }));
         });
+    }
+
+    static noDuplicateOptions(control: AbstractControl) {
+        const array = control as FormArray;
+        const options = array.controls.map((c) => c.get('option')?.value).filter((v) => v !== null && v !== undefined);
+        return options.length === new Set(options).size ? null : { duplicateOptions: true };
     }
 
     get actions(): FormArray {
