@@ -250,8 +250,8 @@ export class NewUraPage implements OnInit {
     ngOnInit(): void {
         this.form = this.fb.group({
             name: ['', [Validators.required]],
-            interactionTimeout: [10, [Validators.required, Validators.min(1)]],
-            digitTimeout: [5, [Validators.required, Validators.min(1)]],
+            interactionTimeout: [5, [Validators.required, Validators.min(1)]],
+            digitTimeout: [2, [Validators.required, Validators.min(1)]],
             soundId: [null, [Validators.required]],
             isEnableDialPeer: [false],
             invalidAction: this.fb.group({
