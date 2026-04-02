@@ -232,7 +232,9 @@ export interface CompanySettings {
 export enum UraActionEnum {
     HANGUP = 'HANGUP',
     DIALPEER = 'DIALPEER',
-    RETURN_TO_START = 'RETURN_TO_START'
+    RETURN_TO_START = 'RETURN_TO_START',
+    CALLGROUP = 'CALLGROUP',
+    SUBURA = 'SUBURA'
 }
 
 export interface UraAction {

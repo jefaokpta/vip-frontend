@@ -14,6 +14,7 @@ import { Moh, UraActionEnum } from '@/pabx/types';
 import { MohService } from '@/pabx/moh/moh.service';
 import { UraService } from '@/pabx/ura/ura.service';
 import { PeerSelectComponent } from '@/pabx/dialplan/components/peer-select-component';
+import { CallGroupService } from '@/pabx/call-group/call-group.service';
 
 @Component({
     selector: 'app-new-ura-page',
@@ -125,6 +126,34 @@ import { PeerSelectComponent } from '@/pabx/dialplan/components/peer-select-comp
                         >
                             <app-peer-select-component formControlName="target" [isShowLabel]="true" />
                         </div>
+                        <div
+                            class="field"
+                            *ngIf="form.get('invalidAction.uraActionEnum')?.value === UraActionEnum.CALLGROUP"
+                        >
+                            <label class="block mb-2">Grupo de Chamada *</label>
+                            <p-select
+                                [options]="callGroupOptions"
+                                formControlName="target"
+                                optionLabel="label"
+                                optionValue="value"
+                                placeholder="Selecione o grupo"
+                                appendTo="body"
+                            />
+                        </div>
+                        <div
+                            class="field"
+                            *ngIf="form.get('invalidAction.uraActionEnum')?.value === UraActionEnum.SUBURA"
+                        >
+                            <label class="block mb-2">Sub URA *</label>
+                            <p-select
+                                [options]="uraOptions"
+                                formControlName="target"
+                                optionLabel="label"
+                                optionValue="value"
+                                placeholder="Selecione a URA"
+                                appendTo="body"
+                            />
+                        </div>
                     </div>
                 </div>
 
@@ -148,6 +177,34 @@ import { PeerSelectComponent } from '@/pabx/dialplan/components/peer-select-comp
                             *ngIf="form.get('timeoutAction.uraActionEnum')?.value === UraActionEnum.DIALPEER"
                         >
                             <app-peer-select-component formControlName="target" [isShowLabel]="true" />
+                        </div>
+                        <div
+                            class="field"
+                            *ngIf="form.get('timeoutAction.uraActionEnum')?.value === UraActionEnum.CALLGROUP"
+                        >
+                            <label class="block mb-2">Grupo de Chamada *</label>
+                            <p-select
+                                [options]="callGroupOptions"
+                                formControlName="target"
+                                optionLabel="label"
+                                optionValue="value"
+                                placeholder="Selecione o grupo"
+                                appendTo="body"
+                            />
+                        </div>
+                        <div
+                            class="field"
+                            *ngIf="form.get('timeoutAction.uraActionEnum')?.value === UraActionEnum.SUBURA"
+                        >
+                            <label class="block mb-2">Sub URA *</label>
+                            <p-select
+                                [options]="uraOptions"
+                                formControlName="target"
+                                optionLabel="label"
+                                optionValue="value"
+                                placeholder="Selecione a URA"
+                                appendTo="body"
+                            />
                         </div>
                     </div>
                 </div>
@@ -196,6 +253,28 @@ import { PeerSelectComponent } from '@/pabx/dialplan/components/peer-select-comp
                             <div class="field" *ngIf="action.get('uraActionEnum')?.value === UraActionEnum.DIALPEER">
                                 <app-peer-select-component formControlName="target" [isShowLabel]="true" />
                             </div>
+                            <div class="field" *ngIf="action.get('uraActionEnum')?.value === UraActionEnum.CALLGROUP">
+                                <label class="block mb-2">Grupo de Chamada *</label>
+                                <p-select
+                                    [options]="callGroupOptions"
+                                    formControlName="target"
+                                    optionLabel="label"
+                                    optionValue="value"
+                                    placeholder="Selecione o grupo"
+                                    appendTo="body"
+                                />
+                            </div>
+                            <div class="field" *ngIf="action.get('uraActionEnum')?.value === UraActionEnum.SUBURA">
+                                <label class="block mb-2">Sub URA *</label>
+                                <p-select
+                                    [options]="uraOptions"
+                                    formControlName="target"
+                                    optionLabel="label"
+                                    optionValue="value"
+                                    placeholder="Selecione a URA"
+                                    appendTo="body"
+                                />
+                            </div>
                             <div class="flex items-end">
                                 <p-button
                                     type="button"
@@ -232,19 +311,24 @@ export class NewUraPage implements OnInit {
     pending = false;
     showError = false;
     mohOptions: { label: string; value: number }[] = [];
+    callGroupOptions: { label: string; value: string }[] = [];
+    uraOptions: { label: string; value: string }[] = [];
     readonly UraActionEnum = UraActionEnum;
 
     actionOptions = [
         { label: 'Desligar', value: UraActionEnum.HANGUP },
         { label: 'Discar para Ramal', value: UraActionEnum.DIALPEER },
-        { label: 'Voltar ao Início', value: UraActionEnum.RETURN_TO_START }
+        { label: 'Voltar ao Início', value: UraActionEnum.RETURN_TO_START },
+        { label: 'Grupo de Chamada', value: UraActionEnum.CALLGROUP },
+        { label: 'Sub URA', value: UraActionEnum.SUBURA }
     ];
 
     constructor(
         private readonly fb: FormBuilder,
         private readonly router: Router,
         private readonly uraService: UraService,
-        private readonly mohService: MohService
+        private readonly mohService: MohService,
+        private readonly callGroupService: CallGroupService
     ) {}
 
     ngOnInit(): void {
@@ -256,23 +340,31 @@ export class NewUraPage implements OnInit {
             isEnableDialPeer: [false],
             invalidAction: this.fb.group(
                 { option: [-2], uraActionEnum: [UraActionEnum.RETURN_TO_START, [Validators.required]], target: [null] },
-                { validators: [NewUraPage.requireTargetForDialpeer] }
+                { validators: [NewUraPage.requireTargetValidator] }
             ),
             timeoutAction: this.fb.group(
                 { option: [-1], uraActionEnum: [UraActionEnum.RETURN_TO_START, [Validators.required]], target: [null] },
-                { validators: [NewUraPage.requireTargetForDialpeer] }
+                { validators: [NewUraPage.requireTargetValidator] }
             ),
             actions: this.fb.array([], [Validators.minLength(1), NewUraPage.noDuplicateOptions])
         });
 
-        this.mohService.findAll().then((mohs: Moh[]) => {
-            this.mohOptions = mohs.map((m) => ({ label: m.name, value: m.id }));
-        });
+        Promise.all([this.mohService.findAll(), this.callGroupService.findAll(), this.uraService.findAll()]).then(
+            ([mohs, callGroups, uras]: [Moh[], any[], any[]]) => {
+                this.mohOptions = mohs.map((m) => ({ label: m.name, value: m.id }));
+                this.callGroupOptions = callGroups.map((g) => ({ label: g.name, value: g.id.toString() }));
+                this.uraOptions = uras.map((u) => ({ label: u.name, value: u.id.toString() }));
+            }
+        );
     }
 
-    static requireTargetForDialpeer(control: AbstractControl) {
+    static requireTargetValidator(control: AbstractControl) {
         const group = control as FormGroup;
-        if (group.get('uraActionEnum')?.value === UraActionEnum.DIALPEER && !group.get('target')?.value) {
+        const actionEnum = group.get('uraActionEnum')?.value;
+        const needsTarget = [UraActionEnum.DIALPEER, UraActionEnum.CALLGROUP, UraActionEnum.SUBURA].includes(
+            actionEnum
+        );
+        if (needsTarget && !group.get('target')?.value) {
             return { targetRequired: true };
         }
         return null;
@@ -296,7 +388,7 @@ export class NewUraPage implements OnInit {
                     uraActionEnum: [UraActionEnum.HANGUP, [Validators.required]],
                     target: [null]
                 },
-                { validators: [NewUraPage.requireTargetForDialpeer] }
+                { validators: [NewUraPage.requireTargetValidator] }
             )
         );
     }
