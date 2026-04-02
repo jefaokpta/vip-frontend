@@ -16,7 +16,7 @@ import { UraService } from '@/pabx/ura/ura.service';
         }
     ],
     template: `
-        <p-panel header="Chamar URA" [toggleable]="true" toggler="header" collapsed>
+        <p-panel header="URA de Atendimento" [toggleable]="true" toggler="header" collapsed>
             <div class="flex flex-col gap-4">
                 <div class="field mb-4">
                     <p-select

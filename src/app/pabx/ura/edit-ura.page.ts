@@ -337,10 +337,6 @@ export class EditUraPage implements OnInit {
         this.actions.removeAt(index);
     }
 
-    getActionControl(action: AbstractControl, field: string) {
-        return (action as FormGroup).get(field);
-    }
-
     onSubmit(): void {
         this.actions.markAllAsTouched();
         if (this.form.invalid || this.actions.length === 0) return;

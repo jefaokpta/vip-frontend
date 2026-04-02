@@ -24,6 +24,7 @@ import { dialplanActionOptions, dialplanSrcOptions } from '@/pabx/dialplan/utils
 import { EditDstActionComponent } from '@/pabx/dialplan/components/edit-dst-action.component';
 import { CalendarActionComponent } from '@/pabx/dialplan/components/calendar-action.component';
 import { CallGroupActionComponent } from '@/pabx/dialplan/components/call-group-action.component';
+import { UraActionComponent } from '@/pabx/dialplan/components/ura-action.component';
 import { actionArg2HasDefaultValue, actionHasArg1 } from '@/pabx/utils';
 
 /**
@@ -57,7 +58,8 @@ import { actionArg2HasDefaultValue, actionHasArg1 } from '@/pabx/utils';
         AccountCodeActionComponent,
         EditDstActionComponent,
         CalendarActionComponent,
-        CallGroupActionComponent
+        CallGroupActionComponent,
+        UraActionComponent
     ],
     templateUrl: './new-dialplan.page.html'
 })
