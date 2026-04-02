@@ -37,7 +37,8 @@ export enum DialPlanActionEnum {
     ACCOUNT_CODE = 'ACCOUNT_CODE',
     EDIT_DST = 'EDIT_DST',
     CALENDAR = 'CALENDAR',
-    CALL_GROUP = 'CALL_GROUP'
+    CALL_GROUP = 'CALL_GROUP',
+    URA = 'URA'
 }
 
 export interface DialPlanAction {

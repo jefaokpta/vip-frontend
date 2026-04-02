@@ -20,7 +20,7 @@ export function dialplanSrcLabel(srcEnum: SrcEnum): string {
 }
 
 export function dialplanActionOptions() {
-    //todo: fila de atendimento, ura de atendimento
+    //todo: fila de atendimento
     return [
         { label: 'Centro de Custo', value: DialPlanActionEnum.ACCOUNT_CODE },
         { label: 'Ramal', value: DialPlanActionEnum.DIAL_PEER },
@@ -30,6 +30,7 @@ export function dialplanActionOptions() {
         { label: 'Editar Destino', value: DialPlanActionEnum.EDIT_DST },
         { label: 'Calendário', value: DialPlanActionEnum.CALENDAR },
         { label: 'Grupo de Chamada', value: DialPlanActionEnum.CALL_GROUP },
+        { label: 'URA', value: DialPlanActionEnum.URA },
         { label: 'Atender', value: DialPlanActionEnum.ANSWER },
         { label: 'Desligar', value: DialPlanActionEnum.HANGUP }
     ];
