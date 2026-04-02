@@ -221,6 +221,7 @@ export interface Moh {
     readonly name: string;
     readonly companyId: string;
     readonly fileName: string;
+    readonly audioUrl?: string;
 }
 
 export interface CompanySettings {

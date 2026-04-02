@@ -37,10 +37,10 @@ import { MohService } from '@/pabx/moh/moh.service';
                     }
                 </div>
 
-                @if (currentFileName) {
+                @if (audioUrl) {
                     <div class="field mb-4">
-                        <label class="block mb-2">Arquivo atual</label>
-                        <span class="text-surface-600">{{ currentFileName }}</span>
+                        <label class="block mb-2">Audio</label>
+                        <audio controls [src]="audioUrl" class="w-full"></audio>
                     </div>
                 }
 
@@ -66,6 +66,7 @@ export class EditMohPage implements OnInit {
     pending = false;
     showError = false;
     currentFileName = '';
+    audioUrl = '';
     private readonly id: string;
 
     constructor(
@@ -85,6 +86,7 @@ export class EditMohPage implements OnInit {
         this.mohService.findById(this.id).then((moh) => {
             this.form.patchValue(moh);
             this.currentFileName = moh.fileName;
+            this.audioUrl = moh.audioUrl ?? '';
         });
     }
 

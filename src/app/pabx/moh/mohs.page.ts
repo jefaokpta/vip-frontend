@@ -60,7 +60,7 @@ import { MohService } from '@/pabx/moh/moh.service';
                 [value]="mohs"
                 [paginator]="true"
                 [rows]="15"
-                [globalFilterFields]="['name', 'fileName']"
+                [globalFilterFields]="['name']"
                 [tableStyle]="{ 'min-width': '40rem' }"
                 stripedRows
             >
@@ -70,7 +70,7 @@ import { MohService } from '@/pabx/moh/moh.service';
                             Nome
                             <p-sortIcon field="name"></p-sortIcon>
                         </th>
-                        <th>Arquivo</th>
+                        <th>Audio</th>
                         <th style="width: 10%">Ações</th>
                     </tr>
                 </ng-template>
@@ -78,7 +78,11 @@ import { MohService } from '@/pabx/moh/moh.service';
                 <ng-template pTemplate="body" let-moh>
                     <tr>
                         <td>{{ moh.name }}</td>
-                        <td>{{ moh.fileName }}</td>
+                        <td>
+                            @if (moh.audioUrl) {
+                                <audio controls [src]="moh.audioUrl" style="height: 2rem"></audio>
+                            }
+                        </td>
                         <td>
                             <div class="flex gap-2">
                                 <p-button
