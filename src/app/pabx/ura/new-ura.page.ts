@@ -118,6 +118,7 @@ import { CallGroupService } from '@/pabx/call-group/call-group.service';
                                 optionValue="value"
                                 placeholder="Selecione uma ação"
                                 appendTo="body"
+                                (onChange)="onActionTypeChange(form.get('invalidAction')!)"
                             />
                         </div>
                         <div
@@ -170,6 +171,7 @@ import { CallGroupService } from '@/pabx/call-group/call-group.service';
                                 optionValue="value"
                                 placeholder="Selecione uma ação"
                                 appendTo="body"
+                                (onChange)="onActionTypeChange(form.get('timeoutAction')!)"
                             />
                         </div>
                         <div
@@ -248,6 +250,7 @@ import { CallGroupService } from '@/pabx/call-group/call-group.service';
                                     optionValue="value"
                                     placeholder="Selecione uma ação"
                                     appendTo="body"
+                                    (onChange)="onActionTypeChange(action)"
                                 />
                             </div>
                             <div class="field" *ngIf="action.get('uraActionEnum')?.value === UraActionEnum.DIALPEER">
@@ -395,6 +398,10 @@ export class NewUraPage implements OnInit {
 
     removeAction(index: number): void {
         this.actions.removeAt(index);
+    }
+
+    onActionTypeChange(group: AbstractControl): void {
+        (group as FormGroup).get('target')?.setValue(null);
     }
 
     getActionControl(action: AbstractControl, field: string) {
