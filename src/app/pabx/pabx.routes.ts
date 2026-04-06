@@ -36,6 +36,7 @@ import { EditCallGroupPage } from '@/pabx/call-group/edit-call-group.page';
 import { UrasPage } from '@/pabx/ura/uras.page';
 import { NewUraPage } from '@/pabx/ura/new-ura.page';
 import { EditUraPage } from '@/pabx/ura/edit-ura.page';
+import { ReportPage } from '@/pabx/report/report.page';
 
 export default [
     { path: 'peers', component: PeerPage, data: { breadcrumb: 'Ramais' } },
@@ -88,6 +89,8 @@ export default [
     { path: 'uras', component: UrasPage, data: { breadcrumb: 'URA' } },
     { path: 'uras/new', component: NewUraPage, data: { breadcrumb: 'URA > Nova' } },
     { path: 'uras/edit/:id', component: EditUraPage, data: { breadcrumb: 'URA > Editar' } },
+
+    { path: 'call-report', component: ReportPage, data: { breadcrumb: 'Relatório de Chamadas' } },
 
     { path: '**', redirectTo: '/notfound' }
 ] as Routes;

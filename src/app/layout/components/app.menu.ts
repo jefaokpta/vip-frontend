@@ -32,7 +32,8 @@ export class AppMenu implements OnInit {
                             items: [
                                 {
                                     label: 'Chamadas',
-                                    icon: 'pi pi-fw pi-chart-bar'
+                                    icon: 'pi pi-fw pi-chart-bar',
+                                    routerLink: ['/pabx/call-report']
                                 },
                                 {
                                     label: 'DAC',
