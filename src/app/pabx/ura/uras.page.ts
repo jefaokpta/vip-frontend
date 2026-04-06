@@ -11,8 +11,9 @@ import { ProgressSpinner } from 'primeng/progressspinner';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { Toast } from 'primeng/toast';
 import { Tooltip } from 'primeng/tooltip';
-import { Ura } from '@/pabx/types';
+import { Moh, Ura } from '@/pabx/types';
 import { UraService } from '@/pabx/ura/ura.service';
+import { MohService } from '@/pabx/moh/moh.service';
 
 @Component({
     selector: 'app-uras-page',
@@ -68,6 +69,8 @@ import { UraService } from '@/pabx/ura/ura.service';
                             Nome
                             <p-sortIcon field="name"></p-sortIcon>
                         </th>
+                        <th>Áudio</th>
+                        <th>Discagem Direta</th>
                         <th style="width: 10%">Ações</th>
                     </tr>
                 </ng-template>
@@ -75,6 +78,14 @@ import { UraService } from '@/pabx/ura/ura.service';
                 <ng-template pTemplate="body" let-ura>
                     <tr>
                         <td>{{ ura.name }}</td>
+                        <td>{{ mohMap.get(ura.soundId) ?? '-' }}</td>
+                        <td>
+                            <i
+                                [class]="
+                                    ura.isEnableDialPeer ? 'pi pi-check text-green-500' : 'pi pi-times text-red-400'
+                                "
+                            ></i>
+                        </td>
                         <td>
                             <div class="flex gap-2">
                                 <p-button
@@ -116,18 +127,21 @@ import { UraService } from '@/pabx/ura/ura.service';
 })
 export class UrasPage implements OnInit {
     uras: Ura[] = [];
+    mohMap = new Map<number, string>();
     @ViewChild('dataTable') dt!: Table;
     loading = true;
 
     constructor(
         private readonly confirmationService: ConfirmationService,
         private readonly messageService: MessageService,
-        private readonly uraService: UraService
+        private readonly uraService: UraService,
+        private readonly mohService: MohService
     ) {}
 
     ngOnInit(): void {
-        this.uraService.findAll().then((uras) => {
+        Promise.all([this.uraService.findAll(), this.mohService.findAll()]).then(([uras, mohs]: [Ura[], Moh[]]) => {
             this.uras = uras;
+            this.mohMap = new Map(mohs.map((m) => [m.id, m.name]));
             this.loading = false;
         });
     }
