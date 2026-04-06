@@ -40,7 +40,8 @@ import { ReportService } from '@/pabx/report/report.service';
                             [minDate]="minDate"
                             (onSelect)="onDateSelect()"
                             (onClearClick)="onClearDate()"
-                        />
+                        >
+                        </p-datepicker>
                     </div>
                 </div>
             </ng-template>
@@ -54,7 +55,7 @@ import { ReportService } from '@/pabx/report/report.service';
                         </th>
                         <th>Origem</th>
                         <th>Destino</th>
-                        <th>Direção</th>
+                        <th>Status</th>
                         <th pSortableColumn="billableSeconds">
                             Duração
                             <p-sortIcon field="billableSeconds"></p-sortIcon>
@@ -76,7 +77,10 @@ import { ReportService } from '@/pabx/report/report.service';
                                             : 'pi pi-arrow-left text-blue-500'
                                     "
                                 ></i>
-                                <p-tag [value]="cdr.disposition" [severity]="dispositionSeverity(cdr.disposition)" />
+                                <p-tag
+                                    [value]="dispositionTranslate(cdr.disposition)"
+                                    [severity]="dispositionSeverity(cdr.disposition)"
+                                />
                             </div>
                         </td>
                         <td>{{ formatDuration(cdr.billableSeconds) }}</td>
@@ -203,6 +207,21 @@ export class ReportPage implements OnInit {
                 return 'danger';
             default:
                 return 'secondary';
+        }
+    }
+
+    dispositionTranslate(disposition: string): string {
+        switch (disposition) {
+            case 'ANSWERED':
+                return 'Atendida';
+            case 'BUSY':
+                return 'Ocupada';
+            case 'NO ANSWER':
+                return 'Não atendida';
+            case 'FAILED':
+                return 'Falha';
+            default:
+                return 'Desconhecido';
         }
     }
 }
