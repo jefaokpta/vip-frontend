@@ -37,6 +37,9 @@ import { UrasPage } from '@/pabx/ura/uras.page';
 import { NewUraPage } from '@/pabx/ura/new-ura.page';
 import { EditUraPage } from '@/pabx/ura/edit-ura.page';
 import { ReportPage } from '@/pabx/report/report.page';
+import { QueuesPage } from '@/pabx/queue/queues.page';
+import { NewQueuePage } from '@/pabx/queue/new-queue.page';
+import { EditQueuePage } from '@/pabx/queue/edit-queue.page';
 
 export default [
     { path: 'peers', component: PeerPage, data: { breadcrumb: 'Ramais' } },
@@ -91,6 +94,10 @@ export default [
     { path: 'uras/edit/:id', component: EditUraPage, data: { breadcrumb: 'URA > Editar' } },
 
     { path: 'call-report', component: ReportPage, data: { breadcrumb: 'Relatório de Chamadas' } },
+
+    { path: 'queues', component: QueuesPage, data: { breadcrumb: 'Filas de Atendimento' } },
+    { path: 'queues/new', component: NewQueuePage, data: { breadcrumb: 'Filas > Nova' } },
+    { path: 'queues/edit/:id', component: EditQueuePage, data: { breadcrumb: 'Filas > Editar' } },
 
     { path: '**', redirectTo: '/notfound' }
 ] as Routes;

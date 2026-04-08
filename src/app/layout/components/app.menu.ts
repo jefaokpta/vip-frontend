@@ -57,6 +57,11 @@ export class AppMenu implements OnInit {
                             routerLink: ['/pabx/call-groups']
                         },
                         {
+                            label: 'Filas de Atendimento',
+                            icon: 'pi pi-fw pi-users',
+                            routerLink: ['/pabx/queues']
+                        },
+                        {
                             label: 'Regras de Discagem',
                             icon: 'pi pi-fw pi-list',
                             routerLink: ['/pabx/dialplans']

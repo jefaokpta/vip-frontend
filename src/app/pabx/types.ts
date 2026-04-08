@@ -341,3 +341,21 @@ export interface Calendar {
     readonly endTime: string;
     readonly actions: DialPlanAction[];
 }
+
+export enum QueueStrategyEnum {
+    ALL = 'ALL',
+    RANDOM = 'RANDOM',
+    LEAST_RECENTLY = 'LEAST_RECENTLY',
+    FEWEST_CALLS = 'FEWEST_CALLS',
+    EQUALLY = 'EQUALLY'
+}
+
+export interface Queue {
+    readonly id: number;
+    readonly name: string;
+    readonly companyId: string;
+    readonly queueStrategy: QueueStrategyEnum;
+    readonly ringTimeout: number;
+    readonly queueTimeout: number;
+    readonly queueSoundId: number;
+}
