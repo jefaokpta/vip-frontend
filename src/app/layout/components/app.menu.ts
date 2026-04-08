@@ -20,6 +20,21 @@ import { UserService } from '@/pages/users/user.service';
 export class AppMenu implements OnInit {
     private readonly model: MenuItem[] = [
         {
+            label: 'DASHBOARDS',
+            items: [
+                {
+                    label: 'Painel de Ramais',
+                    icon: 'pi pi-fw pi-chart-bar',
+                    routerLink: ['']
+                },
+                {
+                    label: 'Painel de Filas',
+                    icon: 'pi pi-fw pi-chart-bar',
+                    routerLink: ['/pages/queues']
+                }
+            ]
+        },
+        {
             label: 'SERVIÇOS',
             items: [
                 {

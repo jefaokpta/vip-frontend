@@ -11,8 +11,8 @@ export const appRoutes: Routes = [
         children: [
             {
                 path: '',
-                loadComponent: () => import('@/pages/dashboard/dashboard').then((c) => c.Dashboard),
-                data: { breadcrumb: 'Dashboard' }
+                loadComponent: () => import('@/pages/dashboard/peer.dashboard').then((c) => c.PeerDashboard),
+                data: { breadcrumb: 'Painel de Ramais' }
             },
             {
                 path: 'pages',

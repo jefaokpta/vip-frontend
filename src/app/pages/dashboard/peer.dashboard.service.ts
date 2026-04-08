@@ -13,7 +13,7 @@ import { CallStateMessage, PeerRegistry } from '@/pabx/types';
 @Injectable({
     providedIn: 'root'
 })
-export class DashboardService {
+export class PeerDashboardService {
     private readonly BACKEND = environment.API_BACKEND_URL;
 
     constructor(private readonly http: HttpClient) {}

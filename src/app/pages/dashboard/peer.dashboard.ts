@@ -10,7 +10,7 @@ import {
     ContactStatusEventEnum,
     PeerRegistry
 } from '@/pabx/types';
-import { DashboardService } from '@/pages/dashboard/dashboard.service';
+import { PeerDashboardService } from '@/pages/dashboard/peer.dashboard.service';
 import { UserService } from '@/pages/users/user.service';
 import { NgClass, NgForOf } from '@angular/common';
 import { Card } from 'primeng/card';
@@ -85,7 +85,7 @@ import { Card } from 'primeng/card';
         </div>
     `
 })
-export class Dashboard implements OnDestroy, OnInit {
+export class PeerDashboard implements OnDestroy, OnInit {
     private readonly subscriptions: Subscription[] = [];
     private readonly peerRegistriesMap = signal(new Map<string, PeerRegistry>());
     private readonly now = signal(Date.now());
@@ -117,7 +117,7 @@ export class Dashboard implements OnDestroy, OnInit {
 
     constructor(
         private readonly webSocketService: WebsocketService,
-        private readonly dashboardService: DashboardService,
+        private readonly dashboardService: PeerDashboardService,
         private readonly userService: UserService
     ) {}
 
