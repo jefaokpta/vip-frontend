@@ -70,6 +70,7 @@ import { QueueService } from '@/pabx/queue/queue.service';
                             Nome
                             <p-sortIcon field="name"></p-sortIcon>
                         </th>
+                        <th>Membros</th>
                         <th style="width: 10%">Ações</th>
                     </tr>
                 </ng-template>
@@ -77,6 +78,7 @@ import { QueueService } from '@/pabx/queue/queue.service';
                 <ng-template pTemplate="body" let-queue>
                     <tr>
                         <td>{{ queue.name }}</td>
+                        <td>{{ queue.memberIds.length }}</td>
                         <td>
                             <div class="flex gap-2">
                                 <p-button
