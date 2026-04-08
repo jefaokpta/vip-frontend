@@ -358,4 +358,5 @@ export interface Queue {
     readonly ringTimeout: number;
     readonly queueTimeout: number;
     readonly queueSoundId: number;
+    readonly memberIds: number[];
 }

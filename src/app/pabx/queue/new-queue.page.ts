@@ -6,14 +6,26 @@ import { CardModule } from 'primeng/card';
 import { Router, RouterLink } from '@angular/router';
 import { Select } from 'primeng/select';
 import { InputNumber } from 'primeng/inputnumber';
+import { PickList } from 'primeng/picklist';
 import { Moh, QueueStrategyEnum } from '@/pabx/types';
+import { User } from '@/types/types';
 import { QueueService } from '@/pabx/queue/queue.service';
 import { MohService } from '@/pabx/moh/moh.service';
+import { UserService } from '@/pages/users/user.service';
 
 @Component({
     selector: 'app-new-queue-page',
     standalone: true,
-    imports: [InputTextModule, ButtonModule, CardModule, ReactiveFormsModule, RouterLink, Select, InputNumber],
+    imports: [
+        InputTextModule,
+        ButtonModule,
+        CardModule,
+        ReactiveFormsModule,
+        RouterLink,
+        Select,
+        InputNumber,
+        PickList
+    ],
     template: `
         <p-card>
             <ng-template #title>
@@ -54,7 +66,7 @@ import { MohService } from '@/pabx/moh/moh.service';
                 </div>
 
                 <div class="field mb-4">
-                    <label for="ringTimeout" class="block mb-2">Timeout por Ramal (segundos) *</label>
+                    <label for="ringTimeout" class="block mb-2">Timeout por Agente (segundos) *</label>
                     <p-input-number id="ringTimeout" mode="decimal" useGrouping="false" formControlName="ringTimeout" />
                 </div>
 
@@ -80,6 +92,33 @@ import { MohService } from '@/pabx/moh/moh.service';
                     ></p-select>
                 </div>
 
+                <div class="field mb-4">
+                    <label class="block mb-2">Agentes da Fila</label>
+                    <p-picklist
+                        [source]="availableUsers"
+                        [target]="selectedUsers"
+                        sourceHeader="Disponíveis"
+                        targetHeader="Selecionados"
+                        [dragdrop]="true"
+                        [responsive]="true"
+                        [sourceStyle]="{ height: '20rem' }"
+                        [targetStyle]="{ height: '20rem' }"
+                        showSourceControls="false"
+                        showTargetControls="false"
+                        filterBy="name,email"
+                        sourceFilterPlaceholder="Pesquisar"
+                        targetFilterPlaceholder="Pesquisar"
+                        breakpoint="1200px"
+                    >
+                        <ng-template let-user pTemplate="item">
+                            <div class="flex items-center gap-2">
+                                <i class="pi pi-user"></i>
+                                <span>{{ user.name }} ({{ user.email }})</span>
+                            </div>
+                        </ng-template>
+                    </p-picklist>
+                </div>
+
                 <div class="flex mt-4">
                     <p-button type="submit" label="Salvar" [disabled]="form.invalid || pending">
                         @if (pending) {
@@ -102,6 +141,8 @@ export class NewQueuePage implements OnInit {
     pending = false;
     showError = false;
     mohs: Moh[] = [];
+    availableUsers: User[] = [];
+    selectedUsers: User[] = [];
 
     strategyOptions = Object.values(QueueStrategyEnum).map((value) => ({
         label: this.strategyLabel(value),
@@ -112,7 +153,8 @@ export class NewQueuePage implements OnInit {
         private readonly fb: FormBuilder,
         private readonly router: Router,
         private readonly queueService: QueueService,
-        private readonly mohService: MohService
+        private readonly mohService: MohService,
+        private readonly userService: UserService
     ) {}
 
     ngOnInit(): void {
@@ -123,7 +165,10 @@ export class NewQueuePage implements OnInit {
             queueTimeout: [120, [Validators.required]],
             queueSoundId: [null, [Validators.required]]
         });
-        this.mohService.findAll().then((mohs) => (this.mohs = mohs));
+        Promise.all([this.mohService.findAll(), this.userService.findAll()]).then(([mohs, users]) => {
+            this.mohs = mohs;
+            this.availableUsers = users;
+        });
     }
 
     get name() {
@@ -133,8 +178,9 @@ export class NewQueuePage implements OnInit {
     onSubmit() {
         this.pending = true;
         this.showError = false;
+        const body = { ...this.form.value, memberIds: this.selectedUsers.map((u) => u.id) };
         this.queueService
-            .create(this.form.value)
+            .create(body)
             .then(() => this.router.navigate(['/pabx/queues']))
             .catch(() => {
                 this.showError = true;

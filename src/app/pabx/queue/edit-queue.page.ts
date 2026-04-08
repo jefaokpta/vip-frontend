@@ -6,14 +6,26 @@ import { CardModule } from 'primeng/card';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Select } from 'primeng/select';
 import { InputNumber } from 'primeng/inputnumber';
+import { PickList } from 'primeng/picklist';
 import { Moh, Queue, QueueStrategyEnum } from '@/pabx/types';
+import { User } from '@/types/types';
 import { QueueService } from '@/pabx/queue/queue.service';
 import { MohService } from '@/pabx/moh/moh.service';
+import { UserService } from '@/pages/users/user.service';
 
 @Component({
     selector: 'app-edit-queue-page',
     standalone: true,
-    imports: [InputTextModule, ButtonModule, CardModule, ReactiveFormsModule, RouterLink, Select, InputNumber],
+    imports: [
+        InputTextModule,
+        ButtonModule,
+        CardModule,
+        ReactiveFormsModule,
+        RouterLink,
+        Select,
+        InputNumber,
+        PickList
+    ],
     template: `
         <p-card>
             <ng-template #title>
@@ -30,7 +42,7 @@ import { MohService } from '@/pabx/moh/moh.service';
                 </div>
             </ng-template>
 
-            @if (queue) {
+            @if (form) {
                 <form [formGroup]="form" (ngSubmit)="onSubmit()" class="p-fluid">
                     <div class="field mb-4">
                         <label for="name" class="block mb-2">Nome *</label>
@@ -55,7 +67,7 @@ import { MohService } from '@/pabx/moh/moh.service';
                     </div>
 
                     <div class="field mb-4">
-                        <label for="ringTimeout" class="block mb-2">Timeout por Ramal (segundos) *</label>
+                        <label for="ringTimeout" class="block mb-2">Timeout por Agente (segundos) *</label>
                         <p-input-number
                             id="ringTimeout"
                             mode="decimal"
@@ -86,6 +98,33 @@ import { MohService } from '@/pabx/moh/moh.service';
                         ></p-select>
                     </div>
 
+                    <div class="field mb-4">
+                        <label class="block mb-2">Agentes da Fila</label>
+                        <p-picklist
+                            [source]="availableUsers"
+                            [target]="selectedUsers"
+                            sourceHeader="Disponíveis"
+                            targetHeader="Selecionados"
+                            [dragdrop]="true"
+                            [responsive]="true"
+                            [sourceStyle]="{ height: '20rem' }"
+                            [targetStyle]="{ height: '20rem' }"
+                            showSourceControls="false"
+                            showTargetControls="false"
+                            filterBy="name,email"
+                            sourceFilterPlaceholder="Pesquisar"
+                            targetFilterPlaceholder="Pesquisar"
+                            breakpoint="1200px"
+                        >
+                            <ng-template let-user pTemplate="item">
+                                <div class="flex items-center gap-2">
+                                    <i class="pi pi-user"></i>
+                                    <span>{{ user.name }} ({{ user.email }})</span>
+                                </div>
+                            </ng-template>
+                        </p-picklist>
+                    </div>
+
                     <div class="flex mt-4">
                         <p-button type="submit" label="Salvar" [disabled]="form.invalid || pending">
                             @if (pending) {
@@ -109,6 +148,8 @@ export class EditQueuePage implements OnInit {
     pending = false;
     showError = false;
     mohs: Moh[] = [];
+    availableUsers: User[] = [];
+    selectedUsers: User[] = [];
     queue: Queue | null = null;
 
     strategyOptions = Object.values(QueueStrategyEnum).map((value) => ({
@@ -121,22 +162,27 @@ export class EditQueuePage implements OnInit {
         private readonly router: Router,
         private readonly route: ActivatedRoute,
         private readonly queueService: QueueService,
-        private readonly mohService: MohService
+        private readonly mohService: MohService,
+        private readonly userService: UserService
     ) {}
 
     ngOnInit(): void {
         const id = this.route.snapshot.paramMap.get('id')!;
-        Promise.all([this.queueService.findById(id), this.mohService.findAll()]).then(([queue, mohs]) => {
-            this.queue = queue;
-            this.mohs = mohs;
-            this.form = this.fb.group({
-                name: [queue.name, [Validators.required]],
-                queueStrategy: [queue.queueStrategy, [Validators.required]],
-                ringTimeout: [queue.ringTimeout, [Validators.required]],
-                queueTimeout: [queue.queueTimeout, [Validators.required]],
-                queueSoundId: [queue.queueSoundId, [Validators.required]]
-            });
-        });
+        Promise.all([this.queueService.findById(id), this.mohService.findAll(), this.userService.findAll()]).then(
+            ([queue, mohs, users]) => {
+                this.queue = queue;
+                this.mohs = mohs;
+                this.selectedUsers = queue.memberIds.map((id) => users.find((u) => u.id === id)!).filter(Boolean);
+                this.availableUsers = users.filter((u) => !queue.memberIds.includes(u.id));
+                this.form = this.fb.group({
+                    name: [queue.name, [Validators.required]],
+                    queueStrategy: [queue.queueStrategy, [Validators.required]],
+                    ringTimeout: [queue.ringTimeout, [Validators.required]],
+                    queueTimeout: [queue.queueTimeout, [Validators.required]],
+                    queueSoundId: [queue.queueSoundId, [Validators.required]]
+                });
+            }
+        );
     }
 
     get name() {
@@ -146,7 +192,12 @@ export class EditQueuePage implements OnInit {
     onSubmit() {
         this.pending = true;
         this.showError = false;
-        const body = { ...this.form.value, id: this.queue!.id, companyId: this.queue!.companyId };
+        const body = {
+            ...this.form.value,
+            id: this.queue!.id,
+            companyId: this.queue!.companyId,
+            memberIds: this.selectedUsers.map((u) => u.id)
+        };
         this.queueService
             .update(this.queue!.id, body)
             .then(() => this.router.navigate(['/pabx/queues']))
