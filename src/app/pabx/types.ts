@@ -286,11 +286,33 @@ export interface PeerRegistry {
     callState?: CallState;
 }
 
+export interface QueueState {
+    readonly queue: Queue;
+    readonly loggedMembers: QueueMember[];
+    readonly waitingCalls: Channel[];
+    readonly mostWaitingCallTimestamp?: number;
+    readonly longestHoldTime?: number;
+    readonly talkedTime?: number;
+    readonly abandonedCalls?: number;
+    readonly answeredCalls?: number;
+    readonly answeredCallsInServiceLevel?: number;
+}
+
 export enum ChannelStateEnum {
     UP = 'UP',
     DOWN = 'DOWN',
     RINGING = 'RINGING',
     DIALING = 'DIALING'
+}
+
+export enum QueueMemberStatusEnum {
+    UP = 'UP',
+    RINGING = 'RINGING',
+    DIALING = 'DIALING',
+    AVAILABLE = 'AVAILABLE',
+    PAUSED = 'PAUSED',
+    COOLDOWN = 'COOLDOWN',
+    UNKNOWN = 'UNKNOWN'
 }
 
 export enum ContactStatusEventEnum {
@@ -301,6 +323,14 @@ export enum ContactStatusEventEnum {
     UNREACHABLE = 'UNREACHABLE',
     UPDATED = 'UPDATED',
     NONQUALIFIED = 'NONQUALIFIED'
+}
+
+export interface QueueMember {
+    readonly id: number;
+    readonly name: string;
+    readonly peer: string;
+    readonly queueMemberStatusEnum: QueueMemberStatusEnum;
+    readonly timestamp?: number;
 }
 
 export interface Channel {

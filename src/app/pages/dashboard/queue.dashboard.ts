@@ -3,17 +3,8 @@ import { NgClass, NgForOf } from '@angular/common';
 import { Card } from 'primeng/card';
 import { ChartModule } from 'primeng/chart';
 import { Button } from 'primeng/button';
-
-interface QueueStatus {
-    id: number;
-    name: string;
-    icon: string;
-    status: 'OPERACAO' | 'ALERTA';
-    statusLabel: string;
-    waiting: number;
-    maxWait: string;
-    agents: string;
-}
+import { QueueDashboardService } from '@/pages/dashboard/queue-dashboard.service';
+import { QueueState } from '@/pabx/types';
 
 interface AgentStatus {
     name: string;
@@ -92,7 +83,7 @@ interface AgentStatus {
                                 <div class="flex gap-3">
                                     <span class="flex items-center gap-1 text-xs font-semibold">
                                         <span class="w-2 h-2 rounded-full bg-green-500 inline-block"></span>
-                                        {{ formatTwoDigits(operacaoCount()) }} EM OPERAÇÃO
+                                        {{ formatTwoDigits(operacaoCount()) }} OPERAÇÃO OK
                                     </span>
                                     <span class="flex items-center gap-1 text-xs font-semibold">
                                         <span class="w-2 h-2 rounded-full bg-red-500 inline-block"></span>
@@ -111,12 +102,11 @@ interface AgentStatus {
                                 <!-- Header row -->
                                 <div class="flex items-start justify-between">
                                     <div class="flex items-center gap-2">
-                                        <i [ngClass]="['pi', 'text-xl', q.icon, queueStatusTextClass(q)]"></i>
                                         <div class="flex flex-col">
-                                            <span class="font-bold text-sm">{{ q.name }}</span>
-                                            <span class="text-xs font-semibold" [ngClass]="queueStatusTextClass(q)">{{
-                                                q.statusLabel
-                                            }}</span>
+                                            <span class="font-bold text-sm">{{ q.queue.name }}</span>
+                                            <span class="text-xs font-semibold" [ngClass]="queueStatusTextClass(q)"
+                                                >ALERTA (TME)</span
+                                            >
                                         </div>
                                     </div>
                                     <i class="pi pi-ellipsis-v text-gray-400 cursor-pointer"></i>
@@ -126,15 +116,17 @@ interface AgentStatus {
                                 <div class="flex gap-6 mt-1">
                                     <div class="flex flex-col">
                                         <span class="text-xs text-gray-400 uppercase tracking-wide">ESPERA</span>
-                                        <span class="font-bold text-sm">{{ formatTwoDigits(q.waiting) }}</span>
+                                        <span class="font-bold text-sm">{{
+                                            formatTwoDigits(q.waitingCalls.length)
+                                        }}</span>
                                     </div>
                                     <div class="flex flex-col">
                                         <span class="text-xs text-gray-400 uppercase tracking-wide">MAIOR T.</span>
-                                        <span class="font-bold text-sm">{{ q.maxWait }}</span>
+                                        <span class="font-bold text-sm">{{ q.longestHoldTime }}</span>
                                     </div>
                                     <div class="flex flex-col">
                                         <span class="text-xs text-gray-400 uppercase tracking-wide">AGENTES</span>
-                                        <span class="font-bold text-sm">{{ q.agents }}</span>
+                                        <span class="font-bold text-sm">{{ q.loggedMembers.length }}</span>
                                     </div>
                                 </div>
                             </div>
@@ -222,56 +214,15 @@ interface AgentStatus {
     `
 })
 export class QueueDashboard implements OnInit {
+    readonly queues = signal<QueueState[]>([]);
     readonly activeQueues = signal(12);
     readonly waitingCalls = signal(8);
     readonly globalTme = signal('01:24');
+
     readonly serviceLevel = signal(94.2);
 
-    readonly queues = signal<QueueStatus[]>([
-        {
-            id: 1,
-            name: 'Suporte Técnico',
-            icon: 'pi-headphones',
-            status: 'OPERACAO',
-            statusLabel: 'EM OPERAÇÃO',
-            waiting: 2,
-            maxWait: '00:45',
-            agents: '12/15'
-        },
-        {
-            id: 2,
-            name: 'Comercial / Vendas',
-            icon: 'pi-shopping-cart',
-            status: 'ALERTA',
-            statusLabel: 'ALERTA (TME)',
-            waiting: 6,
-            maxWait: '05:12',
-            agents: '03/08'
-        },
-        {
-            id: 3,
-            name: 'Financeiro',
-            icon: 'pi-building',
-            status: 'OPERACAO',
-            statusLabel: 'EM OPERAÇÃO',
-            waiting: 0,
-            maxWait: '00:00',
-            agents: '05/06'
-        },
-        {
-            id: 4,
-            name: 'Ouvidoria',
-            icon: 'pi-megaphone',
-            status: 'OPERACAO',
-            statusLabel: 'EM OPERAÇÃO',
-            waiting: 1,
-            maxWait: '01:30',
-            agents: '02/02'
-        }
-    ]);
-
-    readonly operacaoCount = computed(() => this.queues().filter((q) => q.status === 'OPERACAO').length);
-    readonly alertaCount = computed(() => this.queues().filter((q) => q.status === 'ALERTA').length);
+    readonly operacaoCount = computed(() => this.queues().length);
+    readonly alertaCount = computed(() => 1);
 
     readonly disponiveisCount = signal(24);
     readonly emChamadaCount = signal(12);
@@ -308,9 +259,13 @@ export class QueueDashboard implements OnInit {
 
     barData: any;
     barOptions: any;
+    constructor(private readonly queueDashboardService: QueueDashboardService) {}
 
     ngOnInit(): void {
         this.initChart();
+        this.queueDashboardService.findAllQueueStates().then((queueStates) => {
+            this.queues.set(queueStates);
+        });
     }
 
     private initChart(): void {
@@ -367,12 +322,12 @@ export class QueueDashboard implements OnInit {
         };
     }
 
-    queueBorderClass(q: QueueStatus): string {
-        return q.status === 'ALERTA' ? 'border-red-500' : 'border-green-500';
+    queueBorderClass(q: QueueState): string {
+        return q.answeredCalls ? 'border-green-500' : 'border-red-500';
     }
 
-    queueStatusTextClass(q: QueueStatus): string {
-        return q.status === 'ALERTA' ? 'text-red-500' : 'text-green-600';
+    queueStatusTextClass(q: QueueState): string {
+        return q.answeredCalls ? 'text-green-500' : 'text-red-600';
     }
 
     agentInitials(name: string): string {

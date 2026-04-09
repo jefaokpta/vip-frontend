@@ -10,7 +10,7 @@ import {
     ContactStatusEventEnum,
     PeerRegistry
 } from '@/pabx/types';
-import { PeerDashboardService } from '@/pages/dashboard/peer.dashboard.service';
+import { PeerDashboardService } from '@/pages/dashboard/peer-dashboard.service';
 import { UserService } from '@/pages/users/user.service';
 import { NgClass, NgForOf } from '@angular/common';
 import { Card } from 'primeng/card';
