@@ -1,14 +1,14 @@
-import {Component, computed, OnDestroy, OnInit, signal} from '@angular/core';
-import {Subscription} from 'rxjs';
-import {NgClass, NgForOf} from '@angular/common';
-import {Card} from 'primeng/card';
-import {ChartModule} from 'primeng/chart';
-import {Button} from 'primeng/button';
-import {QueueDashboardService} from '@/pages/dashboard/queue-dashboard.service';
-import {QueueState} from '@/pabx/types';
-import {WebsocketService} from '@/websocket/stomp/websocket.service';
-import {rxStompServiceFactory} from '@/websocket/stomp/rx-stomp-service-factory';
-import {UserService} from '@/pages/users/user.service';
+import { Component, computed, OnDestroy, OnInit, signal } from '@angular/core';
+import { Subscription } from 'rxjs';
+import { NgClass, NgForOf } from '@angular/common';
+import { Card } from 'primeng/card';
+import { ChartModule } from 'primeng/chart';
+import { Button } from 'primeng/button';
+import { QueueDashboardService } from '@/pages/dashboard/queue-dashboard.service';
+import { QueueState } from '@/pabx/types';
+import { WebsocketService } from '@/websocket/stomp/websocket.service';
+import { rxStompServiceFactory } from '@/websocket/stomp/rx-stomp-service-factory';
+import { UserService } from '@/pages/users/user.service';
 
 interface AgentStatus {
     name: string;
