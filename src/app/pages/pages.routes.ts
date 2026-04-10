@@ -7,6 +7,7 @@ import { PersonPage } from '@/pages/person.page';
 import { EditCompanyPage } from '@/pages/company/edit-company.page';
 import { EditUserPage } from '@/pages/users/edit-user';
 import { QueueDashboard } from '@/pages/dashboard/queue.dashboard';
+import { QueueLoginPage } from '@/pages/queues/queue-login';
 
 export default [
     { path: 'companies', component: CompanyPage, data: { breadcrumb: 'Empresas' } },
@@ -17,5 +18,6 @@ export default [
     { path: 'users/edit/:id', component: EditUserPage, data: { breadcrumb: 'Usuários / Editar' } },
     { path: 'profile', component: PersonPage, data: { breadcrumb: 'Perfil' } },
     { path: 'queues', component: QueueDashboard, data: { breadcrumb: 'Painel de Filas' } },
+    { path: 'queue-login', component: QueueLoginPage, data: { breadcrumb: 'Minhas Filas' } },
     { path: '**', redirectTo: '/notfound' }
 ] as Routes;

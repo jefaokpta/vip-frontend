@@ -116,19 +116,25 @@ interface AgentStatus {
                                 <div class="flex gap-6 mt-1">
                                     <div class="flex flex-col">
                                         <span class="text-xs text-gray-400 uppercase tracking-wide">ESPERA</span>
-                                        <span class="font-bold text-sm">{{
-                                            formatTwoDigits(q.waitingCalls.length) +
-                                                '/ ' +
-                                                formatTwoDigits(q.queue.maxCalls)
-                                        }}</span>
+                                        <span class="font-bold text-sm">
+                                            {{
+                                                formatTwoDigits(q.waitingCalls.length) +
+                                                    '/ ' +
+                                                    formatTwoDigits(q.queue.maxCalls)
+                                            }}
+                                        </span>
                                     </div>
                                     <div class="flex flex-col">
                                         <span class="text-xs text-gray-400 uppercase tracking-wide">MAIOR T.</span>
                                         <span class="font-bold text-sm">{{ q.longestHoldTime }}</span>
                                     </div>
                                     <div class="flex flex-col">
-                                        <span class="text-xs text-gray-400 uppercase tracking-wide">AGENTES</span>
-                                        <span class="font-bold text-sm">{{ q.loggedMembers.length }}</span>
+                                        <span class="text-xs text-gray-400 uppercase tracking-wide">MEMBROS</span>
+                                        <span class="font-bold text-sm">
+                                            {{
+                                                q.loggedMembers.length + '/' + formatTwoDigits(q.queue.memberIds.length)
+                                            }}
+                                        </span>
                                     </div>
                                 </div>
                             </div>
@@ -149,10 +155,10 @@ interface AgentStatus {
 
                 <!-- RIGHT COLUMN -->
                 <div class="lg:col-span-2 flex flex-col gap-4">
-                    <!-- Status dos Agentes -->
+                    <!-- Status dos Membros -->
                     <p-card>
                         <ng-template #title>
-                            <span class="font-semibold text-lg">Status dos Agentes</span>
+                            <span class="font-semibold text-lg">Status dos Membros</span>
                         </ng-template>
 
                         <div class="flex flex-col gap-3">
@@ -172,10 +178,10 @@ interface AgentStatus {
                         </div>
                     </p-card>
 
-                    <!-- Alertas de Agentes -->
+                    <!-- Alertas de Membros -->
                     <p-card>
                         <ng-template #title>
-                            <span class="font-semibold text-base uppercase tracking-wide">Alertas de Agentes</span>
+                            <span class="font-semibold text-base uppercase tracking-wide">Alertas de Membros</span>
                         </ng-template>
 
                         <div class="flex flex-col gap-4">

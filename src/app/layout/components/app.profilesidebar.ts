@@ -37,6 +37,20 @@ import { UserService } from '@/pages/users/user.service';
                     </li>
                     <li>
                         <a
+                            class="cursor-pointer flex mb-4 p-4 items-center border border-surface-200 dark:border-surface-700 rounded hover:bg-surface-100 dark:hover:bg-surface-800 transition-colors duration-150"
+                            routerLink="/pages/queue-login"
+                        >
+                            <span>
+                                <i class="pi pi-users text-xl text-primary"></i>
+                            </span>
+                            <div class="ml-4">
+                                <span class="mb-2 font-semibold">Minhas Filas</span>
+                                <p class="text-surface-500 dark:text-surface-400 m-0">Entrar / Sair de Filas</p>
+                            </div>
+                        </a>
+                    </li>
+                    <li>
+                        <a
                             (click)="openWhatsApp()"
                             class="cursor-pointer flex mb-4 p-4 items-center border border-surface-200 dark:border-surface-700 rounded hover:bg-surface-100 dark:hover:bg-surface-800 transition-colors duration-150"
                         >
