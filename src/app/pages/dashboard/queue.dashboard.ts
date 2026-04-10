@@ -117,7 +117,9 @@ interface AgentStatus {
                                     <div class="flex flex-col">
                                         <span class="text-xs text-gray-400 uppercase tracking-wide">ESPERA</span>
                                         <span class="font-bold text-sm">{{
-                                            formatTwoDigits(q.waitingCalls.length)
+                                            formatTwoDigits(q.waitingCalls.length) +
+                                                '/ ' +
+                                                formatTwoDigits(q.queue.maxCalls)
                                         }}</span>
                                     </div>
                                     <div class="flex flex-col">
@@ -215,8 +217,8 @@ interface AgentStatus {
 })
 export class QueueDashboard implements OnInit {
     readonly queues = signal<QueueState[]>([]);
-    readonly activeQueues = signal(12);
-    readonly waitingCalls = signal(8);
+    readonly activeQueues = computed(() => this.queues().length);
+    readonly waitingCalls = computed(() => this.queues().reduce((acc, q) => acc + q.waitingCalls.length, 0));
     readonly globalTme = signal('01:24');
 
     readonly serviceLevel = signal(94.2);
@@ -224,7 +226,7 @@ export class QueueDashboard implements OnInit {
     readonly operacaoCount = computed(() => this.queues().length);
     readonly alertaCount = computed(() => 1);
 
-    readonly disponiveisCount = signal(24);
+    readonly disponiveisCount = computed(() => this.queues().reduce((acc, q) => acc + q.loggedMembers.length, 0));
     readonly emChamadaCount = signal(12);
     readonly emPausaCount = signal(3);
 

@@ -388,5 +388,11 @@ export interface Queue {
     readonly ringTimeout: number;
     readonly queueTimeout: number;
     readonly queueSoundId: number;
+    readonly maxCalls: number;
+    readonly weight: number;
+    readonly serviceLevelSeconds: number;
+    readonly tmeAlertSeconds: number;
+    readonly callDurationAlertMinutes: number;
+    readonly memberPauseDurationAlertMinutes: number;
     readonly memberIds: number[];
 }
