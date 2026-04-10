@@ -1,10 +1,14 @@
-import { Component, computed, OnInit, signal } from '@angular/core';
-import { NgClass, NgForOf } from '@angular/common';
-import { Card } from 'primeng/card';
-import { ChartModule } from 'primeng/chart';
-import { Button } from 'primeng/button';
-import { QueueDashboardService } from '@/pages/dashboard/queue-dashboard.service';
-import { QueueState } from '@/pabx/types';
+import {Component, computed, OnDestroy, OnInit, signal} from '@angular/core';
+import {Subscription} from 'rxjs';
+import {NgClass, NgForOf} from '@angular/common';
+import {Card} from 'primeng/card';
+import {ChartModule} from 'primeng/chart';
+import {Button} from 'primeng/button';
+import {QueueDashboardService} from '@/pages/dashboard/queue-dashboard.service';
+import {QueueState} from '@/pabx/types';
+import {WebsocketService} from '@/websocket/stomp/websocket.service';
+import {rxStompServiceFactory} from '@/websocket/stomp/rx-stomp-service-factory';
+import {UserService} from '@/pages/users/user.service';
 
 interface AgentStatus {
     name: string;
@@ -16,6 +20,7 @@ interface AgentStatus {
 @Component({
     selector: 'app-queue-dashboard',
     standalone: true,
+    providers: [{ provide: WebsocketService, useFactory: rxStompServiceFactory }],
     imports: [NgClass, NgForOf, Card, ChartModule, Button],
     template: `
         <div class="flex flex-col gap-4">
@@ -132,7 +137,9 @@ interface AgentStatus {
                                         <span class="text-xs text-gray-400 uppercase tracking-wide">MEMBROS</span>
                                         <span class="font-bold text-sm">
                                             {{
-                                                q.loggedMembers.length + '/' + formatTwoDigits(q.queue.memberIds.length)
+                                                formatTwoDigits(q.loggedMembers.length) +
+                                                    '/' +
+                                                    formatTwoDigits(q.queue.memberIds.length)
                                             }}
                                         </span>
                                     </div>
@@ -221,7 +228,8 @@ interface AgentStatus {
         </div>
     `
 })
-export class QueueDashboard implements OnInit {
+export class QueueDashboard implements OnInit, OnDestroy {
+    private readonly subscriptions: Subscription[] = [];
     readonly queues = signal<QueueState[]>([]);
     readonly activeQueues = computed(() => this.queues().length);
     readonly waitingCalls = computed(() => this.queues().reduce((acc, q) => acc + q.waitingCalls.length, 0));
@@ -267,13 +275,29 @@ export class QueueDashboard implements OnInit {
 
     barData: any;
     barOptions: any;
-    constructor(private readonly queueDashboardService: QueueDashboardService) {}
+    constructor(
+        private readonly queueDashboardService: QueueDashboardService,
+        private readonly webSocketService: WebsocketService,
+        private readonly userService: UserService
+    ) {}
 
     ngOnInit(): void {
         this.initChart();
         this.queueDashboardService.findAllQueueStates().then((queueStates) => {
             this.queues.set(queueStates);
         });
+
+        const companyId = this.userService.getUser().companyId;
+        this.subscriptions.push(
+            this.webSocketService.watch(`/topic/queuestates/${companyId}`).subscribe((message) => {
+                const updated: QueueState = JSON.parse(message.body);
+                this.queues.update((qs) => qs.map((q) => (q.queue.id === updated.queue.id ? updated : q)));
+            })
+        );
+    }
+
+    ngOnDestroy(): void {
+        this.subscriptions.forEach((s) => s.unsubscribe());
     }
 
     private initChart(): void {
