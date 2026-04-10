@@ -5,7 +5,7 @@ import { Button } from 'primeng/button';
 import { BadgeModule } from 'primeng/badge';
 import { Toast } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
-import { QueueState } from '@/pabx/types';
+import { QueueMemberStatusEnum, QueueState } from '@/pabx/types';
 import { QueueLoginService } from '@/pages/queues/queue-login.service';
 import { UserService } from '@/pages/users/user.service';
 import { WebsocketService } from '@/websocket/stomp/websocket.service';
@@ -62,13 +62,31 @@ import { rxStompServiceFactory } from '@/websocket/stomp/rx-stomp-service-factor
                             </div>
                         </div>
 
-                        <p-button
-                            [label]="isLoggedIn(qs) ? 'Sair da Fila' : 'Entrar na Fila'"
-                            [severity]="isLoggedIn(qs) ? 'danger' : 'success'"
-                            [outlined]="!isLoggedIn(qs)"
-                            styleClass="w-full"
-                            (onClick)="toggleLogin(qs)"
-                        />
+                        @if (isPaused(qs)) {
+                            <div class="flex items-center gap-2 text-yellow-600 text-sm font-semibold">
+                                <i class="pi pi-pause-circle"></i>
+                                <span>Em pausa {{ pauseDuration(qs) }}</span>
+                            </div>
+                        }
+
+                        <div class="flex gap-2">
+                            @if (isLoggedIn(qs)) {
+                                <p-button
+                                    [label]="isPaused(qs) ? 'Retomar' : 'Pausar'"
+                                    [severity]="isPaused(qs) ? 'success' : 'warn'"
+                                    [outlined]="true"
+                                    styleClass="flex-1"
+                                    (onClick)="togglePause(qs)"
+                                />
+                            }
+                            <p-button
+                                [label]="isLoggedIn(qs) ? 'Sair da Fila' : 'Entrar na Fila'"
+                                [severity]="isLoggedIn(qs) ? 'danger' : 'success'"
+                                [outlined]="!isLoggedIn(qs)"
+                                styleClass="flex-1"
+                                (onClick)="toggleLogin(qs)"
+                            />
+                        </div>
                     </div>
                 }
             </div>
@@ -77,9 +95,11 @@ import { rxStompServiceFactory } from '@/websocket/stomp/rx-stomp-service-factor
 })
 export class QueueLoginPage implements OnInit, OnDestroy {
     readonly myQueues = signal<QueueState[]>([]);
+    readonly now = signal(Date.now());
     private userId!: number;
     private companyId!: string;
     private readonly subscriptions: Subscription[] = [];
+    private clockInterval!: ReturnType<typeof setInterval>;
 
     constructor(
         private readonly queueLoginService: QueueLoginService,
@@ -89,6 +109,8 @@ export class QueueLoginPage implements OnInit, OnDestroy {
     ) {}
 
     ngOnInit(): void {
+        this.clockInterval = setInterval(() => this.now.set(Date.now()), 1000);
+
         const user = this.userService.getUser();
         this.userId = user.id;
         this.companyId = user.companyId;
@@ -106,11 +128,38 @@ export class QueueLoginPage implements OnInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
+        clearInterval(this.clockInterval);
         this.subscriptions.forEach((s) => s.unsubscribe());
     }
 
     isLoggedIn(qs: QueueState): boolean {
         return qs.loggedMembers.some((m) => m.id === this.userId);
+    }
+
+    isPaused(qs: QueueState): boolean {
+        return (
+            qs.loggedMembers.find((m) => m.id === this.userId)?.queueMemberStatusEnum === QueueMemberStatusEnum.PAUSED
+        );
+    }
+
+    pauseDuration(qs: QueueState): string {
+        const ts = qs.loggedMembers.find((m) => m.id === this.userId)?.timestamp;
+        if (!ts) return '';
+        const secs = Math.floor((this.now() - ts) / 1000);
+        const mm = Math.floor(secs / 60)
+            .toString()
+            .padStart(2, '0');
+        const ss = (secs % 60).toString().padStart(2, '0');
+        return `${mm}:${ss}`;
+    }
+
+    togglePause(qs: QueueState): void {
+        const action = this.isPaused(qs)
+            ? this.queueLoginService.unpause(qs.queue.id)
+            : this.queueLoginService.pause(qs.queue.id);
+        action.catch(() =>
+            this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Não foi possível alterar a pausa' })
+        );
     }
 
     toggleLogin(qs: QueueState): void {
