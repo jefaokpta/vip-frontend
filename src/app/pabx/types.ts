@@ -283,7 +283,7 @@ export interface PeerRegistry {
     readonly peer: Peer;
     readonly registerId?: string;
     readonly contactStatusEventEnum: ContactStatusEventEnum;
-    callState?: CallState;
+    readonly channel?: Channel;
 }
 
 export interface QueueState {
@@ -340,24 +340,8 @@ export interface Channel {
     readonly isLeader: boolean;
     readonly timestamp: number;
     readonly record?: string;
-}
-
-export interface CallState {
-    readonly uniqueId: string;
-    readonly companyId: string;
-    readonly channels: Channel[];
-}
-
-export enum CallMessageActionEnum {
-    UPDATE = 'UPDATE',
-    REMOVE = 'REMOVE'
-}
-
-export interface CallStateMessage {
-    workerId: string;
-    callMessageActionEnum: CallMessageActionEnum;
-    callState: CallState;
-    timestamp: number;
+    readonly connectedNumber?: string;
+    readonly callTypeEnum?: UserFieldEnum;
 }
 
 export interface Calendar {

@@ -2,14 +2,7 @@ import { Component, computed, OnDestroy, OnInit, signal } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { WebsocketService } from '@/websocket/stomp/websocket.service';
 import { rxStompServiceFactory } from '@/websocket/stomp/rx-stomp-service-factory';
-import {
-    CallMessageActionEnum,
-    CallState,
-    CallStateMessage,
-    ChannelStateEnum,
-    ContactStatusEventEnum,
-    PeerRegistry
-} from '@/pabx/types';
+import { ChannelStateEnum, ContactStatusEventEnum, PeerRegistry } from '@/pabx/types';
 import { PeerDashboardService } from '@/pages/dashboard/peer-dashboard.service';
 import { UserService } from '@/pages/users/user.service';
 import { NgClass, NgForOf } from '@angular/common';
@@ -61,7 +54,7 @@ import { Card } from 'primeng/card';
                                 [ngClass]="peerStatusTextClass(pr)"
                             >
                                 {{ peerStatusLabel(pr) }}
-                                @if (pr.callState) {
+                                @if (pr.channel) {
                                     &bull; {{ getCallDuration(pr) }}
                                 }
                             </span>
@@ -71,11 +64,11 @@ import { Card } from 'primeng/card';
                         </div>
                         <span class="font-bold text-base">{{ pr.peer.peer }}</span>
                         <span class="text-sm">{{ pr.peer.name }}</span>
-                        @if (pr.callState && getOtherPeer(pr)) {
+                        @if (pr.channel) {
                             <div class="flex items-center gap-2 mt-1">
                                 <i class="fas fa-phone"></i>
                                 <div>
-                                    <div class="text-sm font-medium">{{ getOtherPeer(pr) }}</div>
+                                    <div class="text-sm font-medium">{{ pr.channel.connectedNumber }}</div>
                                 </div>
                             </div>
                         }
@@ -92,17 +85,10 @@ export class PeerDashboard implements OnDestroy, OnInit {
     private clockInterval?: ReturnType<typeof setInterval>;
 
     readonly peerRegistries = computed(() => Array.from(this.peerRegistriesMap().values()));
-    readonly channels = computed(() => this.peerRegistries().flatMap((pr) => pr.callState?.channels ?? []));
 
-    readonly busyChannelsCount = computed(() => {
-        const seen = new Set<string>();
-        return this.channels().filter(
-            (ch) =>
-                ch.channelStateEnum === ChannelStateEnum.UP &&
-                !seen.has(ch.uniqueId) &&
-                seen.add(ch.uniqueId) !== undefined
-        ).length;
-    });
+    readonly busyChannelsCount = computed(
+        () => this.peerRegistries().filter((pr) => pr.channel?.channelStateEnum == ChannelStateEnum.UP).length
+    );
 
     readonly registeredCount = computed(
         () =>
@@ -132,46 +118,11 @@ export class PeerDashboard implements OnDestroy, OnInit {
                     map.set(pr.peer.peer, pr);
                     return new Map(map);
                 });
-            }),
-            this.webSocketService.watch(`/topic/callstates/${companyId}`).subscribe((message) => {
-                const callStateMessage: CallStateMessage = JSON.parse(message.body);
-                if (callStateMessage.callMessageActionEnum == CallMessageActionEnum.REMOVE) {
-                    this.peerRegistriesMap.update((map) => {
-                        callStateMessage.callState.channels.forEach((ch) => {
-                            const pr = map.get(ch.peer);
-                            if (pr != undefined) {
-                                pr.callState = undefined;
-                            }
-                        });
-                        return new Map(map);
-                    });
-                    return;
-                }
-                this.addCallStateOnPeerRegistries(callStateMessage.callState);
             })
         );
 
         this.dashboardService.findPeerRegistries().then((list) => {
             this.peerRegistriesMap.set(new Map(list.map((pr) => [pr.peer.peer, pr])));
-        });
-
-        this.dashboardService.findCallStates().then((callStateMessages) => {
-            callStateMessages.map((csm) => csm.callState).forEach((cs) => this.addCallStateOnPeerRegistries(cs));
-        });
-    }
-
-    private addCallStateOnPeerRegistries(callState: CallState) {
-        this.peerRegistriesMap.update((map) => {
-            this.peerRegistries() // zerando todas as chamadas deste callstate, caso channels tenham deixado a call (transferencia)
-                .filter((pr) => pr.callState?.uniqueId == callState.uniqueId)
-                .forEach((pr) => (pr.callState = undefined));
-            callState.channels.forEach((ch) => {
-                const pr = map.get(ch.peer);
-                if (pr != undefined) {
-                    pr.callState = callState;
-                }
-            });
-            return new Map(map);
         });
     }
 
@@ -185,8 +136,7 @@ export class PeerDashboard implements OnDestroy, OnInit {
     }
 
     private getChannelState(pr: PeerRegistry): ChannelStateEnum | null {
-        if (!pr.callState) return null;
-        return pr.callState.channels.find((ch) => ch.peer === pr.peer.peer)?.channelStateEnum ?? null;
+        return pr.channel?.channelStateEnum ?? null;
     }
 
     peerCardBorderClass(pr: PeerRegistry): string {
@@ -246,17 +196,10 @@ export class PeerDashboard implements OnDestroy, OnInit {
         return 'REGISTRADO';
     }
 
-    getOtherPeer(pr: PeerRegistry): string | null {
-        if (!pr.callState) return null;
-        const other = pr.callState.channels.find((ch) => ch.peer !== pr.peer.peer);
-        return other?.peer ?? null;
-    }
-
     getCallDuration(pr: PeerRegistry): string {
-        if (!pr.callState) return '';
-        const ownChannel = pr.callState.channels.find((ch) => ch.peer === pr.peer.peer);
-        if (!ownChannel) return '';
-        const elapsedMs = this.now() - ownChannel.timestamp;
+        const channel = pr.channel;
+        if (!channel) return '';
+        const elapsedMs = this.now() - channel.timestamp;
         const totalSeconds = Math.max(0, Math.floor(elapsedMs / 1000));
         const mm = Math.floor(totalSeconds / 60)
             .toString()
