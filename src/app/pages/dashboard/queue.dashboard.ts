@@ -6,7 +6,7 @@ import { ChartModule } from 'primeng/chart';
 import { Button } from 'primeng/button';
 import { RouterLink } from '@angular/router';
 import { QueueDashboardService } from '@/pages/dashboard/queue-dashboard.service';
-import { QueueState } from '@/pabx/types';
+import { QueueMemberStatusEnum, QueueState } from '@/pabx/types';
 import { WebsocketService } from '@/websocket/stomp/websocket.service';
 import { rxStompServiceFactory } from '@/websocket/stomp/rx-stomp-service-factory';
 import { UserService } from '@/pages/users/user.service';
@@ -242,9 +242,19 @@ export class QueueDashboard implements OnInit, OnDestroy {
     readonly operacaoCount = computed(() => this.queues().length);
     readonly alertaCount = computed(() => 1);
 
-    readonly disponiveisCount = computed(() => this.queues().reduce((acc, q) => acc + q.loggedMembers.length, 0));
+    readonly disponiveisCount = computed(
+        () =>
+            this.queues().filter((q) =>
+                q.loggedMembers.some((m) => m.queueMemberStatusEnum === QueueMemberStatusEnum.AVAILABLE)
+            ).length
+    );
     readonly emChamadaCount = signal(12);
-    readonly emPausaCount = signal(3);
+    readonly emPausaCount = computed(
+        () =>
+            this.queues().filter((q) =>
+                q.loggedMembers.some((m) => m.queueMemberStatusEnum === QueueMemberStatusEnum.PAUSED)
+            ).length
+    );
 
     readonly agentAlerts = signal<AgentStatus[]>([
         { name: 'Ricardo S.', extension: 'Est.4055', alertType: 'PAUSA LONGA', duration: '45:12m' },

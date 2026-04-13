@@ -76,16 +76,6 @@ import { UserService } from '@/pages/users/user.service';
                         </span>
                     </div>
 
-                    <div class="rounded-xl shadow px-4 py-3 flex flex-col gap-1" [class]="waitingBorderClass()">
-                        <span class="text-xs font-semibold uppercase tracking-wide" [class]="waitingTextClass()"
-                            >Em Espera</span
-                        >
-                        <span class="text-3xl font-bold">
-                            {{ queueState()!.waitingCalls.length
-                            }}<span class="text-base text-gray-400">/{{ queueState()!.queue.maxCalls }}</span>
-                        </span>
-                    </div>
-
                     <div class="rounded-xl shadow px-4 py-3 flex flex-col gap-1 border-l-4 border-blue-500">
                         <span class="text-xs font-semibold uppercase tracking-wide text-blue-600">Atendidas</span>
                         <span class="text-3xl font-bold">{{ queueState()!.answeredCalls ?? 0 }}</span>
@@ -107,6 +97,16 @@ import { UserService } from '@/pages/users/user.service';
                         >
                         <span class="text-3xl font-bold">{{ serviceLevel() }}%</span>
                     </div>
+
+                    <div class="rounded-xl shadow px-4 py-3 flex flex-col gap-1" [class]="waitingBorderClass()">
+                        <span class="text-xs font-semibold uppercase tracking-wide" [class]="waitingTextClass()"
+                            >Em Espera</span
+                        >
+                        <span class="text-3xl font-bold">
+                            {{ queueState()!.waitingCalls.length
+                            }}<span class="text-base text-gray-400">/{{ queueState()!.queue.maxCalls }}</span>
+                        </span>
+                    </div>
                 </div>
 
                 <!-- Tables -->
@@ -124,7 +124,7 @@ import { UserService } from '@/pages/users/user.service';
                                     <th>Nome</th>
                                     <th>Ramal</th>
                                     <th>Status</th>
-                                    <th>Tempo no Status</th>
+                                    <th>Duração</th>
                                 </tr>
                             </ng-template>
                             <ng-template pTemplate="body" let-member>
@@ -294,7 +294,7 @@ export class QueueDetailPage implements OnInit, OnDestroy {
             case QueueMemberStatusEnum.DIALING:
                 return 'warn';
             case QueueMemberStatusEnum.PAUSED:
-                return 'secondary';
+                return 'warn';
             case QueueMemberStatusEnum.COOLDOWN:
                 return 'info';
             default:
