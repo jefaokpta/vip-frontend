@@ -7,7 +7,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { Password } from 'primeng/password';
 import { UserService } from '@/pages/users/user.service';
 import { Message } from 'primeng/message';
-import { WebphoneRegistration } from '@/types/types';
+import { PeerRegistration } from '@/types/types';
 
 @Component({
     selector: 'app-activate-peer-dialog-component',
@@ -80,7 +80,7 @@ export class ActivatePeerDialogComponent implements OnInit {
     onSubmit() {
         this.usersService
             .updateWebphoneRegistration(this.form.value)
-            .then((webphoneRegistration: WebphoneRegistration) => {
+            .then((webphoneRegistration: PeerRegistration) => {
                 this.usersService.setWebphoneRegistration(webphoneRegistration);
                 this.closePeerFormDialog();
             })

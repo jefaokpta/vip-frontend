@@ -6,7 +6,7 @@
 
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
-import { LoginResponse, User, WebphoneRegistration } from '@/types/types';
+import { LoginResponse, PeerRegistration, User } from '@/types/types';
 import { computed, Injectable, signal } from '@angular/core';
 import { executeRequest, httpHeaders } from '@/util/utils';
 import { jwtDecode } from 'jwt-decode';
@@ -17,8 +17,8 @@ import { jwtDecode } from 'jwt-decode';
 export class UserService {
     private readonly user = signal(this.extractUserFromToken());
     private readonly BACKEND = environment.API_BACKEND_URL;
-    private readonly webphoneRegister = signal<WebphoneRegistration>({});
-    private readonly isWebphoneActivated = computed(() => !!this.webphoneRegister().peer);
+    private readonly webphoneRegister = signal<PeerRegistration>({});
+    private readonly isWebphoneActivated = computed(() => !!this.webphoneRegister().endpoint);
 
     constructor(private readonly http: HttpClient) {
         this.getWebphoneRegistration();
@@ -32,7 +32,7 @@ export class UserService {
         return this.isWebphoneActivated;
     }
 
-    getWebphoneRegisterSignal(): WebphoneRegistration {
+    getWebphoneRegisterSignal(): PeerRegistration {
         return this.webphoneRegister();
     }
 
@@ -142,16 +142,16 @@ export class UserService {
     }
 
     private getWebphoneRegistration() {
-        executeRequest(this.http.get<WebphoneRegistration>(`${this.BACKEND}/users/webphone`, httpHeaders())).then(
+        executeRequest(this.http.get<PeerRegistration>(`${this.BACKEND}/users/webphone`, httpHeaders())).then(
             (response) => this.webphoneRegister.set(response)
         );
     }
 
-    setWebphoneRegistration(webphoneRegistration: WebphoneRegistration) {
+    setWebphoneRegistration(webphoneRegistration: PeerRegistration) {
         this.webphoneRegister.set(webphoneRegistration);
     }
 
-    updateWebphoneRegistration(webphoneRegistration: WebphoneRegistration) {
+    updateWebphoneRegistration(webphoneRegistration: PeerRegistration) {
         return executeRequest(this.http.put(`${this.BACKEND}/users/webphone`, webphoneRegistration, httpHeaders()));
     }
 

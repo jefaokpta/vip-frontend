@@ -12,7 +12,7 @@ import { TableModule } from 'primeng/table';
 import { telephoneFormat } from './utils';
 import { handleCalleId } from '@/webphone/utils';
 import { Cdr, UserFieldEnum } from '@/pabx/types';
-import { User, WebphoneRegistration } from '@/types/types';
+import { PeerRegistration, User } from '@/types/types';
 import { UserService } from '@/pages/users/user.service';
 import { SplitButton } from 'primeng/splitbutton';
 
@@ -198,7 +198,7 @@ export class WebphoneSidebarComponent {
     dialpadVisible = false;
     cdrs: Cdr[] = [];
     user: User;
-    wr: WebphoneRegistration;
+    wr: PeerRegistration;
     menuItems = [
         {
             label: 'Desativar Ramal',
@@ -223,7 +223,7 @@ export class WebphoneSidebarComponent {
     }
 
     get buttonLabel() {
-        return `${this.wr.name} (${this.wr.peer?.split('_')[0]})`;
+        return `${this.wr.name} (${this.wr.endpoint?.split('_')[0]})`;
     }
 
     get phoneStatus() {

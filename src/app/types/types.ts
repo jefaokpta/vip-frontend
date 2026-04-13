@@ -4,6 +4,7 @@
  * @create 4/22/25
  */
 import { RTCSession } from 'jssip/lib/RTCSession';
+import { PeerTransportEnum } from '@/pabx/types';
 
 export interface LoginResponse {
     readonly token: string;
@@ -95,11 +96,12 @@ export interface Worker {
     readonly channelIds: string[],
 }
 
-export interface WebphoneRegistration {
+export interface PeerRegistration {
     readonly id?: string;
     readonly name?: string;
-    readonly peer?: string;
+    readonly endpoint?: string;
     readonly peerSecret?: string;
+    readonly peerTransportEnums?: PeerTransportEnum[];
 }
 
 

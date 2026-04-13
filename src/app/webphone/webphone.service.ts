@@ -31,9 +31,9 @@ export class WebphoneService {
         const user = this.userService.getWebphoneRegisterSignal();
         const socket = new WebSocketInterface(`wss://${this.PABX_URL}:8089/ws`);
         const config = {
-            uri: `sip:${user.peer}_WSS@${this.PABX_URL}`,
+            uri: `sip:${user.endpoint}_WSS@${this.PABX_URL}`,
             password: user.peerSecret,
-            authorization_user: user.peer,
+            authorization_user: user.endpoint,
             sockets: [socket],
             register: true
         };
