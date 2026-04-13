@@ -82,6 +82,14 @@ import { QueueService } from '@/pabx/queue/queue.service';
                         <td>
                             <div class="flex gap-2">
                                 <p-button
+                                    icon="pi pi-eye"
+                                    [routerLink]="['detail', queue.id]"
+                                    outlined
+                                    size="small"
+                                    pTooltip="Monitorar"
+                                    tooltipPosition="left"
+                                />
+                                <p-button
                                     icon="pi pi-pencil"
                                     [routerLink]="['edit', queue.id]"
                                     outlined

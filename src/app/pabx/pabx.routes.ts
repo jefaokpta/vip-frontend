@@ -40,6 +40,7 @@ import { ReportPage } from '@/pabx/report/report.page';
 import { QueuesPage } from '@/pabx/queue/queues.page';
 import { NewQueuePage } from '@/pabx/queue/new-queue.page';
 import { EditQueuePage } from '@/pabx/queue/edit-queue.page';
+import { QueueDetailPage } from '@/pabx/queue/queue-detail.page';
 
 export default [
     { path: 'peers', component: PeerPage, data: { breadcrumb: 'Ramais' } },
@@ -98,6 +99,7 @@ export default [
     { path: 'queues', component: QueuesPage, data: { breadcrumb: 'Filas de Atendimento' } },
     { path: 'queues/new', component: NewQueuePage, data: { breadcrumb: 'Filas > Nova' } },
     { path: 'queues/edit/:id', component: EditQueuePage, data: { breadcrumb: 'Filas > Editar' } },
+    { path: 'queues/detail/:id', component: QueueDetailPage, data: { breadcrumb: 'Filas > Detalhe' } },
 
     { path: '**', redirectTo: '/notfound' }
 ] as Routes;
