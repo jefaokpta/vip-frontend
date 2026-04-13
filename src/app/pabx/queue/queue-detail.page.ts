@@ -25,7 +25,7 @@ import { UserService } from '@/pages/users/user.service';
                     <div class="flex items-center gap-3">
                         <p-button
                             icon="pi pi-arrow-left"
-                            routerLink="/pabx/queues"
+                            routerLink="/pages/queues"
                             outlined
                             rounded
                             size="small"

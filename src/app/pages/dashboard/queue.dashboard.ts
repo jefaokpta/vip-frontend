@@ -4,6 +4,7 @@ import { NgClass, NgForOf } from '@angular/common';
 import { Card } from 'primeng/card';
 import { ChartModule } from 'primeng/chart';
 import { Button } from 'primeng/button';
+import { RouterLink } from '@angular/router';
 import { QueueDashboardService } from '@/pages/dashboard/queue-dashboard.service';
 import { QueueState } from '@/pabx/types';
 import { WebsocketService } from '@/websocket/stomp/websocket.service';
@@ -21,7 +22,7 @@ interface AgentStatus {
     selector: 'app-queue-dashboard',
     standalone: true,
     providers: [{ provide: WebsocketService, useFactory: rxStompServiceFactory }],
-    imports: [NgClass, NgForOf, Card, ChartModule, Button],
+    imports: [NgClass, NgForOf, Card, ChartModule, Button, RouterLink],
     template: `
         <div class="flex flex-col gap-4">
             <!-- Page Header -->
@@ -101,8 +102,9 @@ interface AgentStatus {
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div
                                 *ngFor="let q of queues()"
-                                class="rounded-xl shadow px-4 py-3 flex flex-col gap-2 transition-all duration-300 border-l-4"
+                                class="rounded-xl shadow px-4 py-3 flex flex-col gap-2 transition-all duration-300 border-l-4 cursor-pointer hover:opacity-80"
                                 [ngClass]="queueBorderClass(q)"
+                                [routerLink]="['/pabx/queues/detail', q.queue.id]"
                             >
                                 <!-- Header row -->
                                 <div class="flex items-start justify-between">
