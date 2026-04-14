@@ -67,6 +67,11 @@ import { Card } from 'primeng/card';
                         @if (pr.channel) {
                             <div class="flex items-center gap-2 mt-1">
                                 <i class="fas fa-phone"></i>
+                                @if (pr.channel.callTypeEnum == 'OUTBOUND') {
+                                    <i class="pi pi-arrow-right"></i>
+                                } @else {
+                                    <i class="pi pi-arrow-left"></i>
+                                }
                                 <div>
                                     <div class="text-sm font-medium">{{ pr.channel.connectedNumber }}</div>
                                 </div>

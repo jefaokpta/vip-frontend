@@ -132,14 +132,33 @@ import { UserService } from '@/pages/users/user.service';
                                     <td class="font-medium">{{ member.name }}</td>
                                     <td class="text-gray-500">{{ member.peerRegistry.peer.peer }}</td>
                                     <td>
-                                        <p-tag
-                                            [value]="memberStatusLabel(member.queueMemberStatusEnum)"
-                                            [severity]="memberStatusSeverity(member.queueMemberStatusEnum)"
-                                        />
-                                        {{ member.peerRegistry.channel?.connectedNumber }}
+                                        @if (member.peerRegistry.channel) {
+                                            <div class="flex items-center gap-2 mt-1">
+                                                <i class="fas fa-phone"></i>
+                                                @if (member.peerRegistry.channel.callTypeEnum == 'OUTBOUND') {
+                                                    <i class="pi pi-arrow-right"></i>
+                                                } @else {
+                                                    <i class="pi pi-arrow-left"></i>
+                                                }
+                                                <div>
+                                                    <div class="text-sm font-medium">
+                                                        {{ member.peerRegistry.channel.connectedNumber }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        } @else {
+                                            <p-tag
+                                                [value]="memberStatusLabel(member.queueMemberStatusEnum)"
+                                                [severity]="memberStatusSeverity(member.queueMemberStatusEnum)"
+                                            />
+                                        }
                                     </td>
                                     <td class="font-mono text-sm">
-                                        {{ member.timestamp ? waitTime(member.timestamp) : '—' }}
+                                        @if (member.peerRegistry.channel) {
+                                            {{ waitTime(member.peerRegistry.channel.timestamp) }}
+                                        } @else {
+                                            {{ member.timestamp ? waitTime(member.timestamp) : '—' }}
+                                        }
                                     </td>
                                 </tr>
                             </ng-template>
