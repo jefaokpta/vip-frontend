@@ -328,7 +328,7 @@ export enum ContactStatusEventEnum {
 export interface QueueMember {
     readonly id: number;
     readonly name: string;
-    readonly peer: string;
+    readonly peerRegistry: PeerRegistry;
     readonly queueMemberStatusEnum: QueueMemberStatusEnum;
     readonly timestamp?: number;
 }

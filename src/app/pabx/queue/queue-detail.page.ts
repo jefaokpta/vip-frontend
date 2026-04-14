@@ -130,12 +130,13 @@ import { UserService } from '@/pages/users/user.service';
                             <ng-template pTemplate="body" let-member>
                                 <tr>
                                     <td class="font-medium">{{ member.name }}</td>
-                                    <td class="text-gray-500">{{ member.peer }}</td>
+                                    <td class="text-gray-500">{{ member.peerRegistry.peer.peer }}</td>
                                     <td>
                                         <p-tag
                                             [value]="memberStatusLabel(member.queueMemberStatusEnum)"
                                             [severity]="memberStatusSeverity(member.queueMemberStatusEnum)"
                                         />
+                                        {{ member.peerRegistry.channel?.connectedNumber }}
                                     </td>
                                     <td class="font-mono text-sm">
                                         {{ member.timestamp ? waitTime(member.timestamp) : '—' }}
