@@ -26,6 +26,7 @@ import { EditDstActionComponent } from '@/pabx/dialplan/components/edit-dst-acti
 import { CalendarActionComponent } from '@/pabx/dialplan/components/calendar-action.component';
 import { CallGroupActionComponent } from '@/pabx/dialplan/components/call-group-action.component';
 import { UraActionComponent } from '@/pabx/dialplan/components/ura-action.component';
+import { QueueActionComponent } from '@/pabx/dialplan/components/queue-action.component';
 
 /**
  * @author Jefferson Alves Reis (jefaokpta)
@@ -59,7 +60,8 @@ import { UraActionComponent } from '@/pabx/dialplan/components/ura-action.compon
         EditDstActionComponent,
         CalendarActionComponent,
         CallGroupActionComponent,
-        UraActionComponent
+        UraActionComponent,
+        QueueActionComponent
     ],
     templateUrl: './edit-dialplan.page.html'
 })

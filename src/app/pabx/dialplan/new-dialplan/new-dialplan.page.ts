@@ -25,6 +25,7 @@ import { EditDstActionComponent } from '@/pabx/dialplan/components/edit-dst-acti
 import { CalendarActionComponent } from '@/pabx/dialplan/components/calendar-action.component';
 import { CallGroupActionComponent } from '@/pabx/dialplan/components/call-group-action.component';
 import { UraActionComponent } from '@/pabx/dialplan/components/ura-action.component';
+import { QueueActionComponent } from '@/pabx/dialplan/components/queue-action.component';
 import { actionArg2HasDefaultValue, actionHasArg1 } from '@/pabx/utils';
 
 /**
@@ -59,7 +60,8 @@ import { actionArg2HasDefaultValue, actionHasArg1 } from '@/pabx/utils';
         EditDstActionComponent,
         CalendarActionComponent,
         CallGroupActionComponent,
-        UraActionComponent
+        UraActionComponent,
+        QueueActionComponent
     ],
     templateUrl: './new-dialplan.page.html'
 })
@@ -70,7 +72,6 @@ export class NewDialplanPage implements OnInit {
 
     srcOptions = dialplanSrcOptions();
 
-    //TODO: fila de atendimento, ura de atendimento
     actionOptions = dialplanActionOptions();
 
     constructor(
