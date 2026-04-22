@@ -295,7 +295,7 @@ export class QueueDetailPage implements OnInit, OnDestroy {
             [QueueMemberStatusEnum.RINGING]: 'Chamando',
             [QueueMemberStatusEnum.DIALING]: 'Discando',
             [QueueMemberStatusEnum.PAUSED]: 'Em Pausa',
-            [QueueMemberStatusEnum.COOLDOWN]: 'Cooldown',
+            [QueueMemberStatusEnum.COOLDOWN]: 'Anotação',
             [QueueMemberStatusEnum.UNKNOWN]: 'Desconhecido'
         };
         return labels[status] ?? status;
