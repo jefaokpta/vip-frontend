@@ -62,10 +62,16 @@ import { ActivatePeerDialogComponent } from '@/layout/components/activate-peer-d
                         </p-button>
                     </li>
                     <li class="ml-3">
-                        @if (isWebphoneActivated()) {
+                        @if (isWebphoneJsSipEnabled()) {
                             <app-webphone-topbar />
+                        } @else if (isPeerRegistrationActive()) {
+                            <p-button severity="secondary" outlined (click)="isPeerFormDialogVisible = true">
+                                <i class="pi pi-phone"></i>
+                                <span class="ml-2">{{ activePeerNumber() }}</span>
+                                <i class="pi pi-circle-fill text-red-400"></i>
+                            </p-button>
                         } @else {
-                            <p-button severity="secondary" outlined (onClick)="isPeerFormDialogVisible = true">
+                            <p-button severity="secondary" outlined (click)="isPeerFormDialogVisible = true">
                                 <i class="pi pi-phone"></i>
                                 <span class="ml-2">Ativar Ramal</span>
                                 <i class="pi pi-circle-fill text-red-400"></i>
@@ -119,8 +125,17 @@ export class AppTopbar implements OnInit {
         return this.userService.getUserSignal();
     }
 
-    get isWebphoneActivated() {
+    get isWebphoneJsSipEnabled() {
+        return this.userService.webphoneJsSipEnabledSignal();
+    }
+
+    get isPeerRegistrationActive() {
         return this.userService.isWebphoneActivatedSignal();
+    }
+
+    activePeerNumber(): string {
+        const ep = this.userService.getWebphoneRegisterSignal().endpoint;
+        return ep?.split('_')[0] ?? '';
     }
 
     exitManagingCompany() {

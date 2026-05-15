@@ -1,4 +1,4 @@
-import { Component, computed } from '@angular/core';
+import { Component, computed, OnInit } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { DrawerModule } from 'primeng/drawer';
 import { BadgeModule } from 'primeng/badge';
@@ -193,7 +193,7 @@ import { SplitButton } from 'primeng/splitbutton';
         </p-drawer>
     `
 })
-export class WebphoneSidebarComponent {
+export class WebphoneSidebarComponent implements OnInit {
     telephoneNumber?: string = undefined;
     dialpadVisible = false;
     cdrs: Cdr[] = [];
@@ -216,6 +216,10 @@ export class WebphoneSidebarComponent {
     ) {
         this.user = this.userService.getUser();
         this.wr = this.userService.getWebphoneRegisterSignal();
+    }
+
+    ngOnInit(): void {
+        this.webphoneService.startJsSipIfEligible();
     }
 
     deactivatePeer() {
