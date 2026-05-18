@@ -96,7 +96,7 @@ import { rxStompServiceFactory } from '@/websocket/stomp/rx-stomp-service-factor
 export class QueueLoginPage implements OnInit, OnDestroy {
     readonly myQueues = signal<QueueState[]>([]);
     readonly now = signal(Date.now());
-    private userId!: number;
+    private peerId?: number;
     private companyId!: string;
     private readonly subscriptions: Subscription[] = [];
     private clockInterval!: ReturnType<typeof setInterval>;
@@ -112,8 +112,8 @@ export class QueueLoginPage implements OnInit, OnDestroy {
         this.clockInterval = setInterval(() => this.now.set(Date.now()), 1000);
 
         const user = this.userService.getUser();
-        this.userId = user.id;
         this.companyId = user.companyId;
+        this.syncPeerId();
 
         this.loadMyQueues();
 
@@ -133,17 +133,22 @@ export class QueueLoginPage implements OnInit, OnDestroy {
     }
 
     isLoggedIn(qs: QueueState): boolean {
-        return qs.loggedMembers.some((m) => m.id === this.userId);
+        const peerId = this.resolvePeerId();
+        if (peerId == null) return false;
+        return qs.loggedMembers.some((m) => m.id === peerId);
     }
 
     isPaused(qs: QueueState): boolean {
+        const peerId = this.resolvePeerId();
+        if (peerId == null) return false;
         return (
-            qs.loggedMembers.find((m) => m.id === this.userId)?.queueMemberStatusEnum === QueueMemberStatusEnum.PAUSED
+            qs.loggedMembers.find((m) => m.id === peerId)?.queueMemberStatusEnum === QueueMemberStatusEnum.PAUSED
         );
     }
 
     pauseDuration(qs: QueueState): string {
-        const ts = qs.loggedMembers.find((m) => m.id === this.userId)?.timestamp;
+        const peerId = this.resolvePeerId();
+        const ts = peerId == null ? undefined : qs.loggedMembers.find((m) => m.id === peerId)?.timestamp;
         if (!ts) return '';
         const secs = Math.floor((this.now() - ts) / 1000);
         const mm = Math.floor(secs / 60)
@@ -193,6 +198,24 @@ export class QueueLoginPage implements OnInit, OnDestroy {
     }
 
     private loadMyQueues(): void {
-        this.queueLoginService.getMyQueues().then((queues) => this.myQueues.set(queues));
+        this.queueLoginService.getMyQueues().then((queues) => {
+            this.syncPeerId();
+            this.myQueues.set(queues);
+        });
+    }
+
+    private syncPeerId(): void {
+        const id = this.userService.getWebphoneRegisterSignal().id;
+        if (id != null) {
+            this.peerId = Number(id);
+        }
+    }
+
+    private resolvePeerId(): number | undefined {
+        if (this.peerId != null) {
+            return this.peerId;
+        }
+        this.syncPeerId();
+        return this.peerId;
     }
 }
