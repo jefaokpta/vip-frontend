@@ -161,12 +161,15 @@ export class QueueLoginPage implements OnInit, OnDestroy {
         const peerId = this.resolvePeerId();
         const ts = peerId == null ? undefined : qs.loggedMembers.find((m) => m.id === peerId)?.timestamp;
         if (!ts) return '';
-        const secs = Math.floor((this.now() - ts) / 1000);
-        const mm = Math.floor(secs / 60)
-            .toString()
-            .padStart(2, '0');
-        const ss = (secs % 60).toString().padStart(2, '0');
-        return `${mm}:${ss}`;
+        const secs = Math.max(0, Math.floor((this.now() - ts) / 1000));
+        const h = Math.floor(secs / 3600);
+        const m = Math.floor((secs % 3600) / 60);
+        const s = secs % 60;
+        const pad = (n: number) => n.toString().padStart(2, '0');
+        if (h > 0) {
+            return `${h}:${pad(m)}:${pad(s)}`;
+        }
+        return `${pad(m)}:${pad(s)}`;
     }
 
     togglePause(qs: QueueState): void {
