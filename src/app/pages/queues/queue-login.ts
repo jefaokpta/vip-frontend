@@ -120,9 +120,15 @@ export class QueueLoginPage implements OnInit, OnDestroy {
         this.subscriptions.push(
             this.webSocketService.watch(`/topic/queuestates/${this.companyId}`).subscribe((message) => {
                 const updatedState: QueueState = JSON.parse(message.body);
-                this.myQueues.update((queues) =>
-                    queues.map((qs) => (qs.queue.id === updatedState.queue.id ? updatedState : qs))
-                );
+                this.myQueues.update((queues) => {
+                    const i = queues.findIndex((qs) => qs.queue.id === updatedState.queue.id);
+                    if (i >= 0) return queues.map((qs, idx) => (idx === i ? updatedState : qs));
+                    return [...queues, updatedState];
+                });
+            }),
+            this.webSocketService.watch(`/topic/queues-removed/${this.companyId}`).subscribe((message) => {
+                const { queueId } = JSON.parse(message.body) as { queueId: number };
+                this.myQueues.update((queues) => queues.filter((qs) => qs.queue.id !== queueId));
             })
         );
     }

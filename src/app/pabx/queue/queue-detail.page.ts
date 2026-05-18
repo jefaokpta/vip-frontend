@@ -1,5 +1,5 @@
 import { Component, computed, OnDestroy, OnInit, signal } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { Card } from 'primeng/card';
 import { Button } from 'primeng/button';
@@ -244,6 +244,7 @@ export class QueueDetailPage implements OnInit, OnDestroy {
 
     constructor(
         private readonly route: ActivatedRoute,
+        private readonly router: Router,
         private readonly queueDashboardService: QueueDashboardService,
         private readonly webSocketService: WebsocketService,
         private readonly userService: UserService
@@ -265,6 +266,12 @@ export class QueueDetailPage implements OnInit, OnDestroy {
                 const updated: QueueState = JSON.parse(message.body);
                 if (updated.queue.id === this.queueId) {
                     this.queueState.set(updated);
+                }
+            }),
+            this.webSocketService.watch(`/topic/queues-removed/${companyId}`).subscribe((message) => {
+                const { queueId } = JSON.parse(message.body) as { queueId: number };
+                if (queueId === this.queueId) {
+                    void this.router.navigate(['/pages/queues']);
                 }
             })
         );
