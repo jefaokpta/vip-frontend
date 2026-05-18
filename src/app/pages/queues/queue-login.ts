@@ -97,6 +97,7 @@ export class QueueLoginPage implements OnInit, OnDestroy {
     readonly myQueues = signal<QueueState[]>([]);
     readonly now = signal(Date.now());
     private peerId?: number;
+    private userId!: number;
     private companyId!: string;
     private readonly subscriptions: Subscription[] = [];
     private clockInterval!: ReturnType<typeof setInterval>;
@@ -112,6 +113,7 @@ export class QueueLoginPage implements OnInit, OnDestroy {
         this.clockInterval = setInterval(() => this.now.set(Date.now()), 1000);
 
         const user = this.userService.getUser();
+        this.userId = user.id;
         this.companyId = user.companyId;
         this.syncPeerId();
 
@@ -121,6 +123,9 @@ export class QueueLoginPage implements OnInit, OnDestroy {
             this.webSocketService.watch(`/topic/queuestates/${this.companyId}`).subscribe((message) => {
                 const updatedState: QueueState = JSON.parse(message.body);
                 this.myQueues.update((queues) => {
+                    if (!this.userBelongsToQueue(updatedState)) {
+                        return queues.filter((qs) => qs.queue.id !== updatedState.queue.id);
+                    }
                     const i = queues.findIndex((qs) => qs.queue.id === updatedState.queue.id);
                     if (i >= 0) return queues.map((qs, idx) => (idx === i ? updatedState : qs));
                     return [...queues, updatedState];
@@ -201,6 +206,10 @@ export class QueueLoginPage implements OnInit, OnDestroy {
                     })
                 );
         }
+    }
+
+    private userBelongsToQueue(state: QueueState): boolean {
+        return state.queue.memberIds.includes(this.userId);
     }
 
     private loadMyQueues(): void {
