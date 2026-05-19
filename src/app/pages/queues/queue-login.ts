@@ -96,6 +96,7 @@ import { rxStompServiceFactory } from '@/websocket/stomp/rx-stomp-service-factor
 export class QueueLoginPage implements OnInit, OnDestroy {
     readonly myQueues = signal<QueueState[]>([]);
     readonly now = signal(Date.now());
+    private peerId?: number;
     private userId!: number;
     private companyId!: string;
     private readonly subscriptions: Subscription[] = [];
@@ -114,15 +115,25 @@ export class QueueLoginPage implements OnInit, OnDestroy {
         const user = this.userService.getUser();
         this.userId = user.id;
         this.companyId = user.companyId;
+        this.syncPeerId();
 
         this.loadMyQueues();
 
         this.subscriptions.push(
             this.webSocketService.watch(`/topic/queuestates/${this.companyId}`).subscribe((message) => {
                 const updatedState: QueueState = JSON.parse(message.body);
-                this.myQueues.update((queues) =>
-                    queues.map((qs) => (qs.queue.id === updatedState.queue.id ? updatedState : qs))
-                );
+                this.myQueues.update((queues) => {
+                    if (!this.userBelongsToQueue(updatedState)) {
+                        return queues.filter((qs) => qs.queue.id !== updatedState.queue.id);
+                    }
+                    const i = queues.findIndex((qs) => qs.queue.id === updatedState.queue.id);
+                    if (i >= 0) return queues.map((qs, idx) => (idx === i ? updatedState : qs));
+                    return [...queues, updatedState];
+                });
+            }),
+            this.webSocketService.watch(`/topic/queues-removed/${this.companyId}`).subscribe((message) => {
+                const { queueId } = JSON.parse(message.body) as { queueId: number };
+                this.myQueues.update((queues) => queues.filter((qs) => qs.queue.id !== queueId));
             })
         );
     }
@@ -133,24 +144,32 @@ export class QueueLoginPage implements OnInit, OnDestroy {
     }
 
     isLoggedIn(qs: QueueState): boolean {
-        return qs.loggedMembers.some((m) => m.id === this.userId);
+        const peerId = this.resolvePeerId();
+        if (peerId == null) return false;
+        return qs.loggedMembers.some((m) => m.id === peerId);
     }
 
     isPaused(qs: QueueState): boolean {
+        const peerId = this.resolvePeerId();
+        if (peerId == null) return false;
         return (
-            qs.loggedMembers.find((m) => m.id === this.userId)?.queueMemberStatusEnum === QueueMemberStatusEnum.PAUSED
+            qs.loggedMembers.find((m) => m.id === peerId)?.queueMemberStatusEnum === QueueMemberStatusEnum.PAUSED
         );
     }
 
     pauseDuration(qs: QueueState): string {
-        const ts = qs.loggedMembers.find((m) => m.id === this.userId)?.timestamp;
+        const peerId = this.resolvePeerId();
+        const ts = peerId == null ? undefined : qs.loggedMembers.find((m) => m.id === peerId)?.timestamp;
         if (!ts) return '';
-        const secs = Math.floor((this.now() - ts) / 1000);
-        const mm = Math.floor(secs / 60)
-            .toString()
-            .padStart(2, '0');
-        const ss = (secs % 60).toString().padStart(2, '0');
-        return `${mm}:${ss}`;
+        const secs = Math.max(0, Math.floor((this.now() - ts) / 1000));
+        const h = Math.floor(secs / 3600);
+        const m = Math.floor((secs % 3600) / 60);
+        const s = secs % 60;
+        const pad = (n: number) => n.toString().padStart(2, '0');
+        if (h > 0) {
+            return `${h}:${pad(m)}:${pad(s)}`;
+        }
+        return `${pad(m)}:${pad(s)}`;
     }
 
     togglePause(qs: QueueState): void {
@@ -192,7 +211,29 @@ export class QueueLoginPage implements OnInit, OnDestroy {
         }
     }
 
+    private userBelongsToQueue(state: QueueState): boolean {
+        return state.queue.memberIds.includes(this.userId);
+    }
+
     private loadMyQueues(): void {
-        this.queueLoginService.getMyQueues().then((queues) => this.myQueues.set(queues));
+        this.queueLoginService.getMyQueues().then((queues) => {
+            this.syncPeerId();
+            this.myQueues.set(queues);
+        });
+    }
+
+    private syncPeerId(): void {
+        const id = this.userService.getWebphoneRegisterSignal().id;
+        if (id != null) {
+            this.peerId = Number(id);
+        }
+    }
+
+    private resolvePeerId(): number | undefined {
+        if (this.peerId != null) {
+            return this.peerId;
+        }
+        this.syncPeerId();
+        return this.peerId;
     }
 }

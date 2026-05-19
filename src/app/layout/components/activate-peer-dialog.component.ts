@@ -18,7 +18,7 @@ import { PeerRegistration } from '@/types/types';
             <p-dialog header="Ative seu ramal" [visible]="true" [modal]="true" [closable]="false">
                 <form [formGroup]="form" (submit)="onSubmit()" class="p-fluid">
                     <div class="field mb-4">
-                        <app-peer-select-component formControlName="peer" [isOnlyWSS]="true" [showError]="true" />
+                        <app-peer-select-component formControlName="peer" [showError]="true" />
                     </div>
                     <div class="field mb-4">
                         <label for="peerSecret" class="block mb-2">Senha *</label>

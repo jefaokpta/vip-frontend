@@ -16,10 +16,10 @@ import { UserService } from '@/pages/users/user.service';
 })
 export class WebphoneService {
     private readonly PABX_URL = environment.PABX_URL;
-    private readonly ua: UA;
+    private ua: UA | null = null;
     private readonly phoneState = signal<PhoneState>({ state: PhoneStateEnum.INITIALIZING });
     private readonly callTimer = signal(0);
-    private callTimerInterval: any;
+    private callTimerInterval: ReturnType<typeof setInterval> | undefined;
     private readonly audio = new Audio();
 
     private updatePhoneStatus(newState: Partial<PhoneState>) {
@@ -27,8 +27,26 @@ export class WebphoneService {
     }
     readonly phoneState$ = this.phoneState.asReadonly();
 
-    constructor(private readonly userService: UserService) {
+    constructor(private readonly userService: UserService) {}
+
+    /**
+     * Inicia registro JsSIP quando o ramal tem tecnologia WSS. Seguro chamar várias vezes.
+     */
+    startJsSipIfEligible(): void {
+        this.ensureUaStarted();
+    }
+
+    private ensureUaStarted(): void {
+        if (this.ua != null) {
+            return;
+        }
+        if (!this.userService.webphoneJsSipEnabledSignal()()) {
+            return;
+        }
         const user = this.userService.getWebphoneRegisterSignal();
+        if (!user.endpoint || !user.peerSecret) {
+            return;
+        }
         const socket = new WebSocketInterface(`wss://${this.PABX_URL}:8089/ws`);
         const config = {
             uri: `sip:${user.endpoint}_WSS@${this.PABX_URL}`,
@@ -70,15 +88,17 @@ export class WebphoneService {
     }
 
     async makeCall(telephone: string) {
-        if (this.ua) {
-            const options = {
-                eventHandlers: this.callEventHandlers(),
-                mediaConstraints: { audio: true, video: false },
-                extraHeaders: [`X-CALL-TOKEN: TOKEN_PLACEHOLDER`]
-            };
-            const target = `sip:${telephone}@${this.PABX_URL}`;
-            this.updatePhoneStatus({ session: this.ua.call(target, options) });
+        this.ensureUaStarted();
+        if (!this.ua) {
+            return;
         }
+        const options = {
+            eventHandlers: this.callEventHandlers(),
+            mediaConstraints: { audio: true, video: false },
+            extraHeaders: [`X-CALL-TOKEN: TOKEN_PLACEHOLDER`]
+        };
+        const target = `sip:${telephone}@${this.PABX_URL}`;
+        this.updatePhoneStatus({ session: this.ua.call(target, options) });
     }
 
     sendDTMF(digit: string) {
@@ -204,6 +224,9 @@ export class WebphoneService {
 
     private stopCallTimer() {
         this.callTimer.set(0);
-        clearInterval(this.callTimerInterval);
+        if (this.callTimerInterval !== undefined) {
+            clearInterval(this.callTimerInterval);
+            this.callTimerInterval = undefined;
+        }
     }
 }

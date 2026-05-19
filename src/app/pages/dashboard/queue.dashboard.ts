@@ -303,7 +303,15 @@ export class QueueDashboard implements OnInit, OnDestroy {
         this.subscriptions.push(
             this.webSocketService.watch(`/topic/queuestates/${companyId}`).subscribe((message) => {
                 const updated: QueueState = JSON.parse(message.body);
-                this.queues.update((qs) => qs.map((q) => (q.queue.id === updated.queue.id ? updated : q)));
+                this.queues.update((qs) => {
+                    const i = qs.findIndex((q) => q.queue.id === updated.queue.id);
+                    if (i >= 0) return qs.map((q, idx) => (idx === i ? updated : q));
+                    return [...qs, updated];
+                });
+            }),
+            this.webSocketService.watch(`/topic/queues-removed/${companyId}`).subscribe((message) => {
+                const { queueId } = JSON.parse(message.body) as { queueId: number };
+                this.queues.update((qs) => qs.filter((q) => q.queue.id !== queueId));
             })
         );
     }

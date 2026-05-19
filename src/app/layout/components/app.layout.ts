@@ -31,7 +31,7 @@ import { UserService } from '@/pages/users/user.service';
             </div>
         </div>
         <div app-profilesidebar></div>
-        @if (isWebphoneActivated()) {
+        @if (isWebphoneJsSipEnabled()) {
             <app-webphone-sidebar />
         }
         <app-configurator></app-configurator>
@@ -87,8 +87,8 @@ export class AppLayout {
         });
     }
 
-    get isWebphoneActivated() {
-        return this.userService.isWebphoneActivatedSignal();
+    get isWebphoneJsSipEnabled() {
+        return this.userService.webphoneJsSipEnabledSignal();
     }
 
     isOutsideClicked(event: any) {

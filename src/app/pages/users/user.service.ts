@@ -7,6 +7,7 @@
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { LoginResponse, PeerRegistration, User } from '@/types/types';
+import { PeerTransportEnum } from '@/pabx/types';
 import { computed, Injectable, signal } from '@angular/core';
 import { executeRequest, httpHeaders } from '@/util/utils';
 import { jwtDecode } from 'jwt-decode';
@@ -19,6 +20,10 @@ export class UserService {
     private readonly BACKEND = environment.API_BACKEND_URL;
     private readonly webphoneRegister = signal<PeerRegistration>({});
     private readonly isWebphoneActivated = computed(() => !!this.webphoneRegister().endpoint);
+    private readonly webphoneJsSipEnabled = computed(() => {
+        const r = this.webphoneRegister();
+        return !!r.endpoint && !!r.peerTransportEnums?.includes(PeerTransportEnum.WSS);
+    });
 
     constructor(private readonly http: HttpClient) {
         this.getWebphoneRegistration();
@@ -30,6 +35,10 @@ export class UserService {
 
     isWebphoneActivatedSignal() {
         return this.isWebphoneActivated;
+    }
+
+    webphoneJsSipEnabledSignal() {
+        return this.webphoneJsSipEnabled;
     }
 
     getWebphoneRegisterSignal(): PeerRegistration {

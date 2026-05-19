@@ -3,7 +3,7 @@
  * @email jefaokpta@hotmail.com
  * @create 5/5/25
  */
-import {Component} from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import {Button} from 'primeng/button';
 import {WebphoneService} from '@/webphone/webphone.service';
 import {LayoutService} from '@/layout/service/layout.service';
@@ -43,11 +43,15 @@ import {handleCalleId, telephoneFormat} from '@/webphone/utils';
         </div>
     `
 })
-export class WebphoneTopbarComponent {
+export class WebphoneTopbarComponent implements OnInit {
     constructor(
         readonly webphoneService: WebphoneService,
         private readonly layoutService: LayoutService
     ) {}
+
+    ngOnInit(): void {
+        this.webphoneService.startJsSipIfEligible();
+    }
 
     get phoneStatus() {
         return this.webphoneService.phoneState$;
