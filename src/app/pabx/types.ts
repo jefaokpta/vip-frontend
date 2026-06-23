@@ -332,6 +332,7 @@ export interface QueueMember {
     readonly peerRegistry: PeerRegistry;
     readonly queueMemberStatusEnum: QueueMemberStatusEnum;
     readonly timestamp?: number;
+    readonly lastCallTimestamp?: number;
 }
 
 export interface Channel {

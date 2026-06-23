@@ -121,10 +121,11 @@ import { UserService } from '@/pages/users/user.service';
                         >
                             <ng-template pTemplate="header">
                                 <tr>
-                                    <th>Nome</th>
+                                    <th>Membro</th>
                                     <th>Ramal</th>
                                     <th>Status</th>
                                     <th>Duração</th>
+                                    <th>Última</th>
                                 </tr>
                             </ng-template>
                             <ng-template pTemplate="body" let-member>
@@ -160,11 +161,14 @@ import { UserService } from '@/pages/users/user.service';
                                             {{ member.timestamp ? waitTime(member.timestamp) : '—' }}
                                         }
                                     </td>
+                                    <td class="font-mono text-sm text-gray-500">
+                                        {{ formatLastCall(member.lastCallTimestamp) }}
+                                    </td>
                                 </tr>
                             </ng-template>
                             <ng-template pTemplate="emptymessage">
                                 <tr>
-                                    <td colspan="4" class="text-center p-6 text-gray-400">Nenhum agente logado.</td>
+                                    <td colspan="5" class="text-center p-6 text-gray-400">Nenhum agente logado.</td>
                                 </tr>
                             </ng-template>
                         </p-table>
@@ -285,6 +289,14 @@ export class QueueDetailPage implements OnInit, OnDestroy {
     waitTime(timestamp: number): string {
         const secs = Math.max(0, Math.floor((this.now() - timestamp) / 1000));
         return this.formatSeconds(secs);
+    }
+
+    formatLastCall(timestamp?: number): string {
+        if (timestamp == null) return '—';
+        const d = new Date(timestamp);
+        const h = d.getHours().toString().padStart(2, '0');
+        const m = d.getMinutes().toString().padStart(2, '0');
+        return `${h}:${m}`;
     }
 
     private formatSeconds(secs: number): string {
