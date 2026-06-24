@@ -345,9 +345,8 @@ export class QueueDetailPage implements OnInit, OnDestroy {
         const labels: Record<string, string> = {
             ALL: 'Todos',
             RANDOM: 'Aleatório',
-            LEAST_RECENTLY: 'Menos Recente',
-            FEWEST_CALLS: 'Menos Chamadas',
-            EQUALLY: 'Igualmente'
+            LEAST_RECENTLY: 'Mais Oscioso',
+            FEWEST_CALLS: 'Menos Atendimentos'
         };
         return labels[strategy] ?? strategy;
     }

@@ -152,10 +152,12 @@ export class EditQueuePage implements OnInit {
     selectedUsers: User[] = [];
     queue: Queue | null = null;
 
-    strategyOptions = Object.values(QueueStrategyEnum).map((value) => ({
-        label: this.strategyLabel(value),
-        value
-    }));
+    strategyOptions = Object.values(QueueStrategyEnum)
+        .filter((value) => value !== QueueStrategyEnum.EQUALLY)
+        .map((value) => ({
+            label: this.strategyLabel(value),
+            value
+        }));
 
     constructor(
         private readonly fb: FormBuilder,
@@ -208,12 +210,11 @@ export class EditQueuePage implements OnInit {
     }
 
     private strategyLabel(strategy: QueueStrategyEnum): string {
-        const labels: Record<QueueStrategyEnum, string> = {
+        const labels: Partial<Record<QueueStrategyEnum, string>> = {
             [QueueStrategyEnum.ALL]: 'Todos simultaneamente',
             [QueueStrategyEnum.RANDOM]: 'Aleatório',
-            [QueueStrategyEnum.LEAST_RECENTLY]: 'Menos recente',
-            [QueueStrategyEnum.FEWEST_CALLS]: 'Menos chamadas',
-            [QueueStrategyEnum.EQUALLY]: 'Igualmente'
+            [QueueStrategyEnum.LEAST_RECENTLY]: 'Mais oscioso',
+            [QueueStrategyEnum.FEWEST_CALLS]: 'Menos atendimentos'
         };
         return labels[strategy] ?? strategy;
     }
