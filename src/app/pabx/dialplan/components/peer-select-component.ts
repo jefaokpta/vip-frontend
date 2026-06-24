@@ -4,7 +4,7 @@ import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModu
 import { Select } from 'primeng/select';
 import { NgIf } from '@angular/common';
 import { PeerService } from '@/pabx/peer/peer.service';
-import { PeerTransportEnum } from '@/pabx/types';
+import { PeerTransportEnum } from '@/pabx/types/peer-transport-enum';
 
 @Component({
     selector: 'app-peer-select-component',

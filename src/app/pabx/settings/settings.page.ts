@@ -5,7 +5,7 @@ import { Select } from 'primeng/select';
 import { Toast } from 'primeng/toast';
 import { Button } from 'primeng/button';
 import { FormsModule } from '@angular/forms';
-import { Moh } from '@/pabx/types';
+import { Moh } from '@/pabx/types/moh';
 import { MohService } from '@/pabx/moh/moh.service';
 import { CompanySettingsService } from '@/pabx/settings/company-settings.service';
 

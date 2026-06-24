@@ -12,7 +12,7 @@ import { ConfirmDialog } from 'primeng/confirmdialog';
 import { Toast } from 'primeng/toast';
 import { NgIf } from '@angular/common';
 import { Tooltip } from 'primeng/tooltip';
-import { Ddr } from '@/pabx/types';
+import { Ddr } from '@/pabx/types/ddr';
 import { DdrService } from '@/pabx/ddr/ddr.service';
 
 @Component({

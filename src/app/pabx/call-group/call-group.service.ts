@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { executeRequest, httpHeaders } from '@/util/utils';
-import { CallGroup } from '@/pabx/types';
+import { CallGroup } from '@/pabx/types/call-group';
 
 @Injectable({ providedIn: 'root' })
 export class CallGroupService {

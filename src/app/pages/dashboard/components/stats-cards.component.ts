@@ -2,7 +2,8 @@ import { Component, Input, OnChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { KnobModule } from 'primeng/knob';
 import { FormsModule } from '@angular/forms';
-import { CallAnalyzeStatusEnum, Cdr } from '@/types/types';
+import { Cdr } from '@/pabx/types/cdr';
+import { CallAnalyzeStatusEnum } from '@/types/call-analyze-status-enum';
 
 @Component({
     standalone: true,

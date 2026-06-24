@@ -10,7 +10,7 @@ import { RouterLink } from '@angular/router';
 import { ProgressSpinner } from 'primeng/progressspinner';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { Toast } from 'primeng/toast';
-import { Moh } from '@/pabx/types';
+import { Moh } from '@/pabx/types/moh';
 import { Tooltip } from 'primeng/tooltip';
 import { MohService } from '@/pabx/moh/moh.service';
 

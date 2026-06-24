@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { executeRequest, httpHeaders } from '@/util/utils';
-import { Alias } from '@/pabx/types';
+import { Alias } from '@/pabx/types/alias';
 
 @Injectable({ providedIn: 'root' })
 export class AliasService {

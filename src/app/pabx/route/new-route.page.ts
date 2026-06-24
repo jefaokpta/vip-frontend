@@ -11,7 +11,7 @@ import { TableModule } from 'primeng/table';
 import { Tag } from 'primeng/tag';
 import { TrunkService } from '@/pabx/trunk/trunk.service';
 import { AccountCodeService } from '@/pabx/accountcode/account-code.service';
-import { AccountCode } from '@/pabx/types';
+import { AccountCode } from '@/pabx/types/account-code';
 
 /**
  * @author Jefferson Alves Reis (jefaokpta)

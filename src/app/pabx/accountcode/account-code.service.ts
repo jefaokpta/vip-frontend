@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { HttpClient } from '@angular/common/http';
-import { AccountCode } from '@/pabx/types';
+import { AccountCode } from '@/pabx/types/account-code';
 import { executeRequest, httpHeaders } from '@/util/utils';
 
 @Injectable({

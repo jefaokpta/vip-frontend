@@ -11,7 +11,7 @@ import { NgIf } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { Card } from 'primeng/card';
-import { RoleEnum } from '@/types/types';
+import { RoleEnum } from '@/types/role-enum';
 import { Select } from 'primeng/select';
 import { UserService } from '@/pages/users/user.service';
 import { buildRoleOptions } from '@/pages/users/utils';

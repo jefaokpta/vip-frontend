@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { executeRequest, httpHeaders } from '@/util/utils';
-import { Peer } from '@/pabx/types';
+import { Peer } from '@/pabx/types/peer';
 
 @Injectable({ providedIn: 'root' })
 export class PeerService {

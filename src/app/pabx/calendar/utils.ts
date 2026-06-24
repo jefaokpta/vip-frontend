@@ -1,4 +1,5 @@
-import { CalendarTypeEnum, WeekDayEnum } from '@/pabx/types';
+import { CalendarTypeEnum } from '@/pabx/types/calendar-type-enum';
+import { WeekDayEnum } from '@/pabx/types/week-day-enum';
 
 export const calendarTypeOptions = [
     { label: 'Datas', value: CalendarTypeEnum.DATES },

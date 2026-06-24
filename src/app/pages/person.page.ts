@@ -7,7 +7,7 @@ import { InputText } from 'primeng/inputtext';
 import { NgForOf, NgIf } from '@angular/common';
 import { Password } from 'primeng/password';
 import { passwordStrengthValidator } from '@/pages/utils/validators';
-import { User } from '@/types/types';
+import { User } from '@/types/user';
 import { Toast } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import { UserService } from '@/pages/users/user.service';

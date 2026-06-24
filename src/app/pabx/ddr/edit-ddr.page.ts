@@ -8,7 +8,7 @@ import { NgIf } from '@angular/common';
 import { MessageService } from 'primeng/api';
 import { Toast } from 'primeng/toast';
 import { DdrService } from '@/pabx/ddr/ddr.service';
-import { Ddr } from '@/pabx/types';
+import { Ddr } from '@/pabx/types/ddr';
 import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({

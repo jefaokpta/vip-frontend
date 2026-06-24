@@ -11,8 +11,10 @@ import { NgClass, NgIf } from '@angular/common';
 import { TableModule } from 'primeng/table';
 import { telephoneFormat } from './utils';
 import { handleCalleId } from '@/webphone/utils';
-import { Cdr, UserFieldEnum } from '@/pabx/types';
-import { PeerRegistration, User } from '@/types/types';
+import { Cdr } from '@/pabx/types/cdr';
+import { UserFieldEnum } from '@/pabx/types/user-field-enum';
+import { PeerRegistration } from '@/types/peer-registration';
+import { User } from '@/types/user';
 import { UserService } from '@/pages/users/user.service';
 import { SplitButton } from 'primeng/splitbutton';
 

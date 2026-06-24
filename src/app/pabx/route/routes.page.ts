@@ -10,7 +10,7 @@ import { RouterLink } from '@angular/router';
 import { ProgressSpinner } from 'primeng/progressspinner';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { Toast } from 'primeng/toast';
-import { Route } from '@/pabx/types';
+import { Route } from '@/pabx/types/route';
 import { Tooltip } from 'primeng/tooltip';
 import { RouteService } from '@/pabx/route/route.service';
 

@@ -7,7 +7,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { Password } from 'primeng/password';
 import { UserService } from '@/pages/users/user.service';
 import { Message } from 'primeng/message';
-import { PeerRegistration } from '@/types/types';
+import { PeerRegistration } from '@/types/peer-registration';
 
 @Component({
     selector: 'app-activate-peer-dialog-component',

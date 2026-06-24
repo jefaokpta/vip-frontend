@@ -12,7 +12,7 @@ import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {Card} from 'primeng/card';
 import {AccountCodeService} from '@/pabx/accountcode/account-code.service';
-import {AccountCode} from "@/pabx/types";
+import { AccountCode } from '@/pabx/types/account-code';
 import {InputNumber} from "primeng/inputnumber";
 
 @Component({

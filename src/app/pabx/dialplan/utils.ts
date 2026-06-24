@@ -1,4 +1,5 @@
-import { DialPlanActionEnum, SrcEnum } from '@/pabx/types';
+import { DialPlanActionEnum } from '@/pabx/types/dial-plan-action-enum';
+import { SrcEnum } from '@/pabx/types/src-enum';
 
 const srcOptions = [
     { label: 'Qualquer', value: SrcEnum.ANY },

@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { QueueState } from '@/pabx/types';
+import { QueueState } from '@/pabx/types/queue-state';
 import { executeRequest, httpHeaders } from '@/util/utils';
 import { environment } from '../../../environments/environment';
 

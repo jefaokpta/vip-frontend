@@ -10,7 +10,7 @@ import { Select } from 'primeng/select';
 import { TableModule } from 'primeng/table';
 import { Tag } from 'primeng/tag';
 import { TrunkService } from '@/pabx/trunk/trunk.service';
-import { RouteTrunk } from '@/pabx/types';
+import { RouteTrunk } from '@/pabx/types/route-trunk';
 
 /**
  * @author Jefferson Alves Reis (jefaokpta)

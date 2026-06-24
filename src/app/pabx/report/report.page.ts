@@ -13,7 +13,7 @@ import { NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DatePicker } from 'primeng/datepicker';
 import { Tag } from 'primeng/tag';
-import { Cdr } from '@/pabx/types';
+import { Cdr } from '@/pabx/types/cdr';
 import { ReportService } from '@/pabx/report/report.service';
 
 @Component({

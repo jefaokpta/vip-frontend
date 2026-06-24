@@ -1,4 +1,4 @@
-import { RoleEnum } from '@/types/types';
+import { RoleEnum } from '@/types/role-enum';
 
 export function translateRole(role: RoleEnum): string {
     switch (role) {

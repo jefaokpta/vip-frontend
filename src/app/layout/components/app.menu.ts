@@ -2,7 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AppMenuitem } from './app.menuitem';
-import { RoleEnum, User } from '@/types/types';
+import { RoleEnum } from '@/types/role-enum';
+import { User } from '@/types/user';
 import { MenuItem } from 'primeng/api';
 import { UserService } from '@/pages/users/user.service';
 

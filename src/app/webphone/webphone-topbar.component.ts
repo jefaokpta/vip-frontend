@@ -9,7 +9,7 @@ import {WebphoneService} from '@/webphone/webphone.service';
 import {LayoutService} from '@/layout/service/layout.service';
 import {NgClass, NgIf} from '@angular/common';
 import {ButtonGroup} from 'primeng/buttongroup';
-import {PhoneStateEnum} from '@/types/types';
+import { PhoneStateEnum } from '@/types/phone-state-enum';
 import {handleCalleId, telephoneFormat} from '@/webphone/utils';
 
 @Component({

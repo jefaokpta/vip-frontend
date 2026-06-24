@@ -11,7 +11,7 @@ import { RouterLink } from '@angular/router';
 import { ProgressSpinner } from 'primeng/progressspinner';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { Toast } from 'primeng/toast';
-import { Alias } from '@/pabx/types';
+import { Alias } from '@/pabx/types/alias';
 import { NgIf } from '@angular/common';
 import { Tooltip } from 'primeng/tooltip';
 

@@ -11,7 +11,7 @@ import { ProgressSpinner } from 'primeng/progressspinner';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { Toast } from 'primeng/toast';
 import { Tooltip } from 'primeng/tooltip';
-import { Queue } from '@/pabx/types';
+import { Queue } from '@/pabx/types/queue';
 import { QueueService } from '@/pabx/queue/queue.service';
 
 @Component({

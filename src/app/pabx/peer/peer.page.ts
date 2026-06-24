@@ -10,7 +10,7 @@ import { RouterLink } from '@angular/router';
 import { ProgressSpinner } from 'primeng/progressspinner';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { Toast } from 'primeng/toast';
-import { Peer } from '@/pabx/types';
+import { Peer } from '@/pabx/types/peer';
 import { NgIf } from '@angular/common';
 import { Tooltip } from 'primeng/tooltip';
 import { PeerService } from '@/pabx/peer/peer.service';

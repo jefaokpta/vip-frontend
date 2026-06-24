@@ -6,7 +6,7 @@ import {CardModule} from 'primeng/card';
 import {NgForOf, NgIf} from '@angular/common';
 import {Router, RouterLink} from '@angular/router';
 import {Tooltip} from 'primeng/tooltip';
-import {Alias} from "@/pabx/types";
+import { Alias } from '@/pabx/types/alias';
 import {AliasService} from "@/pabx/alias/alias.service";
 
 /**

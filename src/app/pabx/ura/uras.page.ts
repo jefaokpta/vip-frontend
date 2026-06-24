@@ -11,7 +11,8 @@ import { ProgressSpinner } from 'primeng/progressspinner';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { Toast } from 'primeng/toast';
 import { Tooltip } from 'primeng/tooltip';
-import { Moh, Ura } from '@/pabx/types';
+import { Moh } from '@/pabx/types/moh';
+import { Ura } from '@/pabx/types/ura';
 import { UraService } from '@/pabx/ura/ura.service';
 import { MohService } from '@/pabx/moh/moh.service';
 

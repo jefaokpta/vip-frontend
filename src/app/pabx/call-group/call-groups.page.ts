@@ -10,7 +10,8 @@ import { RouterLink } from '@angular/router';
 import { ProgressSpinner } from 'primeng/progressspinner';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { Toast } from 'primeng/toast';
-import { CallGroup, CallGroupStrategyEnum } from '@/pabx/types';
+import { CallGroup } from '@/pabx/types/call-group';
+import { CallGroupStrategyEnum } from '@/pabx/types/call-group-strategy-enum';
 import { Tooltip } from 'primeng/tooltip';
 import { CallGroupService } from '@/pabx/call-group/call-group.service';
 

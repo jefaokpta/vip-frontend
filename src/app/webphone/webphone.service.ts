@@ -6,7 +6,8 @@
 import { Injectable, signal } from '@angular/core';
 import { UA, WebSocketInterface } from 'jssip';
 import { environment } from '../../environments/environment';
-import { PhoneState, PhoneStateEnum } from '@/types/types';
+import { PhoneState } from '@/types/phone-state';
+import { PhoneStateEnum } from '@/types/phone-state-enum';
 import { RTCSession } from 'jssip/lib/RTCSession';
 import { RTCSessionEvent, UnRegisteredEvent } from 'jssip/lib/UA';
 import { UserService } from '@/pages/users/user.service';

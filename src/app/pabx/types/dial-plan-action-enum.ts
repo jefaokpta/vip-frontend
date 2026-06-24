@@ -1,0 +1,14 @@
+export enum DialPlanActionEnum {
+    ANSWER = 'ANSWER',
+    HANGUP = 'HANGUP',
+    PLAYBACK = 'PLAYBACK',
+    SET_VARIABLE = 'SET_VARIABLE',
+    DIAL_ROUTE = 'DIAL_ROUTE',
+    DIAL_PEER = 'DIAL_PEER',
+    ACCOUNT_CODE = 'ACCOUNT_CODE',
+    EDIT_DST = 'EDIT_DST',
+    CALENDAR = 'CALENDAR',
+    CALL_GROUP = 'CALL_GROUP',
+    URA = 'URA',
+    QUEUE = 'QUEUE'
+}

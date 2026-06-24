@@ -12,7 +12,7 @@ import { RouterLink } from '@angular/router';
 import { Table, TableModule } from 'primeng/table';
 import { Toast } from 'primeng/toast';
 import { Tooltip } from 'primeng/tooltip';
-import { AccountCode } from '@/pabx/types';
+import { AccountCode } from '@/pabx/types/account-code';
 import { AccountCodeService } from '@/pabx/accountcode/account-code.service';
 import { Tag } from 'primeng/tag';
 

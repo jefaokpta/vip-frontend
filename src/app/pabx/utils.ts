@@ -1,4 +1,7 @@
-import { Cdr, DialPlanActionEnum, DtmfModeEnum, LanguageEnum } from '@/pabx/types';
+import { Cdr } from '@/pabx/types/cdr';
+import { DialPlanActionEnum } from '@/pabx/types/dial-plan-action-enum';
+import { DtmfModeEnum } from '@/pabx/types/dtmf-mode-enum';
+import { LanguageEnum } from '@/pabx/types/language-enum';
 import { Validators } from '@angular/forms';
 
 export function sortCdrByDate(cdrs: Cdr[]) {

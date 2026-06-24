@@ -6,7 +6,7 @@ import { CardModule } from 'primeng/card';
 import { NgIf } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { DialPlanService } from '../dial-plan.service';
-import { DialPlanActionEnum } from '@/pabx/types';
+import { DialPlanActionEnum } from '@/pabx/types/dial-plan-action-enum';
 import { Select } from 'primeng/select';
 import { PeerSelectComponent } from '@/pabx/dialplan/components/peer-select-component';
 import { AliasSelectComponent } from '@/pabx/dialplan/components/alias-select-component';

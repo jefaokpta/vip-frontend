@@ -1,6 +1,7 @@
 import { Component, Input, OnChanges } from '@angular/core';
 import { ChartModule } from 'primeng/chart';
-import { Cdr, TemperatureEnum } from '@/types/types';
+import { Cdr } from '@/pabx/types/cdr';
+import { TemperatureEnum } from '@/types/temperature-enum';
 
 @Component({
     standalone: true,

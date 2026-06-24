@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { executeRequest, httpHeaders } from '@/util/utils';
-import { Moh } from '@/pabx/types';
+import { Moh } from '@/pabx/types/moh';
 import { firstValueFrom } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })

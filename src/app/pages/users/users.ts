@@ -8,7 +8,8 @@ import { ConfirmationService, MessageService, PrimeTemplate } from 'primeng/api'
 import { RouterLink } from '@angular/router';
 import { Table, TableModule } from 'primeng/table';
 import { Tooltip } from 'primeng/tooltip';
-import { RoleEnum, User } from '@/types/types';
+import { RoleEnum } from '@/types/role-enum';
+import { User } from '@/types/user';
 import { Card } from 'primeng/card';
 import { Toast } from 'primeng/toast';
 import { NgIf } from '@angular/common';

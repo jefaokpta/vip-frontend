@@ -1,0 +1,11 @@
+export enum PeerStateEnum {
+    UNKNOWN = 'UNKNOWN',
+    NOT_INUSE = 'NOT_INUSE',
+    INUSE = 'INUSE',
+    BUSY = 'BUSY',
+    INVALID = 'INVALID',
+    UNAVAILABLE = 'UNAVAILABLE',
+    RINGING = 'RINGING',
+    RINGINUSE = 'RINGINUSE',
+    ONHOLD = 'ONHOLD'
+}

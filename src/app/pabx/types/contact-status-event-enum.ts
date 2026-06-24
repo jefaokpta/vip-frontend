@@ -1,0 +1,9 @@
+export enum ContactStatusEventEnum {
+    CREATED = 'CREATED',
+    REACHABLE = 'REACHABLE',
+    REMOVED = 'REMOVED',
+    UNKNOWN = 'UNKNOWN',
+    UNREACHABLE = 'UNREACHABLE',
+    UPDATED = 'UPDATED',
+    NONQUALIFIED = 'NONQUALIFIED'
+}

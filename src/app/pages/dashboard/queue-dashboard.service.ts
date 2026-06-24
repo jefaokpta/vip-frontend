@@ -8,7 +8,7 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { Injectable } from '@angular/core';
 import { executeRequest, httpHeaders } from '@/util/utils';
-import { QueueState } from '@/pabx/types';
+import { QueueState } from '@/pabx/types/queue-state';
 
 @Injectable({
     providedIn: 'root'

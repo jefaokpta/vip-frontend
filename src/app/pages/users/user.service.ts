@@ -6,8 +6,10 @@
 
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
-import { LoginResponse, PeerRegistration, User } from '@/types/types';
-import { PeerTransportEnum } from '@/pabx/types';
+import { LoginResponse } from '@/types/login-response';
+import { PeerRegistration } from '@/types/peer-registration';
+import { User } from '@/types/user';
+import { PeerTransportEnum } from '@/pabx/types/peer-transport-enum';
 import { computed, Injectable, signal } from '@angular/core';
 import { executeRequest, httpHeaders } from '@/util/utils';
 import { jwtDecode } from 'jwt-decode';

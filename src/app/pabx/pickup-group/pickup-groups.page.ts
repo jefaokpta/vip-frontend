@@ -10,7 +10,7 @@ import { RouterLink } from '@angular/router';
 import { ProgressSpinner } from 'primeng/progressspinner';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { Toast } from 'primeng/toast';
-import { PickupGroup } from '@/pabx/types';
+import { PickupGroup } from '@/pabx/types/pickup-group';
 import { Tooltip } from 'primeng/tooltip';
 import { PickupGroupService } from '@/pabx/pickup-group/pickup-group.service';
 

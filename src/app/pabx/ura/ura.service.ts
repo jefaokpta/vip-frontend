@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { executeRequest, httpHeaders } from '@/util/utils';
-import { Ura } from '@/pabx/types';
+import { Ura } from '@/pabx/types/ura';
 
 @Injectable({ providedIn: 'root' })
 export class UraService {

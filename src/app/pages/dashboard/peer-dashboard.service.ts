@@ -8,7 +8,7 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { Injectable } from '@angular/core';
 import { executeRequest, httpHeaders } from '@/util/utils';
-import { PeerRegistry } from '@/pabx/types';
+import { PeerRegistry } from '@/pabx/types/peer-registry';
 
 @Injectable({
     providedIn: 'root'

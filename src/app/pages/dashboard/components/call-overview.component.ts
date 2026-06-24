@@ -4,7 +4,8 @@ import { SelectModule } from 'primeng/select';
 import { ChartModule } from 'primeng/chart';
 import { debounceTime, Subscription } from 'rxjs';
 import { LayoutService } from '@/layout/service/layout.service';
-import { Cdr, UserFieldEnum } from '@/types/types';
+import { Cdr } from '@/pabx/types/cdr';
+import { UserFieldEnum } from '@/pabx/types/user-field-enum';
 
 @Component({
     standalone: true,

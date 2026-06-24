@@ -7,7 +7,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { executeRequest, httpHeaders } from '@/util/utils';
-import { Cdr } from '@/pabx/types';
+import { Cdr } from '@/pabx/types/cdr';
 
 @Injectable({ providedIn: 'root' })
 export class ReportService {
