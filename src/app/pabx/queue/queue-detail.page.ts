@@ -127,6 +127,7 @@ import { UserService } from '@/pages/users/user.service';
                                     <th>Status</th>
                                     <th>Duração</th>
                                     <th>Última</th>
+                                    <th>Atendidas</th>
                                 </tr>
                             </ng-template>
                             <ng-template pTemplate="body" let-member>
@@ -165,11 +166,14 @@ import { UserService } from '@/pages/users/user.service';
                                     <td class="font-mono text-sm text-gray-500">
                                         {{ formatLastCall(member.lastCallTimestamp) }}
                                     </td>
+                                    <td class="font-mono text-sm text-gray-500 text-center">
+                                        {{ member.answeredCallCount ?? 0 }}
+                                    </td>
                                 </tr>
                             </ng-template>
                             <ng-template pTemplate="emptymessage">
                                 <tr>
-                                    <td colspan="5" class="text-center p-6 text-gray-400">Nenhum agente logado.</td>
+                                    <td colspan="6" class="text-center p-6 text-gray-400">Nenhum agente logado.</td>
                                 </tr>
                             </ng-template>
                         </p-table>

@@ -8,4 +8,5 @@ export interface QueueMember {
     readonly queueMemberStatusEnum: QueueMemberStatusEnum;
     readonly timestamp?: number;
     readonly lastCallTimestamp?: number;
+    readonly answeredCallCount?: number;
 }

@@ -154,9 +154,7 @@ export class EditQueuePage implements OnInit {
     selectedUsers: User[] = [];
     queue: Queue | null = null;
 
-    strategyOptions = Object.values(QueueStrategyEnum)
-        .filter((value) => value !== QueueStrategyEnum.EQUALLY)
-        .map((value) => ({
+    strategyOptions = Object.values(QueueStrategyEnum).map((value) => ({
             label: this.strategyLabel(value),
             value
         }));
