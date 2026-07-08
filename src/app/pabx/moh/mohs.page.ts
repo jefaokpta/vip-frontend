@@ -1,18 +1,18 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { Table, TableModule } from 'primeng/table';
-import { ConfirmationService, MessageService } from 'primeng/api';
-import { Card } from 'primeng/card';
-import { IconField } from 'primeng/iconfield';
-import { InputIcon } from 'primeng/inputicon';
-import { InputText } from 'primeng/inputtext';
-import { Button } from 'primeng/button';
-import { RouterLink } from '@angular/router';
-import { ProgressSpinner } from 'primeng/progressspinner';
-import { ConfirmDialog } from 'primeng/confirmdialog';
-import { Toast } from 'primeng/toast';
-import { Moh } from '@/pabx/types/moh';
-import { Tooltip } from 'primeng/tooltip';
-import { MohService } from '@/pabx/moh/moh.service';
+import {Component, OnInit, ViewChild} from '@angular/core';
+import {Table, TableModule} from 'primeng/table';
+import {ConfirmationService, MessageService} from 'primeng/api';
+import {Card} from 'primeng/card';
+import {IconField} from 'primeng/iconfield';
+import {InputIcon} from 'primeng/inputicon';
+import {InputText} from 'primeng/inputtext';
+import {Button} from 'primeng/button';
+import {RouterLink} from '@angular/router';
+import {ProgressSpinner} from 'primeng/progressspinner';
+import {ConfirmDialog} from 'primeng/confirmdialog';
+import {Toast} from 'primeng/toast';
+import {Moh} from '@/pabx/types/moh';
+import {Tooltip} from 'primeng/tooltip';
+import {MohService} from '@/pabx/moh/moh.service';
 
 @Component({
     selector: 'app-mohs-page',
@@ -174,11 +174,11 @@ export class MohsPage implements OnInit {
                             life: 15_000
                         });
                     })
-                    .catch(() => {
+                    .catch((err) => {
                         this.messageService.add({
                             severity: 'error',
                             summary: 'Desculpe não foi possível remover o MOH',
-                            detail: 'Tente novamente mais tarde.',
+                            detail: err?.error?.message || 'Tente novamente mais tarde.',
                             life: 15_000
                         });
                     });
