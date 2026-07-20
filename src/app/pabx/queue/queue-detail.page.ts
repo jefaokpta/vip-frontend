@@ -1,18 +1,18 @@
-import { Component, computed, OnDestroy, OnInit, signal } from '@angular/core';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { Subscription } from 'rxjs';
-import { Card } from 'primeng/card';
-import { Button } from 'primeng/button';
-import { TableModule } from 'primeng/table';
-import { Tag } from 'primeng/tag';
-import { ProgressSpinner } from 'primeng/progressspinner';
-import { Tooltip } from 'primeng/tooltip';
-import { QueueMemberStatusEnum } from '@/pabx/types/queue-member-status-enum';
-import { QueueState } from '@/pabx/types/queue-state';
-import { QueueDashboardService } from '@/pages/dashboard/queue-dashboard.service';
-import { WebsocketService } from '@/websocket/stomp/websocket.service';
-import { rxStompServiceFactory } from '@/websocket/stomp/rx-stomp-service-factory';
-import { UserService } from '@/pages/users/user.service';
+import {Component, computed, OnDestroy, OnInit, signal} from '@angular/core';
+import {ActivatedRoute, Router, RouterLink} from '@angular/router';
+import {Subscription} from 'rxjs';
+import {Card} from 'primeng/card';
+import {Button} from 'primeng/button';
+import {TableModule} from 'primeng/table';
+import {Tag} from 'primeng/tag';
+import {ProgressSpinner} from 'primeng/progressspinner';
+import {Tooltip} from 'primeng/tooltip';
+import {QueueMemberStatusEnum} from '@/pabx/types/queue-member-status-enum';
+import {QueueState} from '@/pabx/types/queue-state';
+import {QueueDashboardService} from '@/pages/dashboard/queue-dashboard.service';
+import {WebsocketService} from '@/websocket/stomp/websocket.service';
+import {rxStompServiceFactory} from '@/websocket/stomp/rx-stomp-service-factory';
+import {UserService} from '@/pages/users/user.service';
 
 @Component({
     selector: 'app-queue-detail-page',
@@ -240,9 +240,11 @@ export class QueueDetailPage implements OnInit, OnDestroy {
 
     readonly serviceLevel = computed(() => {
         const answered = this.queueState()?.answeredCalls ?? 0;
+        console.log(answered + ' atendidas')
         const inSl = this.queueState()?.answeredCallsInServiceLevel ?? 0;
-        if (answered === 0) return 0;
-        return Math.round((inSl / answered) * 100);
+        console.log(inSl + ' dentro do SL')
+        if (answered === 0) return 100;
+        return Math.round((inSl / answered) * 1000) / 10;
     });
 
     readonly oldestCallTimestamp = computed(() => {

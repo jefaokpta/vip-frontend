@@ -1,16 +1,16 @@
-import { Component, computed, OnDestroy, OnInit, signal } from '@angular/core';
-import { Subscription } from 'rxjs';
-import { NgClass, NgForOf } from '@angular/common';
-import { Card } from 'primeng/card';
-import { ChartModule } from 'primeng/chart';
-import { Button } from 'primeng/button';
-import { RouterLink } from '@angular/router';
-import { QueueDashboardService } from '@/pages/dashboard/queue-dashboard.service';
-import { QueueMemberStatusEnum } from '@/pabx/types/queue-member-status-enum';
-import { QueueState } from '@/pabx/types/queue-state';
-import { WebsocketService } from '@/websocket/stomp/websocket.service';
-import { rxStompServiceFactory } from '@/websocket/stomp/rx-stomp-service-factory';
-import { UserService } from '@/pages/users/user.service';
+import {Component, computed, OnDestroy, OnInit, signal} from '@angular/core';
+import {Subscription} from 'rxjs';
+import {NgClass, NgForOf} from '@angular/common';
+import {Card} from 'primeng/card';
+import {ChartModule} from 'primeng/chart';
+import {Button} from 'primeng/button';
+import {RouterLink} from '@angular/router';
+import {QueueDashboardService} from '@/pages/dashboard/queue-dashboard.service';
+import {QueueMemberStatusEnum} from '@/pabx/types/queue-member-status-enum';
+import {QueueState} from '@/pabx/types/queue-state';
+import {WebsocketService} from '@/websocket/stomp/websocket.service';
+import {rxStompServiceFactory} from '@/websocket/stomp/rx-stomp-service-factory';
+import {UserService} from '@/pages/users/user.service';
 
 interface AgentStatus {
     name: string;
@@ -238,7 +238,12 @@ export class QueueDashboard implements OnInit, OnDestroy {
     readonly waitingCalls = computed(() => this.queues().reduce((acc, q) => acc + q.waitingCalls.length, 0));
     readonly globalTme = signal('01:24');
 
-    readonly serviceLevel = signal(94.2);
+    readonly serviceLevel = computed(() => {
+        const totalAnswered = this.queues().reduce((acc, q) => acc + (q.answeredCalls ?? 0), 0);
+        const totalInSla = this.queues().reduce((acc, q) => acc + (q.answeredCallsInServiceLevel ?? 0), 0);
+        if (totalAnswered === 0) return 100;
+        return Math.round((totalInSla / totalAnswered) * 1000) / 10;
+    });
 
     readonly operacaoCount = computed(() => this.queues().length);
     readonly alertaCount = computed(() => 1);
