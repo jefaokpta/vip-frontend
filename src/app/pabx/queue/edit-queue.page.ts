@@ -1,19 +1,19 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { InputTextModule } from 'primeng/inputtext';
-import { ButtonModule } from 'primeng/button';
-import { CardModule } from 'primeng/card';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { Select } from 'primeng/select';
-import { InputNumber } from 'primeng/inputnumber';
-import { PickList } from 'primeng/picklist';
-import { Moh } from '@/pabx/types/moh';
-import { Queue } from '@/pabx/types/queue';
-import { QueueStrategyEnum } from '@/pabx/types/queue-strategy-enum';
-import { User } from '@/types/user';
-import { QueueService } from '@/pabx/queue/queue.service';
-import { MohService } from '@/pabx/moh/moh.service';
-import { UserService } from '@/pages/users/user.service';
+import {Component, OnInit} from '@angular/core';
+import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {InputTextModule} from 'primeng/inputtext';
+import {ButtonModule} from 'primeng/button';
+import {CardModule} from 'primeng/card';
+import {ActivatedRoute, Router, RouterLink} from '@angular/router';
+import {Select} from 'primeng/select';
+import {InputNumber} from 'primeng/inputnumber';
+import {PickList} from 'primeng/picklist';
+import {Moh} from '@/pabx/types/moh';
+import {Queue} from '@/pabx/types/queue';
+import {QueueStrategyEnum} from '@/pabx/types/queue-strategy-enum';
+import {User} from '@/types/user';
+import {QueueService} from '@/pabx/queue/queue.service';
+import {MohService} from '@/pabx/moh/moh.service';
+import {UserService} from '@/pages/users/user.service';
 
 @Component({
     selector: 'app-edit-queue-page',
@@ -85,6 +85,16 @@ import { UserService } from '@/pages/users/user.service';
                             mode="decimal"
                             useGrouping="false"
                             formControlName="queueTimeout"
+                        />
+                    </div>
+
+                    <div class="field mb-4">
+                        <label for="serviceLevelSeconds" class="block mb-2">Nível de Serviço (segundos) *</label>
+                        <p-input-number
+                            id="serviceLevelSeconds"
+                            mode="decimal"
+                            useGrouping="false"
+                            formControlName="serviceLevelSeconds"
                         />
                     </div>
 
@@ -181,6 +191,7 @@ export class EditQueuePage implements OnInit {
                     queueStrategy: [queue.queueStrategy, [Validators.required]],
                     ringTimeout: [queue.ringTimeout, [Validators.required]],
                     queueTimeout: [queue.queueTimeout, [Validators.required]],
+                    serviceLevelSeconds: [queue.serviceLevelSeconds, [Validators.required]],
                     queueSoundId: [queue.queueSoundId, [Validators.required]]
                 });
             }
