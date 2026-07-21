@@ -240,9 +240,7 @@ export class QueueDetailPage implements OnInit, OnDestroy {
 
     readonly serviceLevel = computed(() => {
         const answered = this.queueState()?.answeredCalls ?? 0;
-        console.log(answered + ' atendidas')
         const inSl = this.queueState()?.answeredCallsInServiceLevel ?? 0;
-        console.log(inSl + ' dentro do SL')
         if (answered === 0) return 100;
         return Math.round((inSl / answered) * 1000) / 10;
     });
