@@ -7,6 +7,7 @@ import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {Select} from 'primeng/select';
 import {InputNumber} from 'primeng/inputnumber';
 import {PickList} from 'primeng/picklist';
+import {ToggleSwitch} from 'primeng/toggleswitch';
 import {Moh} from '@/pabx/types/moh';
 import {Queue} from '@/pabx/types/queue';
 import {QueueStrategyEnum} from '@/pabx/types/queue-strategy-enum';
@@ -26,7 +27,8 @@ import {UserService} from '@/pages/users/user.service';
         RouterLink,
         Select,
         InputNumber,
-        PickList
+        PickList,
+        ToggleSwitch
     ],
     template: `
         <p-card>
@@ -108,6 +110,11 @@ import {UserService} from '@/pages/users/user.service';
                             optionValue="id"
                             placeholder="Selecione um áudio"
                         ></p-select>
+                    </div>
+
+                    <div class="field flex items-center gap-3 mt-2 mb-4">
+                        <label class="block">Entrar em fila vazia</label>
+                        <p-toggleswitch formControlName="isJoinWhenEmpty" />
                     </div>
 
                     <div class="field mb-4">
@@ -192,7 +199,8 @@ export class EditQueuePage implements OnInit {
                     ringTimeout: [queue.ringTimeout, [Validators.required]],
                     queueTimeout: [queue.queueTimeout, [Validators.required]],
                     serviceLevelSeconds: [queue.serviceLevelSeconds, [Validators.required]],
-                    queueSoundId: [queue.queueSoundId, [Validators.required]]
+                    queueSoundId: [queue.queueSoundId, [Validators.required]],
+                    isJoinWhenEmpty: [queue.isJoinWhenEmpty]
                 });
             }
         );
