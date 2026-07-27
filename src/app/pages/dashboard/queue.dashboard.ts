@@ -133,10 +133,6 @@ interface AgentStatus {
                                         </span>
                                     </div>
                                     <div class="flex flex-col">
-                                        <span class="text-xs text-gray-400 uppercase tracking-wide">MAIOR T.</span>
-                                        <span class="font-bold text-sm">{{ q.longestHoldTime }}</span>
-                                    </div>
-                                    <div class="flex flex-col">
                                         <span class="text-xs text-gray-400 uppercase tracking-wide">MEMBROS</span>
                                         <span class="font-bold text-sm">
                                             {{

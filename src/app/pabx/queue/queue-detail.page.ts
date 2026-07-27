@@ -234,7 +234,7 @@ export class QueueDetailPage implements OnInit, OnDestroy {
     private timer?: ReturnType<typeof setInterval>;
 
     readonly tme = computed(() => {
-        const s = this.queueState()?.longestHoldTime ?? 0;
+        const s = this.queueState()?.tmeSeconds ?? 0;
         return this.formatSeconds(s);
     });
 
