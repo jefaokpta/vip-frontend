@@ -118,6 +118,12 @@ import {UserService} from '@/pages/users/user.service';
                     </div>
 
                     <div class="field mb-4">
+                        <label for="maxCalls" class="block mb-2">Limite de Chamadas em Espera</label>
+                        <p-input-number id="maxCalls" mode="decimal" useGrouping="false" formControlName="maxCalls" />
+                        <small class="block mt-1 text-gray-500">0 = sem limite</small>
+                    </div>
+
+                    <div class="field mb-4">
                         <label class="block mb-2">Agentes da Fila</label>
                         <p-picklist
                             [source]="availableUsers"
@@ -200,7 +206,8 @@ export class EditQueuePage implements OnInit {
                     queueTimeout: [queue.queueTimeout, [Validators.required]],
                     serviceLevelSeconds: [queue.serviceLevelSeconds, [Validators.required]],
                     queueSoundId: [queue.queueSoundId, [Validators.required]],
-                    isJoinWhenEmpty: [queue.isJoinWhenEmpty]
+                    isJoinWhenEmpty: [queue.isJoinWhenEmpty],
+                    maxCalls: [queue.maxCalls]
                 });
             }
         );

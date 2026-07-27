@@ -111,6 +111,12 @@ import {UserService} from '@/pages/users/user.service';
                 </div>
 
                 <div class="field mb-4">
+                    <label for="maxCalls" class="block mb-2">Limite de Chamadas em Espera</label>
+                    <p-input-number id="maxCalls" mode="decimal" useGrouping="false" formControlName="maxCalls" />
+                    <small class="block mt-1 text-gray-500">0 = sem limite</small>
+                </div>
+
+                <div class="field mb-4">
                     <label class="block mb-2">Agentes da Fila</label>
                     <p-picklist
                         [source]="availableUsers"
@@ -183,7 +189,8 @@ export class NewQueuePage implements OnInit {
             queueTimeout: [120, [Validators.required]],
             serviceLevelSeconds: [15, [Validators.required]],
             queueSoundId: [null, [Validators.required]],
-            isJoinWhenEmpty: [true]
+            isJoinWhenEmpty: [true],
+            maxCalls: [0]
         });
         Promise.all([this.mohService.findAll(), this.userService.findAll()]).then(([mohs, users]) => {
             this.mohs = mohs;
