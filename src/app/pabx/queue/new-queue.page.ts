@@ -117,6 +117,17 @@ import {UserService} from '@/pages/users/user.service';
                 </div>
 
                 <div class="field mb-4">
+                    <label for="cooldownSeconds" class="block mb-2">Cooldown após Chamada (segundos)</label>
+                    <p-input-number
+                        id="cooldownSeconds"
+                        mode="decimal"
+                        useGrouping="false"
+                        formControlName="cooldownSeconds"
+                    />
+                    <small class="block mt-1 text-gray-500">0 = sem cooldown</small>
+                </div>
+
+                <div class="field mb-4">
                     <label class="block mb-2">Agentes da Fila</label>
                     <p-picklist
                         [source]="availableUsers"
@@ -169,9 +180,9 @@ export class NewQueuePage implements OnInit {
     selectedUsers: User[] = [];
 
     strategyOptions = Object.values(QueueStrategyEnum).map((value) => ({
-            label: this.strategyLabel(value),
-            value
-        }));
+        label: this.strategyLabel(value),
+        value
+    }));
 
     constructor(
         private readonly fb: FormBuilder,
@@ -190,7 +201,8 @@ export class NewQueuePage implements OnInit {
             serviceLevelSeconds: [15, [Validators.required]],
             queueSoundId: [null, [Validators.required]],
             isJoinWhenEmpty: [true],
-            maxCalls: [0]
+            maxCalls: [0],
+            cooldownSeconds: [0]
         });
         Promise.all([this.mohService.findAll(), this.userService.findAll()]).then(([mohs, users]) => {
             this.mohs = mohs;

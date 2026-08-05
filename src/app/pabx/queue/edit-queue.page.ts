@@ -124,6 +124,17 @@ import {UserService} from '@/pages/users/user.service';
                     </div>
 
                     <div class="field mb-4">
+                        <label for="cooldownSeconds" class="block mb-2">Cooldown após Chamada (segundos)</label>
+                        <p-input-number
+                            id="cooldownSeconds"
+                            mode="decimal"
+                            useGrouping="false"
+                            formControlName="cooldownSeconds"
+                        />
+                        <small class="block mt-1 text-gray-500">0 = sem cooldown</small>
+                    </div>
+
+                    <div class="field mb-4">
                         <label class="block mb-2">Agentes da Fila</label>
                         <p-picklist
                             [source]="availableUsers"
@@ -178,9 +189,9 @@ export class EditQueuePage implements OnInit {
     queue: Queue | null = null;
 
     strategyOptions = Object.values(QueueStrategyEnum).map((value) => ({
-            label: this.strategyLabel(value),
-            value
-        }));
+        label: this.strategyLabel(value),
+        value
+    }));
 
     constructor(
         private readonly fb: FormBuilder,
@@ -207,7 +218,8 @@ export class EditQueuePage implements OnInit {
                     serviceLevelSeconds: [queue.serviceLevelSeconds, [Validators.required]],
                     queueSoundId: [queue.queueSoundId, [Validators.required]],
                     isJoinWhenEmpty: [queue.isJoinWhenEmpty],
-                    maxCalls: [queue.maxCalls]
+                    maxCalls: [queue.maxCalls],
+                    cooldownSeconds: [queue.cooldownSeconds]
                 });
             }
         );

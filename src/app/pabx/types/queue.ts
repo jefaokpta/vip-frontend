@@ -16,4 +16,5 @@ export interface Queue {
     readonly memberPauseDurationAlertMinutes: number;
     readonly memberIds: number[];
     readonly isJoinWhenEmpty: boolean;
+    readonly cooldownSeconds: number;
 }
