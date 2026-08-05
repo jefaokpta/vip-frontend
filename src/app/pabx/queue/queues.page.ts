@@ -178,11 +178,11 @@ export class QueuesPage implements OnInit {
                             life: 15_000
                         });
                     })
-                    .catch(() => {
+                    .catch((err) => {
                         this.messageService.add({
                             severity: 'error',
                             summary: 'Não foi possível remover a fila',
-                            detail: 'Tente novamente mais tarde.',
+                            detail: err?.error?.message || 'Tente novamente mais tarde.',
                             life: 15_000
                         });
                     });
