@@ -41,9 +41,9 @@ import {QueuesPage} from '@/pabx/queue/queues.page';
 import {NewQueuePage} from '@/pabx/queue/new-queue.page';
 import {EditQueuePage} from '@/pabx/queue/edit-queue.page';
 import {QueueDetailPage} from '@/pabx/queue/queue-detail.page';
-import {PausaPage} from '@/pabx/pausa/pausa.page';
-import {NewPausaPage} from '@/pabx/pausa/new-pausa.page';
-import {EditPausaPage} from '@/pabx/pausa/edit-pausa.page';
+import {PausePage} from '@/pabx/pause/pause.page';
+import {NewPausePage} from '@/pabx/pause/new-pause.page';
+import {EditPausePage} from '@/pabx/pause/edit-pause.page';
 
 export default [
     { path: 'peers', component: PeerPage, data: { breadcrumb: 'Ramais' } },
@@ -104,9 +104,9 @@ export default [
     { path: 'queues/edit/:id', component: EditQueuePage, data: { breadcrumb: 'Filas > Editar' } },
     { path: 'queues/detail/:id', component: QueueDetailPage, data: { breadcrumb: 'Filas > Detalhe' } },
 
-    {path: 'pausas', component: PausaPage, data: {breadcrumb: 'Pausas'}},
-    {path: 'pausas/new', component: NewPausaPage, data: {breadcrumb: 'Pausas > Nova'}},
-    {path: 'pausas/edit/:id', component: EditPausaPage, data: {breadcrumb: 'Pausas > Editar'}},
+    {path: 'pauses', component: PausePage, data: {breadcrumb: 'Pausas'}},
+    {path: 'pauses/new', component: NewPausePage, data: {breadcrumb: 'Pausas > Nova'}},
+    {path: 'pauses/edit/:id', component: EditPausePage, data: {breadcrumb: 'Pausas > Editar'}},
 
     { path: '**', redirectTo: '/notfound' }
 ] as Routes;

@@ -26,9 +26,9 @@ export class QueueLoginService {
         return executeRequest(this.http.delete<void>(`${this.BACKEND}/queues/states/${queueId}/logout`, httpHeaders()));
     }
 
-    pause(queueId: number, pausaId: number): Promise<void> {
+    pause(queueId: number, pauseId: number): Promise<void> {
         return executeRequest(
-            this.http.post<void>(`${this.BACKEND}/queues/states/${queueId}/pause`, {pausaId}, httpHeaders())
+            this.http.post<void>(`${this.BACKEND}/queues/states/${queueId}/pause`, {pauseId}, httpHeaders())
         );
     }
 

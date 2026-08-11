@@ -152,7 +152,7 @@ import {UserService} from '@/pages/users/user.service';
                                             </div>
                                         } @else if (isPausedMember(member)) {
                                             <p-tag
-                                                [value]="'Pausa: ' + (member.pausaName ?? 'Em Pausa')"
+                                                [value]="'Pausa: ' + (member.pauseName ?? 'Em Pausa')"
                                                 [severity]="isPauseExceeded(member) ? 'danger' : 'warn'"
                                             />
                                         } @else {
@@ -323,9 +323,9 @@ export class QueueDetailPage implements OnInit, OnDestroy {
     }
 
     isPauseExceeded(member: QueueMember): boolean {
-        if (!member.pauseTimestamp || !member.pausaTimeLimitMinutes) return false;
+        if (!member.pauseTimestamp || !member.pauseTimeLimitMinutes) return false;
         const elapsedMinutes = (this.now() - member.pauseTimestamp) / 60_000;
-        return elapsedMinutes > member.pausaTimeLimitMinutes;
+        return elapsedMinutes > member.pauseTimeLimitMinutes;
     }
 
     memberStatusLabel(status: QueueMemberStatusEnum): string {

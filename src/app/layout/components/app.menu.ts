@@ -80,7 +80,7 @@ export class AppMenu implements OnInit {
                         {
                             label: 'Pausas',
                             icon: 'pi pi-fw pi-pause-circle',
-                            routerLink: ['/pabx/pausas']
+                            routerLink: ['/pabx/pauses']
                         },
                         {
                             label: 'Regras de Discagem',

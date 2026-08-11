@@ -1,4 +1,4 @@
-export interface Pausa {
+export interface Pause {
     readonly id: number;
     readonly companyId: string;
     name: string;

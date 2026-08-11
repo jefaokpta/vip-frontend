@@ -6,11 +6,11 @@ import {ButtonModule} from 'primeng/button';
 import {CardModule} from 'primeng/card';
 import {NgIf} from '@angular/common';
 import {Router, RouterLink} from '@angular/router';
-import {Pausa} from '@/pabx/types/pausa';
-import {PausaService} from '@/pabx/pausa/pausa.service';
+import {Pause} from '@/pabx/types/pause';
+import {PauseService} from '@/pabx/pause/pause.service';
 
 @Component({
-    selector: 'app-new-pausa-page',
+    selector: 'app-new-pause-page',
     standalone: true,
     imports: [InputTextModule, InputNumberModule, ButtonModule, CardModule, NgIf, ReactiveFormsModule, RouterLink],
     template: `
@@ -22,7 +22,7 @@ import {PausaService} from '@/pabx/pausa/pausa.service';
                         type="button"
                         label="Voltar"
                         icon="pi pi-arrow-left"
-                        routerLink="/pabx/pausas"
+                        routerLink="/pabx/pauses"
                         outlined
                         severity="secondary"
                     ></p-button>
@@ -62,7 +62,7 @@ import {PausaService} from '@/pabx/pausa/pausa.service';
         </p-card>
     `
 })
-export class NewPausaPage implements OnInit {
+export class NewPausePage implements OnInit {
     form!: FormGroup;
     pending = false;
     showError = false;
@@ -70,7 +70,7 @@ export class NewPausaPage implements OnInit {
     constructor(
         private readonly fb: FormBuilder,
         private readonly router: Router,
-        private readonly pausaService: PausaService
+        private readonly pauseService: PauseService
     ) {
     }
 
@@ -88,10 +88,10 @@ export class NewPausaPage implements OnInit {
     onSubmit() {
         this.pending = true;
         this.showError = false;
-        const pausa: Pausa = {...this.form.value};
-        this.pausaService
-            .create(pausa)
-            .then(() => this.router.navigate(['/pabx/pausas']))
+        const pause: Pause = {...this.form.value};
+        this.pauseService
+            .create(pause)
+            .then(() => this.router.navigate(['/pabx/pauses']))
             .catch(() => {
                 this.showError = true;
             })

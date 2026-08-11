@@ -11,9 +11,9 @@ import {Select} from 'primeng/select';
 import {QueueMemberStatusEnum} from '@/pabx/types/queue-member-status-enum';
 import {QueueState} from '@/pabx/types/queue-state';
 import {QueueMember} from '@/pabx/types/queue-member';
-import {Pausa} from '@/pabx/types/pausa';
+import {Pause} from '@/pabx/types/pause';
 import {QueueLoginService} from '@/pages/queues/queue-login.service';
-import {PausaService} from '@/pabx/pausa/pausa.service';
+import {PauseService} from '@/pabx/pause/pause.service';
 import {UserService} from '@/pages/users/user.service';
 import {WebsocketService} from '@/websocket/stomp/websocket.service';
 import {rxStompServiceFactory} from '@/websocket/stomp/rx-stomp-service-factory';
@@ -117,11 +117,11 @@ import {rxStompServiceFactory} from '@/websocket/stomp/rx-stomp-service-factory'
             [style]="{ width: '25rem' }"
         >
             <div class="field mb-4">
-                <label for="pausaSelect" class="block mb-2">Pausa *</label>
+                <label for="pauseSelect" class="block mb-2">Pausa *</label>
                 <p-select
-                    id="pausaSelect"
-                    [options]="pausaOptions()"
-                    [(ngModel)]="selectedPausaId"
+                    id="pauseSelect"
+                    [options]="pauseOptions()"
+                    [(ngModel)]="selectedPauseId"
                     optionLabel="label"
                     optionValue="value"
                     placeholder="Selecione uma pausa"
@@ -130,7 +130,7 @@ import {rxStompServiceFactory} from '@/websocket/stomp/rx-stomp-service-factory'
             </div>
             <div class="flex justify-end gap-2">
                 <p-button label="Cancelar" severity="secondary" outlined (onClick)="closePauseDialog()"/>
-                <p-button label="Pausar" severity="warn" [disabled]="!selectedPausaId" (onClick)="confirmPause()"/>
+                <p-button label="Pausar" severity="warn" [disabled]="!selectedPauseId" (onClick)="confirmPause()"/>
             </div>
         </p-dialog>
     `
@@ -139,8 +139,8 @@ export class QueueLoginPage implements OnInit, OnDestroy {
     readonly myQueues = signal<QueueState[]>([]);
     readonly now = signal(Date.now());
     readonly pauseDialogVisible = signal(false);
-    readonly pausaOptions = signal<{ label: string; value: number }[]>([]);
-    selectedPausaId: number | null = null;
+    readonly pauseOptions = signal<{ label: string; value: number }[]>([]);
+    selectedPauseId: number | null = null;
     private pauseDialogQueue: QueueState | null = null;
     private peerId?: number;
     private userId!: number;
@@ -150,7 +150,7 @@ export class QueueLoginPage implements OnInit, OnDestroy {
 
     constructor(
         private readonly queueLoginService: QueueLoginService,
-        private readonly pausaService: PausaService,
+        private readonly pauseService: PauseService,
         private readonly userService: UserService,
         private readonly webSocketService: WebsocketService,
         private readonly messageService: MessageService
@@ -165,7 +165,7 @@ export class QueueLoginPage implements OnInit, OnDestroy {
         this.syncPeerId();
 
         this.loadMyQueues();
-        this.loadPausas();
+        this.loadPauses();
 
         this.subscriptions.push(
             this.webSocketService.watch(`/topic/queuestates/${this.companyId}`).subscribe((message) => {
@@ -202,14 +202,14 @@ export class QueueLoginPage implements OnInit, OnDestroy {
     }
 
     pauseReasonName(qs: QueueState): string {
-        return this.findMember(qs)?.pausaName ?? 'Em pausa';
+        return this.findMember(qs)?.pauseName ?? 'Em pausa';
     }
 
     isPauseExceeded(qs: QueueState): boolean {
         const member = this.findMember(qs);
-        if (!member?.pauseTimestamp || !member.pausaTimeLimitMinutes) return false;
+        if (!member?.pauseTimestamp || !member.pauseTimeLimitMinutes) return false;
         const elapsedMinutes = (this.now() - member.pauseTimestamp) / 60_000;
-        return elapsedMinutes > member.pausaTimeLimitMinutes;
+        return elapsedMinutes > member.pauseTimeLimitMinutes;
     }
 
     pauseDuration(qs: QueueState): string {
@@ -242,21 +242,21 @@ export class QueueLoginPage implements OnInit, OnDestroy {
 
     openPauseDialog(qs: QueueState): void {
         this.pauseDialogQueue = qs;
-        this.selectedPausaId = this.pausaOptions()[0]?.value ?? null;
+        this.selectedPauseId = this.pauseOptions()[0]?.value ?? null;
         this.pauseDialogVisible.set(true);
     }
 
     closePauseDialog(): void {
         this.pauseDialogVisible.set(false);
         this.pauseDialogQueue = null;
-        this.selectedPausaId = null;
+        this.selectedPauseId = null;
     }
 
     confirmPause(): void {
         const qs = this.pauseDialogQueue;
-        if (!qs || this.selectedPausaId == null) return;
+        if (!qs || this.selectedPauseId == null) return;
         this.queueLoginService
-            .pause(qs.queue.id, this.selectedPausaId)
+            .pause(qs.queue.id, this.selectedPauseId)
             .then(() => this.closePauseDialog())
             .catch(() =>
                 this.messageService.add({
@@ -314,9 +314,9 @@ export class QueueLoginPage implements OnInit, OnDestroy {
         });
     }
 
-    private loadPausas(): void {
-        this.pausaService.findAll().then((pausas: Pausa[]) => {
-            this.pausaOptions.set(pausas.map((p) => ({label: p.name, value: p.id})));
+    private loadPauses(): void {
+        this.pauseService.findAll().then((pauses: Pause[]) => {
+            this.pauseOptions.set(pauses.map((p) => ({label: p.name, value: p.id})));
         });
     }
 

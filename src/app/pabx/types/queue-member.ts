@@ -7,9 +7,9 @@ export interface QueueMember {
     readonly peerRegistry: PeerRegistry;
     readonly queueMemberStatusEnum: QueueMemberStatusEnum;
     readonly pauseTimestamp?: number;
-    readonly pausaId?: number;
-    readonly pausaName?: string;
-    readonly pausaTimeLimitMinutes?: number;
+    readonly pauseId?: number;
+    readonly pauseName?: string;
+    readonly pauseTimeLimitMinutes?: number;
     readonly lastCallTimestamp?: number;
     readonly answeredCallCount?: number;
 }

@@ -12,11 +12,11 @@ import {ConfirmDialog} from 'primeng/confirmdialog';
 import {Toast} from 'primeng/toast';
 import {NgIf} from '@angular/common';
 import {Tooltip} from 'primeng/tooltip';
-import {PausaService} from '@/pabx/pausa/pausa.service';
-import {Pausa} from '@/pabx/types/pausa';
+import {PauseService} from '@/pabx/pause/pause.service';
+import {Pause} from '@/pabx/types/pause';
 
 @Component({
-    selector: 'app-pausa-page',
+    selector: 'app-pause-page',
     standalone: true,
     providers: [ConfirmationService, MessageService],
     imports: [
@@ -57,7 +57,7 @@ import {Pausa} from '@/pabx/types/pausa';
 
             <p-table
                 #dataTable
-                [value]="pausas"
+                [value]="pauses"
                 [paginator]="true"
                 [rows]="15"
                 [globalFilterFields]="['name']"
@@ -75,15 +75,15 @@ import {Pausa} from '@/pabx/types/pausa';
                     </tr>
                 </ng-template>
 
-                <ng-template pTemplate="body" let-pausa>
+                <ng-template pTemplate="body" let-pause>
                     <tr>
-                        <td>{{ pausa.name }}</td>
-                        <td>{{ pausa.timeLimitMinutes > 0 ? pausa.timeLimitMinutes + ' min' : 'Ilimitado' }}</td>
+                        <td>{{ pause.name }}</td>
+                        <td>{{ pause.timeLimitMinutes > 0 ? pause.timeLimitMinutes + ' min' : 'Ilimitado' }}</td>
                         <td>
                             <div class="flex gap-2">
                                 <p-button
                                     icon="pi pi-pencil"
-                                    [routerLink]="['edit', pausa.id]"
+                                    [routerLink]="['edit', pause.id]"
                                     outlined
                                     size="small"
                                     pTooltip="Editar"
@@ -92,7 +92,7 @@ import {Pausa} from '@/pabx/types/pausa';
                                 <p-button
                                     icon="pi pi-trash"
                                     severity="danger"
-                                    (click)="confirmDelete(pausa)"
+                                    (click)="confirmDelete(pause)"
                                     outlined
                                     size="small"
                                     pTooltip="Remover"
@@ -114,21 +114,21 @@ import {Pausa} from '@/pabx/types/pausa';
         <p-toast/>
     `
 })
-export class PausaPage implements OnInit {
-    pausas: Pausa[] = [];
+export class PausePage implements OnInit {
+    pauses: Pause[] = [];
     @ViewChild('dataTable') dt!: Table;
     loading = true;
 
     constructor(
         private readonly confirmationService: ConfirmationService,
         private readonly messageService: MessageService,
-        private readonly pausaService: PausaService
+        private readonly pauseService: PauseService
     ) {
     }
 
     ngOnInit(): void {
-        this.pausaService.findAll().then((pausas) => {
-            this.pausas = pausas;
+        this.pauseService.findAll().then((pauses) => {
+            this.pauses = pauses;
             this.loading = false;
         });
     }
@@ -140,9 +140,9 @@ export class PausaPage implements OnInit {
         }
     }
 
-    confirmDelete(pausa: Pausa) {
+    confirmDelete(pause: Pause) {
         this.confirmationService.confirm({
-            message: `Deletar ${pausa.name}?`,
+            message: `Deletar ${pause.name}?`,
             header: 'Confirmação',
             closable: true,
             closeOnEscape: true,
@@ -157,10 +157,10 @@ export class PausaPage implements OnInit {
                 outlined: true
             },
             accept: () => {
-                this.pausaService
-                    .delete(pausa.id)
+                this.pauseService
+                    .delete(pause.id)
                     .then(() => {
-                        this.pausas = this.pausas.filter((p) => p.id !== pausa.id);
+                        this.pauses = this.pauses.filter((p) => p.id !== pause.id);
                         this.messageService.add({
                             severity: 'success',
                             summary: 'Pausa removida com sucesso',

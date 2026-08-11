@@ -6,11 +6,11 @@ import {ButtonModule} from 'primeng/button';
 import {CardModule} from 'primeng/card';
 import {NgIf} from '@angular/common';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
-import {Pausa} from '@/pabx/types/pausa';
-import {PausaService} from '@/pabx/pausa/pausa.service';
+import {Pause} from '@/pabx/types/pause';
+import {PauseService} from '@/pabx/pause/pause.service';
 
 @Component({
-    selector: 'app-edit-pausa-page',
+    selector: 'app-edit-pause-page',
     standalone: true,
     imports: [InputTextModule, InputNumberModule, ButtonModule, CardModule, NgIf, ReactiveFormsModule, RouterLink],
     template: `
@@ -22,7 +22,7 @@ import {PausaService} from '@/pabx/pausa/pausa.service';
                         type="button"
                         label="Voltar"
                         icon="pi pi-arrow-left"
-                        routerLink="/pabx/pausas"
+                        routerLink="/pabx/pauses"
                         outlined
                         severity="secondary"
                     ></p-button>
@@ -62,16 +62,16 @@ import {PausaService} from '@/pabx/pausa/pausa.service';
         </p-card>
     `
 })
-export class EditPausaPage implements OnInit {
+export class EditPausePage implements OnInit {
     form!: FormGroup;
     pending = false;
     showError = false;
-    private pausa: Pausa | undefined;
+    private pause: Pause | undefined;
 
     constructor(
         private readonly fb: FormBuilder,
         private readonly router: Router,
-        private readonly pausaService: PausaService,
+        private readonly pauseService: PauseService,
         private readonly activatedRoute: ActivatedRoute
     ) {
     }
@@ -85,24 +85,24 @@ export class EditPausaPage implements OnInit {
             name: ['', [Validators.required]],
             timeLimitMinutes: [0, [Validators.required, Validators.min(0)]]
         });
-        this.pausaService
+        this.pauseService
             .findById(this.activatedRoute.snapshot.params['id'])
-            .then((pausa) => {
-                this.pausa = pausa;
-                this.form.patchValue(pausa);
+            .then((pause) => {
+                this.pause = pause;
+                this.form.patchValue(pause);
             })
             .catch(() => {
-                this.router.navigate(['/pabx/pausas']);
+                this.router.navigate(['/pabx/pauses']);
             });
     }
 
     onSubmit() {
         this.pending = true;
         this.showError = false;
-        const pausa: Pausa = {...this.pausa!, ...this.form.value};
-        this.pausaService
-            .update(pausa)
-            .then(() => this.router.navigate(['/pabx/pausas']))
+        const pause: Pause = {...this.pause!, ...this.form.value};
+        this.pauseService
+            .update(pause)
+            .then(() => this.router.navigate(['/pabx/pauses']))
             .catch(() => {
                 this.showError = true;
             })
