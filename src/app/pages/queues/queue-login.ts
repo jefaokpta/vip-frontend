@@ -126,6 +126,7 @@ import {rxStompServiceFactory} from '@/websocket/stomp/rx-stomp-service-factory'
                     optionValue="value"
                     placeholder="Selecione uma pausa"
                     styleClass="w-full"
+                    appendTo="body"
                 />
             </div>
             <div class="flex justify-end gap-2">

@@ -1,27 +1,27 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { Card } from 'primeng/card';
-import { IconField } from 'primeng/iconfield';
-import { InputIcon } from 'primeng/inputicon';
-import { Button } from 'primeng/button';
-import { Table, TableModule } from 'primeng/table';
-import { RouterLink } from '@angular/router';
-import { ProgressSpinner } from 'primeng/progressspinner';
-import { ConfirmDialog } from 'primeng/confirmdialog';
-import { Toast } from 'primeng/toast';
-import { Alias } from '@/pabx/types/alias';
-import { DialPlan } from '@/pabx/types/dial-plan';
-import { SrcEnum } from '@/pabx/types/src-enum';
-import { Trunk } from '@/pabx/types/trunk';
-import { NgIf } from '@angular/common';
-import { Tooltip } from 'primeng/tooltip';
-import { InputText } from 'primeng/inputtext';
-import { ConfirmationService, MessageService } from 'primeng/api';
-import { DialPlanService } from '@/pabx/dialplan/dial-plan.service';
-import { dialplanSrcLabel } from '@/pabx/dialplan/utils';
-import { TrunkService } from '@/pabx/trunk/trunk.service';
-import { AliasService } from '@/pabx/alias/alias.service';
-import { FormsModule } from '@angular/forms';
-import { Select } from 'primeng/select';
+import {Component, OnInit, ViewChild} from '@angular/core';
+import {Card} from 'primeng/card';
+import {IconField} from 'primeng/iconfield';
+import {InputIcon} from 'primeng/inputicon';
+import {Button} from 'primeng/button';
+import {Table, TableModule} from 'primeng/table';
+import {RouterLink} from '@angular/router';
+import {ProgressSpinner} from 'primeng/progressspinner';
+import {ConfirmDialog} from 'primeng/confirmdialog';
+import {Toast} from 'primeng/toast';
+import {Alias} from '@/pabx/types/alias';
+import {DialPlan} from '@/pabx/types/dial-plan';
+import {SrcEnum} from '@/pabx/types/src-enum';
+import {Trunk} from '@/pabx/types/trunk';
+import {NgIf} from '@angular/common';
+import {Tooltip} from 'primeng/tooltip';
+import {InputText} from 'primeng/inputtext';
+import {ConfirmationService, MessageService} from 'primeng/api';
+import {DialPlanService} from '@/pabx/dialplan/dial-plan.service';
+import {dialplanSrcLabel} from '@/pabx/dialplan/utils';
+import {TrunkService} from '@/pabx/trunk/trunk.service';
+import {AliasService} from '@/pabx/alias/alias.service';
+import {FormsModule} from '@angular/forms';
+import {Select} from 'primeng/select';
 
 @Component({
     selector: 'app-dialplan-page',
@@ -110,6 +110,7 @@ import { Select } from 'primeng/select';
                                 optionLabel="label"
                                 optionValue="value"
                                 size="small"
+                                appendTo="body"
                             >
                             </p-select>
                         </td>
