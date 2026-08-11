@@ -1,8 +1,8 @@
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { QueueState } from '@/pabx/types/queue-state';
-import { executeRequest, httpHeaders } from '@/util/utils';
-import { environment } from '../../../environments/environment';
+import {HttpClient} from '@angular/common/http';
+import {Injectable} from '@angular/core';
+import {QueueState} from '@/pabx/types/queue-state';
+import {executeRequest, httpHeaders} from '@/util/utils';
+import {environment} from '../../../environments/environment';
 
 @Injectable({
     providedIn: 'root'
@@ -26,9 +26,9 @@ export class QueueLoginService {
         return executeRequest(this.http.delete<void>(`${this.BACKEND}/queues/states/${queueId}/logout`, httpHeaders()));
     }
 
-    pause(queueId: number): Promise<void> {
+    pause(queueId: number, pausaId: number): Promise<void> {
         return executeRequest(
-            this.http.post<void>(`${this.BACKEND}/queues/states/${queueId}/pause`, {}, httpHeaders())
+            this.http.post<void>(`${this.BACKEND}/queues/states/${queueId}/pause`, {pausaId}, httpHeaders())
         );
     }
 

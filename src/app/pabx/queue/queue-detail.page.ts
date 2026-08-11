@@ -8,6 +8,7 @@ import {Tag} from 'primeng/tag';
 import {ProgressSpinner} from 'primeng/progressspinner';
 import {Tooltip} from 'primeng/tooltip';
 import {QueueMemberStatusEnum} from '@/pabx/types/queue-member-status-enum';
+import {QueueMember} from '@/pabx/types/queue-member';
 import {QueueState} from '@/pabx/types/queue-state';
 import {QueueDashboardService} from '@/pages/dashboard/queue-dashboard.service';
 import {WebsocketService} from '@/websocket/stomp/websocket.service';
@@ -149,6 +150,11 @@ import {UserService} from '@/pages/users/user.service';
                                                     </div>
                                                 </div>
                                             </div>
+                                        } @else if (isPausedMember(member)) {
+                                            <p-tag
+                                                [value]="'Pausa: ' + (member.pausaName ?? 'Em Pausa')"
+                                                [severity]="isPauseExceeded(member) ? 'danger' : 'warn'"
+                                            />
                                         } @else {
                                             <p-tag
                                                 [value]="memberStatusLabel(member.queueMemberStatusEnum)"
@@ -160,7 +166,7 @@ import {UserService} from '@/pages/users/user.service';
                                         @if (member.peerRegistry.channel) {
                                             {{ waitTime(member.peerRegistry.channel.timestamp) }}
                                         } @else {
-                                            {{ member.timestamp ? waitTime(member.timestamp) : '—' }}
+                                            {{ member.pauseTimestamp ? waitTime(member.pauseTimestamp) : '—' }}
                                         }
                                     </td>
                                     <td class="font-mono text-sm text-gray-500">
@@ -310,6 +316,16 @@ export class QueueDetailPage implements OnInit, OnDestroy {
             .padStart(2, '0');
         const s = (secs % 60).toString().padStart(2, '0');
         return `${m}:${s}`;
+    }
+
+    isPausedMember(member: QueueMember): boolean {
+        return member.queueMemberStatusEnum === QueueMemberStatusEnum.PAUSED;
+    }
+
+    isPauseExceeded(member: QueueMember): boolean {
+        if (!member.pauseTimestamp || !member.pausaTimeLimitMinutes) return false;
+        const elapsedMinutes = (this.now() - member.pauseTimestamp) / 60_000;
+        return elapsedMinutes > member.pausaTimeLimitMinutes;
     }
 
     memberStatusLabel(status: QueueMemberStatusEnum): string {

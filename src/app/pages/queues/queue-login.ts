@@ -1,21 +1,27 @@
-import { Component, OnDestroy, OnInit, signal } from '@angular/core';
-import { Subscription } from 'rxjs';
-import { Card } from 'primeng/card';
-import { Button } from 'primeng/button';
-import { BadgeModule } from 'primeng/badge';
-import { Toast } from 'primeng/toast';
-import { MessageService } from 'primeng/api';
-import { QueueMemberStatusEnum } from '@/pabx/types/queue-member-status-enum';
-import { QueueState } from '@/pabx/types/queue-state';
-import { QueueLoginService } from '@/pages/queues/queue-login.service';
-import { UserService } from '@/pages/users/user.service';
-import { WebsocketService } from '@/websocket/stomp/websocket.service';
-import { rxStompServiceFactory } from '@/websocket/stomp/rx-stomp-service-factory';
+import {Component, OnDestroy, OnInit, signal} from '@angular/core';
+import {FormsModule} from '@angular/forms';
+import {Subscription} from 'rxjs';
+import {Card} from 'primeng/card';
+import {Button} from 'primeng/button';
+import {BadgeModule} from 'primeng/badge';
+import {Toast} from 'primeng/toast';
+import {MessageService} from 'primeng/api';
+import {Dialog} from 'primeng/dialog';
+import {Select} from 'primeng/select';
+import {QueueMemberStatusEnum} from '@/pabx/types/queue-member-status-enum';
+import {QueueState} from '@/pabx/types/queue-state';
+import {QueueMember} from '@/pabx/types/queue-member';
+import {Pausa} from '@/pabx/types/pausa';
+import {QueueLoginService} from '@/pages/queues/queue-login.service';
+import {PausaService} from '@/pabx/pausa/pausa.service';
+import {UserService} from '@/pages/users/user.service';
+import {WebsocketService} from '@/websocket/stomp/websocket.service';
+import {rxStompServiceFactory} from '@/websocket/stomp/rx-stomp-service-factory';
 
 @Component({
     selector: 'app-queue-login',
     providers: [{ provide: WebsocketService, useFactory: rxStompServiceFactory }, MessageService],
-    imports: [Card, Button, BadgeModule, Toast],
+    imports: [Card, Button, BadgeModule, Toast, Dialog, Select, FormsModule],
     template: `
         <p-toast />
         <p-card>
@@ -64,9 +70,18 @@ import { rxStompServiceFactory } from '@/websocket/stomp/rx-stomp-service-factor
                         </div>
 
                         @if (isPaused(qs)) {
-                            <div class="flex items-center gap-2 text-yellow-600 text-sm font-semibold">
+                            <div
+                                class="flex items-center gap-2 text-sm font-semibold"
+                                [class.text-yellow-600]="!isPauseExceeded(qs)"
+                                [class.text-red-600]="isPauseExceeded(qs)"
+                            >
                                 <i class="pi pi-pause-circle"></i>
-                                <span>Em pausa {{ pauseDuration(qs) }}</span>
+                                <span
+                                >{{ pauseReasonName(qs) }} — {{ pauseDuration(qs) }}
+                                    @if (isPauseExceeded(qs)) {
+                                        (tempo excedido)
+                                    }
+                                </span>
                             </div>
                         }
 
@@ -92,11 +107,41 @@ import { rxStompServiceFactory } from '@/websocket/stomp/rx-stomp-service-factor
                 }
             </div>
         </p-card>
+
+        <p-dialog
+            header="Selecione o motivo da pausa"
+            [visible]="pauseDialogVisible()"
+            [modal]="true"
+            [closable]="true"
+            (visibleChange)="closePauseDialog()"
+            [style]="{ width: '25rem' }"
+        >
+            <div class="field mb-4">
+                <label for="pausaSelect" class="block mb-2">Pausa *</label>
+                <p-select
+                    id="pausaSelect"
+                    [options]="pausaOptions()"
+                    [(ngModel)]="selectedPausaId"
+                    optionLabel="label"
+                    optionValue="value"
+                    placeholder="Selecione uma pausa"
+                    styleClass="w-full"
+                />
+            </div>
+            <div class="flex justify-end gap-2">
+                <p-button label="Cancelar" severity="secondary" outlined (onClick)="closePauseDialog()"/>
+                <p-button label="Pausar" severity="warn" [disabled]="!selectedPausaId" (onClick)="confirmPause()"/>
+            </div>
+        </p-dialog>
     `
 })
 export class QueueLoginPage implements OnInit, OnDestroy {
     readonly myQueues = signal<QueueState[]>([]);
     readonly now = signal(Date.now());
+    readonly pauseDialogVisible = signal(false);
+    readonly pausaOptions = signal<{ label: string; value: number }[]>([]);
+    selectedPausaId: number | null = null;
+    private pauseDialogQueue: QueueState | null = null;
     private peerId?: number;
     private userId!: number;
     private companyId!: string;
@@ -105,6 +150,7 @@ export class QueueLoginPage implements OnInit, OnDestroy {
 
     constructor(
         private readonly queueLoginService: QueueLoginService,
+        private readonly pausaService: PausaService,
         private readonly userService: UserService,
         private readonly webSocketService: WebsocketService,
         private readonly messageService: MessageService
@@ -119,6 +165,7 @@ export class QueueLoginPage implements OnInit, OnDestroy {
         this.syncPeerId();
 
         this.loadMyQueues();
+        this.loadPausas();
 
         this.subscriptions.push(
             this.webSocketService.watch(`/topic/queuestates/${this.companyId}`).subscribe((message) => {
@@ -151,16 +198,22 @@ export class QueueLoginPage implements OnInit, OnDestroy {
     }
 
     isPaused(qs: QueueState): boolean {
-        const peerId = this.resolvePeerId();
-        if (peerId == null) return false;
-        return (
-            qs.loggedMembers.find((m) => m.id === peerId)?.queueMemberStatusEnum === QueueMemberStatusEnum.PAUSED
-        );
+        return this.findMember(qs)?.queueMemberStatusEnum === QueueMemberStatusEnum.PAUSED;
+    }
+
+    pauseReasonName(qs: QueueState): string {
+        return this.findMember(qs)?.pausaName ?? 'Em pausa';
+    }
+
+    isPauseExceeded(qs: QueueState): boolean {
+        const member = this.findMember(qs);
+        if (!member?.pauseTimestamp || !member.pausaTimeLimitMinutes) return false;
+        const elapsedMinutes = (this.now() - member.pauseTimestamp) / 60_000;
+        return elapsedMinutes > member.pausaTimeLimitMinutes;
     }
 
     pauseDuration(qs: QueueState): string {
-        const peerId = this.resolvePeerId();
-        const ts = peerId == null ? undefined : qs.loggedMembers.find((m) => m.id === peerId)?.timestamp;
+        const ts = this.findMember(qs)?.pauseTimestamp;
         if (!ts) return '';
         const secs = Math.max(0, Math.floor((this.now() - ts) / 1000));
         const h = Math.floor(secs / 3600);
@@ -174,12 +227,44 @@ export class QueueLoginPage implements OnInit, OnDestroy {
     }
 
     togglePause(qs: QueueState): void {
-        const action = this.isPaused(qs)
-            ? this.queueLoginService.unpause(qs.queue.id)
-            : this.queueLoginService.pause(qs.queue.id);
-        action.catch(() =>
-            this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Não foi possível alterar a pausa' })
-        );
+        if (this.isPaused(qs)) {
+            this.queueLoginService.unpause(qs.queue.id).catch(() =>
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Erro',
+                    detail: 'Não foi possível retomar a fila'
+                })
+            );
+            return;
+        }
+        this.openPauseDialog(qs);
+    }
+
+    openPauseDialog(qs: QueueState): void {
+        this.pauseDialogQueue = qs;
+        this.selectedPausaId = this.pausaOptions()[0]?.value ?? null;
+        this.pauseDialogVisible.set(true);
+    }
+
+    closePauseDialog(): void {
+        this.pauseDialogVisible.set(false);
+        this.pauseDialogQueue = null;
+        this.selectedPausaId = null;
+    }
+
+    confirmPause(): void {
+        const qs = this.pauseDialogQueue;
+        if (!qs || this.selectedPausaId == null) return;
+        this.queueLoginService
+            .pause(qs.queue.id, this.selectedPausaId)
+            .then(() => this.closePauseDialog())
+            .catch(() =>
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Erro',
+                    detail: 'Não foi possível pausar'
+                })
+            );
     }
 
     toggleLogin(qs: QueueState): void {
@@ -212,6 +297,12 @@ export class QueueLoginPage implements OnInit, OnDestroy {
         }
     }
 
+    private findMember(qs: QueueState): QueueMember | undefined {
+        const peerId = this.resolvePeerId();
+        if (peerId == null) return undefined;
+        return qs.loggedMembers.find((m) => m.id === peerId);
+    }
+
     private userBelongsToQueue(state: QueueState): boolean {
         return state.queue.memberIds.includes(this.userId);
     }
@@ -220,6 +311,12 @@ export class QueueLoginPage implements OnInit, OnDestroy {
         this.queueLoginService.getMyQueues().then((queues) => {
             this.syncPeerId();
             this.myQueues.set(queues);
+        });
+    }
+
+    private loadPausas(): void {
+        this.pausaService.findAll().then((pausas: Pausa[]) => {
+            this.pausaOptions.set(pausas.map((p) => ({label: p.name, value: p.id})));
         });
     }
 

@@ -1,11 +1,11 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
-import { AppMenuitem } from './app.menuitem';
-import { RoleEnum } from '@/types/role-enum';
-import { User } from '@/types/user';
-import { MenuItem } from 'primeng/api';
-import { UserService } from '@/pages/users/user.service';
+import {Component, OnInit} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {RouterModule} from '@angular/router';
+import {AppMenuitem} from './app.menuitem';
+import {RoleEnum} from '@/types/role-enum';
+import {User} from '@/types/user';
+import {MenuItem} from 'primeng/api';
+import {UserService} from '@/pages/users/user.service';
 
 @Component({
     selector: 'app-menu',
@@ -76,6 +76,11 @@ export class AppMenu implements OnInit {
                             label: 'Filas de Atendimento',
                             icon: 'pi pi-fw pi-users',
                             routerLink: ['/pabx/queues']
+                        },
+                        {
+                            label: 'Pausas',
+                            icon: 'pi pi-fw pi-pause-circle',
+                            routerLink: ['/pabx/pausas']
                         },
                         {
                             label: 'Regras de Discagem',
