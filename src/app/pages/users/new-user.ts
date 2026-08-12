@@ -4,17 +4,17 @@
  * @create 5/13/25
  */
 
-import { Component, OnInit } from '@angular/core';
-import { Button } from 'primeng/button';
-import { InputText } from 'primeng/inputtext';
-import { NgIf } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
-import { Card } from 'primeng/card';
-import { RoleEnum } from '@/types/role-enum';
-import { Select } from 'primeng/select';
-import { UserService } from '@/pages/users/user.service';
-import { buildRoleOptions } from '@/pages/users/utils';
+import {Component, OnInit} from '@angular/core';
+import {Button} from 'primeng/button';
+import {InputText} from 'primeng/inputtext';
+import {NgIf} from '@angular/common';
+import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {Router, RouterLink} from '@angular/router';
+import {Card} from 'primeng/card';
+import {RoleEnum} from '@/types/role-enum';
+import {Select} from 'primeng/select';
+import {UserService} from '@/pages/users/user.service';
+import {buildRoleOptions} from '@/pages/users/utils';
 
 @Component({
     selector: 'app-new-user',
@@ -68,8 +68,15 @@ import { buildRoleOptions } from '@/pages/users/utils';
                     </small>
                 </div>
 
+                <small *ngIf="submitError" class="p-error block mb-4">{{ submitError }}</small>
+
                 <div class="flex mt-4">
-                    <p-button type="submit" label="Salvar" icon="pi pi-save" [disabled]="form.invalid"></p-button>
+                    <p-button
+                        type="submit"
+                        label="Salvar"
+                        icon="pi pi-save"
+                        [disabled]="form.invalid || pending"
+                    ></p-button>
                 </div>
             </form>
         </p-card>
@@ -78,6 +85,8 @@ import { buildRoleOptions } from '@/pages/users/utils';
 export class NewUserPage implements OnInit {
     form!: FormGroup;
     roleOptions: { label: string; value: string }[] = [];
+    submitError = '';
+    pending = false;
 
     constructor(
         private readonly fb: FormBuilder,
@@ -108,7 +117,15 @@ export class NewUserPage implements OnInit {
     }
 
     onSubmit() {
+        this.pending = true;
+        this.submitError = '';
         const user = { ...this.form.value, roles: [this.form.value.role] };
-        this.userService.create(user).then(() => this.router.navigate(['/pages/users']));
+        this.userService
+            .create(user)
+            .then(() => this.router.navigate(['/pages/users']))
+            .catch((err) => {
+                this.submitError = err.error?.message ?? 'Não foi possível criar o usuário.';
+            })
+            .finally(() => (this.pending = false));
     }
 }
