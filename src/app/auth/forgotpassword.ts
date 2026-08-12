@@ -1,14 +1,15 @@
-import { Component, computed, OnInit } from '@angular/core';
-import { RouterModule } from '@angular/router';
-import { ButtonModule } from 'primeng/button';
-import { LayoutService } from '@/layout/service/layout.service';
-import { AppConfigurator } from '@/layout/components/app.configurator';
-import { IconFieldModule } from 'primeng/iconfield';
-import { InputIconModule } from 'primeng/inputicon';
-import { InputTextModule } from 'primeng/inputtext';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { NgIf } from '@angular/common';
-import { UserService } from '@/pages/users/user.service';
+import {Component, computed, OnInit} from '@angular/core';
+import {Router, RouterModule} from '@angular/router';
+import {ButtonModule} from 'primeng/button';
+import {LayoutService} from '@/layout/service/layout.service';
+import {AppConfigurator} from '@/layout/components/app.configurator';
+import {IconFieldModule} from 'primeng/iconfield';
+import {InputIconModule} from 'primeng/inputicon';
+import {InputTextModule} from 'primeng/inputtext';
+import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {NgIf} from '@angular/common';
+import {UserService} from '@/pages/users/user.service';
+import {encodeEmailBase64} from '@/util/utils';
 
 @Component({
     selector: 'app-forgot-password',
@@ -82,23 +83,13 @@ import { UserService } from '@/pages/users/user.service';
 
                         <div class="flex justify-between items-center gap-2">
                             <p-button fluid label="Entrar" outlined routerLink="/"></p-button>
-                            <p-button fluid label="Redefinir" type="submit" [disabled]="form.invalid"></p-button>
+                            <p-button
+                                fluid
+                                label="Redefinir"
+                                type="submit"
+                                [disabled]="form.invalid || pending"
+                            ></p-button>
                         </div>
-
-                        <p-button
-                            class="mt-4"
-                            fluid
-                            label="Validar Código"
-                            link
-                            size="small"
-                            outlined
-                            routerLink="/auth/verification"
-                        />
-
-                        <small *ngIf="submitSuccess" class="mt-2">
-                            <i class="pi pi-check text-green-600"></i>
-                            Enviamos um email com instrucões para redefinir sua senha
-                        </small>
                     </div>
                 </form>
             </div>
@@ -109,12 +100,13 @@ import { UserService } from '@/pages/users/user.service';
 export class ForgotPassword implements OnInit {
     form!: FormGroup;
     submitError = false;
-    submitSuccess = false;
+    pending = false;
     isDarkTheme = computed(() => this.LayoutService.isDarkTheme());
 
     constructor(
         private readonly LayoutService: LayoutService,
         private readonly fb: FormBuilder,
+        private readonly router: Router,
         private readonly userService: UserService
     ) {}
 
@@ -125,16 +117,15 @@ export class ForgotPassword implements OnInit {
     }
 
     onSubmit() {
+        this.pending = true;
+        this.submitError = false;
+        const email = this.form.value.email;
         this.userService
-            .forgotPassword(this.form.value.email)
+            .forgotPassword(email)
             .then(() => {
-                this.submitError = false;
-                this.submitSuccess = true;
-                this.form.reset();
+                this.router.navigate(['/auth/confirm-email'], {queryParams: {e: encodeEmailBase64(email)}});
             })
-            .catch(() => {
-                this.submitError = true;
-                this.submitSuccess = false;
-            });
+            .catch(() => (this.submitError = true))
+            .finally(() => (this.pending = false));
     }
 }

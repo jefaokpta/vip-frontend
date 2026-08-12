@@ -190,22 +190,14 @@ export class UserService {
         return executeRequest(this.http.post(`${this.BACKEND}/auth/forgot-password`, { email }, httpHeaders()));
     }
 
-    confirmForgotPassword(confirmation: { email: string; code: string; password: string }) {
-        return executeRequest(
-            this.http.post(`${this.BACKEND}/auth/confirm-forgot-password`, confirmation, httpHeaders())
-        );
-    }
-
     confirmEmail(confirmation: { email: string; code: string }): Promise<LoginResponse> {
         return executeRequest(
             this.http.post<LoginResponse>(`${this.BACKEND}/auth/confirmation`, confirmation, httpHeaders())
         );
     }
 
-    createFirstPassword(payload: { email: string; password: string }): Promise<LoginResponse> {
-        return executeRequest(
-            this.http.post<LoginResponse>(`${this.BACKEND}/users/first-password`, payload, httpHeaders())
-        );
+    setPassword(payload: { email: string; password: string }): Promise<LoginResponse> {
+        return executeRequest(this.http.post<LoginResponse>(`${this.BACKEND}/users/password`, payload, httpHeaders()));
     }
 
     delete(id: number) {

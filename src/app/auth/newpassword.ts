@@ -63,7 +63,7 @@ import {UserService} from '@/pages/users/user.service';
                 class="border border-surface-200 dark:border-surface-700 bg-surface-0 dark:bg-surface-900 rounded py-16 px-6 md:px-16 z-10"
             >
                 <div class="mb-6">
-                    <div class="text-surface-900 dark:text-surface-0 text-xl font-bold mb-2">Primeiro Acesso</div>
+                    <div class="text-surface-900 dark:text-surface-0 text-xl font-bold mb-2">Defina sua senha</div>
                 </div>
 
                 <span class="text-surface-600 dark:text-surface-200 font-medium">Crie uma senha forte para acesso</span>
@@ -173,7 +173,7 @@ export class NewPassword implements OnInit {
     onSubmit() {
         this.pending = true;
         this.userService
-            .createFirstPassword(this.form.value)
+            .setPassword(this.form.value)
             .then(() => {
                 // Descarta o token de definição de senha para forçar login explícito com a senha nova
                 localStorage.removeItem('token');
