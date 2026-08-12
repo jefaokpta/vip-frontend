@@ -1,10 +1,11 @@
-import { Routes } from '@angular/router';
-import { Access } from './access';
-import { Login } from './login';
-import { Error } from './error';
-import { ForgotPassword } from './forgotpassword';
-import { NewPassword } from './newpassword';
-import { VerificationForgotPasswordPage } from './verification-forgot-password.page';
+import {Routes} from '@angular/router';
+import {Access} from './access';
+import {Login} from './login';
+import {Error} from './error';
+import {ForgotPassword} from './forgotpassword';
+import {NewPassword} from './newpassword';
+import {VerificationForgotPasswordPage} from './verification-forgot-password.page';
+import {ConfirmEmailPage} from './confirm-email.page';
 
 export default [
     { path: 'access', component: Access },
@@ -13,5 +14,6 @@ export default [
     { path: 'forgotpassword', component: ForgotPassword },
     { path: 'newpassword', component: NewPassword },
     { path: 'verification', component: VerificationForgotPasswordPage },
+    {path: 'confirm-email', component: ConfirmEmailPage},
     { path: '**', redirectTo: '/notfound' }
 ] as Routes;

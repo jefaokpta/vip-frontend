@@ -1,17 +1,17 @@
-import { Component, computed, OnInit } from '@angular/core';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { ButtonModule } from 'primeng/button';
-import { LayoutService } from '@/layout/service/layout.service';
-import { AppConfigurator } from '@/layout/components/app.configurator';
-import { IconFieldModule } from 'primeng/iconfield';
-import { InputIconModule } from 'primeng/inputicon';
-import { InputTextModule } from 'primeng/inputtext';
-import { PasswordModule } from 'primeng/password';
-import { Divider } from 'primeng/divider';
-import { NgIf } from '@angular/common';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { matchPasswordValidator, passwordStrengthValidator } from '@/pages/utils/validators';
-import { UserService } from '@/pages/users/user.service';
+import {Component, computed, OnInit} from '@angular/core';
+import {ActivatedRoute, Router, RouterModule} from '@angular/router';
+import {ButtonModule} from 'primeng/button';
+import {LayoutService} from '@/layout/service/layout.service';
+import {AppConfigurator} from '@/layout/components/app.configurator';
+import {IconFieldModule} from 'primeng/iconfield';
+import {InputIconModule} from 'primeng/inputicon';
+import {InputTextModule} from 'primeng/inputtext';
+import {PasswordModule} from 'primeng/password';
+import {Divider} from 'primeng/divider';
+import {NgIf} from '@angular/common';
+import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
+import {matchPasswordValidator, passwordStrengthValidator} from '@/pages/utils/validators';
+import {UserService} from '@/pages/users/user.service';
 
 @Component({
     selector: 'app-new-password',
@@ -174,9 +174,10 @@ export class NewPassword implements OnInit {
         this.pending = true;
         this.userService
             .createFirstPassword(this.form.value)
-            .then((loginResponse) => {
-                this.userService.loginSuccess(loginResponse.token);
-                this.router.navigate(['/']);
+            .then(() => {
+                // Descarta o token de definição de senha para forçar login explícito com a senha nova
+                localStorage.removeItem('token');
+                this.router.navigate(['/auth/login']);
             })
             .catch((err) => {
                 this.submitError = true;
