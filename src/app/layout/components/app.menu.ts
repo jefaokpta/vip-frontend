@@ -182,7 +182,7 @@ export class AppMenu implements OnInit {
         },
         {
             label: 'Configurações',
-            roles: [RoleEnum.ROLE_COMPANY_ADMIN, RoleEnum.ROLE_SAAS_ADMIN],
+            roles: [RoleEnum.ROLE_COMPANY_ADMIN],
             icon: 'pi pi-fw pi-microchip-ai',
             items: [
                 {
@@ -192,7 +192,7 @@ export class AppMenu implements OnInit {
                 },
                 {
                     label: 'Empresas',
-                    roles: [RoleEnum.ROLE_SAAS_ADMIN],
+                    roles: [RoleEnum.ROLE_COMPANY_ADMIN],
                     icon: 'pi pi-fw pi-building',
                     routerLink: ['/pages/companies']
                 },
