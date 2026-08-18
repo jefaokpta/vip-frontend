@@ -201,6 +201,12 @@ export class AppMenu implements OnInit {
                     roles: [RoleEnum.ROLE_COMPANY_ADMIN],
                     icon: 'fa fa-puzzle-piece',
                     routerLink: ['/pages/integrations']
+                },
+                {
+                    label: 'Tenants',
+                    roles: [RoleEnum.ROLE_SAAS_SUPPORT],
+                    icon: 'pi pi-fw pi-sitemap',
+                    routerLink: ['/pages/tenants']
                 }
             ]
         }

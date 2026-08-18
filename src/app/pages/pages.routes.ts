@@ -8,11 +8,17 @@ import { EditCompanyPage } from '@/pages/company/edit-company.page';
 import { EditUserPage } from '@/pages/users/edit-user';
 import { QueueDashboard } from '@/pages/dashboard/queue.dashboard';
 import { QueueLoginPage } from '@/pages/queues/queue-login';
+import { TenantPage } from '@/pages/tenant/tenant.page';
+import { NewTenantPage } from '@/pages/tenant/new-tenant.page';
+import { EditTenantPage } from '@/pages/tenant/edit-tenant.page';
 
 export default [
     { path: 'companies', component: CompanyPage, data: { breadcrumb: 'Empresas' } },
     { path: 'companies/new', component: NewCompanyPage, data: { breadcrumb: 'Empresas / Nova' } },
     { path: 'companies/edit/:id', component: EditCompanyPage, data: { breadcrumb: 'Empresas / Editar' } },
+    { path: 'tenants', component: TenantPage, data: { breadcrumb: 'Tenants' } },
+    { path: 'tenants/new', component: NewTenantPage, data: { breadcrumb: 'Tenants / Novo' } },
+    { path: 'tenants/edit/:id', component: EditTenantPage, data: { breadcrumb: 'Tenants / Editar' } },
     { path: 'users', component: UsersPage, data: { breadcrumb: 'Usuários' } },
     { path: 'users/new', component: NewUserPage, data: { breadcrumb: 'Usuários / Novo' } },
     { path: 'users/edit/:id', component: EditUserPage, data: { breadcrumb: 'Usuários / Editar' } },
