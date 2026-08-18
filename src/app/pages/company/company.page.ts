@@ -1,21 +1,21 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { Button } from 'primeng/button';
-import { IconField } from 'primeng/iconfield';
-import { InputIcon } from 'primeng/inputicon';
-import { InputText } from 'primeng/inputtext';
-import { MessageService, PrimeTemplate } from 'primeng/api';
-import { Router, RouterLink } from '@angular/router';
-import { Table, TableModule } from 'primeng/table';
-import { Tooltip } from 'primeng/tooltip';
-import { Company } from '@/types/company';
-import { User } from '@/types/user';
-import { Card } from 'primeng/card';
-import { NgIf } from '@angular/common';
-import { Toast } from 'primeng/toast';
-import { ProgressSpinner } from 'primeng/progressspinner';
-import { FormsModule } from '@angular/forms';
-import { CompanyService } from '@/pages/company/company.service';
-import { UserService } from '@/pages/users/user.service';
+import {Component, OnInit, ViewChild} from '@angular/core';
+import {Button} from 'primeng/button';
+import {IconField} from 'primeng/iconfield';
+import {InputIcon} from 'primeng/inputicon';
+import {InputText} from 'primeng/inputtext';
+import {MessageService, PrimeTemplate} from 'primeng/api';
+import {Router, RouterLink} from '@angular/router';
+import {Table, TableModule} from 'primeng/table';
+import {Tooltip} from 'primeng/tooltip';
+import {Company} from '@/types/company';
+import {User} from '@/types/user';
+import {Card} from 'primeng/card';
+import {NgIf} from '@angular/common';
+import {Toast} from 'primeng/toast';
+import {ProgressSpinner} from 'primeng/progressspinner';
+import {FormsModule} from '@angular/forms';
+import {CompanyService} from '@/pages/company/company.service';
+import {UserService} from '@/pages/users/user.service';
 
 @Component({
     selector: 'app-company-page',
@@ -143,9 +143,9 @@ export class CompanyPage implements OnInit {
         });
     }
 
-    manageCompany(controlNumber: number) {
+    manageCompany(companyId: string) {
         this.userService
-            .manageOtherCompany(controlNumber)
+            .manageOtherCompany(companyId)
             .then(() => this.router.navigate(['/']))
             .catch(() => {
                 this.messageService.add({

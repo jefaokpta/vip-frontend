@@ -65,20 +65,16 @@ export class UserService {
         this.setUser(payload.token);
     }
 
-    async manageOtherCompany(controlNumber: number) {
+    async manageOtherCompany(companyId: string) {
         const response = await executeRequest(
-            this.http.post<LoginResponse>(`${this.BACKEND}/users/manage`, { controlNumber }, httpHeaders())
+            this.http.post<LoginResponse>(`${this.BACKEND}/users/manage`, {companyId}, httpHeaders())
         );
         return this.setUser(response.token);
     }
 
     async exitManageCompany() {
         const response = await executeRequest(
-            this.http.post<LoginResponse>(
-                `${this.BACKEND}/users/manage/exit`,
-                { controlNumber: this.getUser().companyId },
-                httpHeaders()
-            )
+            this.http.post<LoginResponse>(`${this.BACKEND}/users/manage/exit`, {}, httpHeaders())
         );
         return this.setUser(response.token);
     }
