@@ -1,13 +1,13 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { InputTextModule } from 'primeng/inputtext';
-import { ButtonModule } from 'primeng/button';
-import { CardModule } from 'primeng/card';
-import { ToastModule } from 'primeng/toast';
-import { NgIf } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
-import { CompanyService } from '@/pages/company/company.service';
-import { InputMask } from 'primeng/inputmask';
+import {Component, OnInit} from '@angular/core';
+import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {InputTextModule} from 'primeng/inputtext';
+import {ButtonModule} from 'primeng/button';
+import {CardModule} from 'primeng/card';
+import {ToastModule} from 'primeng/toast';
+import {NgIf} from '@angular/common';
+import {Router, RouterLink} from '@angular/router';
+import {CompanyService} from '@/pages/company/company.service';
+import {InputMask} from 'primeng/inputmask';
 
 /**
  * @author Jefferson Alves Reis (jefaokpta)
@@ -65,20 +65,6 @@ import { InputMask } from 'primeng/inputmask';
                     </small>
                 </div>
 
-                <div class="field mb-4">
-                    <label for="companyId" class="block mb-2">Código de Controle *</label>
-                    <p-input-mask mask="999999" formControlName="companyId" placeholder="100054" />
-                    <small
-                        *ngIf="companyId?.invalid && (companyId?.dirty || companyId?.touched)"
-                        class="p-error block mt-2"
-                    >
-                        <div *ngIf="companyId?.errors?.['required']">Código da empresa é obrigatório.</div>
-                        <div *ngIf="companyId?.errors?.['pattern']">
-                            Código deve conter exatamente 6 dígitos numéricos.
-                        </div>
-                    </small>
-                </div>
-
                 <div class="flex mt-4">
                     <p-button type="submit" label="Salvar" [disabled]="form.invalid || pending">
                         <i *ngIf="pending" class="pi pi-spin pi-spinner"></i>
@@ -86,9 +72,7 @@ import { InputMask } from 'primeng/inputmask';
                     </p-button>
                 </div>
 
-                <small *ngIf="showError" class="text-red-500"
-                    >Houve um erro, verifique se o código de controle já existe.</small
-                >
+                <small *ngIf="showError" class="text-red-500">Houve um erro ao salvar a empresa.</small>
             </form>
         </p-card>
     `
@@ -107,9 +91,6 @@ export class NewCompanyPage implements OnInit {
     get name() {
         return this.form.get('name');
     }
-    get companyId() {
-        return this.form.get('companyId');
-    }
     get cnpj() {
         return this.form.get('cnpj');
     }
@@ -121,7 +102,6 @@ export class NewCompanyPage implements OnInit {
         this.form = this.fb.group({
             name: ['', [Validators.required]],
             corporateName: ['', [Validators.required]],
-            companyId: ['', [Validators.required, Validators.pattern('^[0-9]{6}$')]],
             cnpj: [
                 '',
                 [

@@ -1,8 +1,8 @@
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Company } from '@/types/company';
-import { executeRequest, httpHeaders } from '@/util/utils';
-import { environment } from '../../../environments/environment';
+import {Injectable} from '@angular/core';
+import {HttpClient} from '@angular/common/http';
+import {Company, NewCompany} from '@/types/company';
+import {executeRequest, httpHeaders} from '@/util/utils';
+import {environment} from '../../../environments/environment';
 
 @Injectable({
     providedIn: 'root'
@@ -26,7 +26,7 @@ export class CompanyService {
         return executeRequest(this.http.get<Company[]>(`${this.BACKEND}/companies`, httpHeaders()));
     }
 
-    create(company: Company) {
+    create(company: NewCompany) {
         return executeRequest(this.http.post(`${this.BACKEND}/companies`, company, httpHeaders()));
     }
 }
