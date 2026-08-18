@@ -4,6 +4,7 @@ export interface Company {
     readonly corporateName: string;
     readonly companyId: string;
     readonly cnpj: string;
+    readonly tenantId: number;
 }
 
 export interface NewCompany {

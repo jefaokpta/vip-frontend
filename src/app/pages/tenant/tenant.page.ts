@@ -180,11 +180,11 @@ export class TenantPage implements OnInit {
                             life: 15_000
                         });
                     })
-                    .catch(() => {
+                    .catch((err) => {
                         this.messageService.add({
                             severity: 'error',
                             summary: 'Desculpe não foi possível remover o tenant',
-                            detail: 'Verifique se ainda existem companies vinculadas a esse tenant.',
+                            detail: err?.error?.message || 'Tente novamente mais tarde.',
                             life: 15_000
                         });
                     });
