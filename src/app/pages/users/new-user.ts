@@ -98,7 +98,7 @@ export class NewUserPage implements OnInit {
         this.form = this.fb.group({
             name: ['', [Validators.required]],
             email: ['', [Validators.required, Validators.email]],
-            role: [RoleEnum.ROLE_USER, [Validators.required]]
+            role: [RoleEnum.ROLE_COMPANY_USER, [Validators.required]]
         });
         const user = this.userService.getUser();
         this.roleOptions = buildRoleOptions(user.roles);

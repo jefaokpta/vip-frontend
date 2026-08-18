@@ -4,17 +4,17 @@
  * @create 5/13/25
  */
 
-import { Component, OnInit } from '@angular/core';
-import { Button } from 'primeng/button';
-import { InputText } from 'primeng/inputtext';
-import { NgIf } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { Card } from 'primeng/card';
-import { RoleEnum } from '@/types/role-enum';
-import { Select } from 'primeng/select';
-import { UserService } from '@/pages/users/user.service';
-import { buildRoleOptions } from '@/pages/users/utils';
+import {Component, OnInit} from '@angular/core';
+import {Button} from 'primeng/button';
+import {InputText} from 'primeng/inputtext';
+import {NgIf} from '@angular/common';
+import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {ActivatedRoute, Router, RouterLink} from '@angular/router';
+import {Card} from 'primeng/card';
+import {RoleEnum} from '@/types/role-enum';
+import {Select} from 'primeng/select';
+import {UserService} from '@/pages/users/user.service';
+import {buildRoleOptions} from '@/pages/users/utils';
 
 @Component({
     selector: 'app-edit-user',
@@ -91,7 +91,7 @@ export class EditUserPage implements OnInit {
             id: [null, [Validators.required]],
             name: ['', [Validators.required]],
             email: ['', [Validators.required, Validators.email]],
-            role: [RoleEnum.ROLE_USER, [Validators.required]]
+            role: [RoleEnum.ROLE_COMPANY_USER, [Validators.required]]
         });
         const id = this.activatedRoute.snapshot.paramMap.get('id')!;
         this.userService.findById(id).then((user) => {

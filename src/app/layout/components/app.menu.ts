@@ -182,7 +182,7 @@ export class AppMenu implements OnInit {
         },
         {
             label: 'Configurações',
-            roles: ['ROLE_ADMIN', 'ROLE_SUPER'],
+            roles: ['ROLE_COMPANY_ADMIN', 'ROLE_SAAS_ADMIN'],
             icon: 'pi pi-fw pi-microchip-ai',
             items: [
                 {
@@ -192,13 +192,13 @@ export class AppMenu implements OnInit {
                 },
                 {
                     label: 'Empresas',
-                    roles: ['ROLE_SUPER'],
+                    roles: ['ROLE_SAAS_ADMIN'],
                     icon: 'pi pi-fw pi-building',
                     routerLink: ['/pages/companies']
                 },
                 {
                     label: 'Integrações',
-                    roles: ['ROLE_ADMIN'],
+                    roles: ['ROLE_COMPANY_ADMIN'],
                     icon: 'fa fa-puzzle-piece',
                     routerLink: ['/pages/integrations']
                 }
