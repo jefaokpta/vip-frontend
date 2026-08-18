@@ -1,14 +1,14 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { InputTextModule } from 'primeng/inputtext';
-import { ButtonModule } from 'primeng/button';
-import { CardModule } from 'primeng/card';
-import { ToastModule } from 'primeng/toast';
-import { NgIf } from '@angular/common';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { Select } from 'primeng/select';
-import { TenantService } from '@/pages/tenant/tenant.service';
-import { CompanyService } from '@/pages/company/company.service';
+import {Component, OnInit} from '@angular/core';
+import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {InputTextModule} from 'primeng/inputtext';
+import {ButtonModule} from 'primeng/button';
+import {CardModule} from 'primeng/card';
+import {ToastModule} from 'primeng/toast';
+import {NgIf} from '@angular/common';
+import {ActivatedRoute, Router, RouterLink} from '@angular/router';
+import {Select} from 'primeng/select';
+import {TenantService} from '@/pages/tenant/tenant.service';
+import {CompanyService} from '@/pages/company/company.service';
 
 @Component({
     selector: 'app-edit-tenant',
@@ -40,7 +40,7 @@ import { CompanyService } from '@/pages/company/company.service';
                 </div>
 
                 <div class="field mb-4">
-                    <label for="primaryCompanyId" class="block mb-2">Company Primária *</label>
+                    <label for="primaryCompanyId" class="block mb-2">Empresa Primária *</label>
                     <p-select
                         id="primaryCompanyId"
                         [options]="companyOptions"
@@ -48,6 +48,7 @@ import { CompanyService } from '@/pages/company/company.service';
                         optionLabel="label"
                         optionValue="value"
                         placeholder="Selecione a Company"
+                        readonly
                     ></p-select>
                     <small
                         *ngIf="primaryCompanyId?.invalid && (primaryCompanyId?.dirty || primaryCompanyId?.touched)"

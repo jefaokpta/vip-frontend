@@ -1,20 +1,20 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { Table, TableModule } from 'primeng/table';
-import { ConfirmationService, MessageService } from 'primeng/api';
-import { Card } from 'primeng/card';
-import { IconField } from 'primeng/iconfield';
-import { InputIcon } from 'primeng/inputicon';
-import { InputText } from 'primeng/inputtext';
-import { Button } from 'primeng/button';
-import { RouterLink } from '@angular/router';
-import { ProgressSpinner } from 'primeng/progressspinner';
-import { ConfirmDialog } from 'primeng/confirmdialog';
-import { Toast } from 'primeng/toast';
-import { Tooltip } from 'primeng/tooltip';
-import { Tenant } from '@/types/tenant';
-import { TenantService } from '@/pages/tenant/tenant.service';
-import { CompanyService } from '@/pages/company/company.service';
-import { Company } from '@/types/company';
+import {Component, OnInit, ViewChild} from '@angular/core';
+import {Table, TableModule} from 'primeng/table';
+import {ConfirmationService, MessageService} from 'primeng/api';
+import {Card} from 'primeng/card';
+import {IconField} from 'primeng/iconfield';
+import {InputIcon} from 'primeng/inputicon';
+import {InputText} from 'primeng/inputtext';
+import {Button} from 'primeng/button';
+import {RouterLink} from '@angular/router';
+import {ProgressSpinner} from 'primeng/progressspinner';
+import {ConfirmDialog} from 'primeng/confirmdialog';
+import {Toast} from 'primeng/toast';
+import {Tooltip} from 'primeng/tooltip';
+import {Tenant} from '@/types/tenant';
+import {TenantService} from '@/pages/tenant/tenant.service';
+import {CompanyService} from '@/pages/company/company.service';
+import {Company} from '@/types/company';
 
 @Component({
     selector: 'app-tenant-page',
@@ -70,7 +70,7 @@ import { Company } from '@/types/company';
                             Nome
                             <p-sortIcon field="name"></p-sortIcon>
                         </th>
-                        <th>Company Primária</th>
+                        <th>Empresa Primária</th>
                         <th style="width: 10%">Ações</th>
                     </tr>
                 </ng-template>
