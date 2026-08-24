@@ -36,6 +36,9 @@ import {EditCallGroupPage} from '@/pabx/call-group/edit-call-group.page';
 import {UrasPage} from '@/pabx/ura/uras.page';
 import {NewUraPage} from '@/pabx/ura/new-ura.page';
 import {EditUraPage} from '@/pabx/ura/edit-ura.page';
+import {SurveysPage} from '@/pabx/survey/surveys.page';
+import {NewSurveyPage} from '@/pabx/survey/new-survey.page';
+import {EditSurveyPage} from '@/pabx/survey/edit-survey.page';
 import {ReportPage} from '@/pabx/report/report.page';
 import {QueuesPage} from '@/pabx/queue/queues.page';
 import {NewQueuePage} from '@/pabx/queue/new-queue.page';
@@ -96,6 +99,10 @@ export default [
     { path: 'uras', component: UrasPage, data: { breadcrumb: 'URA' } },
     { path: 'uras/new', component: NewUraPage, data: { breadcrumb: 'URA > Nova' } },
     { path: 'uras/edit/:id', component: EditUraPage, data: { breadcrumb: 'URA > Editar' } },
+
+    { path: 'surveys', component: SurveysPage, data: { breadcrumb: 'Pesquisa de Satisfação' } },
+    { path: 'surveys/new', component: NewSurveyPage, data: { breadcrumb: 'Pesquisa de Satisfação > Nova' } },
+    { path: 'surveys/edit/:id', component: EditSurveyPage, data: { breadcrumb: 'Pesquisa de Satisfação > Editar' } },
 
     { path: 'call-report', component: ReportPage, data: { breadcrumb: 'Relatório de Chamadas' } },
 
