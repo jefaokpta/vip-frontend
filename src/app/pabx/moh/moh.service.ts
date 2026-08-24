@@ -8,11 +8,16 @@ import { firstValueFrom } from 'rxjs';
 @Injectable({ providedIn: 'root' })
 export class MohService {
     private readonly BACKEND = environment.API_BACKEND_URL;
+    private cachedFindAllPromise: Promise<Moh[]> | null = null;
 
     constructor(private readonly http: HttpClient) {}
 
     findAll(): Promise<Moh[]> {
-        return executeRequest(this.http.get<Moh[]>(`${this.BACKEND}/mohs`, httpHeaders()));
+        if (this.cachedFindAllPromise) {
+            return this.cachedFindAllPromise;
+        }
+        this.cachedFindAllPromise = executeRequest(this.http.get<Moh[]>(`${this.BACKEND}/mohs`, httpHeaders()));
+        return this.cachedFindAllPromise;
     }
 
     findById(id: string): Promise<Moh> {
@@ -27,16 +32,21 @@ export class MohService {
         await firstValueFrom(
             this.http.put(uploadUrl, file, { headers: new HttpHeaders({ 'Content-Type': file.type || 'audio/mpeg' }) })
         );
+        this.cachedFindAllPromise = null;
         return moh;
     }
 
     update(id: number, name: string): Promise<Moh> {
         const formData = new FormData();
         formData.append('name', name);
-        return executeRequest(this.http.put<Moh>(`${this.BACKEND}/mohs/${id}`, formData, httpHeaders()));
+        const result = executeRequest(this.http.put<Moh>(`${this.BACKEND}/mohs/${id}`, formData, httpHeaders()));
+        this.cachedFindAllPromise = null;
+        return result;
     }
 
     delete(id: number) {
-        return executeRequest(this.http.delete(`${this.BACKEND}/mohs/${id}`, httpHeaders()));
+        const result = executeRequest(this.http.delete(`${this.BACKEND}/mohs/${id}`, httpHeaders()));
+        this.cachedFindAllPromise = null;
+        return result;
     }
 }
