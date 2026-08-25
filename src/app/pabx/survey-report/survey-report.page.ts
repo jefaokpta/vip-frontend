@@ -160,6 +160,7 @@ export class SurveyReportPage implements OnInit {
     }
 
     onSurveySelect(): void {
+        this.responses = [];
         this.dateRange = [];
         this.maxDate = new Date(this.today);
         this.loadLastResponses();
@@ -176,16 +177,20 @@ export class SurveyReportPage implements OnInit {
         }
 
         if (this.dateRange[0] && this.dateRange[1]) {
+            const requested = this.selectedSurvey;
             this.loading = true;
             const end = new Date(this.dateRange[1]);
             end.setHours(23, 59, 59, 999);
             this.surveyReportService
-                .findByDateRange(this.selectedSurvey.id, this.dateRange[0], end)
+                .findByDateRange(requested.id, this.dateRange[0], end)
                 .then((responses) => {
+                    if (this.selectedSurvey !== requested) return;
                     this.responses = responses;
                     this.loading = false;
                 })
                 .catch(() => {
+                    if (this.selectedSurvey !== requested) return;
+                    this.responses = [];
                     this.loading = false;
                     this.showError();
                 });
@@ -199,14 +204,18 @@ export class SurveyReportPage implements OnInit {
 
     private loadLastResponses(): void {
         if (!this.selectedSurvey) return;
+        const requested = this.selectedSurvey;
         this.loading = true;
         this.surveyReportService
-            .findLastResponses(this.selectedSurvey.id)
+            .findLastResponses(requested.id)
             .then((responses) => {
+                if (this.selectedSurvey !== requested) return;
                 this.responses = responses;
                 this.loading = false;
             })
             .catch(() => {
+                if (this.selectedSurvey !== requested) return;
+                this.responses = [];
                 this.loading = false;
                 this.showError();
             });
@@ -240,7 +249,7 @@ export class SurveyReportPage implements OnInit {
     }
 
     averageLabel(value: number | null): string {
-        return value === null ? '—' : value.toString();
+        return value === null ? '—' : value.toFixed(1);
     }
 
     formatDate(createdAt: Date | string): string {

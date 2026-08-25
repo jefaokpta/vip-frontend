@@ -53,6 +53,7 @@ export class AppMenu implements OnInit {
                                 },
                                 {
                                     label: 'Pesquisa de Satisfação',
+                                    roles: [RoleEnum.ROLE_COMPANY_SUPERVISOR],
                                     icon: 'fa fa-music',
                                     routerLink: ['/pabx/survey-report']
                                 },
@@ -229,43 +230,28 @@ export class AppMenu implements OnInit {
     }
 
     ngOnInit() {
-        this.filteredModel = this.filterModel();
+        this.filteredModel = this.filterByRole(this.model);
     }
 
     /**
-     * Filtra o modelo de menu com base nas permissões do usuário atual.
-     * Realiza filtragem recursiva em todos os níveis de itens do menu.
+     * Filtra uma lista de itens de menu com base nas permissões do usuário atual.
+     * Realiza filtragem recursiva em todos os níveis de itens do menu (sem limite de profundidade).
      */
-    private filterModel(): MenuItem[] {
-        return this.model.filter((item) => {
+    private filterByRole(items: MenuItem[]): MenuItem[] {
+        return items.filter((item) => {
             // Se o item não tem permissão, exclui imediatamente
             if (item['roles'] && !this.hasRole(item['roles'])) {
                 return false;
             }
 
-            // Processa os itens filhos, se existirem
+            // Processa os itens filhos recursivamente, se existirem
             if (this.hasSubitems(item)) {
-                // Filtra itens de primeiro nível
                 item.items = this.filterByRole(item.items!);
-
-                // Filtra itens de segundo nível
-                this.filterByRoleLevel2(item);
+                // Mantém o item apenas se tiver pelo menos um subitem após filtragem
+                return item.items.length > 0;
             }
 
-            // Mantém o item se não tiver subitens ou se tiver pelo menos um subitem após filtragem
-            return !this.hasSubitems(item) || item.items!.length > 0;
-        });
-    }
-
-    /**
-     * Processa e filtra os subitens de segundo nível
-     */
-    private filterByRoleLevel2(item: MenuItem): void {
-        item.items = item.items?.map((subItem) => {
-            if (this.hasSubitems(subItem)) {
-                subItem.items = this.filterByRole(subItem.items!);
-            }
-            return subItem;
+            return true;
         });
     }
 
@@ -274,13 +260,6 @@ export class AppMenu implements OnInit {
      */
     private hasSubitems(item: MenuItem): boolean {
         return item.items !== undefined && Array.isArray(item.items);
-    }
-
-    /**
-     * Filtra uma lista de itens de menu com base nas permissões
-     */
-    private filterByRole(items: MenuItem[]): MenuItem[] {
-        return items.filter((item) => !item['roles'] || this.hasRole(item['roles']));
     }
 
     /**
