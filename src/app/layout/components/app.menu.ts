@@ -52,6 +52,11 @@ export class AppMenu implements OnInit {
                                     routerLink: ['/pabx/call-report']
                                 },
                                 {
+                                    label: 'Pesquisa de Satisfação',
+                                    icon: 'fa fa-music',
+                                    routerLink: ['/pabx/survey-report']
+                                },
+                                {
                                     label: 'DAC',
                                     icon: 'pi pi-fw pi-image'
                                 }

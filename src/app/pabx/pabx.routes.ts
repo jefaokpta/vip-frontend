@@ -40,6 +40,7 @@ import {SurveysPage} from '@/pabx/survey/surveys.page';
 import {NewSurveyPage} from '@/pabx/survey/new-survey.page';
 import {EditSurveyPage} from '@/pabx/survey/edit-survey.page';
 import {ReportPage} from '@/pabx/report/report.page';
+import {SurveyReportPage} from '@/pabx/survey-report/survey-report.page';
 import {QueuesPage} from '@/pabx/queue/queues.page';
 import {NewQueuePage} from '@/pabx/queue/new-queue.page';
 import {EditQueuePage} from '@/pabx/queue/edit-queue.page';
@@ -105,6 +106,11 @@ export default [
     { path: 'surveys/edit/:id', component: EditSurveyPage, data: { breadcrumb: 'Pesquisa de Satisfação > Editar' } },
 
     { path: 'call-report', component: ReportPage, data: { breadcrumb: 'Relatório de Chamadas' } },
+    {
+        path: 'survey-report',
+        component: SurveyReportPage,
+        data: { breadcrumb: 'Relatório de Pesquisa de Satisfação' }
+    },
 
     { path: 'queues', component: QueuesPage, data: { breadcrumb: 'Filas de Atendimento' } },
     { path: 'queues/new', component: NewQueuePage, data: { breadcrumb: 'Filas > Nova' } },
