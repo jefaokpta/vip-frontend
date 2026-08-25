@@ -1,11 +1,11 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { InputText } from 'primeng/inputtext';
-import { Button } from 'primeng/button';
-import { Card } from 'primeng/card';
-import { Router, RouterLink } from '@angular/router';
-import { SurveyService } from '@/pabx/survey/survey.service';
-import { AudioSelectComponent } from '@/pabx/moh/audio-select.component';
+import {Component, OnInit} from '@angular/core';
+import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {InputText} from 'primeng/inputtext';
+import {Button} from 'primeng/button';
+import {Card} from 'primeng/card';
+import {Router, RouterLink} from '@angular/router';
+import {SurveyService} from '@/pabx/survey/survey.service';
+import {AudioSelectComponent} from '@/pabx/moh/audio-select.component';
 
 @Component({
     selector: 'app-new-survey-page',
@@ -30,7 +30,7 @@ import { AudioSelectComponent } from '@/pabx/moh/audio-select.component';
             <form [formGroup]="form" (ngSubmit)="onSubmit()" class="p-fluid">
                 <div class="field mb-4">
                     <label for="title" class="block mb-2">Título *</label>
-                    <input id="title" pInputText formControlName="title" class="w-full" />
+                    <input id="title" pInputText formControlName="title"/>
                     @if (form.get('title')?.invalid && (form.get('title')?.dirty || form.get('title')?.touched)) {
                         <small class="p-error block mt-2">Título é obrigatório.</small>
                     }
