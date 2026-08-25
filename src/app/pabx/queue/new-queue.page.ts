@@ -11,9 +11,11 @@ import {ToggleSwitch} from 'primeng/toggleswitch';
 import {Moh} from '@/pabx/types/moh';
 import {QueueStrategyEnum} from '@/pabx/types/queue-strategy-enum';
 import {User} from '@/types/user';
+import {Survey} from '@/pabx/types/survey';
 import {QueueService} from '@/pabx/queue/queue.service';
 import {MohService} from '@/pabx/moh/moh.service';
 import {UserService} from '@/pages/users/user.service';
+import {SurveyService} from '@/pabx/survey/survey.service';
 
 @Component({
     selector: 'app-new-queue-page',
@@ -105,6 +107,22 @@ import {UserService} from '@/pages/users/user.service';
                     ></p-select>
                 </div>
 
+                <div class="field mb-4">
+                    <label for="surveyId" class="block mb-2">Pesquisa de Satisfação</label>
+                    <p-select
+                        id="surveyId"
+                        [options]="surveys"
+                        formControlName="surveyId"
+                        optionLabel="title"
+                        optionValue="id"
+                        placeholder="Nenhuma"
+                        [showClear]="true"
+                    ></p-select>
+                    <small class="block mt-1 text-gray-500">
+                        Se selecionada, a pesquisa é tocada pro chamador ao final do atendimento.
+                    </small>
+                </div>
+
                 <div class="field flex items-center gap-3 mt-2 mb-4">
                     <label class="block">Entrar em fila vazia</label>
                     <p-toggleswitch formControlName="isJoinWhenEmpty"/>
@@ -176,6 +194,7 @@ export class NewQueuePage implements OnInit {
     pending = false;
     showError = false;
     mohs: Moh[] = [];
+    surveys: Survey[] = [];
     availableUsers: User[] = [];
     selectedUsers: User[] = [];
 
@@ -189,7 +208,8 @@ export class NewQueuePage implements OnInit {
         private readonly router: Router,
         private readonly queueService: QueueService,
         private readonly mohService: MohService,
-        private readonly userService: UserService
+        private readonly userService: UserService,
+        private readonly surveyService: SurveyService
     ) {}
 
     ngOnInit(): void {
@@ -202,12 +222,16 @@ export class NewQueuePage implements OnInit {
             queueSoundId: [null, [Validators.required]],
             isJoinWhenEmpty: [true],
             maxCalls: [0],
-            cooldownSeconds: [0]
+            cooldownSeconds: [0],
+            surveyId: [null]
         });
-        Promise.all([this.mohService.findAll(), this.userService.findAll()]).then(([mohs, users]) => {
-            this.mohs = mohs;
-            this.availableUsers = users;
-        });
+        Promise.all([this.mohService.findAll(), this.userService.findAll(), this.surveyService.findAll()]).then(
+            ([mohs, users, surveys]) => {
+                this.mohs = mohs;
+                this.availableUsers = users;
+                this.surveys = surveys;
+            }
+        );
     }
 
     get name() {

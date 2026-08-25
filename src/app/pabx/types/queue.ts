@@ -17,4 +17,5 @@ export interface Queue {
     readonly memberIds: number[];
     readonly isJoinWhenEmpty: boolean;
     readonly cooldownSeconds: number;
+    readonly surveyId?: number;
 }

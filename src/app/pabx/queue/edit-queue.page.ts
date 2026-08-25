@@ -12,9 +12,11 @@ import {Moh} from '@/pabx/types/moh';
 import {Queue} from '@/pabx/types/queue';
 import {QueueStrategyEnum} from '@/pabx/types/queue-strategy-enum';
 import {User} from '@/types/user';
+import {Survey} from '@/pabx/types/survey';
 import {QueueService} from '@/pabx/queue/queue.service';
 import {MohService} from '@/pabx/moh/moh.service';
 import {UserService} from '@/pages/users/user.service';
+import {SurveyService} from '@/pabx/survey/survey.service';
 
 @Component({
     selector: 'app-edit-queue-page',
@@ -112,6 +114,22 @@ import {UserService} from '@/pages/users/user.service';
                         ></p-select>
                     </div>
 
+                    <div class="field mb-4">
+                        <label for="surveyId" class="block mb-2">Pesquisa de Satisfação</label>
+                        <p-select
+                            id="surveyId"
+                            [options]="surveys"
+                            formControlName="surveyId"
+                            optionLabel="title"
+                            optionValue="id"
+                            placeholder="Nenhuma"
+                            [showClear]="true"
+                        ></p-select>
+                        <small class="block mt-1 text-gray-500">
+                            Se selecionada, a pesquisa é tocada pro chamador ao final do atendimento.
+                        </small>
+                    </div>
+
                     <div class="field flex items-center gap-3 mt-2 mb-4">
                         <label class="block">Entrar em fila vazia</label>
                         <p-toggleswitch formControlName="isJoinWhenEmpty" />
@@ -184,6 +202,7 @@ export class EditQueuePage implements OnInit {
     pending = false;
     showError = false;
     mohs: Moh[] = [];
+    surveys: Survey[] = [];
     availableUsers: User[] = [];
     selectedUsers: User[] = [];
     queue: Queue | null = null;
@@ -199,30 +218,36 @@ export class EditQueuePage implements OnInit {
         private readonly route: ActivatedRoute,
         private readonly queueService: QueueService,
         private readonly mohService: MohService,
-        private readonly userService: UserService
+        private readonly userService: UserService,
+        private readonly surveyService: SurveyService
     ) {}
 
     ngOnInit(): void {
         const id = this.route.snapshot.paramMap.get('id')!;
-        Promise.all([this.queueService.findById(id), this.mohService.findAll(), this.userService.findAll()]).then(
-            ([queue, mohs, users]) => {
-                this.queue = queue;
-                this.mohs = mohs;
-                this.selectedUsers = queue.memberIds.map((id) => users.find((u) => u.id === id)!).filter(Boolean);
-                this.availableUsers = users.filter((u) => !queue.memberIds.includes(u.id));
-                this.form = this.fb.group({
-                    name: [queue.name, [Validators.required]],
-                    queueStrategy: [queue.queueStrategy, [Validators.required]],
-                    ringTimeout: [queue.ringTimeout, [Validators.required]],
-                    queueTimeout: [queue.queueTimeout, [Validators.required]],
-                    serviceLevelSeconds: [queue.serviceLevelSeconds, [Validators.required]],
-                    queueSoundId: [queue.queueSoundId, [Validators.required]],
-                    isJoinWhenEmpty: [queue.isJoinWhenEmpty],
-                    maxCalls: [queue.maxCalls],
-                    cooldownSeconds: [queue.cooldownSeconds]
-                });
-            }
-        );
+        Promise.all([
+            this.queueService.findById(id),
+            this.mohService.findAll(),
+            this.userService.findAll(),
+            this.surveyService.findAll()
+        ]).then(([queue, mohs, users, surveys]) => {
+            this.queue = queue;
+            this.mohs = mohs;
+            this.surveys = surveys;
+            this.selectedUsers = queue.memberIds.map((id) => users.find((u) => u.id === id)!).filter(Boolean);
+            this.availableUsers = users.filter((u) => !queue.memberIds.includes(u.id));
+            this.form = this.fb.group({
+                name: [queue.name, [Validators.required]],
+                queueStrategy: [queue.queueStrategy, [Validators.required]],
+                ringTimeout: [queue.ringTimeout, [Validators.required]],
+                queueTimeout: [queue.queueTimeout, [Validators.required]],
+                serviceLevelSeconds: [queue.serviceLevelSeconds, [Validators.required]],
+                queueSoundId: [queue.queueSoundId, [Validators.required]],
+                isJoinWhenEmpty: [queue.isJoinWhenEmpty],
+                maxCalls: [queue.maxCalls],
+                cooldownSeconds: [queue.cooldownSeconds],
+                surveyId: [queue.surveyId ?? null]
+            });
+        });
     }
 
     get name() {
