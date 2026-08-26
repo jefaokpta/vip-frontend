@@ -3,24 +3,24 @@
  * @email jefaokpta@hotmail.com
  */
 
-import { Component, OnInit } from '@angular/core';
-import { TableModule } from 'primeng/table';
-import { MessageService } from 'primeng/api';
-import { Card } from 'primeng/card';
-import { ProgressSpinner } from 'primeng/progressspinner';
-import { Toast } from 'primeng/toast';
-import { NgIf } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { DatePicker } from 'primeng/datepicker';
-import { Tag } from 'primeng/tag';
-import { Cdr } from '@/pabx/types/cdr';
-import { ReportService } from '@/pabx/report/report.service';
+import {Component, OnInit} from '@angular/core';
+import {TableModule} from 'primeng/table';
+import {MessageService} from 'primeng/api';
+import {Card} from 'primeng/card';
+import {ProgressSpinner} from 'primeng/progressspinner';
+import {Toast} from 'primeng/toast';
+import {CurrencyPipe, NgIf} from '@angular/common';
+import {FormsModule} from '@angular/forms';
+import {DatePicker} from 'primeng/datepicker';
+import {Tag} from 'primeng/tag';
+import {Cdr} from '@/pabx/types/cdr';
+import {ReportService} from '@/pabx/report/report.service';
 
 @Component({
     selector: 'app-report-page',
     standalone: true,
     providers: [MessageService],
-    imports: [Card, TableModule, ProgressSpinner, Toast, NgIf, FormsModule, DatePicker, Tag],
+    imports: [Card, TableModule, ProgressSpinner, Toast, NgIf, FormsModule, DatePicker, Tag, CurrencyPipe],
     template: `
         <p-card>
             <ng-template #title>
@@ -60,6 +60,10 @@ import { ReportService } from '@/pabx/report/report.service';
                             Duração
                             <p-sortIcon field="billableSeconds"></p-sortIcon>
                         </th>
+                        <th pSortableColumn="cost">
+                            Custo
+                            <p-sortIcon field="cost"></p-sortIcon>
+                        </th>
                     </tr>
                 </ng-template>
 
@@ -84,12 +88,13 @@ import { ReportService } from '@/pabx/report/report.service';
                             </div>
                         </td>
                         <td>{{ formatDuration(cdr.billableSeconds) }}</td>
+                        <td>{{ cdr.cost | currency: 'BRL' : true : '1.2-2' }}</td>
                     </tr>
                 </ng-template>
 
                 <ng-template pTemplate="emptymessage">
                     <tr>
-                        <td colspan="5">
+                        <td colspan="6">
                             <div class="flex justify-center p-4" *ngIf="loading">
                                 <p-progress-spinner [style]="{ width: '2rem', height: '2rem' }" />
                             </div>

@@ -1,7 +1,7 @@
-import { CallAnalyzeStatusEnum } from '@/types/call-analyze-status-enum';
-import { SentimentEnum } from '@/types/sentiment-enum';
-import { TemperatureEnum } from '@/types/temperature-enum';
-import { UserFieldEnum } from '@/pabx/types/user-field-enum';
+import {CallAnalyzeStatusEnum} from '@/types/call-analyze-status-enum';
+import {SentimentEnum} from '@/types/sentiment-enum';
+import {TemperatureEnum} from '@/types/temperature-enum';
+import {UserFieldEnum} from '@/pabx/types/user-field-enum';
 
 export interface Cdr {
     readonly id: number;
@@ -23,4 +23,5 @@ export interface Cdr {
     readonly mostFrequentWords: string;
     readonly action: string;
     readonly billableSeconds: number;
+    readonly cost: number;
 }
