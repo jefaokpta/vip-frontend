@@ -79,3 +79,12 @@ Auth is JWT-based (`jwt-decode`); `UserService.refreshToken()` backs the route g
 - Component selector prefix: `p` (element, kebab-case for components; attribute, camelCase for directives) — enforced by `@angular-eslint/component-selector` / `directive-selector`.
 - Prettier: 4-space indent, single quotes, semicolons, no trailing commas, printWidth 120. Angular parser used for `*.component.html`.
 - PrimeNG 19 (Aura theme, pt-BR locale) + Tailwind CSS 3 utilities for styling.
+
+## Definição de Trabalho Feito (Definition of Done)
+
+- **Verificação técnica**: uma alteração só é considerada feita quando todos os testes passam com sucesso. Nunca pule, desabilite ou enfraqueça testes para atingir esse estado.
+- **Revisão automatizada**: nenhuma branch deve ser fundida (merge) na branch `dev` sem passar por uma revisão de código automatizada, feita por um agente independente (diferente daquele que escreveu o código).
+- **Processo de revisão**: se a verificação falhar, o agente deve corrigir a falha e repetir o ciclo (testes → revisão) até passar. A revisão deve ser comitada com uma mensagem de commit clara.
+- **Convenções**: não edite `to-do.md` (ou qualquer outro plano criado pelo usuário ou por outro agente) diretamente no worktree.
+- **Subagentes**: devem sempre trabalhar em worktrees isoladas, para não atrapalhar o desenvolvimento em andamento.
+- **Merge final**: depois do trabalho feito (testes passando + revisão aprovada), fazer o merge na branch `dev`.
