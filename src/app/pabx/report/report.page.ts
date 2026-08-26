@@ -13,14 +13,31 @@ import {CurrencyPipe, NgIf} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 import {DatePicker} from 'primeng/datepicker';
 import {Tag} from 'primeng/tag';
+import {Button} from 'primeng/button';
+import {Tooltip} from 'primeng/tooltip';
+import {RouterLink} from '@angular/router';
 import {Cdr} from '@/pabx/types/cdr';
 import {ReportService} from '@/pabx/report/report.service';
+import {dispositionSeverity, dispositionTranslate, formatDate, formatDuration} from '@/pabx/report/cdr-format';
 
 @Component({
     selector: 'app-report-page',
     standalone: true,
     providers: [MessageService],
-    imports: [Card, TableModule, ProgressSpinner, Toast, NgIf, FormsModule, DatePicker, Tag, CurrencyPipe],
+    imports: [
+        Card,
+        TableModule,
+        ProgressSpinner,
+        Toast,
+        NgIf,
+        FormsModule,
+        DatePicker,
+        Tag,
+        CurrencyPipe,
+        Button,
+        Tooltip,
+        RouterLink
+    ],
     template: `
         <p-card>
             <ng-template #title>
@@ -64,6 +81,7 @@ import {ReportService} from '@/pabx/report/report.service';
                             Custo
                             <p-sortIcon field="cost"></p-sortIcon>
                         </th>
+                        <th>Ações</th>
                     </tr>
                 </ng-template>
 
@@ -89,12 +107,22 @@ import {ReportService} from '@/pabx/report/report.service';
                         </td>
                         <td>{{ formatDuration(cdr.billableSeconds) }}</td>
                         <td>{{ cdr.cost | currency: 'BRL' : true : '1.2-2' }}</td>
+                        <td>
+                            <p-button
+                                icon="pi pi-search"
+                                [routerLink]="['detail', cdr.id]"
+                                outlined
+                                size="small"
+                                pTooltip="Detalhes"
+                                tooltipPosition="left"
+                            />
+                        </td>
                     </tr>
                 </ng-template>
 
                 <ng-template pTemplate="emptymessage">
                     <tr>
-                        <td colspan="6">
+                        <td colspan="7">
                             <div class="flex justify-center p-4" *ngIf="loading">
                                 <p-progress-spinner [style]="{ width: '2rem', height: '2rem' }" />
                             </div>
@@ -187,46 +215,8 @@ export class ReportPage implements OnInit {
             });
     }
 
-    formatDate(startTime: Date | string): string {
-        const d = new Date(startTime);
-        const pad = (n: number) => String(n).padStart(2, '0');
-        return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
-    }
-
-    formatDuration(seconds: number): string {
-        const h = Math.floor(seconds / 3600);
-        const m = Math.floor((seconds % 3600) / 60);
-        const s = seconds % 60;
-        const pad = (n: number) => String(n).padStart(2, '0');
-        return `${pad(h)}:${pad(m)}:${pad(s)}`;
-    }
-
-    dispositionSeverity(disposition: string): 'success' | 'info' | 'warn' | 'danger' | 'secondary' {
-        switch (disposition) {
-            case 'ANSWERED':
-                return 'success';
-            case 'BUSY':
-                return 'warn';
-            case 'NO ANSWER':
-            case 'FAILED':
-                return 'danger';
-            default:
-                return 'secondary';
-        }
-    }
-
-    dispositionTranslate(disposition: string): string {
-        switch (disposition) {
-            case 'ANSWERED':
-                return 'Atendida';
-            case 'BUSY':
-                return 'Ocupada';
-            case 'NO ANSWER':
-                return 'Não atendida';
-            case 'FAILED':
-                return 'Falha';
-            default:
-                return 'Desconhecido';
-        }
-    }
+    protected readonly formatDate = formatDate;
+    protected readonly formatDuration = formatDuration;
+    protected readonly dispositionSeverity = dispositionSeverity;
+    protected readonly dispositionTranslate = dispositionTranslate;
 }

@@ -58,7 +58,8 @@ import {AudioSelectComponent} from '@/pabx/moh/audio-select.component';
                     </div>
 
                     <p class="text-surface-500 dark:text-surface-400 text-sm mb-4">
-                        As respostas de cada pergunta serão captadas por DTMF durante a chamada: 1 dígito, nota de 1 a 5.
+                        As respostas de cada pergunta serão captadas por DTMF durante a chamada: 1 dígito, nota de 1 a
+                        5.
                     </p>
 
                     <div class="field mb-4">

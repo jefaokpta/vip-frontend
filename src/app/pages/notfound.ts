@@ -1,7 +1,7 @@
-import { AppConfigurator } from '@/layout/components/app.configurator';
-import { Component } from '@angular/core';
-import { RouterModule } from '@angular/router';
-import { ButtonModule } from 'primeng/button';
+import {AppConfigurator} from '@/layout/components/app.configurator';
+import {Component} from '@angular/core';
+import {RouterModule} from '@angular/router';
+import {ButtonModule} from 'primeng/button';
 
 @Component({
     selector: 'app-notfound',
@@ -28,7 +28,9 @@ import { ButtonModule } from 'primeng/button';
         <div class="px-8 min-h-screen flex justify-center items-center">
             <div class="z-10 text-center">
                 <div class="text-surface-900 dark:text-surface-0 font-bold text-8xl mb-6">Oops!</div>
-                <p class="leading-normal mt-0 mb-8 text-surface-700 dark:text-surface-100 text-xl font-medium">Nada por aqui</p>
+                <p class="leading-normal mt-0 mb-8 text-surface-700 dark:text-surface-100 text-xl font-medium">
+                    Nada por aqui
+                </p>
                 <p-button [routerLink]="['/']" severity="warn" raised>Ir para o inicio</p-button>
             </div>
         </div>

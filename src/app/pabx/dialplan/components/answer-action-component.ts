@@ -1,15 +1,11 @@
-import {Component} from "@angular/core";
-import {Message} from "primeng/message";
-import {Panel} from "primeng/panel";
-import {ReactiveFormsModule} from "@angular/forms";
+import {Component} from '@angular/core';
+import {Message} from 'primeng/message';
+import {Panel} from 'primeng/panel';
+import {ReactiveFormsModule} from '@angular/forms';
 
 @Component({
     selector: 'app-answer-action-component',
-    imports: [
-        Message,
-        Panel,
-        ReactiveFormsModule
-    ],
+    imports: [Message, Panel, ReactiveFormsModule],
     template: `
         <p-panel header="Atende Chamada" [toggleable]="true" toggler="header" collapsed>
             <div class="flex flex-col gap-4">

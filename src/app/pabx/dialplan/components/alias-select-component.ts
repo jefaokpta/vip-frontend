@@ -3,7 +3,7 @@ import {Component, forwardRef, Input, OnInit} from '@angular/core';
 import {ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule} from '@angular/forms';
 import {Select} from 'primeng/select';
 import {NgIf} from '@angular/common';
-import {AliasService} from "@/pabx/alias/alias.service";
+import {AliasService} from '@/pabx/alias/alias.service';
 
 @Component({
     selector: 'app-alias-select-component',
@@ -28,9 +28,7 @@ import {AliasService} from "@/pabx/alias/alias.service";
                 optionValue="value"
                 placeholder="Selecione um alias"
             ></p-select>
-            <small *ngIf="showError" class="p-error block mt-2">
-                Alias é obrigatório.
-            </small>
+            <small *ngIf="showError" class="p-error block mt-2"> Alias é obrigatório. </small>
         </div>
     `
 })
@@ -43,9 +41,12 @@ export class AliasSelectComponent implements ControlValueAccessor, OnInit {
     }
 
     ngOnInit() {
-        this.aliasService.findAll()
-            .then(aliases => this.aliasOptions = aliases
-                .map(alias => ({label: alias.name, value: alias.id.toString()})))
+        this.aliasService
+            .findAll()
+            .then(
+                (aliases) =>
+                    (this.aliasOptions = aliases.map((alias) => ({label: alias.name, value: alias.id.toString()})))
+            );
     }
 
     private onChange: (value: string) => void = () => {

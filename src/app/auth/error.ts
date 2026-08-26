@@ -27,7 +27,9 @@ import {AppConfigurator} from '@/layout/components/app.configurator';
         <div class="px-8 min-h-screen flex justify-center items-center">
             <div class="z-10 text-center">
                 <div class="text-surface-900 dark:text-surface-0 font-bold text-8xl mb-6">ERRO</div>
-                <p class="leading-normal mt-0 mb-8 text-surface-700 dark:text-surface-100 text-xl font-medium">Algo de errado não está certo!</p>
+                <p class="leading-normal mt-0 mb-8 text-surface-700 dark:text-surface-100 text-xl font-medium">
+                    Algo de errado não está certo!
+                </p>
                 <p-button [routerLink]="['/']" severity="danger" raised>Ir para o inicio</p-button>
             </div>
         </div>

@@ -6,8 +6,8 @@ import {CardModule} from 'primeng/card';
 import {NgForOf, NgIf} from '@angular/common';
 import {Router, RouterLink} from '@angular/router';
 import {Tooltip} from 'primeng/tooltip';
-import { Alias } from '@/pabx/types/alias';
-import {AliasService} from "@/pabx/alias/alias.service";
+import {Alias} from '@/pabx/types/alias';
+import {AliasService} from '@/pabx/alias/alias.service';
 
 /**
  * @author Jefferson Alves Reis (jefaokpta)
@@ -17,16 +17,7 @@ import {AliasService} from "@/pabx/alias/alias.service";
 @Component({
     selector: 'app-new-alias-page',
     standalone: true,
-    imports: [
-        InputTextModule,
-        ButtonModule,
-        CardModule,
-        NgIf,
-        ReactiveFormsModule,
-        RouterLink,
-        NgForOf,
-        Tooltip
-    ],
+    imports: [InputTextModule, ButtonModule, CardModule, NgIf, ReactiveFormsModule, RouterLink, NgForOf, Tooltip],
     template: `
         <p-card>
             <ng-template #title>
@@ -101,9 +92,7 @@ import {AliasService} from "@/pabx/alias/alias.service";
                     </p-button>
                 </div>
 
-                <small *ngIf="showError" class="text-red-500">
-                    Erro ao salvar o alias
-                </small>
+                <small *ngIf="showError" class="text-red-500"> Erro ao salvar o alias </small>
             </form>
         </p-card>
     `
@@ -153,7 +142,8 @@ export class NewAliasPage implements OnInit {
                 return {expression};
             })
         };
-        this.aliasService.create(alias)
+        this.aliasService
+            .create(alias)
             .then(() => this.router.navigate(['/pabx/aliases']))
             .catch(() => {
                 this.showError = true;

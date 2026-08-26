@@ -1,5 +1,5 @@
-import {environment} from "../../../environments/environment";
-import {RxStompConfig} from "@stomp/rx-stomp";
+import {environment} from '../../../environments/environment';
+import {RxStompConfig} from '@stomp/rx-stomp';
 
 export const myRxStompConfig: RxStompConfig = {
     // Which server?
@@ -27,5 +27,5 @@ export const myRxStompConfig: RxStompConfig = {
     // Skip this key to stop logging to console
     debug: (msg: string): void => {
         console.log(new Date(), msg);
-    },
+    }
 };

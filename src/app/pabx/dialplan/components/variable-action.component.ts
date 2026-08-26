@@ -1,9 +1,9 @@
 import {Component, EventEmitter, forwardRef, Input, Output} from '@angular/core';
 import {ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule} from '@angular/forms';
-import {Panel} from "primeng/panel";
-import {InputText} from "primeng/inputtext";
-import {Message} from "primeng/message";
-import {NgIf} from "@angular/common";
+import {Panel} from 'primeng/panel';
+import {InputText} from 'primeng/inputtext';
+import {Message} from 'primeng/message';
+import {NgIf} from '@angular/common';
 
 @Component({
     selector: 'app-variable-action-component',

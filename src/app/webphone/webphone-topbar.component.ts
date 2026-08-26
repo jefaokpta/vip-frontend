@@ -3,13 +3,13 @@
  * @email jefaokpta@hotmail.com
  * @create 5/5/25
  */
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {Button} from 'primeng/button';
 import {WebphoneService} from '@/webphone/webphone.service';
 import {LayoutService} from '@/layout/service/layout.service';
 import {NgClass, NgIf} from '@angular/common';
 import {ButtonGroup} from 'primeng/buttongroup';
-import { PhoneStateEnum } from '@/types/phone-state-enum';
+import {PhoneStateEnum} from '@/types/phone-state-enum';
 import {handleCalleId, telephoneFormat} from '@/webphone/utils';
 
 @Component({
@@ -25,7 +25,9 @@ import {handleCalleId, telephoneFormat} from '@/webphone/utils';
             <p-button outlined severity="secondary" (click)="onWebphoneButtonClick()">
                 <i class="pi pi-phone"></i>
                 <ng-container *ngIf="phoneStatus().session; else noSession">
-                    <span class="ml-2">{{ telephoneFormat(handleCalleId(phoneStatus().session?.remote_identity?.uri?.user)) }}</span>
+                    <span class="ml-2">{{
+                        telephoneFormat(handleCalleId(phoneStatus().session?.remote_identity?.uri?.user))
+                    }}</span>
                     <span>{{ timer }}</span>
                     <i class="pi pi-circle-fill text-yellow-400"></i>
                 </ng-container>
@@ -75,5 +77,5 @@ export class WebphoneTopbarComponent implements OnInit {
 
     protected readonly PhoneStateEnum = PhoneStateEnum;
     protected readonly handleCalleId = handleCalleId;
-    protected readonly telephoneFormat = telephoneFormat
+    protected readonly telephoneFormat = telephoneFormat;
 }

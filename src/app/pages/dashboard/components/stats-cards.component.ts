@@ -1,9 +1,9 @@
-import { Component, Input, OnChanges } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { KnobModule } from 'primeng/knob';
-import { FormsModule } from '@angular/forms';
-import { Cdr } from '@/pabx/types/cdr';
-import { CallAnalyzeStatusEnum } from '@/types/call-analyze-status-enum';
+import {Component, Input, OnChanges} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {KnobModule} from 'primeng/knob';
+import {FormsModule} from '@angular/forms';
+import {Cdr} from '@/pabx/types/cdr';
+import {CallAnalyzeStatusEnum} from '@/types/call-analyze-status-enum';
 
 @Component({
     standalone: true,
@@ -14,7 +14,9 @@ import { CallAnalyzeStatusEnum } from '@/types/call-analyze-status-enum';
                 <span class="font-semibold text-lg">Total de Conversação</span>
                 <div class="flex justify-between items-start mt-4">
                     <div class="w-6/12">
-                        <span class="text-4xl font-bold text-surface-900 dark:text-surface-0">{{ totalConversation }}</span>
+                        <span class="text-4xl font-bold text-surface-900 dark:text-surface-0">{{
+                                totalConversation
+                            }}</span>
                         <small class="font-thin ml-2">min</small>
                     </div>
                     <div class="w-6/12">

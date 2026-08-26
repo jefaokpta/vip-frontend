@@ -1,11 +1,11 @@
-import { Component, Input, OnChanges, OnDestroy } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { SelectModule } from 'primeng/select';
-import { ChartModule } from 'primeng/chart';
-import { debounceTime, Subscription } from 'rxjs';
-import { LayoutService } from '@/layout/service/layout.service';
-import { Cdr } from '@/pabx/types/cdr';
-import { UserFieldEnum } from '@/pabx/types/user-field-enum';
+import {Component, Input, OnChanges, OnDestroy} from '@angular/core';
+import {FormsModule} from '@angular/forms';
+import {SelectModule} from 'primeng/select';
+import {ChartModule} from 'primeng/chart';
+import {debounceTime, Subscription} from 'rxjs';
+import {LayoutService} from '@/layout/service/layout.service';
+import {Cdr} from '@/pabx/types/cdr';
+import {UserFieldEnum} from '@/pabx/types/user-field-enum';
 
 @Component({
     standalone: true,
@@ -115,15 +115,23 @@ export class CallOverviewComponent implements OnChanges, OnDestroy {
     }
 
     private getOutboundCallsSumByDate(date: Date): number {
-        return this.cdrs.filter((cdr) => this.compareDates(date, new Date(cdr.startTime)) && cdr.userfield === UserFieldEnum.OUTBOUND).length;
+        return this.cdrs.filter(
+            (cdr) => this.compareDates(date, new Date(cdr.startTime)) && cdr.userfield === UserFieldEnum.OUTBOUND
+        ).length;
     }
 
     private getInboundCallsSumByDate(date: Date): number {
-        return this.cdrs.filter((cdr) => this.compareDates(date, new Date(cdr.startTime)) && cdr.userfield === UserFieldEnum.INBOUND).length;
+        return this.cdrs.filter(
+            (cdr) => this.compareDates(date, new Date(cdr.startTime)) && cdr.userfield === UserFieldEnum.INBOUND
+        ).length;
     }
 
     private compareDates(date1: Date, date2: Date): boolean {
-        return date1.getDate() === date2.getDate() && date1.getMonth() === date2.getMonth() && date1.getFullYear() === date2.getFullYear();
+        return (
+            date1.getDate() === date2.getDate() &&
+            date1.getMonth() === date2.getMonth() &&
+            date1.getFullYear() === date2.getFullYear()
+        );
     }
 
     private last7DaysFromNow(): ChartData[] {

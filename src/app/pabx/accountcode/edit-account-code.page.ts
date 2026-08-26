@@ -13,7 +13,7 @@ import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {Card} from 'primeng/card';
 import {AccountCodeService} from '@/pabx/accountcode/account-code.service';
 import {AccountCode} from '@/pabx/types/account-code';
-import {InputNumber} from "primeng/inputnumber";
+import {InputNumber} from 'primeng/inputnumber';
 import {MessageService} from 'primeng/api';
 import {Toast} from 'primeng/toast';
 
@@ -26,8 +26,9 @@ import {Toast} from 'primeng/toast';
         <p-card>
             <ng-template #title>
                 <div class="flex justify-between">
-                    <span class="font-semibold text-2xl">Editar {{ accountCode?.title }}
-                        - {{ accountCode?.code }}</span>
+                    <span class="font-semibold text-2xl"
+                    >Editar {{ accountCode?.title }} - {{ accountCode?.code }}</span
+                    >
                     <p-button
                         type="button"
                         label="Voltar"
@@ -40,7 +41,6 @@ import {Toast} from 'primeng/toast';
             </ng-template>
 
             <form [formGroup]="form" (ngSubmit)="onSubmit()" class="p-fluid">
-
                 <div class="field mb-4">
                     <label for="title" class="block mb-2">Título *</label>
                     <input id="title" pInputText class="p-inputtext" formControlName="acTitle"/>
@@ -60,16 +60,23 @@ import {Toast} from 'primeng/toast';
                 <div class="field mb-4">
                     <label for="fraction" class="block mb-2">Fração *</label>
                     <p-input-number id="fraction" mode="decimal" useGrouping="false" formControlName="fraction"/>
-                    <small *ngIf="fraction?.invalid && (fraction?.dirty || fraction?.touched)"
-                           class="p-error block mt-2">
+                    <small
+                        *ngIf="fraction?.invalid && (fraction?.dirty || fraction?.touched)"
+                        class="p-error block mt-2"
+                    >
                         <div *ngIf="fraction?.errors?.['required']">Fração é obrigatória.</div>
                     </small>
                 </div>
 
                 <div class="field mb-4">
                     <label for="cost" class="block mb-2">Custo *</label>
-                    <p-input-number id="cost" mode="currency" currency="BRL" currencyDisplay="symbol"
-                                    formControlName="cost"/>
+                    <p-input-number
+                        id="cost"
+                        mode="currency"
+                        currency="BRL"
+                        currencyDisplay="symbol"
+                        formControlName="cost"
+                    />
                     <small *ngIf="cost?.invalid && (cost?.dirty || cost?.touched)" class="p-error block mt-2">
                         <div *ngIf="cost?.errors?.['required']">Custo é obrigatório.</div>
                     </small>
@@ -85,7 +92,7 @@ import {Toast} from 'primeng/toast';
 export class EditAccountCodePage implements OnInit {
     form!: FormGroup;
     private readonly id: string;
-    accountCode?: AccountCode
+    accountCode?: AccountCode;
 
     constructor(
         private readonly fb: FormBuilder,
@@ -97,7 +104,6 @@ export class EditAccountCodePage implements OnInit {
         this.id = this.activatedRoute.snapshot.params['id'];
     }
 
-
     ngOnInit(): void {
         this.form = this.fb.group({
             id: ['', [Validators.required]],
@@ -105,20 +111,21 @@ export class EditAccountCodePage implements OnInit {
             acTitle: ['', [Validators.required]],
             fraction: ['', [Validators.required]],
             cost: ['', [Validators.required]],
-            cadence: ['', [Validators.required]],
+            cadence: ['', [Validators.required]]
         });
         this.accountCodeService.findById(this.id).then((accountCode) => {
             this.accountCode = accountCode;
             this.form.patchValue(accountCode);
-            this.acTitle?.setValue(accountCode.title)
+            this.acTitle?.setValue(accountCode.title);
         });
     }
 
     onSubmit() {
-        const accode = {...this.form.value, title: this.acTitle?.value}
-        this.accountCodeService.update(accode)
+        const accode = {...this.form.value, title: this.acTitle?.value};
+        this.accountCodeService
+            .update(accode)
             .then(() => {
-                this.router.navigate(['/pabx/accountcodes'])
+                this.router.navigate(['/pabx/accountcodes']);
             })
             .catch(() => {
                 this.messageService.add({
@@ -127,7 +134,7 @@ export class EditAccountCodePage implements OnInit {
                     detail: 'Tente novamente mais tarde.',
                     life: 15_000
                 });
-            })
+            });
     }
 
     get acTitle() {
@@ -145,5 +152,4 @@ export class EditAccountCodePage implements OnInit {
     get cost() {
         return this.form.get('cost');
     }
-
 }
