@@ -12,13 +12,17 @@ import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {Card} from 'primeng/card';
 import {AccountCodeService} from '@/pabx/accountcode/account-code.service';
-import { AccountCode } from '@/pabx/types/account-code';
+import {AccountCode} from '@/pabx/types/account-code';
 import {InputNumber} from "primeng/inputnumber";
+import {MessageService} from 'primeng/api';
+import {Toast} from 'primeng/toast';
 
 @Component({
     selector: 'app-edit-account-code-page',
-    imports: [Button, InputText, NgIf, ReactiveFormsModule, RouterLink, Card, InputNumber],
+    providers: [MessageService],
+    imports: [Button, InputText, NgIf, ReactiveFormsModule, RouterLink, Card, InputNumber, Toast],
     template: `
+        <p-toast></p-toast>
         <p-card>
             <ng-template #title>
                 <div class="flex justify-between">
@@ -87,7 +91,8 @@ export class EditAccountCodePage implements OnInit {
         private readonly fb: FormBuilder,
         private readonly router: Router,
         private readonly accountCodeService: AccountCodeService,
-        private readonly activatedRoute: ActivatedRoute
+        private readonly activatedRoute: ActivatedRoute,
+        private readonly messageService: MessageService
     ) {
         this.id = this.activatedRoute.snapshot.params['id'];
     }
@@ -111,9 +116,18 @@ export class EditAccountCodePage implements OnInit {
 
     onSubmit() {
         const accode = {...this.form.value, title: this.acTitle?.value}
-        this.accountCodeService.update(accode).then(() => {
-            this.router.navigate(['/pabx/accountcodes'])
-        })
+        this.accountCodeService.update(accode)
+            .then(() => {
+                this.router.navigate(['/pabx/accountcodes'])
+            })
+            .catch(() => {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Desculpe não foi possível salvar o centro de custo',
+                    detail: 'Tente novamente mais tarde.',
+                    life: 15_000
+                });
+            })
     }
 
     get acTitle() {
