@@ -92,6 +92,14 @@ interface PauseEntry {
                 <div class="flex justify-center p-10">
                     <p-progress-spinner [style]="{ width: '2.5rem', height: '2.5rem' }" />
                 </div>
+            } @else if (reportError()) {
+                <div class="flex flex-col items-center gap-3 p-10 text-center">
+                    <i class="pi pi-exclamation-triangle text-3xl text-red-500"></i>
+                    <span class="text-surface-600 dark:text-surface-300"
+                        >Não foi possível carregar o relatório. Tente novamente.</span
+                    >
+                    <p-button icon="pi pi-refresh" label="Tentar novamente" (onClick)="loadReport()" />
+                </div>
             } @else if (report()) {
                 <!-- KPI cards -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -268,6 +276,7 @@ export class MemberActivityReportPage implements OnInit {
     readonly report = signal<MemberActivityReportResponse | null>(null);
     readonly selectedMemberId = signal<number | null>(null);
     readonly loading = signal<boolean>(false);
+    readonly reportError = signal<boolean>(false);
 
     readonly today = new Date();
 
@@ -362,9 +371,19 @@ export class MemberActivityReportPage implements OnInit {
     ) {}
 
     ngOnInit(): void {
-        this.memberActivityReportService.findQueues().then((queues) => {
-            this.queues.set(queues);
-        });
+        this.memberActivityReportService
+            .findQueues()
+            .then((queues) => {
+                this.queues.set(queues);
+            })
+            .catch(() => {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Erro ao carregar filas',
+                    detail: 'Tente novamente mais tarde.',
+                    life: 10_000
+                });
+            });
     }
 
     onQueueSelect(): void {
@@ -417,11 +436,12 @@ export class MemberActivityReportPage implements OnInit {
         return 'bg-red-500';
     }
 
-    private loadReport(): void {
+    loadReport(): void {
         const queue = this.selectedQueue();
         if (!queue) return;
         const id = ++this.requestId;
         this.loading.set(true);
+        this.reportError.set(false);
 
         const start = new Date(this.date());
         start.setHours(0, 0, 0, 0);
@@ -439,6 +459,7 @@ export class MemberActivityReportPage implements OnInit {
                 if (id !== this.requestId) return;
                 this.report.set(null);
                 this.loading.set(false);
+                this.reportError.set(true);
                 this.showError();
             });
     }
