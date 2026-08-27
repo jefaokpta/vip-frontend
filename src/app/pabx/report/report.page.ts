@@ -3,22 +3,39 @@
  * @email jefaokpta@hotmail.com
  */
 
-import {Component, OnInit} from '@angular/core';
-import {TableModule} from 'primeng/table';
+import {Component, computed, effect, OnDestroy, OnInit, signal, ViewChild} from '@angular/core';
+import {Table, TableModule} from 'primeng/table';
 import {MessageService} from 'primeng/api';
 import {Card} from 'primeng/card';
 import {ProgressSpinner} from 'primeng/progressspinner';
 import {Toast} from 'primeng/toast';
-import {CurrencyPipe, NgIf} from '@angular/common';
+import {CurrencyPipe} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 import {DatePicker} from 'primeng/datepicker';
+import {Select} from 'primeng/select';
+import {ChartModule} from 'primeng/chart';
 import {Tag} from 'primeng/tag';
 import {Button} from 'primeng/button';
+import {IconField} from 'primeng/iconfield';
+import {InputIcon} from 'primeng/inputicon';
+import {InputText} from 'primeng/inputtext';
 import {Tooltip} from 'primeng/tooltip';
 import {RouterLink} from '@angular/router';
+import {debounceTime, Subscription} from 'rxjs';
 import {Cdr} from '@/pabx/types/cdr';
 import {ReportService} from '@/pabx/report/report.service';
 import {dispositionSeverity, dispositionTranslate, formatDate, formatDuration} from '@/pabx/report/cdr-format';
+import {LayoutService} from '@/layout/service/layout.service';
+
+interface StatusOption {
+    label: string;
+    value: string | null;
+}
+
+interface ChartBucket {
+    key: string;
+    label: string;
+}
 
 @Component({
     selector: 'app-report-page',
@@ -29,41 +46,128 @@ import {dispositionSeverity, dispositionTranslate, formatDate, formatDuration} f
         TableModule,
         ProgressSpinner,
         Toast,
-        NgIf,
         FormsModule,
         DatePicker,
+        Select,
+        ChartModule,
         Tag,
         CurrencyPipe,
         Button,
+        IconField,
+        InputIcon,
+        InputText,
         Tooltip,
         RouterLink
     ],
     template: `
         <p-card>
             <ng-template #title>
-                <div class="flex flex-col md:flex-row md:items-start md:justify-between mb-4">
-                    <h2 class="text-surface-900 dark:text-surface-0 text-2xl font-semibold mb-4 md:mb-0">
+                <div class="flex flex-col md:flex-row md:items-start md:justify-between mb-4 gap-3">
+                    <h2 class="text-surface-900 dark:text-surface-0 text-2xl font-semibold">
                         Relatório de Chamadas
                     </h2>
-                    <div class="flex items-center gap-2">
-                        <p-datepicker
-                            [(ngModel)]="dateRange"
-                            selectionMode="range"
-                            [readonlyInput]="true"
-                            [showButtonBar]="true"
-                            dateFormat="dd/mm/yy"
-                            placeholder="Selecione o período"
-                            [maxDate]="maxDate"
-                            [minDate]="minDate"
-                            (onSelect)="onDateSelect()"
-                            (onClearClick)="onClearDate()"
-                        >
-                        </p-datepicker>
+                    <div class="flex flex-col sm:flex-row items-start sm:items-end gap-3">
+                        <div class="flex flex-col gap-1">
+                            <label class="text-xs font-semibold uppercase tracking-wide text-surface-500">
+                                Período
+                            </label>
+                            <p-datepicker
+                                [ngModel]="dateRange()"
+                                (ngModelChange)="dateRange.set($event)"
+                                selectionMode="range"
+                                [readonlyInput]="true"
+                                [showButtonBar]="true"
+                                dateFormat="dd/mm/yy"
+                                placeholder="Selecione o período"
+                                [maxDate]="maxDate"
+                                [minDate]="minDate"
+                                (onSelect)="onDateSelect()"
+                                (onClearClick)="onClearDate()"
+                            >
+                            </p-datepicker>
+                        </div>
+                        <div class="flex flex-col gap-1">
+                            <label class="text-xs font-semibold uppercase tracking-wide text-surface-500">
+                                Status da Chamada
+                            </label>
+                            <p-select
+                                [options]="statusOptions()"
+                                [ngModel]="statusFilter()"
+                                (ngModelChange)="statusFilter.set($event)"
+                                optionLabel="label"
+                                optionValue="value"
+                                styleClass="w-44"
+                            ></p-select>
+                        </div>
                     </div>
                 </div>
             </ng-template>
 
-            <p-table [value]="cdrs" [paginator]="true" [rows]="30" [tableStyle]="{ 'min-width': '50rem' }" stripedRows>
+            <!-- KPI cards -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                <div
+                    class="rounded-xl shadow px-4 py-3 flex flex-col gap-1 border-l-4 border-blue-500 bg-white dark:bg-surface-900"
+                >
+                    <span class="text-xs font-semibold uppercase tracking-wide text-surface-500">
+                        Total de Chamadas
+                    </span>
+                    <span class="text-2xl font-bold">{{ totalCalls() }}</span>
+                </div>
+                <div
+                    class="rounded-xl shadow px-4 py-3 flex flex-col gap-1 border-l-4 border-purple-500 bg-white dark:bg-surface-900"
+                >
+                    <span class="text-xs font-semibold uppercase tracking-wide text-surface-500">
+                        Duração Média
+                    </span>
+                    <span class="text-2xl font-bold">{{ formatDuration(avgDurationSeconds()) }}</span>
+                </div>
+                <div
+                    class="rounded-xl shadow px-4 py-3 flex flex-col gap-1 border-l-4 border-green-500 bg-white dark:bg-surface-900"
+                >
+                    <span class="text-xs font-semibold uppercase tracking-wide text-surface-500">
+                        Taxa de Atendimento
+                    </span>
+                    <span class="text-2xl font-bold">{{ answerRate() }}%</span>
+                </div>
+                <div
+                    class="rounded-xl shadow px-4 py-3 flex flex-col gap-1 border-l-4 border-orange-500 bg-white dark:bg-surface-900"
+                >
+                    <span class="text-xs font-semibold uppercase tracking-wide text-surface-500">
+                        Total de Minutos
+                    </span>
+                    <span class="text-2xl font-bold">{{ totalMinutes() }}</span>
+                </div>
+            </div>
+
+            <!-- Chart -->
+            <div class="rounded-xl border border-surface-200 dark:border-surface-700 p-4 mb-4">
+                <h3 class="font-semibold text-lg mb-2">{{ chartTitle() }}</h3>
+                <p-chart type="bar" height="280" [data]="chartData" [options]="chartOptions"></p-chart>
+            </div>
+
+            <!-- Search -->
+            <div class="flex justify-end mb-2">
+                <p-iconfield>
+                    <p-inputicon class="pi pi-search"/>
+                    <input
+                        pInputText
+                        type="text"
+                        (input)="onFilterGlobal($event)"
+                        placeholder="Pesquisar"
+                        class="w-full"
+                    />
+                </p-iconfield>
+            </div>
+
+            <p-table
+                #dataTable
+                [value]="tableRows()"
+                [paginator]="true"
+                [rows]="30"
+                [globalFilterFields]="['dateLabel', 'displaySrc', 'destination']"
+                [tableStyle]="{ 'min-width': '50rem' }"
+                stripedRows
+            >
                 <ng-template pTemplate="header">
                     <tr>
                         <th pSortableColumn="startTime">
@@ -87,8 +191,8 @@ import {dispositionSeverity, dispositionTranslate, formatDate, formatDuration} f
 
                 <ng-template pTemplate="body" let-cdr>
                     <tr>
-                        <td>{{ formatDate(cdr.startTime) }}</td>
-                        <td>{{ cdr.userfield === 'OUTBOUND' ? cdr.peer : cdr.src }}</td>
+                        <td>{{ cdr.dateLabel }}</td>
+                        <td>{{ cdr.displaySrc }}</td>
                         <td>{{ cdr.destination }}</td>
                         <td>
                             <div class="flex items-center gap-2">
@@ -123,10 +227,14 @@ import {dispositionSeverity, dispositionTranslate, formatDate, formatDuration} f
                 <ng-template pTemplate="emptymessage">
                     <tr>
                         <td colspan="7">
-                            <div class="flex justify-center p-4" *ngIf="loading">
-                                <p-progress-spinner [style]="{ width: '2rem', height: '2rem' }" />
-                            </div>
-                            <div class="text-center p-4" *ngIf="!loading">Nenhuma chamada encontrada.</div>
+                            @if (loading()) {
+                                <div class="flex justify-center p-4">
+                                    <p-progress-spinner [style]="{ width: '2rem', height: '2rem' }"/>
+                                </div>
+                            }
+                            @if (!loading()) {
+                                <div class="text-center p-4">Nenhuma chamada encontrada.</div>
+                            }
                         </td>
                     </tr>
                 </ng-template>
@@ -135,10 +243,16 @@ import {dispositionSeverity, dispositionTranslate, formatDate, formatDuration} f
         <p-toast />
     `
 })
-export class ReportPage implements OnInit {
-    cdrs: Cdr[] = [];
-    dateRange: Date[] = [];
-    loading = true;
+export class ReportPage implements OnInit, OnDestroy {
+    readonly cdrs = signal<Cdr[]>([]);
+    readonly dateRange = signal<Date[]>([]);
+    readonly statusFilter = signal<string | null>(null);
+    readonly loading = signal<boolean>(true);
+
+    @ViewChild('dataTable') dt!: Table;
+
+    private requestId = 0;
+    private themeSubscription: Subscription;
 
     readonly today = new Date();
     maxDate = new Date();
@@ -148,20 +262,175 @@ export class ReportPage implements OnInit {
         return d;
     })();
 
+    chartData: any;
+    chartOptions: any;
+
+    readonly filteredCdrs = computed(() => {
+        const status = this.statusFilter();
+        const all = this.cdrs();
+        return status ? all.filter((c) => c.disposition === status) : all;
+    });
+
+    readonly statusOptions = computed<StatusOption[]>(() => {
+        const dispositions = Array.from(new Set(this.cdrs().map((c) => c.disposition))).sort();
+        return [
+            {label: 'Todos', value: null},
+            ...dispositions.map((d) => ({label: dispositionTranslate(d), value: d}))
+        ];
+    });
+
+    readonly totalCalls = computed(() => this.filteredCdrs().length);
+
+    readonly avgDurationSeconds = computed(() => {
+        const list = this.filteredCdrs();
+        if (!list.length) return 0;
+        return Math.round(list.reduce((sum, c) => sum + c.billableSeconds, 0) / list.length);
+    });
+
+    readonly answerRate = computed(() => {
+        const list = this.filteredCdrs();
+        if (!list.length) return 0;
+        const answered = list.filter((c) => c.disposition === 'ANSWERED').length;
+        return Math.round((answered / list.length) * 1000) / 10;
+    });
+
+    readonly totalMinutes = computed(() =>
+        Math.round(this.filteredCdrs().reduce((sum, c) => sum + c.billableSeconds, 0) / 60)
+    );
+
+    readonly isSingleDay = computed(() => {
+        const range = this.dateRange();
+        if (range.length === 2 && range[0] && range[1]) {
+            return this.isSameDay(range[0], range[1]);
+        }
+        return false;
+    });
+
+    readonly chartTitle = computed(() => (this.isSingleDay() ? 'Chamadas por Hora' : 'Chamadas por Dia'));
+
+    readonly chartDispositions = computed(() =>
+        Array.from(new Set(this.filteredCdrs().map((c) => c.disposition))).sort()
+    );
+
+    readonly chartBuckets = computed<ChartBucket[]>(() => {
+        if (this.isSingleDay()) {
+            return Array.from({length: 24}, (_, h) => ({
+                key: String(h),
+                label: `${String(h).padStart(2, '0')}:00`
+            }));
+        }
+
+        const range = this.dateRange();
+        const list = this.filteredCdrs();
+        let start: Date;
+        let end: Date;
+        if (range.length === 2 && range[0] && range[1]) {
+            start = new Date(range[0]);
+            end = new Date(range[1]);
+        } else if (list.length) {
+            const times = list.map((c) => new Date(c.startTime).getTime());
+            start = new Date(Math.min(...times));
+            end = new Date(Math.max(...times));
+        } else {
+            start = new Date();
+            end = new Date();
+        }
+
+        const buckets: ChartBucket[] = [];
+        const cursor = new Date(start);
+        cursor.setHours(0, 0, 0, 0);
+        const last = new Date(end);
+        last.setHours(0, 0, 0, 0);
+        while (cursor.getTime() <= last.getTime()) {
+            buckets.push({
+                key: this.dayKey(cursor),
+                label: `${String(cursor.getDate()).padStart(2, '0')}/${String(cursor.getMonth() + 1).padStart(2, '0')}`
+            });
+            cursor.setDate(cursor.getDate() + 1);
+        }
+        return buckets;
+    });
+
+    readonly tableRows = computed(() =>
+        this.filteredCdrs().map((cdr) => ({
+            ...cdr,
+            dateLabel: formatDate(cdr.startTime),
+            displaySrc: cdr.userfield === 'OUTBOUND' ? cdr.peer : cdr.src
+        }))
+    );
+
     constructor(
         private readonly reportService: ReportService,
-        private readonly messageService: MessageService
-    ) {}
+        private readonly messageService: MessageService,
+        private readonly layoutService: LayoutService
+    ) {
+        this.themeSubscription = this.layoutService.configUpdate$.pipe(debounceTime(50)).subscribe(() => {
+            this.initChart();
+        });
+        effect(() => {
+            this.filteredCdrs();
+            this.isSingleDay();
+            this.chartBuckets();
+            this.chartDispositions();
+            this.initChart();
+        });
+    }
 
     ngOnInit(): void {
-        this.reportService
-            .findLast30()
+        this.load(() => this.reportService.findLast30());
+    }
+
+    ngOnDestroy(): void {
+        this.themeSubscription.unsubscribe();
+    }
+
+    onDateSelect(): void {
+        const range = this.dateRange();
+        if (range[0] && !range[1]) {
+            const limit = new Date(range[0]);
+            limit.setMonth(limit.getMonth() + 2);
+            this.maxDate = limit > this.today ? this.today : limit;
+            return;
+        }
+
+        if (range[0] && range[1]) {
+            const end = new Date(range[1]);
+            end.setHours(23, 59, 59, 999);
+            this.statusFilter.set(null);
+            this.load(() => this.reportService.findByDateRange(range[0], end));
+        }
+    }
+
+    onClearDate(): void {
+        this.maxDate = new Date(this.today);
+        this.dateRange.set([]);
+        this.statusFilter.set(null);
+        this.load(() => this.reportService.findLast30());
+    }
+
+    onFilterGlobal(event: Event): void {
+        const target = event.target as HTMLInputElement | null;
+        if (target) {
+            this.dt.filterGlobal(target.value, 'contains');
+        }
+    }
+
+    protected readonly formatDuration = formatDuration;
+    protected readonly dispositionSeverity = dispositionSeverity;
+    protected readonly dispositionTranslate = dispositionTranslate;
+
+    private load(fetch: () => Promise<Cdr[]>): void {
+        const id = ++this.requestId;
+        this.loading.set(true);
+        fetch()
             .then((cdrs) => {
-                this.cdrs = cdrs;
-                this.loading = false;
+                if (id !== this.requestId) return;
+                this.cdrs.set(cdrs);
+                this.loading.set(false);
             })
             .catch(() => {
-                this.loading = false;
+                if (id !== this.requestId) return;
+                this.loading.set(false);
                 this.messageService.add({
                     severity: 'error',
                     summary: 'Erro ao carregar chamadas',
@@ -171,52 +440,80 @@ export class ReportPage implements OnInit {
             });
     }
 
-    onDateSelect(): void {
-        if (this.dateRange[0] && !this.dateRange[1]) {
-            const limit = new Date(this.dateRange[0]);
-            limit.setMonth(limit.getMonth() + 2);
-            this.maxDate = limit > this.today ? this.today : limit;
-            return;
-        }
+    private initChart(): void {
+        const documentStyle = getComputedStyle(document.documentElement);
+        const textColor = documentStyle.getPropertyValue('--text-color');
+        const textColorSecondary = documentStyle.getPropertyValue('--text-color-secondary');
+        const surfaceBorder = documentStyle.getPropertyValue('--surface-border');
 
-        if (this.dateRange[0] && this.dateRange[1]) {
-            this.loading = true;
-            const end = new Date(this.dateRange[1]);
-            end.setHours(23, 59, 59, 999);
-            this.reportService
-                .findByDateRange(this.dateRange[0], end)
-                .then((cdrs) => {
-                    this.cdrs = cdrs;
-                    this.loading = false;
-                })
-                .catch(() => {
-                    this.loading = false;
-                    this.messageService.add({
-                        severity: 'error',
-                        summary: 'Erro ao carregar chamadas',
-                        detail: 'Tente novamente mais tarde.',
-                        life: 10_000
-                    });
-                });
+        const buckets = this.chartBuckets();
+        const dispositions = this.chartDispositions();
+        const list = this.filteredCdrs();
+
+        this.chartData = {
+            labels: buckets.map((b) => b.label),
+            datasets: dispositions.map((d) => ({
+                label: dispositionTranslate(d),
+                backgroundColor: this.severityColor(d, documentStyle),
+                barThickness: 14,
+                borderRadius: 6,
+                data: buckets.map(
+                    (b) => list.filter((c) => c.disposition === d && this.dayKey(new Date(c.startTime)) === b.key).length
+                )
+            }))
+        };
+
+        this.chartOptions = {
+            animation: {duration: 1000},
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        color: textColor,
+                        usePointStyle: true,
+                        font: {weight: 700},
+                        padding: 20
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    ticks: {color: textColorSecondary, font: {weight: 500}},
+                    grid: {display: false, drawBorder: false}
+                },
+                y: {
+                    ticks: {color: textColorSecondary},
+                    grid: {color: surfaceBorder, drawBorder: false},
+                    beginAtZero: true
+                }
+            }
+        };
+    }
+
+    private severityColor(disposition: string, documentStyle: CSSStyleDeclaration): string {
+        switch (dispositionSeverity(disposition)) {
+            case 'success':
+                return documentStyle.getPropertyValue('--p-green-500');
+            case 'warn':
+                return documentStyle.getPropertyValue('--p-yellow-500');
+            case 'danger':
+                return documentStyle.getPropertyValue('--p-red-500');
+            default:
+                return documentStyle.getPropertyValue('--p-surface-400');
         }
     }
 
-    onClearDate(): void {
-        this.maxDate = new Date(this.today);
-        this.loading = true;
-        this.reportService
-            .findLast30()
-            .then((cdrs) => {
-                this.cdrs = cdrs;
-                this.loading = false;
-            })
-            .catch(() => {
-                this.loading = false;
-            });
+    private dayKey(date: Date): string {
+        if (this.isSingleDay()) return String(date.getHours());
+        const y = date.getFullYear();
+        const m = String(date.getMonth() + 1).padStart(2, '0');
+        const d = String(date.getDate()).padStart(2, '0');
+        return `${y}-${m}-${d}`;
     }
 
-    protected readonly formatDate = formatDate;
-    protected readonly formatDuration = formatDuration;
-    protected readonly dispositionSeverity = dispositionSeverity;
-    protected readonly dispositionTranslate = dispositionTranslate;
+    private isSameDay(a: Date, b: Date): boolean {
+        return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+    }
 }
