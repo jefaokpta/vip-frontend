@@ -1,17 +1,17 @@
-import { Component, OnInit, ViewChild, computed, signal } from '@angular/core';
-import { Table, TableModule } from 'primeng/table';
-import { MessageService } from 'primeng/api';
-import { Card } from 'primeng/card';
-import { ProgressSpinner } from 'primeng/progressspinner';
-import { Toast } from 'primeng/toast';
-import { FormsModule } from '@angular/forms';
-import { DatePicker } from 'primeng/datepicker';
-import { Select } from 'primeng/select';
-import { Button } from 'primeng/button';
-import { IconField } from 'primeng/iconfield';
-import { InputIcon } from 'primeng/inputicon';
-import { InputText } from 'primeng/inputtext';
-import { Tooltip } from 'primeng/tooltip';
+import {Component, computed, OnInit, signal, ViewChild} from '@angular/core';
+import {Table, TableModule} from 'primeng/table';
+import {MessageService} from 'primeng/api';
+import {Card} from 'primeng/card';
+import {ProgressSpinner} from 'primeng/progressspinner';
+import {Toast} from 'primeng/toast';
+import {FormsModule} from '@angular/forms';
+import {DatePicker} from 'primeng/datepicker';
+import {Select} from 'primeng/select';
+import {Button} from 'primeng/button';
+import {IconField} from 'primeng/iconfield';
+import {InputIcon} from 'primeng/inputicon';
+import {InputText} from 'primeng/inputtext';
+import {Tooltip} from 'primeng/tooltip';
 import {
     MemberActivity,
     MemberActivityPause,
@@ -19,7 +19,7 @@ import {
     MemberActivitySession,
     QueueOption
 } from '@/pabx/types/member-activity';
-import { MemberActivityReportService } from '@/pabx/member-activity-report/member-activity-report.service';
+import {MemberActivityReportService} from '@/pabx/member-activity-report/member-activity-report.service';
 
 interface JourneySegment {
     type: 'logged' | 'paused' | 'gap';
@@ -123,57 +123,131 @@ interface PauseEntry {
                     </div>
                 </div>
 
-                <!-- Jornada do Dia + Registro de Pausas -->
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
-                    @if (selectedMember(); as member) {
-                        <div class="lg:col-span-2 rounded-xl border border-surface-200 dark:border-surface-700 p-4">
-                            <div class="flex items-center justify-between mb-4">
-                                <h3 class="font-semibold text-lg">Jornada do Dia: {{ member.memberName }}</h3>
-                                <div class="flex items-center gap-2">
-                                    <span
-                                        class="text-xs font-bold px-2 py-1 rounded-full"
-                                        [class]="productivityBadgeClass(member.productivityPercent)"
-                                    >
-                                        Produtividade: {{ member.productivityPercent }}%
-                                    </span>
-                                    <p-button
-                                        icon="pi pi-times"
-                                        label="Ver todos"
-                                        text
-                                        size="small"
-                                        (onClick)="selectedMemberId.set(null)"
-                                    />
-                                </div>
-                            </div>
-
-                            <div class="flex w-full h-8 rounded overflow-hidden">
-                                @for (segment of journeySegments(); track $index) {
-                                    <div
-                                        [style.width.%]="segment.widthPercent"
-                                        [class]="journeySegmentClass(segment.type)"
-                                    ></div>
-                                }
-                            </div>
-                            <div class="flex justify-between text-xs text-surface-400 mt-1">
-                                @for (label of journeyHourLabels(); track $index) {
-                                    <span>{{ label }}</span>
-                                }
+                <!-- Jornada do Dia -->
+                @if (selectedMember(); as member) {
+                    <div class="rounded-xl border border-surface-200 dark:border-surface-700 p-4 mb-4">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-semibold text-lg">Jornada do Dia: {{ member.memberName }}</h3>
+                            <div class="flex items-center gap-2">
+                                <span
+                                    class="text-xs font-bold px-2 py-1 rounded-full"
+                                    [class]="productivityBadgeClass(member.productivityPercent)"
+                                >
+                                    Produtividade: {{ member.productivityPercent }}%
+                                </span>
+                                <p-button
+                                    icon="pi pi-times"
+                                    label="Ver todos"
+                                    text
+                                    size="small"
+                                    (onClick)="selectedMemberId.set(null)"
+                                />
                             </div>
                         </div>
-                    }
 
-                    <div [class]="selectedMemberId() !== null ? 'lg:col-span-1' : 'lg:col-span-3'">
+                        <div class="flex w-full h-8 rounded overflow-hidden">
+                            @for (segment of journeySegments(); track $index) {
+                                <div
+                                    [style.width.%]="segment.widthPercent"
+                                    [class]="journeySegmentClass(segment.type)"
+                                ></div>
+                            }
+                        </div>
+                        <div class="flex justify-between text-xs text-surface-400 mt-1">
+                            @for (label of journeyHourLabels(); track $index) {
+                                <span>{{ label }}</span>
+                            }
+                        </div>
+                    </div>
+                }
+
+                <!-- Detalhamento de Atividade + Registro de Pausas -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                    <div class="lg:col-span-2 rounded-xl border border-surface-200 dark:border-surface-700 p-4">
+                        <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-2">
+                            <h3 class="font-semibold text-lg">Detalhamento de Atividade</h3>
+                            <p-iconfield>
+                                <p-inputicon class="pi pi-search"/>
+                                <input
+                                    pInputText
+                                    type="text"
+                                    (input)="onFilterGlobal($event)"
+                                    placeholder="Filtrar tabela..."
+                                    class="w-full"
+                                />
+                            </p-iconfield>
+                        </div>
+
+                        <p-table
+                            #dataTable
+                            [value]="report()!.members"
+                            [paginator]="true"
+                            [rows]="10"
+                            [globalFilterFields]="['memberName']"
+                            [tableStyle]="{ 'min-width': '45rem' }"
+                            stripedRows
+                        >
+                            <ng-template pTemplate="header">
+                                <tr>
+                                    <th>Membro</th>
+                                    <th>Entrada/Saída</th>
+                                    <th>Tempo logado</th>
+                                    <th>Total de pausas</th>
+                                    <th>Produtividade</th>
+                                    <th>Ação</th>
+                                </tr>
+                            </ng-template>
+
+                            <ng-template pTemplate="body" let-member>
+                                <tr>
+                                    <td class="font-medium">{{ member.memberName }}</td>
+                                    <td>{{ formatSessionRange(member.entrada, member.saida) }}</td>
+                                    <td>{{ formatDuration(member.loggedSeconds) }}</td>
+                                    <td>{{ formatDuration(member.pauseSeconds) }}</td>
+                                    <td>
+                                        <div class="flex items-center gap-2">
+                                            <div class="w-20 h-1.5 rounded-full bg-surface-200 dark:bg-surface-700">
+                                                <div
+                                                    class="h-1.5 rounded-full"
+                                                    [class]="productivityBarClass(member.productivityPercent)"
+                                                    [style.width.%]="member.productivityPercent"
+                                                ></div>
+                                            </div>
+                                            <span class="text-sm font-semibold">{{ member.productivityPercent }}%</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <p-button
+                                            icon="pi pi-eye"
+                                            outlined
+                                            size="small"
+                                            pTooltip="Ver detalhes"
+                                            (onClick)="selectedMemberId.set(member.memberId)"
+                                        />
+                                    </td>
+                                </tr>
+                            </ng-template>
+
+                            <ng-template pTemplate="emptymessage">
+                                <tr>
+                                    <td colspan="6" class="text-center p-4">Nenhuma atividade encontrada.</td>
+                                </tr>
+                            </ng-template>
+                        </p-table>
+                    </div>
+
+                    <div class="lg:col-span-1">
                         <div class="rounded-xl border border-surface-200 dark:border-surface-700 p-4 h-full">
                             <h3 class="font-semibold text-lg mb-4 flex items-center gap-2">
                                 <i class="pi pi-history"></i> Registro de Pausas
                             </h3>
-                            <div class="flex flex-col gap-4">
+                            <div class="flex flex-col gap-4 max-h-[32rem] overflow-y-auto">
                                 @for (entry of pauseEntries(); track $index) {
                                     <div class="flex items-start justify-between gap-2">
                                         <div class="flex flex-col">
                                             <span class="font-semibold text-sm uppercase">{{
-                                                entry.pause.pauseName ?? 'Pausa'
-                                            }}</span>
+                                                    entry.pause.pauseName ?? 'Pausa'
+                                                }}</span>
                                             <span class="text-xs text-surface-400">
                                                 {{ formatPauseRange(entry.pause.start, entry.pause.end) }}
                                                 @if (selectedMemberId() === null) {
@@ -182,8 +256,8 @@ interface PauseEntry {
                                             </span>
                                         </div>
                                         <span class="text-sm font-semibold whitespace-nowrap">{{
-                                            formatDuration(entry.pause.durationSeconds)
-                                        }}</span>
+                                                formatDuration(entry.pause.durationSeconds)
+                                            }}</span>
                                     </div>
                                 } @empty {
                                     <div class="text-center text-surface-400 text-sm">Nenhuma pausa registrada.</div>
@@ -191,80 +265,6 @@ interface PauseEntry {
                             </div>
                         </div>
                     </div>
-                </div>
-
-                <!-- Detalhamento de Atividade -->
-                <div class="rounded-xl border border-surface-200 dark:border-surface-700 p-4">
-                    <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-2">
-                        <h3 class="font-semibold text-lg">Detalhamento de Atividade</h3>
-                        <p-iconfield>
-                            <p-inputicon class="pi pi-search" />
-                            <input
-                                pInputText
-                                type="text"
-                                (input)="onFilterGlobal($event)"
-                                placeholder="Filtrar tabela..."
-                                class="w-full"
-                            />
-                        </p-iconfield>
-                    </div>
-
-                    <p-table
-                        #dataTable
-                        [value]="report()!.members"
-                        [paginator]="true"
-                        [rows]="10"
-                        [globalFilterFields]="['memberName']"
-                        [tableStyle]="{ 'min-width': '55rem' }"
-                        stripedRows
-                    >
-                        <ng-template pTemplate="header">
-                            <tr>
-                                <th>Membro</th>
-                                <th>Entrada/Saída</th>
-                                <th>Tempo logado</th>
-                                <th>Total de pausas</th>
-                                <th>Produtividade</th>
-                                <th>Ação</th>
-                            </tr>
-                        </ng-template>
-
-                        <ng-template pTemplate="body" let-member>
-                            <tr>
-                                <td class="font-medium">{{ member.memberName }}</td>
-                                <td>{{ formatSessionRange(member.entrada, member.saida) }}</td>
-                                <td>{{ formatDuration(member.loggedSeconds) }}</td>
-                                <td>{{ formatDuration(member.pauseSeconds) }}</td>
-                                <td>
-                                    <div class="flex items-center gap-2">
-                                        <div class="w-20 h-1.5 rounded-full bg-surface-200 dark:bg-surface-700">
-                                            <div
-                                                class="h-1.5 rounded-full"
-                                                [class]="productivityBarClass(member.productivityPercent)"
-                                                [style.width.%]="member.productivityPercent"
-                                            ></div>
-                                        </div>
-                                        <span class="text-sm font-semibold">{{ member.productivityPercent }}%</span>
-                                    </div>
-                                </td>
-                                <td>
-                                    <p-button
-                                        icon="pi pi-eye"
-                                        outlined
-                                        size="small"
-                                        pTooltip="Ver detalhes"
-                                        (onClick)="selectedMemberId.set(member.memberId)"
-                                    />
-                                </td>
-                            </tr>
-                        </ng-template>
-
-                        <ng-template pTemplate="emptymessage">
-                            <tr>
-                                <td colspan="6" class="text-center p-4">Nenhuma atividade encontrada.</td>
-                            </tr>
-                        </ng-template>
-                    </p-table>
                 </div>
             }
         </p-card>
