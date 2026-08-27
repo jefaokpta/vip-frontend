@@ -133,9 +133,9 @@ interface ChartBucket {
                     class="rounded-xl shadow px-4 py-3 flex flex-col gap-1 border-l-4 border-orange-500 bg-white dark:bg-surface-900"
                 >
                     <span class="text-xs font-semibold uppercase tracking-wide text-surface-500">
-                        Total de Minutos
+                        Total Falado
                     </span>
-                    <span class="text-2xl font-bold">{{ totalMinutes() }}</span>
+                    <span class="text-2xl font-bold">{{ formatDuration(totalTalkSeconds()) }}</span>
                 </div>
             </div>
 
@@ -294,8 +294,8 @@ export class ReportPage implements OnInit, OnDestroy {
         return Math.round((answered / list.length) * 1000) / 10;
     });
 
-    readonly totalMinutes = computed(() =>
-        Math.round(this.filteredCdrs().reduce((sum, c) => sum + c.billableSeconds, 0) / 60)
+    readonly totalTalkSeconds = computed(() =>
+        this.filteredCdrs().reduce((sum, c) => sum + c.billableSeconds, 0)
     );
 
     readonly isSingleDay = computed(() => {
