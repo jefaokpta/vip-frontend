@@ -16,12 +16,13 @@ import {
     MemberActivity,
     MemberActivityPause,
     MemberActivityReportResponse,
+    MemberActivitySession,
     QueueOption
 } from '@/pabx/types/member-activity';
 import { MemberActivityReportService } from '@/pabx/member-activity-report/member-activity-report.service';
 
 interface JourneySegment {
-    type: 'logged' | 'paused';
+    type: 'logged' | 'paused' | 'gap';
     widthPercent: number;
 }
 
@@ -79,6 +80,7 @@ interface PauseEntry {
                                 placeholder="Selecione a data"
                                 [maxDate]="today"
                                 (onSelect)="onDateSelect()"
+                                (onClearClick)="onClearDate()"
                             >
                             </p-datepicker>
                         }
@@ -148,7 +150,7 @@ interface PauseEntry {
                                 @for (segment of journeySegments(); track $index) {
                                     <div
                                         [style.width.%]="segment.widthPercent"
-                                        [class]="segment.type === 'logged' ? 'bg-green-400' : 'bg-surface-300'"
+                                        [class]="journeySegmentClass(segment.type)"
                                     ></div>
                                 }
                             </div>
@@ -311,28 +313,52 @@ export class MemberActivityReportPage implements OnInit {
         const member = this.selectedMember();
         if (!member) return [];
         const windowStart = member.entrada;
-        const windowEnd = member.saida ?? Date.now();
+        const windowEnd = this.memberWindowEnd(member);
         const totalMs = Math.max(windowEnd - windowStart, 1);
+
+        const sessions: { start: number; end: number }[] = [...member.sessions]
+            .map((s: MemberActivitySession) => ({
+                start: Math.max(s.start, windowStart),
+                end: Math.min(s.end ?? windowEnd, windowEnd)
+            }))
+            .filter((s) => s.end > s.start)
+            .sort((a, b) => a.start - b.start);
 
         const pauses = [...member.pauses]
             .map((p) => ({
                 start: Math.max(p.start, windowStart),
-                end: Math.min(p.end ?? Date.now(), windowEnd)
+                end: Math.min(p.end ?? windowEnd, windowEnd)
             }))
             .filter((p) => p.end > p.start)
             .sort((a, b) => a.start - b.start);
 
         const segments: JourneySegment[] = [];
-        let cursor = windowStart;
-        for (const pause of pauses) {
-            if (pause.start > cursor) {
-                segments.push({ type: 'logged', widthPercent: ((pause.start - cursor) / totalMs) * 100 });
+        const pushSegment = (type: JourneySegment['type'], start: number, end: number) => {
+            if (end > start) {
+                segments.push({ type, widthPercent: ((end - start) / totalMs) * 100 });
             }
-            segments.push({ type: 'paused', widthPercent: ((pause.end - pause.start) / totalMs) * 100 });
-            cursor = Math.max(cursor, pause.end);
+        };
+
+        let cursor = windowStart;
+        for (const session of sessions) {
+            if (session.start > cursor) {
+                pushSegment('gap', cursor, session.start);
+            }
+            let sessionCursor = Math.max(session.start, cursor);
+            const sessionPauses = pauses.filter((p) => p.start < session.end && p.end > session.start);
+            for (const pause of sessionPauses) {
+                const pauseStart = Math.max(pause.start, sessionCursor);
+                const pauseEnd = Math.min(pause.end, session.end);
+                if (pauseEnd <= pauseStart) continue;
+                pushSegment('logged', sessionCursor, pauseStart);
+                pushSegment('paused', pauseStart, pauseEnd);
+                sessionCursor = Math.max(sessionCursor, pauseEnd);
+            }
+            pushSegment('logged', sessionCursor, session.end);
+            cursor = session.end;
         }
         if (cursor < windowEnd) {
-            segments.push({ type: 'logged', widthPercent: ((windowEnd - cursor) / totalMs) * 100 });
+            pushSegment('gap', cursor, windowEnd);
         }
         return segments;
     });
@@ -342,7 +368,7 @@ export class MemberActivityReportPage implements OnInit {
         if (!member) return [];
         const start = new Date(member.entrada);
         start.setMinutes(0, 0, 0);
-        const end = new Date(member.saida ?? Date.now());
+        const end = new Date(this.memberWindowEnd(member));
         if (end.getMinutes() !== 0 || end.getSeconds() !== 0 || end.getMilliseconds() !== 0) {
             end.setHours(end.getHours() + 1, 0, 0, 0);
         }
@@ -397,6 +423,12 @@ export class MemberActivityReportPage implements OnInit {
         this.loadReport();
     }
 
+    onClearDate(): void {
+        this.date.set(new Date());
+        this.selectedMemberId.set(null);
+        this.loadReport();
+    }
+
     onFilterGlobal(event: Event): void {
         const target = event.target as HTMLInputElement | null;
         if (target) {
@@ -424,16 +456,53 @@ export class MemberActivityReportPage implements OnInit {
         return `${this.formatTime(start)} - ${end !== null ? this.formatTime(end) : 'em andamento'}`;
     }
 
+    productivityBand(percent: number): 'high' | 'mid' | 'low' {
+        if (percent >= 80) return 'high';
+        if (percent >= 60) return 'mid';
+        return 'low';
+    }
+
     productivityBadgeClass(percent: number): string {
-        if (percent >= 80) return 'bg-green-100 text-green-700';
-        if (percent >= 60) return 'bg-orange-100 text-orange-600';
-        return 'bg-red-100 text-red-600';
+        switch (this.productivityBand(percent)) {
+            case 'high':
+                return 'bg-green-100 text-green-700';
+            case 'mid':
+                return 'bg-orange-100 text-orange-600';
+            default:
+                return 'bg-red-100 text-red-600';
+        }
     }
 
     productivityBarClass(percent: number): string {
-        if (percent >= 80) return 'bg-green-500';
-        if (percent >= 60) return 'bg-orange-400';
-        return 'bg-red-500';
+        switch (this.productivityBand(percent)) {
+            case 'high':
+                return 'bg-green-500';
+            case 'mid':
+                return 'bg-orange-400';
+            default:
+                return 'bg-red-500';
+        }
+    }
+
+    journeySegmentClass(type: JourneySegment['type']): string {
+        switch (type) {
+            case 'logged':
+                return 'bg-green-400';
+            case 'paused':
+                return 'bg-surface-300';
+            default:
+                return 'bg-transparent border-x border-dashed border-surface-300 dark:border-surface-600';
+        }
+    }
+
+    private selectedDayEnd(): number {
+        const end = new Date(this.date());
+        end.setHours(23, 59, 59, 999);
+        return end.getTime();
+    }
+
+    private memberWindowEnd(member: MemberActivity): number {
+        return member.saida ?? Math.min(Date.now(), this.selectedDayEnd());
     }
 
     loadReport(): void {
@@ -445,8 +514,7 @@ export class MemberActivityReportPage implements OnInit {
 
         const start = new Date(this.date());
         start.setHours(0, 0, 0, 0);
-        const end = new Date(this.date());
-        end.setHours(23, 59, 59, 999);
+        const end = new Date(this.selectedDayEnd());
 
         this.memberActivityReportService
             .findReport(queue.id, start, end)
