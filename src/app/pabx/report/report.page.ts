@@ -3,27 +3,28 @@
  * @email jefaokpta@hotmail.com
  */
 
-import { Component, computed, effect, OnDestroy, OnInit, signal, ViewChild } from '@angular/core';
-import { Table, TableModule } from 'primeng/table';
-import { MessageService } from 'primeng/api';
-import { Card } from 'primeng/card';
-import { ProgressSpinner } from 'primeng/progressspinner';
-import { Toast } from 'primeng/toast';
-import { CurrencyPipe } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { DatePicker } from 'primeng/datepicker';
-import { Select } from 'primeng/select';
-import { ChartModule } from 'primeng/chart';
-import { Tag } from 'primeng/tag';
-import { Button } from 'primeng/button';
-import { IconField } from 'primeng/iconfield';
-import { InputIcon } from 'primeng/inputicon';
-import { InputText } from 'primeng/inputtext';
-import { Tooltip } from 'primeng/tooltip';
-import { RouterLink } from '@angular/router';
-import { debounceTime, Subscription } from 'rxjs';
-import { Cdr } from '@/pabx/types/cdr';
-import { ReportService } from '@/pabx/report/report.service';
+import {Component, computed, effect, inject, OnDestroy, OnInit, signal, ViewChild} from '@angular/core';
+import {Table, TableModule} from 'primeng/table';
+import {MessageService} from 'primeng/api';
+import {Card} from 'primeng/card';
+import {ProgressSpinner} from 'primeng/progressspinner';
+import {Toast} from 'primeng/toast';
+import {CurrencyPipe} from '@angular/common';
+import {FormsModule} from '@angular/forms';
+import {DatePicker} from 'primeng/datepicker';
+import {Select} from 'primeng/select';
+import {ChartModule} from 'primeng/chart';
+import {Tag} from 'primeng/tag';
+import {Button} from 'primeng/button';
+import {IconField} from 'primeng/iconfield';
+import {InputIcon} from 'primeng/inputicon';
+import {InputText} from 'primeng/inputtext';
+import {Tooltip} from 'primeng/tooltip';
+import {RouterLink} from '@angular/router';
+import {debounceTime, Subscription} from 'rxjs';
+import {Cdr} from '@/pabx/types/cdr';
+import {ReportService} from '@/pabx/report/report.service';
+import {ReportStateService} from '@/pabx/report/report-state.service';
 import {
     costCenterLabel,
     dispositionSeverity,
@@ -31,8 +32,8 @@ import {
     formatDate,
     formatDuration
 } from '@/pabx/report/cdr-format';
-import { LayoutService } from '@/layout/service/layout.service';
-import { AccountCodeService } from '@/pabx/accountcode/account-code.service';
+import {LayoutService} from '@/layout/service/layout.service';
+import {AccountCodeService} from '@/pabx/accountcode/account-code.service';
 
 interface StatusOption {
     label: string;
@@ -247,10 +248,12 @@ interface ChartBucket {
     `
 })
 export class ReportPage implements OnInit, OnDestroy {
-    readonly cdrs = signal<Cdr[]>([]);
-    readonly dateRange = signal<Date[]>([]);
-    readonly statusFilter = signal<string | null>(null);
-    readonly loading = signal<boolean>(true);
+    private readonly reportState = inject(ReportStateService);
+
+    readonly cdrs = this.reportState.cdrs;
+    readonly dateRange = this.reportState.dateRange;
+    readonly statusFilter = this.reportState.statusFilter;
+    readonly loading = signal<boolean>(!this.reportState.loaded());
     readonly costCenterLabelsByCode = signal<Map<string, string>>(new Map());
 
     @ViewChild('dataTable') dt!: Table;
@@ -382,7 +385,9 @@ export class ReportPage implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
-        this.load(() => this.reportService.findLast30());
+        if (!this.reportState.loaded()) {
+            this.load(() => this.reportService.findLast30());
+        }
         this.accountCodeService
             .findAll()
             .then((accountCodes) => {
@@ -449,7 +454,7 @@ export class ReportPage implements OnInit, OnDestroy {
         fetch()
             .then((cdrs) => {
                 if (id !== this.requestId) return;
-                this.cdrs.set(cdrs);
+                this.reportState.setCdrs(cdrs);
                 this.loading.set(false);
             })
             .catch(() => {
