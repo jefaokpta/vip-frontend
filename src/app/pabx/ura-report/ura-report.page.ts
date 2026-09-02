@@ -1,17 +1,17 @@
-import { Component, OnInit } from '@angular/core';
-import { TableModule } from 'primeng/table';
-import { MessageService } from 'primeng/api';
-import { Card } from 'primeng/card';
-import { ProgressSpinner } from 'primeng/progressspinner';
-import { Toast } from 'primeng/toast';
-import { NgIf } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { DatePicker } from 'primeng/datepicker';
-import { Select } from 'primeng/select';
-import { Ura } from '@/pabx/types/ura';
-import { UraSelection } from '@/pabx/types/ura-selection';
-import { UraService } from '@/pabx/ura/ura.service';
-import { UraReportService } from '@/pabx/ura-report/ura-report.service';
+import {Component, OnInit} from '@angular/core';
+import {TableModule} from 'primeng/table';
+import {MessageService} from 'primeng/api';
+import {Card} from 'primeng/card';
+import {ProgressSpinner} from 'primeng/progressspinner';
+import {Toast} from 'primeng/toast';
+import {NgIf} from '@angular/common';
+import {FormsModule} from '@angular/forms';
+import {DatePicker} from 'primeng/datepicker';
+import {Select} from 'primeng/select';
+import {Ura} from '@/pabx/types/ura';
+import {UraSelection} from '@/pabx/types/ura-selection';
+import {UraService} from '@/pabx/ura/ura.service';
+import {UraReportService} from '@/pabx/ura-report/ura-report.service';
 
 interface OptionSummary {
     readonly optionDigit: number;
@@ -91,9 +91,9 @@ interface OptionSummary {
                                 Data/Hora
                                 <p-sortIcon field="createdAt"></p-sortIcon>
                             </th>
-                            <th>Chamador</th>
+                            <th>Telefone</th>
                             <th>Opção</th>
-                            <th>Ação</th>
+                            <th>Ação Executada</th>
                         </tr>
                     </ng-template>
 

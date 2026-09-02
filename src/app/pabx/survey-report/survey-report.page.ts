@@ -1,17 +1,17 @@
-import { Component, OnInit } from '@angular/core';
-import { TableModule } from 'primeng/table';
-import { MessageService } from 'primeng/api';
-import { Card } from 'primeng/card';
-import { ProgressSpinner } from 'primeng/progressspinner';
-import { Toast } from 'primeng/toast';
-import { NgIf } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { DatePicker } from 'primeng/datepicker';
-import { Select } from 'primeng/select';
-import { Survey } from '@/pabx/types/survey';
-import { SurveyResponse } from '@/pabx/types/survey-response';
-import { SurveyService } from '@/pabx/survey/survey.service';
-import { SurveyReportService } from '@/pabx/survey-report/survey-report.service';
+import {Component, OnInit} from '@angular/core';
+import {TableModule} from 'primeng/table';
+import {MessageService} from 'primeng/api';
+import {Card} from 'primeng/card';
+import {ProgressSpinner} from 'primeng/progressspinner';
+import {Toast} from 'primeng/toast';
+import {NgIf} from '@angular/common';
+import {FormsModule} from '@angular/forms';
+import {DatePicker} from 'primeng/datepicker';
+import {Select} from 'primeng/select';
+import {Survey} from '@/pabx/types/survey';
+import {SurveyResponse} from '@/pabx/types/survey-response';
+import {SurveyService} from '@/pabx/survey/survey.service';
+import {SurveyReportService} from '@/pabx/survey-report/survey-report.service';
 
 @Component({
     selector: 'app-survey-report-page',
@@ -91,7 +91,7 @@ import { SurveyReportService } from '@/pabx/survey-report/survey-report.service'
                                 Data/Hora
                                 <p-sortIcon field="createdAt"></p-sortIcon>
                             </th>
-                            <th>Chamador</th>
+                            <th>Telefone</th>
                             <th>Pergunta 1</th>
                             @if (selectedSurvey.question2AudioId) {
                                 <th>Pergunta 2</th>
