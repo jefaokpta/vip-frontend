@@ -36,6 +36,7 @@ import { EditCallGroupPage } from '@/pabx/call-group/edit-call-group.page';
 import { UrasPage } from '@/pabx/ura/uras.page';
 import { NewUraPage } from '@/pabx/ura/new-ura.page';
 import { EditUraPage } from '@/pabx/ura/edit-ura.page';
+import { UraReportPage } from '@/pabx/ura-report/ura-report.page';
 import { SurveysPage } from '@/pabx/survey/surveys.page';
 import { NewSurveyPage } from '@/pabx/survey/new-survey.page';
 import { EditSurveyPage } from '@/pabx/survey/edit-survey.page';
@@ -117,6 +118,11 @@ export default [
         path: 'survey-report',
         component: SurveyReportPage,
         data: { breadcrumb: 'Relatório de Pesquisa de Satisfação' }
+    },
+    {
+        path: 'ura-report',
+        component: UraReportPage,
+        data: { breadcrumb: 'Relatório de Estatísticas de URA' }
     },
     {
         path: 'member-activity-report',

@@ -52,6 +52,12 @@ export class AppMenu implements OnInit {
                                     routerLink: ['/pabx/call-report']
                                 },
                                 {
+                                    label: 'URA',
+                                    roles: [RoleEnum.ROLE_COMPANY_SUPERVISOR],
+                                    icon: 'pi pi-fw pi-sitemap',
+                                    routerLink: ['/pabx/ura-report']
+                                },
+                                {
                                     label: 'Pesquisa de Satisfação',
                                     roles: [RoleEnum.ROLE_COMPANY_SUPERVISOR],
                                     icon: 'fa fa-music',
