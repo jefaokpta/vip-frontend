@@ -123,7 +123,7 @@ export class ForgotPassword implements OnInit {
         this.userService
             .forgotPassword(email)
             .then(() => {
-                this.router.navigate(['/auth/confirm-email'], {queryParams: {e: encodeEmailBase64(email)}});
+                this.router.navigate(['/auth/confirm-email'], { queryParams: { e: encodeEmailBase64(email) } });
             })
             .catch(() => (this.submitError = true))
             .finally(() => (this.pending = false));

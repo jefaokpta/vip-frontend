@@ -37,7 +37,7 @@ import {AliasService} from '@/pabx/alias/alias.service';
             <form [formGroup]="form" (ngSubmit)="onSubmit()" class="p-fluid">
                 <div class="field mb-4">
                     <label for="name" class="block mb-2">Nome *</label>
-                    <input id="name" pInputText class="p-inputtext" formControlName="name"/>
+                    <input id="name" pInputText class="p-inputtext" formControlName="name" />
                     <small *ngIf="name?.invalid && (name?.dirty || name?.touched)" class="p-error block mt-2">
                         <div *ngIf="name?.errors?.['required']">Nome é obrigatório.</div>
                     </small>
@@ -106,8 +106,7 @@ export class NewAliasPage implements OnInit {
         private readonly fb: FormBuilder,
         private readonly router: Router,
         private readonly aliasService: AliasService
-    ) {
-    }
+    ) {}
 
     get expressions() {
         return this.form.get('expressions') as FormArray;
@@ -139,7 +138,7 @@ export class NewAliasPage implements OnInit {
         const alias: Alias = {
             ...this.form.value,
             expressions: this.form.value.expressions.map((expression: string) => {
-                return {expression};
+                return { expression };
             })
         };
         this.aliasService

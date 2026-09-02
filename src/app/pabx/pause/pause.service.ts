@@ -4,12 +4,11 @@ import {environment} from '../../../environments/environment';
 import {executeRequest, httpHeaders} from '@/util/utils';
 import {Pause} from '@/pabx/types/pause';
 
-@Injectable({providedIn: 'root'})
+@Injectable({ providedIn: 'root' })
 export class PauseService {
     private readonly BACKEND = environment.API_BACKEND_URL;
 
-    constructor(private readonly http: HttpClient) {
-    }
+    constructor(private readonly http: HttpClient) {}
 
     findAll(): Promise<Pause[]> {
         return executeRequest(this.http.get<Pause[]>(`${this.BACKEND}/pauses`, httpHeaders()));

@@ -18,7 +18,7 @@ describe('ReportStateService', () => {
     });
 
     it('setCdrs atualiza cdrs e marca loaded como true numa única chamada', () => {
-        const cdrs = [{id: 1} as Cdr];
+        const cdrs = [{ id: 1 } as Cdr];
 
         service.setCdrs(cdrs);
 
@@ -34,5 +34,18 @@ describe('ReportStateService', () => {
 
         expect(service.dateRange()).toEqual(range);
         expect(service.statusFilter()).toBe('ANSWERED');
+    });
+
+    it('reset limpa cdrs, loaded, dateRange e statusFilter', () => {
+        service.setCdrs([{ id: 1 } as Cdr]);
+        service.dateRange.set([new Date(2026, 0, 1), new Date(2026, 0, 5)]);
+        service.statusFilter.set('ANSWERED');
+
+        service.reset();
+
+        expect(service.cdrs()).toEqual([]);
+        expect(service.loaded()).toBeFalse();
+        expect(service.dateRange()).toEqual([]);
+        expect(service.statusFilter()).toBeNull();
     });
 });

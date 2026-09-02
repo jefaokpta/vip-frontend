@@ -37,23 +37,20 @@ export class AliasSelectComponent implements ControlValueAccessor, OnInit {
     value: string = '';
     aliasOptions: { label: string; value: string }[] = [];
 
-    constructor(private readonly aliasService: AliasService) {
-    }
+    constructor(private readonly aliasService: AliasService) {}
 
     ngOnInit() {
         this.aliasService
             .findAll()
             .then(
                 (aliases) =>
-                    (this.aliasOptions = aliases.map((alias) => ({label: alias.name, value: alias.id.toString()})))
+                    (this.aliasOptions = aliases.map((alias) => ({ label: alias.name, value: alias.id.toString() })))
             );
     }
 
-    private onChange: (value: string) => void = () => {
-    };
+    private onChange: (value: string) => void = () => {};
 
-    private onTouched: () => void = () => {
-    };
+    private onTouched: () => void = () => {};
 
     writeValue(value: string): void {
         this.value = value;

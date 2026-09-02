@@ -38,7 +38,7 @@ import {AudioSelectComponent} from '@/pabx/moh/audio-select.component';
                 <form [formGroup]="form" (ngSubmit)="onSubmit()" class="p-fluid">
                     <div class="field mb-4">
                         <label for="title" class="block mb-2">Título *</label>
-                        <input id="title" pInputText formControlName="title"/>
+                        <input id="title" pInputText formControlName="title" />
                         @if (form.get('title')?.invalid && (form.get('title')?.dirty || form.get('title')?.touched)) {
                             <small class="p-error block mt-2">Título é obrigatório.</small>
                         }

@@ -9,7 +9,7 @@ describe('ReportPage', () => {
     let reportServiceSpy: jasmine.SpyObj<ReportService>;
     let accountCodeServiceSpy: jasmine.SpyObj<AccountCodeService>;
 
-    const cdrsFixture: Cdr[] = [{id: 1, disposition: 'ANSWERED'} as Cdr];
+    const cdrsFixture: Cdr[] = [{ id: 1, disposition: 'ANSWERED' } as Cdr];
 
     beforeEach(() => {
         reportServiceSpy = jasmine.createSpyObj('ReportService', ['findLast30', 'findByDateRange', 'findById']);
@@ -22,8 +22,8 @@ describe('ReportPage', () => {
         TestBed.configureTestingModule({
             imports: [ReportPage],
             providers: [
-                {provide: ReportService, useValue: reportServiceSpy},
-                {provide: AccountCodeService, useValue: accountCodeServiceSpy}
+                { provide: ReportService, useValue: reportServiceSpy },
+                { provide: AccountCodeService, useValue: accountCodeServiceSpy }
             ]
         });
     });

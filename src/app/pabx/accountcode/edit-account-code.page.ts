@@ -27,7 +27,7 @@ import {Toast} from 'primeng/toast';
             <ng-template #title>
                 <div class="flex justify-between">
                     <span class="font-semibold text-2xl"
-                    >Editar {{ accountCode?.title }} - {{ accountCode?.code }}</span
+                        >Editar {{ accountCode?.title }} - {{ accountCode?.code }}</span
                     >
                     <p-button
                         type="button"
@@ -43,7 +43,7 @@ import {Toast} from 'primeng/toast';
             <form [formGroup]="form" (ngSubmit)="onSubmit()" class="p-fluid">
                 <div class="field mb-4">
                     <label for="title" class="block mb-2">Título *</label>
-                    <input id="title" pInputText class="p-inputtext" formControlName="acTitle"/>
+                    <input id="title" pInputText class="p-inputtext" formControlName="acTitle" />
                     <small *ngIf="acTitle?.invalid && (acTitle?.dirty || acTitle?.touched)" class="p-error block mt-2">
                         <div *ngIf="acTitle?.errors?.['required']">Título é obrigatório.</div>
                     </small>
@@ -51,7 +51,7 @@ import {Toast} from 'primeng/toast';
 
                 <div class="field mb-4">
                     <label for="cadence" class="block mb-2">Cadência *</label>
-                    <p-input-number id="cadence" mode="decimal" useGrouping="false" formControlName="cadence"/>
+                    <p-input-number id="cadence" mode="decimal" useGrouping="false" formControlName="cadence" />
                     <small *ngIf="cadence?.invalid && (cadence?.dirty || cadence?.touched)" class="p-error block mt-2">
                         <div *ngIf="cadence?.errors?.['required']">Cadência é obrigatória.</div>
                     </small>
@@ -59,7 +59,7 @@ import {Toast} from 'primeng/toast';
 
                 <div class="field mb-4">
                     <label for="fraction" class="block mb-2">Fração *</label>
-                    <p-input-number id="fraction" mode="decimal" useGrouping="false" formControlName="fraction"/>
+                    <p-input-number id="fraction" mode="decimal" useGrouping="false" formControlName="fraction" />
                     <small
                         *ngIf="fraction?.invalid && (fraction?.dirty || fraction?.touched)"
                         class="p-error block mt-2"
@@ -121,7 +121,7 @@ export class EditAccountCodePage implements OnInit {
     }
 
     onSubmit() {
-        const accode = {...this.form.value, title: this.acTitle?.value};
+        const accode = { ...this.form.value, title: this.acTitle?.value };
         this.accountCodeService
             .update(accode)
             .then(() => {

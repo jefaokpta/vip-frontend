@@ -57,16 +57,16 @@ import {InputIconModule} from 'primeng/inputicon';
                     <div class="mb-12 flex flex-col items-center">
                         <div class="text-surface-900 dark:text-surface-0 text-xl font-bold mb-2">Screen Locked</div>
                         <span class="text-surface-600 dark:text-surface-200 font-medium mb-8"
-                        >Please enter your password</span
+                            >Please enter your password</span
                         >
 
-                        <img src="/layout/images/avatar.png" class="w-12 h-12 mb-2" alt="Avatar"/>
+                        <img src="/layout/images/avatar.png" class="w-12 h-12 mb-2" alt="Avatar" />
 
                         <span class="font-medium text-surface-900 dark:text-surface-0">Isabella Andolini</span>
                     </div>
                     <div class="flex flex-col">
                         <p-iconfield class="w-full mb-6">
-                            <p-inputicon class="pi pi-lock"/>
+                            <p-inputicon class="pi pi-lock" />
                             <input
                                 id="password"
                                 type="password"
@@ -88,7 +88,7 @@ import {InputIconModule} from 'primeng/inputicon';
                 </div>
             </div>
 
-            <app-configurator [simple]="true"/>
+            <app-configurator [simple]="true" />
         </div>
     `
 })

@@ -1,18 +1,19 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { Router, RouterModule } from '@angular/router';
-import { CommonModule } from '@angular/common';
-import { StyleClassModule } from 'primeng/styleclass';
-import { LayoutService } from '@/layout/service/layout.service';
-import { AppBreadcrumb } from './app.breadcrumb';
-import { InputTextModule } from 'primeng/inputtext';
-import { ButtonModule } from 'primeng/button';
-import { IconFieldModule } from 'primeng/iconfield';
-import { InputIconModule } from 'primeng/inputicon';
-import { Avatar } from 'primeng/avatar';
-import { WebphoneTopbarComponent } from '@/webphone/webphone-topbar.component';
-import { UserService } from '@/pages/users/user.service';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { ActivatePeerDialogComponent } from '@/layout/components/activate-peer-dialog.component';
+import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import {Router, RouterModule} from '@angular/router';
+import {CommonModule} from '@angular/common';
+import {StyleClassModule} from 'primeng/styleclass';
+import {LayoutService} from '@/layout/service/layout.service';
+import {AppBreadcrumb} from './app.breadcrumb';
+import {InputTextModule} from 'primeng/inputtext';
+import {ButtonModule} from 'primeng/button';
+import {IconFieldModule} from 'primeng/iconfield';
+import {InputIconModule} from 'primeng/inputicon';
+import {Avatar} from 'primeng/avatar';
+import {WebphoneTopbarComponent} from '@/webphone/webphone-topbar.component';
+import {UserService} from '@/pages/users/user.service';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {ActivatePeerDialogComponent} from '@/layout/components/activate-peer-dialog.component';
+import {ReportStateService} from '@/pabx/report/report-state.service';
 
 @Component({
     selector: '[app-topbar]',
@@ -108,7 +109,8 @@ export class AppTopbar implements OnInit {
     constructor(
         public layoutService: LayoutService,
         private readonly userService: UserService,
-        private readonly router: Router
+        private readonly router: Router,
+        private readonly reportState: ReportStateService
     ) {}
 
     ngOnInit(): void {
@@ -139,7 +141,10 @@ export class AppTopbar implements OnInit {
     }
 
     exitManagingCompany() {
-        this.userService.exitManageCompany().then(() => this.router.navigate(['/']));
+        this.userService.exitManageCompany().then(() => {
+            this.reportState.reset();
+            this.router.navigate(['/']);
+        });
     }
 
     onMenuButtonClick() {

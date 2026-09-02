@@ -73,8 +73,7 @@ export class EditPausePage implements OnInit {
         private readonly router: Router,
         private readonly pauseService: PauseService,
         private readonly activatedRoute: ActivatedRoute
-    ) {
-    }
+    ) {}
 
     get name() {
         return this.form.get('name');
@@ -99,7 +98,7 @@ export class EditPausePage implements OnInit {
     onSubmit() {
         this.pending = true;
         this.showError = false;
-        const pause: Pause = {...this.pause!, ...this.form.value};
+        const pause: Pause = { ...this.pause!, ...this.form.value };
         this.pauseService
             .update(pause)
             .then(() => this.router.navigate(['/pabx/pauses']))

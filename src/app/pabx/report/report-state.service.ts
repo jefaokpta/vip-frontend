@@ -6,7 +6,7 @@
 import {Injectable, signal} from '@angular/core';
 import {Cdr} from '@/pabx/types/cdr';
 
-@Injectable({providedIn: 'root'})
+@Injectable({ providedIn: 'root' })
 export class ReportStateService {
     readonly dateRange = signal<Date[]>([]);
     readonly statusFilter = signal<string | null>(null);
@@ -19,5 +19,12 @@ export class ReportStateService {
     setCdrs(cdrs: Cdr[]): void {
         this._cdrs.set(cdrs);
         this._loaded.set(true);
+    }
+
+    reset(): void {
+        this._cdrs.set([]);
+        this._loaded.set(false);
+        this.dateRange.set([]);
+        this.statusFilter.set(null);
     }
 }

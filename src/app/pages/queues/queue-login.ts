@@ -77,7 +77,7 @@ import {rxStompServiceFactory} from '@/websocket/stomp/rx-stomp-service-factory'
                             >
                                 <i class="pi pi-pause-circle"></i>
                                 <span
-                                >{{ pauseReasonName(qs) }} — {{ pauseDuration(qs) }}
+                                    >{{ pauseReasonName(qs) }} — {{ pauseDuration(qs) }}
                                     @if (isPauseExceeded(qs)) {
                                         (tempo excedido)
                                     }
@@ -130,8 +130,8 @@ import {rxStompServiceFactory} from '@/websocket/stomp/rx-stomp-service-factory'
                 />
             </div>
             <div class="flex justify-end gap-2">
-                <p-button label="Cancelar" severity="secondary" outlined (onClick)="closePauseDialog()"/>
-                <p-button label="Pausar" severity="warn" [disabled]="!selectedPauseId" (onClick)="confirmPause()"/>
+                <p-button label="Cancelar" severity="secondary" outlined (onClick)="closePauseDialog()" />
+                <p-button label="Pausar" severity="warn" [disabled]="!selectedPauseId" (onClick)="confirmPause()" />
             </div>
         </p-dialog>
     `
@@ -317,7 +317,7 @@ export class QueueLoginPage implements OnInit, OnDestroy {
 
     private loadPauses(): void {
         this.pauseService.findAll().then((pauses: Pause[]) => {
-            this.pauseOptions.set(pauses.map((p) => ({label: p.name, value: p.id})));
+            this.pauseOptions.set(pauses.map((p) => ({ label: p.name, value: p.id })));
         });
     }
 

@@ -23,8 +23,7 @@ import {decodeEmailBase64, maskEmail} from '@/util/utils';
         ReactiveFormsModule
     ],
     standalone: true,
-    template: `
-        <svg
+    template: ` <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 1600 800"
             class="fixed left-0 top-0 min-h-screen min-w-[100vw]"
@@ -73,13 +72,13 @@ import {decodeEmailBase64, maskEmail} from '@/util/utils';
                         </div>
 
                         <small *ngIf="isShowError" class="text-surface-600 dark:text-surface-200"
-                        >Código inválido ou expirado</small
+                            >Código inválido ou expirado</small
                         >
                     </div>
                 </form>
             </div>
         </div>
-        <app-configurator hidden [simple]="true"/>`
+        <app-configurator hidden [simple]="true" />`
 })
 export class ConfirmEmailPage implements OnInit {
     layoutService = inject(LayoutService);
@@ -94,8 +93,7 @@ export class ConfirmEmailPage implements OnInit {
         private readonly router: Router,
         private readonly activatedRoute: ActivatedRoute,
         private readonly userService: UserService
-    ) {
-    }
+    ) {}
 
     ngOnInit(): void {
         this.form = this.fb.group({
@@ -110,10 +108,10 @@ export class ConfirmEmailPage implements OnInit {
         this.pending = true;
         this.isShowError = false;
         this.userService
-            .confirmEmail({email: this.email, code: this.form.value.code})
+            .confirmEmail({ email: this.email, code: this.form.value.code })
             .then((loginResponse) => {
                 this.userService.loginSuccess(loginResponse.token);
-                this.router.navigate(['/auth/newpassword', {email: this.email}]);
+                this.router.navigate(['/auth/newpassword', { email: this.email }]);
             })
             .catch(() => (this.isShowError = true))
             .finally(() => (this.pending = false));

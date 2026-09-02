@@ -18,7 +18,7 @@
             <div class="flex items-center justify-between">
                 <div class="field">
                     <label for="name" class="block mb-2">Nome *</label>
-                    <input id="name" pInputText formControlName="name"/>
+                    <input id="name" pInputText formControlName="name" />
                     <small *ngIf="name?.invalid && (name?.dirty || name?.touched)" class="p-error block mt-2">
                         <div *ngIf="name?.errors?.['required']">Nome é obrigatório.</div>
                     </small>
@@ -26,7 +26,7 @@
 
                 <div class="flex gap-2">
                     <span>Ativada</span>
-                    <p-toggleswitch name="isActive" formControlName="isActive"/>
+                    <p-toggleswitch name="isActive" formControlName="isActive" />
                 </div>
             </div>
 
@@ -178,13 +178,13 @@
                                         ></app-route-action-component>
                                     </ng-container>
                                     <ng-container *ngIf="action.get('actionEnum').value == 'ANSWER'">
-                                        <app-answer-action-component/>
+                                        <app-answer-action-component />
                                     </ng-container>
                                     <ng-container *ngIf="action.get('actionEnum').value == 'HANGUP'">
-                                        <app-hangup-action-component/>
+                                        <app-hangup-action-component />
                                     </ng-container>
                                     <ng-container *ngIf="action.get('actionEnum').value == 'PLAYBACK'">
-                                        <app-playback-action-component formControlName="arg1"/>
+                                        <app-playback-action-component formControlName="arg1" />
                                     </ng-container>
                                     <ng-container *ngIf="action.get('actionEnum').value == 'SET_VARIABLE'">
                                         <app-variable-action-component

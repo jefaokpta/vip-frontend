@@ -8,8 +8,7 @@ import {AppConfigurator} from '@/layout/components/app.configurator';
     selector: 'app-access',
     standalone: true,
     imports: [ButtonModule, RouterModule, RippleModule, ButtonModule, AppConfigurator],
-    template: `
-        <svg
+    template: ` <svg
             viewBox="0 0 960 540"
             xmlns="http://www.w3.org/2000/svg"
             xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -35,6 +34,6 @@ import {AppConfigurator} from '@/layout/components/app.configurator';
                 <p-button [routerLink]="['/']" severity="help" raised>Go to Dashboard</p-button>
             </div>
         </div>
-        <app-configurator [simple]="true"/>`
+        <app-configurator [simple]="true" />`
 })
 export class Access {}

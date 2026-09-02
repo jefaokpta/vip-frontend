@@ -15,8 +15,8 @@ import {CallAnalyzeStatusEnum} from '@/types/call-analyze-status-enum';
                 <div class="flex justify-between items-start mt-4">
                     <div class="w-6/12">
                         <span class="text-4xl font-bold text-surface-900 dark:text-surface-0">{{
-                                totalConversation
-                            }}</span>
+                            totalConversation
+                        }}</span>
                         <small class="font-thin ml-2">min</small>
                     </div>
                     <div class="w-6/12">

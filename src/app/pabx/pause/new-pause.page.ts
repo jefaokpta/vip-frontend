@@ -32,7 +32,7 @@ import {PauseService} from '@/pabx/pause/pause.service';
             <form [formGroup]="form" (ngSubmit)="onSubmit()" class="p-fluid">
                 <div class="field mb-4">
                     <label for="name" class="block mb-2">Nome *</label>
-                    <input id="name" pInputText class="p-inputtext" formControlName="name"/>
+                    <input id="name" pInputText class="p-inputtext" formControlName="name" />
                     <small *ngIf="name?.invalid && (name?.dirty || name?.touched)" class="p-error block mt-2">
                         <div *ngIf="name?.errors?.['required']">Nome é obrigatório.</div>
                     </small>
@@ -71,8 +71,7 @@ export class NewPausePage implements OnInit {
         private readonly fb: FormBuilder,
         private readonly router: Router,
         private readonly pauseService: PauseService
-    ) {
-    }
+    ) {}
 
     get name() {
         return this.form.get('name');
@@ -88,7 +87,7 @@ export class NewPausePage implements OnInit {
     onSubmit() {
         this.pending = true;
         this.showError = false;
-        const pause: Pause = {...this.form.value};
+        const pause: Pause = { ...this.form.value };
         this.pauseService
             .create(pause)
             .then(() => this.router.navigate(['/pabx/pauses']))

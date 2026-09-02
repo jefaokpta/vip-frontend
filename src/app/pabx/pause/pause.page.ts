@@ -40,7 +40,7 @@ import {Pause} from '@/pabx/types/pause';
                     <h2 class="text-surface-900 dark:text-surface-0 text-2xl font-semibold mb-4 md:mb-0">Pausas</h2>
                     <div class="inline-flex items-center">
                         <p-iconfield>
-                            <p-inputicon class="pi pi-search"/>
+                            <p-inputicon class="pi pi-search" />
                             <input
                                 pInputText
                                 type="text"
@@ -50,7 +50,7 @@ import {Pause} from '@/pabx/types/pause';
                                 class="w-full"
                             />
                         </p-iconfield>
-                        <p-button icon="pi pi-plus" label="Pausa" routerLink="new" outlined class="mx-4" rounded/>
+                        <p-button icon="pi pi-plus" label="Pausa" routerLink="new" outlined class="mx-4" rounded />
                     </div>
                 </div>
             </ng-template>
@@ -103,15 +103,15 @@ import {Pause} from '@/pabx/types/pause';
                 </ng-template>
 
                 <ng-template pTemplate="emptymessage">
-                    <p-progress-spinner *ngIf="loading" [style]="{ width: '2rem', height: '2rem' }"/>
+                    <p-progress-spinner *ngIf="loading" [style]="{ width: '2rem', height: '2rem' }" />
                     <tr>
                         <td colspan="3" *ngIf="!loading" class="text-center p-4">Nenhuma pausa encontrada.</td>
                     </tr>
                 </ng-template>
             </p-table>
         </p-card>
-        <p-confirm-dialog/>
-        <p-toast/>
+        <p-confirm-dialog />
+        <p-toast />
     `
 })
 export class PausePage implements OnInit {
@@ -123,8 +123,7 @@ export class PausePage implements OnInit {
         private readonly confirmationService: ConfirmationService,
         private readonly messageService: MessageService,
         private readonly pauseService: PauseService
-    ) {
-    }
+    ) {}
 
     ngOnInit(): void {
         this.pauseService.findAll().then((pauses) => {

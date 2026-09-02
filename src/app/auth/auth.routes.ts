@@ -12,6 +12,6 @@ export default [
     { path: 'login', component: Login },
     { path: 'forgotpassword', component: ForgotPassword },
     { path: 'newpassword', component: NewPassword },
-    {path: 'confirm-email', component: ConfirmEmailPage},
+    { path: 'confirm-email', component: ConfirmEmailPage },
     { path: '**', redirectTo: '/notfound' }
 ] as Routes;

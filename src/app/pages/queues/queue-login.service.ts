@@ -28,7 +28,7 @@ export class QueueLoginService {
 
     pause(queueId: number, pauseId: number): Promise<void> {
         return executeRequest(
-            this.http.post<void>(`${this.BACKEND}/queues/states/${queueId}/pause`, {pauseId}, httpHeaders())
+            this.http.post<void>(`${this.BACKEND}/queues/states/${queueId}/pause`, { pauseId }, httpHeaders())
         );
     }
 

@@ -14,5 +14,4 @@ import {ReactiveFormsModule} from '@angular/forms';
         </p-panel>
     `
 })
-export class AnswerActionComponent {
-}
+export class AnswerActionComponent {}

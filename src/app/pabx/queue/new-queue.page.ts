@@ -125,7 +125,7 @@ import {SurveyService} from '@/pabx/survey/survey.service';
 
                 <div class="field flex items-center gap-3 mt-2 mb-4">
                     <label class="block">Entrar em fila vazia</label>
-                    <p-toggleswitch formControlName="isJoinWhenEmpty"/>
+                    <p-toggleswitch formControlName="isJoinWhenEmpty" />
                 </div>
 
                 <div class="field mb-4">

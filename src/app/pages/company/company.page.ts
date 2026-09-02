@@ -16,6 +16,7 @@ import {ProgressSpinner} from 'primeng/progressspinner';
 import {FormsModule} from '@angular/forms';
 import {CompanyService} from '@/pages/company/company.service';
 import {UserService} from '@/pages/users/user.service';
+import {ReportStateService} from '@/pabx/report/report-state.service';
 
 @Component({
     selector: 'app-company-page',
@@ -131,7 +132,8 @@ export class CompanyPage implements OnInit {
         private readonly companyService: CompanyService,
         private readonly userService: UserService,
         private readonly router: Router,
-        private readonly messageService: MessageService
+        private readonly messageService: MessageService,
+        private readonly reportState: ReportStateService
     ) {
         this.user = this.userService.getUser();
     }
@@ -146,7 +148,10 @@ export class CompanyPage implements OnInit {
     manageCompany(companyId: string) {
         this.userService
             .manageOtherCompany(companyId)
-            .then(() => this.router.navigate(['/']))
+            .then(() => {
+                this.reportState.reset();
+                this.router.navigate(['/']);
+            })
             .catch(() => {
                 this.messageService.add({
                     severity: 'error',

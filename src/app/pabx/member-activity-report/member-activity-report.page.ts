@@ -167,7 +167,7 @@ interface PauseEntry {
                         <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-2">
                             <h3 class="font-semibold text-lg">Detalhamento de Atividade</h3>
                             <p-iconfield>
-                                <p-inputicon class="pi pi-search"/>
+                                <p-inputicon class="pi pi-search" />
                                 <input
                                     pInputText
                                     type="text"
@@ -246,8 +246,8 @@ interface PauseEntry {
                                     <div class="flex items-start justify-between gap-2">
                                         <div class="flex flex-col">
                                             <span class="font-semibold text-sm uppercase">{{
-                                                    entry.pause.pauseName ?? 'Pausa'
-                                                }}</span>
+                                                entry.pause.pauseName ?? 'Pausa'
+                                            }}</span>
                                             <span class="text-xs text-surface-400">
                                                 {{ formatPauseRange(entry.pause.start, entry.pause.end) }}
                                                 @if (selectedMemberId() === null) {
@@ -256,8 +256,8 @@ interface PauseEntry {
                                             </span>
                                         </div>
                                         <span class="text-sm font-semibold whitespace-nowrap">{{
-                                                formatDuration(entry.pause.durationSeconds)
-                                            }}</span>
+                                            formatDuration(entry.pause.durationSeconds)
+                                        }}</span>
                                     </div>
                                 } @empty {
                                     <div class="text-center text-surface-400 text-sm">Nenhuma pausa registrada.</div>
