@@ -8,6 +8,7 @@ import { Select } from 'primeng/select';
 import { ToggleSwitch } from 'primeng/toggleswitch';
 import { InputNumber } from 'primeng/inputnumber';
 import { NgForOf, NgIf } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Toast } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import { Moh } from '@/pabx/types/moh';
@@ -317,10 +318,6 @@ import { CallGroupService } from '@/pabx/call-group/call-group.service';
                             }
                         </p-button>
                     </div>
-
-                    @if (showError) {
-                        <small class="text-red-500">Erro ao salvar a URA.</small>
-                    }
                 </form>
             }
         </p-card>
@@ -330,7 +327,6 @@ import { CallGroupService } from '@/pabx/call-group/call-group.service';
 export class EditUraPage implements OnInit {
     form!: FormGroup;
     pending = false;
-    showError = false;
     mohOptions: { label: string; value: number }[] = [];
     callGroupOptions: { label: string; value: string }[] = [];
     uraOptions: { label: string; value: string }[] = [];
@@ -352,7 +348,8 @@ export class EditUraPage implements OnInit {
         private readonly route: ActivatedRoute,
         private readonly uraService: UraService,
         private readonly mohService: MohService,
-        private readonly callGroupService: CallGroupService
+        private readonly callGroupService: CallGroupService,
+        private readonly messageService: MessageService
     ) {}
 
     ngOnInit(): void {
@@ -449,11 +446,16 @@ export class EditUraPage implements OnInit {
         this.actions.markAllAsTouched();
         if (this.form.invalid || this.actions.length === 0) return;
         this.pending = true;
-        this.showError = false;
         this.uraService
             .update(this.form.value as Ura)
             .then(() => this.router.navigate(['/pabx/uras']))
-            .catch(() => (this.showError = true))
+            .catch((error: HttpErrorResponse) => {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: error?.error?.message ?? 'Erro ao salvar a URA',
+                    life: 15_000
+                });
+            })
             .finally(() => (this.pending = false));
     }
 }
