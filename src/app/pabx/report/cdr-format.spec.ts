@@ -1,4 +1,10 @@
-import {dispositionSeverity, dispositionTranslate, formatDate, formatDuration} from '@/pabx/report/cdr-format';
+import {
+    costCenterLabel,
+    dispositionSeverity,
+    dispositionTranslate,
+    formatDate,
+    formatDuration
+} from '@/pabx/report/cdr-format';
 
 describe('cdr-format', () => {
     describe('formatDate', () => {
@@ -47,6 +53,21 @@ describe('cdr-format', () => {
 
         it('retorna Desconhecido para status não mapeado', () => {
             expect(dispositionTranslate('XYZ')).toBe('Desconhecido');
+        });
+    });
+
+    describe('costCenterLabel', () => {
+        it('retorna o nome do centro de custo quando o código existe no mapa', () => {
+            const labelsByCode = new Map([['CC01', 'Comercial']]);
+            expect(costCenterLabel('CC01', labelsByCode)).toBe('Comercial');
+        });
+
+        it('retorna "-" quando accountCode é null', () => {
+            expect(costCenterLabel(null, new Map())).toBe('-');
+        });
+
+        it('retorna "-" quando o código não está mapeado', () => {
+            expect(costCenterLabel('CC99', new Map([['CC01', 'Comercial']]))).toBe('-');
         });
     });
 });

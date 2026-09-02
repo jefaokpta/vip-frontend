@@ -3,29 +3,36 @@
  * @email jefaokpta@hotmail.com
  */
 
-import {Component, computed, effect, OnDestroy, OnInit, signal, ViewChild} from '@angular/core';
-import {Table, TableModule} from 'primeng/table';
-import {MessageService} from 'primeng/api';
-import {Card} from 'primeng/card';
-import {ProgressSpinner} from 'primeng/progressspinner';
-import {Toast} from 'primeng/toast';
-import {CurrencyPipe} from '@angular/common';
-import {FormsModule} from '@angular/forms';
-import {DatePicker} from 'primeng/datepicker';
-import {Select} from 'primeng/select';
-import {ChartModule} from 'primeng/chart';
-import {Tag} from 'primeng/tag';
-import {Button} from 'primeng/button';
-import {IconField} from 'primeng/iconfield';
-import {InputIcon} from 'primeng/inputicon';
-import {InputText} from 'primeng/inputtext';
-import {Tooltip} from 'primeng/tooltip';
-import {RouterLink} from '@angular/router';
-import {debounceTime, Subscription} from 'rxjs';
-import {Cdr} from '@/pabx/types/cdr';
-import {ReportService} from '@/pabx/report/report.service';
-import {dispositionSeverity, dispositionTranslate, formatDate, formatDuration} from '@/pabx/report/cdr-format';
-import {LayoutService} from '@/layout/service/layout.service';
+import { Component, computed, effect, OnDestroy, OnInit, signal, ViewChild } from '@angular/core';
+import { Table, TableModule } from 'primeng/table';
+import { MessageService } from 'primeng/api';
+import { Card } from 'primeng/card';
+import { ProgressSpinner } from 'primeng/progressspinner';
+import { Toast } from 'primeng/toast';
+import { CurrencyPipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { DatePicker } from 'primeng/datepicker';
+import { Select } from 'primeng/select';
+import { ChartModule } from 'primeng/chart';
+import { Tag } from 'primeng/tag';
+import { Button } from 'primeng/button';
+import { IconField } from 'primeng/iconfield';
+import { InputIcon } from 'primeng/inputicon';
+import { InputText } from 'primeng/inputtext';
+import { Tooltip } from 'primeng/tooltip';
+import { RouterLink } from '@angular/router';
+import { debounceTime, Subscription } from 'rxjs';
+import { Cdr } from '@/pabx/types/cdr';
+import { ReportService } from '@/pabx/report/report.service';
+import {
+    costCenterLabel,
+    dispositionSeverity,
+    dispositionTranslate,
+    formatDate,
+    formatDuration
+} from '@/pabx/report/cdr-format';
+import { LayoutService } from '@/layout/service/layout.service';
+import { AccountCodeService } from '@/pabx/accountcode/account-code.service';
 
 interface StatusOption {
     label: string;
@@ -63,9 +70,7 @@ interface ChartBucket {
         <p-card>
             <ng-template #title>
                 <div class="flex flex-col md:flex-row md:items-start md:justify-between mb-4 gap-3">
-                    <h2 class="text-surface-900 dark:text-surface-0 text-2xl font-semibold">
-                        Relatório de Chamadas
-                    </h2>
+                    <h2 class="text-surface-900 dark:text-surface-0 text-2xl font-semibold">Relatório de Chamadas</h2>
                     <div class="flex flex-col sm:flex-row items-start sm:items-end gap-3">
                         <div class="flex flex-col gap-1">
                             <label class="text-xs font-semibold uppercase tracking-wide text-surface-500">
@@ -116,9 +121,7 @@ interface ChartBucket {
                 <div
                     class="rounded-xl shadow px-4 py-3 flex flex-col gap-1 border-l-4 border-purple-500 bg-white dark:bg-surface-900"
                 >
-                    <span class="text-xs font-semibold uppercase tracking-wide text-surface-500">
-                        Duração Média
-                    </span>
+                    <span class="text-xs font-semibold uppercase tracking-wide text-surface-500"> Duração Média </span>
                     <span class="text-2xl font-bold">{{ formatDuration(avgDurationSeconds()) }}</span>
                 </div>
                 <div
@@ -132,9 +135,7 @@ interface ChartBucket {
                 <div
                     class="rounded-xl shadow px-4 py-3 flex flex-col gap-1 border-l-4 border-orange-500 bg-white dark:bg-surface-900"
                 >
-                    <span class="text-xs font-semibold uppercase tracking-wide text-surface-500">
-                        Total Falado
-                    </span>
+                    <span class="text-xs font-semibold uppercase tracking-wide text-surface-500"> Total Falado </span>
                     <span class="text-2xl font-bold">{{ formatDuration(totalTalkSeconds()) }}</span>
                 </div>
             </div>
@@ -148,7 +149,7 @@ interface ChartBucket {
             <!-- Search -->
             <div class="flex justify-end mb-2">
                 <p-iconfield>
-                    <p-inputicon class="pi pi-search"/>
+                    <p-inputicon class="pi pi-search" />
                     <input
                         pInputText
                         type="text"
@@ -177,6 +178,7 @@ interface ChartBucket {
                         <th>Origem</th>
                         <th>Destino</th>
                         <th>Status</th>
+                        <th>Tipo</th>
                         <th pSortableColumn="billableSeconds">
                             Duração
                             <p-sortIcon field="billableSeconds"></p-sortIcon>
@@ -209,6 +211,7 @@ interface ChartBucket {
                                 />
                             </div>
                         </td>
+                        <td>{{ cdr.costCenterLabel }}</td>
                         <td>{{ formatDuration(cdr.billableSeconds) }}</td>
                         <td>{{ cdr.cost | currency: 'BRL' : true : '1.2-2' }}</td>
                         <td>
@@ -226,10 +229,10 @@ interface ChartBucket {
 
                 <ng-template pTemplate="emptymessage">
                     <tr>
-                        <td colspan="7">
+                        <td colspan="8">
                             @if (loading()) {
                                 <div class="flex justify-center p-4">
-                                    <p-progress-spinner [style]="{ width: '2rem', height: '2rem' }"/>
+                                    <p-progress-spinner [style]="{ width: '2rem', height: '2rem' }" />
                                 </div>
                             }
                             @if (!loading()) {
@@ -248,6 +251,7 @@ export class ReportPage implements OnInit, OnDestroy {
     readonly dateRange = signal<Date[]>([]);
     readonly statusFilter = signal<string | null>(null);
     readonly loading = signal<boolean>(true);
+    readonly costCenterLabelsByCode = signal<Map<string, string>>(new Map());
 
     @ViewChild('dataTable') dt!: Table;
 
@@ -274,8 +278,8 @@ export class ReportPage implements OnInit, OnDestroy {
     readonly statusOptions = computed<StatusOption[]>(() => {
         const dispositions = Array.from(new Set(this.cdrs().map((c) => c.disposition))).sort();
         return [
-            {label: 'Todos', value: null},
-            ...dispositions.map((d) => ({label: dispositionTranslate(d), value: d}))
+            { label: 'Todos', value: null },
+            ...dispositions.map((d) => ({ label: dispositionTranslate(d), value: d }))
         ];
     });
 
@@ -294,9 +298,7 @@ export class ReportPage implements OnInit, OnDestroy {
         return Math.round((answered / list.length) * 1000) / 10;
     });
 
-    readonly totalTalkSeconds = computed(() =>
-        this.filteredCdrs().reduce((sum, c) => sum + c.billableSeconds, 0)
-    );
+    readonly totalTalkSeconds = computed(() => this.filteredCdrs().reduce((sum, c) => sum + c.billableSeconds, 0));
 
     readonly isSingleDay = computed(() => {
         const range = this.dateRange();
@@ -314,7 +316,7 @@ export class ReportPage implements OnInit, OnDestroy {
 
     readonly chartBuckets = computed<ChartBucket[]>(() => {
         if (this.isSingleDay()) {
-            return Array.from({length: 24}, (_, h) => ({
+            return Array.from({ length: 24 }, (_, h) => ({
                 key: String(h),
                 label: `${String(h).padStart(2, '0')}:00`
             }));
@@ -351,16 +353,19 @@ export class ReportPage implements OnInit, OnDestroy {
         return buckets;
     });
 
-    readonly tableRows = computed(() =>
-        this.filteredCdrs().map((cdr) => ({
+    readonly tableRows = computed(() => {
+        const labelsByCode = this.costCenterLabelsByCode();
+        return this.filteredCdrs().map((cdr) => ({
             ...cdr,
             dateLabel: formatDate(cdr.startTime),
-            displaySrc: cdr.userfield === 'OUTBOUND' ? cdr.peer : cdr.src
-        }))
-    );
+            displaySrc: cdr.userfield === 'OUTBOUND' ? cdr.peer : cdr.src,
+            costCenterLabel: costCenterLabel(cdr.accountCode, labelsByCode)
+        }));
+    });
 
     constructor(
         private readonly reportService: ReportService,
+        private readonly accountCodeService: AccountCodeService,
         private readonly messageService: MessageService,
         private readonly layoutService: LayoutService
     ) {
@@ -378,6 +383,19 @@ export class ReportPage implements OnInit, OnDestroy {
 
     ngOnInit(): void {
         this.load(() => this.reportService.findLast30());
+        this.accountCodeService
+            .findAll()
+            .then((accountCodes) => {
+                this.costCenterLabelsByCode.set(new Map(accountCodes.map((a) => [a.code, a.title])));
+            })
+            .catch(() => {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Erro ao carregar centros de custo',
+                    detail: 'Tente novamente mais tarde.',
+                    life: 10_000
+                });
+            });
     }
 
     ngOnDestroy(): void {
@@ -458,13 +476,14 @@ export class ReportPage implements OnInit, OnDestroy {
                 barThickness: 14,
                 borderRadius: 6,
                 data: buckets.map(
-                    (b) => list.filter((c) => c.disposition === d && this.dayKey(new Date(c.startTime)) === b.key).length
+                    (b) =>
+                        list.filter((c) => c.disposition === d && this.dayKey(new Date(c.startTime)) === b.key).length
                 )
             }))
         };
 
         this.chartOptions = {
-            animation: {duration: 1000},
+            animation: { duration: 1000 },
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
@@ -473,19 +492,19 @@ export class ReportPage implements OnInit, OnDestroy {
                     labels: {
                         color: textColor,
                         usePointStyle: true,
-                        font: {weight: 700},
+                        font: { weight: 700 },
                         padding: 20
                     }
                 }
             },
             scales: {
                 x: {
-                    ticks: {color: textColorSecondary, font: {weight: 500}},
-                    grid: {display: false, drawBorder: false}
+                    ticks: { color: textColorSecondary, font: { weight: 500 } },
+                    grid: { display: false, drawBorder: false }
                 },
                 y: {
-                    ticks: {color: textColorSecondary},
-                    grid: {color: surfaceBorder, drawBorder: false},
+                    ticks: { color: textColorSecondary },
+                    grid: { color: surfaceBorder, drawBorder: false },
                     beginAtZero: true
                 }
             }

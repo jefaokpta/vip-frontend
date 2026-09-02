@@ -26,6 +26,11 @@ export function dispositionSeverity(disposition: string): 'success' | 'info' | '
     }
 }
 
+export function costCenterLabel(accountCode: string | null, labelsByCode: Map<string, string>): string {
+    if (!accountCode) return '-';
+    return labelsByCode.get(accountCode) ?? '-';
+}
+
 export function dispositionTranslate(disposition: string): string {
     switch (disposition) {
         case 'ANSWERED':
