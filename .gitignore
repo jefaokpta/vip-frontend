@@ -52,3 +52,6 @@ testem.log
 # Cache e arquivos temporários
 .angular/
 .eslintcache
+
+# Worktrees isoladas de desenvolvimento
+.worktrees/
