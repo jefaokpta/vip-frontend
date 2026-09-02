@@ -211,7 +211,7 @@ interface ChartBucket {
                                 />
                             </div>
                         </td>
-                        <td>{{ cdr.costCenterLabel }}</td>
+                        <td>{{ cdr.costCenter }}</td>
                         <td>{{ formatDuration(cdr.billableSeconds) }}</td>
                         <td>{{ cdr.cost | currency: 'BRL' : true : '1.2-2' }}</td>
                         <td>
@@ -359,7 +359,7 @@ export class ReportPage implements OnInit, OnDestroy {
             ...cdr,
             dateLabel: formatDate(cdr.startTime),
             displaySrc: cdr.userfield === 'OUTBOUND' ? cdr.peer : cdr.src,
-            costCenterLabel: costCenterLabel(cdr.accountCode, labelsByCode)
+            costCenter: costCenterLabel(cdr.accountCode, labelsByCode)
         }));
     });
 
@@ -386,7 +386,13 @@ export class ReportPage implements OnInit, OnDestroy {
         this.accountCodeService
             .findAll()
             .then((accountCodes) => {
-                this.costCenterLabelsByCode.set(new Map(accountCodes.map((a) => [a.code, a.title])));
+                const labelsByCode = new Map<string, string>();
+                for (const accountCode of accountCodes) {
+                    if (!labelsByCode.has(accountCode.code)) {
+                        labelsByCode.set(accountCode.code, accountCode.title);
+                    }
+                }
+                this.costCenterLabelsByCode.set(labelsByCode);
             })
             .catch(() => {
                 this.messageService.add({

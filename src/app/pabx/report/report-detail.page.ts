@@ -3,19 +3,26 @@
  * @email jefaokpta@hotmail.com
  */
 
-import {Component, OnInit} from '@angular/core';
-import {ActivatedRoute, RouterLink} from '@angular/router';
-import {Card} from 'primeng/card';
-import {Button} from 'primeng/button';
-import {Tooltip} from 'primeng/tooltip';
-import {ProgressSpinner} from 'primeng/progressspinner';
-import {Tag} from 'primeng/tag';
-import {Toast} from 'primeng/toast';
-import {MessageService} from 'primeng/api';
-import {CurrencyPipe} from '@angular/common';
-import {CdrDetail} from '@/pabx/types/cdr-detail';
-import {ReportService} from '@/pabx/report/report.service';
-import {dispositionSeverity, dispositionTranslate, formatDate, formatDuration} from '@/pabx/report/cdr-format';
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, RouterLink } from '@angular/router';
+import { Card } from 'primeng/card';
+import { Button } from 'primeng/button';
+import { Tooltip } from 'primeng/tooltip';
+import { ProgressSpinner } from 'primeng/progressspinner';
+import { Tag } from 'primeng/tag';
+import { Toast } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
+import { CurrencyPipe } from '@angular/common';
+import { CdrDetail } from '@/pabx/types/cdr-detail';
+import { ReportService } from '@/pabx/report/report.service';
+import {
+    costCenterLabel,
+    dispositionSeverity,
+    dispositionTranslate,
+    formatDate,
+    formatDuration
+} from '@/pabx/report/cdr-format';
+import { AccountCodeService } from '@/pabx/accountcode/account-code.service';
 
 @Component({
     selector: 'app-report-detail-page',
@@ -41,7 +48,7 @@ import {dispositionSeverity, dispositionTranslate, formatDate, formatDuration} f
 
             @if (loading) {
                 <div class="flex justify-center py-10">
-                    <p-progress-spinner [style]="{ width: '2.5rem', height: '2.5rem' }"/>
+                    <p-progress-spinner [style]="{ width: '2.5rem', height: '2.5rem' }" />
                 </div>
             }
 
@@ -89,9 +96,8 @@ import {dispositionSeverity, dispositionTranslate, formatDate, formatDuration} f
                     </div>
                     <div class="flex flex-col gap-1">
                         <span class="text-xs font-semibold uppercase tracking-wide text-gray-400">Centro de Custo</span>
-                        <span class="font-medium">{{ cdr.accountCode ?? '—' }}</span>
+                        <span class="font-medium">{{ costCenterLabel(cdr.accountCode, costCenterLabelsByCode) }}</span>
                     </div>
-
                 </div>
 
                 <h3 class="font-semibold text-lg mb-3">Interações e Gravações</h3>
@@ -104,7 +110,7 @@ import {dispositionSeverity, dispositionTranslate, formatDate, formatDuration} f
                             <div class="flex flex-wrap items-center gap-4">
                                 <div class="flex flex-col gap-1">
                                     <span class="text-xs font-semibold uppercase tracking-wide text-gray-400"
-                                    >Origem</span
+                                        >Origem</span
                                     >
                                     <span class="font-medium">
                                         {{ interaction.channelSrc.peer }}
@@ -113,12 +119,12 @@ import {dispositionSeverity, dispositionTranslate, formatDate, formatDuration} f
                                 @if (interaction.channelDst) {
                                     <div class="flex flex-col gap-1">
                                         <span class="text-xs font-semibold uppercase tracking-wide text-gray-400"
-                                        >Destino</span
+                                            >Destino</span
                                         >
                                         <span class="font-medium">
                                             {{ interaction.channelDst.peer }}
                                             @if (interaction.channelDst.isLeader) {
-                                                <p-tag value="Líder" severity="info" class="ml-2"/>
+                                                <p-tag value="Líder" severity="info" class="ml-2" />
                                             }
                                         </span>
                                     </div>
@@ -138,19 +144,20 @@ import {dispositionSeverity, dispositionTranslate, formatDate, formatDuration} f
                 <div class="text-center p-10 text-gray-400">Chamada não encontrada.</div>
             }
         </p-card>
-        <p-toast/>
+        <p-toast />
     `
 })
 export class ReportDetailPage implements OnInit {
     cdr: CdrDetail | null = null;
     loading = true;
+    costCenterLabelsByCode = new Map<string, string>();
 
     constructor(
         private readonly route: ActivatedRoute,
         private readonly reportService: ReportService,
+        private readonly accountCodeService: AccountCodeService,
         private readonly messageService: MessageService
-    ) {
-    }
+    ) {}
 
     ngOnInit(): void {
         const id = Number(this.route.snapshot.paramMap.get('id'));
@@ -169,10 +176,31 @@ export class ReportDetailPage implements OnInit {
                     life: 10_000
                 });
             });
+
+        this.accountCodeService
+            .findAll()
+            .then((accountCodes) => {
+                const labelsByCode = new Map<string, string>();
+                for (const accountCode of accountCodes) {
+                    if (!labelsByCode.has(accountCode.code)) {
+                        labelsByCode.set(accountCode.code, accountCode.title);
+                    }
+                }
+                this.costCenterLabelsByCode = labelsByCode;
+            })
+            .catch(() => {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Erro ao carregar centros de custo',
+                    detail: 'Tente novamente mais tarde.',
+                    life: 10_000
+                });
+            });
     }
 
     protected readonly formatDate = formatDate;
     protected readonly formatDuration = formatDuration;
     protected readonly dispositionSeverity = dispositionSeverity;
     protected readonly dispositionTranslate = dispositionTranslate;
+    protected readonly costCenterLabel = costCenterLabel;
 }
