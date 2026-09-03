@@ -51,6 +51,7 @@ import { PausePage } from '@/pabx/pause/pause.page';
 import { NewPausePage } from '@/pabx/pause/new-pause.page';
 import { EditPausePage } from '@/pabx/pause/edit-pause.page';
 import { MemberActivityReportPage } from '@/pabx/member-activity-report/member-activity-report.page';
+import { DacReportPage } from '@/pabx/dac-report/dac-report.page';
 
 export default [
     { path: 'peers', component: PeerPage, data: { breadcrumb: 'Ramais' } },
@@ -128,6 +129,11 @@ export default [
         path: 'member-activity-report',
         component: MemberActivityReportPage,
         data: { breadcrumb: 'Relatório de Atividade dos Membros' }
+    },
+    {
+        path: 'dac-report',
+        component: DacReportPage,
+        data: { breadcrumb: 'Relatório DAC' }
     },
 
     { path: 'queues', component: QueuesPage, data: { breadcrumb: 'Filas de Atendimento' } },

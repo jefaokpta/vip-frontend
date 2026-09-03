@@ -71,7 +71,9 @@ export class AppMenu implements OnInit {
                                 },
                                 {
                                     label: 'DAC',
-                                    icon: 'pi pi-fw pi-image'
+                                    roles: [RoleEnum.ROLE_COMPANY_SUPERVISOR],
+                                    icon: 'pi pi-fw pi-image',
+                                    routerLink: ['/pabx/dac-report']
                                 }
                             ]
                         },

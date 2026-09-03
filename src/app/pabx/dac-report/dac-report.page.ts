@@ -71,31 +71,31 @@ import { DacReportService } from '@/pabx/dac-report/dac-report.service';
                     >
                     <p-button icon="pi pi-refresh" label="Tentar novamente" (onClick)="loadReport()" />
                 </div>
-            } @else if (report(); as r) {
+            } @else if (report()) {
                 <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4">
                     <div class="rounded-xl shadow px-4 py-3 flex flex-col gap-1 border-l-4 border-gray-200">
                         <span class="text-xs font-semibold uppercase tracking-wide text-gray-400">TOTAL DE CHAMADAS</span>
-                        <span class="text-2xl font-bold">{{ r.totalCalls }}</span>
+                        <span class="text-2xl font-bold">{{ report()!.totalCalls }}</span>
                     </div>
                     <div class="rounded-xl shadow px-4 py-3 flex flex-col gap-1 border-l-4 border-green-500">
                         <span class="text-xs font-semibold uppercase tracking-wide text-green-600">ATENDIDAS</span>
-                        <span class="text-2xl font-bold">{{ r.answeredCalls }} ({{ answeredPercent(r) }}%)</span>
+                        <span class="text-2xl font-bold">{{ report()!.answeredCalls }} ({{ answeredPercent(report()!) }}%)</span>
                         <span class="text-xs text-surface-500"
-                            >Nível de Serviço: {{ r.serviceLevelPercent }}% (≤ {{ r.serviceLevelSeconds }}s)</span
+                            >Nível de Serviço: {{ report()!.serviceLevelPercent }}% (≤ {{ report()!.serviceLevelSeconds }}s)</span
                         >
                     </div>
                     <div class="rounded-xl shadow px-4 py-3 flex flex-col gap-1 border-l-4 border-red-500">
                         <span class="text-xs font-semibold uppercase tracking-wide text-red-500">ABANDONADAS</span>
-                        <span class="text-2xl font-bold">{{ r.abandonedCalls }} ({{ abandonedPercent(r) }}%)</span>
+                        <span class="text-2xl font-bold">{{ report()!.abandonedCalls }} ({{ abandonedPercent(report()!) }}%)</span>
                     </div>
                     <div class="rounded-xl shadow px-4 py-3 flex flex-col gap-1 border-l-4 border-orange-400">
                         <span class="text-xs font-semibold uppercase tracking-wide text-gray-400">TME MÉDIO</span>
-                        <span class="text-2xl font-bold">{{ formatHms(r.avgWaitSeconds) }}</span>
+                        <span class="text-2xl font-bold">{{ formatHms(report()!.avgWaitSeconds) }}</span>
                         <span class="text-xs text-surface-500">Espera</span>
                     </div>
                     <div class="rounded-xl shadow px-4 py-3 flex flex-col gap-1 border-l-4 border-indigo-400">
                         <span class="text-xs font-semibold uppercase tracking-wide text-gray-400">TMA MÉDIO</span>
-                        <span class="text-2xl font-bold">{{ formatHms(r.avgTalkSeconds) }}</span>
+                        <span class="text-2xl font-bold">{{ formatHms(report()!.avgTalkSeconds) }}</span>
                         <span class="text-xs text-surface-500">Conversação</span>
                     </div>
                 </div>
@@ -106,8 +106,8 @@ import { DacReportService } from '@/pabx/dac-report/dac-report.service';
                     }
                 </div>
                 <div class="rounded-xl border border-surface-200 dark:border-surface-700 p-4">
-                    <h3 class="font-semibold text-lg mb-4">Detalhamento por Faixa {{ r.granularity === 'HOUR' ? 'Horária' : 'Diária' }}</h3>
-                    <p-table [value]="r.totalCalls > 0 ? r.partials : []" [tableStyle]="{ 'min-width': '45rem' }" stripedRows>
+                    <h3 class="font-semibold text-lg mb-4">Detalhamento por Faixa {{ report()!.granularity === 'HOUR' ? 'Horária' : 'Diária' }}</h3>
+                    <p-table [value]="report()!.totalCalls > 0 ? report()!.partials : []" [tableStyle]="{ 'min-width': '45rem' }" stripedRows>
                         <ng-template pTemplate="header">
                             <tr>
                                 <th>Período</th>
@@ -120,8 +120,8 @@ import { DacReportService } from '@/pabx/dac-report/dac-report.service';
                         </ng-template>
                         <ng-template pTemplate="body" let-partial>
                             <tr>
-                                <td>{{ partialLabel(partial, r.granularity) }}</td>
-                                <td>{{ partial.totalCalls }} ({{ partialPercentOfTotal(partial, r) }}%)</td>
+                                <td>{{ partialLabel(partial, report()!.granularity) }}</td>
+                                <td>{{ partial.totalCalls }} ({{ partialPercentOfTotal(partial, report()!) }}%)</td>
                                 <td>{{ partial.answeredCalls }} ({{ partialAnsweredPercent(partial) }}%)</td>
                                 <td>{{ partial.abandonedCalls }} ({{ partialAbandonedPercent(partial) }}%)</td>
                                 <td>{{ formatHms(partial.avgWaitSeconds) }}</td>
@@ -129,14 +129,14 @@ import { DacReportService } from '@/pabx/dac-report/dac-report.service';
                             </tr>
                         </ng-template>
                         <ng-template pTemplate="footer">
-                            @if (r.totalCalls > 0) {
+                            @if (report()!.totalCalls > 0) {
                                 <tr>
                                     <td class="font-semibold">TOTAL GERAL / MÉDIAS</td>
-                                    <td class="font-semibold">{{ r.totalCalls }} (100%)</td>
-                                    <td class="font-semibold">{{ r.answeredCalls }} ({{ answeredPercent(r) }}%)</td>
-                                    <td class="font-semibold">{{ r.abandonedCalls }} ({{ abandonedPercent(r) }}%)</td>
-                                    <td class="font-semibold">{{ formatHms(r.avgWaitSeconds) }}</td>
-                                    <td class="font-semibold">{{ formatHms(r.avgTalkSeconds) }}</td>
+                                    <td class="font-semibold">{{ report()!.totalCalls }} (100%)</td>
+                                    <td class="font-semibold">{{ report()!.answeredCalls }} ({{ answeredPercent(report()!) }}%)</td>
+                                    <td class="font-semibold">{{ report()!.abandonedCalls }} ({{ abandonedPercent(report()!) }}%)</td>
+                                    <td class="font-semibold">{{ formatHms(report()!.avgWaitSeconds) }}</td>
+                                    <td class="font-semibold">{{ formatHms(report()!.avgTalkSeconds) }}</td>
                                 </tr>
                             }
                         </ng-template>
