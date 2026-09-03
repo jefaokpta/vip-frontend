@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, computed } from '@angular/core';
 import { Card } from 'primeng/card';
 import { ProgressSpinner } from 'primeng/progressspinner';
 import { Toast } from 'primeng/toast';
@@ -7,14 +7,16 @@ import { FormsModule } from '@angular/forms';
 import { DatePicker } from 'primeng/datepicker';
 import { Select } from 'primeng/select';
 import { Button } from 'primeng/button';
+import { ChartModule } from 'primeng/chart';
 import { DacReportResponse, QueueOption } from '@/pabx/types/dac-report';
+import { DacPartial } from '@/pabx/types/dac-report';
 import { DacReportService } from '@/pabx/dac-report/dac-report.service';
 
 @Component({
     selector: 'app-dac-report-page',
     standalone: true,
     providers: [MessageService],
-    imports: [Card, ProgressSpinner, Toast, FormsModule, DatePicker, Select, Button],
+    imports: [Card, ProgressSpinner, Toast, FormsModule, DatePicker, Select, Button, ChartModule],
     template: `
         <p-card>
             <ng-template #title>
@@ -96,6 +98,12 @@ import { DacReportService } from '@/pabx/dac-report/dac-report.service';
                         <span class="text-xs text-surface-500">Conversação</span>
                     </div>
                 </div>
+                <div class="rounded-xl border border-surface-200 dark:border-surface-700 p-4 mb-4">
+                    <h3 class="font-semibold text-lg mb-2">Volumetria: Atendidas vs. Abandonadas</h3>
+                    @if (chartData(); as data) {
+                        <p-chart type="line" height="280" [data]="data" [options]="chartOptions"></p-chart>
+                    }
+                </div>
             }
         </p-card>
         <p-toast />
@@ -109,6 +117,42 @@ export class DacReportPage implements OnInit {
     readonly loading = signal<boolean>(false);
     readonly reportError = signal<boolean>(false);
     readonly maxDate = signal<Date>(new Date());
+
+    readonly chartData = computed(() => {
+        const r = this.report();
+        if (!r) return null;
+        return {
+            labels: r.partials.map((p) => this.partialLabel(p, r.granularity)),
+            datasets: [
+                {
+                    label: 'Atendidas',
+                    borderColor: '#22c55e',
+                    backgroundColor: 'rgba(34, 197, 94, 0.15)',
+                    fill: true,
+                    tension: 0.3,
+                    data: r.partials.map((p) => p.answeredCalls)
+                },
+                {
+                    label: 'Abandonadas',
+                    borderColor: '#ef4444',
+                    backgroundColor: 'rgba(239, 68, 68, 0.15)',
+                    fill: false,
+                    tension: 0.3,
+                    data: r.partials.map((p) => p.abandonedCalls)
+                }
+            ]
+        };
+    });
+
+    readonly chartOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { position: 'bottom' as const } },
+        scales: {
+            x: { grid: { display: false } },
+            y: { beginAtZero: true }
+        }
+    };
 
     readonly today = new Date();
     private requestId = 0;
@@ -198,6 +242,14 @@ export class DacReportPage implements OnInit {
         const s = Math.floor(totalSeconds % 60);
         const pad = (n: number) => String(n).padStart(2, '0');
         return `${pad(h)}:${pad(m)}:${pad(s)}`;
+    }
+
+    partialLabel(partial: DacPartial, granularity: 'HOUR' | 'DAY'): string {
+        const d = new Date(partial.periodStart);
+        const pad = (n: number) => String(n).padStart(2, '0');
+        return granularity === 'HOUR'
+            ? `${pad(d.getHours())}:00`
+            : `${pad(d.getDate())}/${pad(d.getMonth() + 1)}`;
     }
 
     private showError(summary: string): void {
