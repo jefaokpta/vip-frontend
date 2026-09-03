@@ -8,6 +8,7 @@ import { DatePicker } from 'primeng/datepicker';
 import { Select } from 'primeng/select';
 import { Button } from 'primeng/button';
 import { ChartModule } from 'primeng/chart';
+import { TableModule } from 'primeng/table';
 import { DacReportResponse, QueueOption } from '@/pabx/types/dac-report';
 import { DacPartial } from '@/pabx/types/dac-report';
 import { DacReportService } from '@/pabx/dac-report/dac-report.service';
@@ -16,7 +17,7 @@ import { DacReportService } from '@/pabx/dac-report/dac-report.service';
     selector: 'app-dac-report-page',
     standalone: true,
     providers: [MessageService],
-    imports: [Card, ProgressSpinner, Toast, FormsModule, DatePicker, Select, Button, ChartModule],
+    imports: [Card, ProgressSpinner, Toast, FormsModule, DatePicker, Select, Button, ChartModule, TableModule],
     template: `
         <p-card>
             <ng-template #title>
@@ -103,6 +104,48 @@ import { DacReportService } from '@/pabx/dac-report/dac-report.service';
                     @if (chartData(); as data) {
                         <p-chart type="line" height="280" [data]="data" [options]="chartOptions"></p-chart>
                     }
+                </div>
+                <div class="rounded-xl border border-surface-200 dark:border-surface-700 p-4">
+                    <h3 class="font-semibold text-lg mb-4">Detalhamento por Faixa {{ r.granularity === 'HOUR' ? 'Horária' : 'Diária' }}</h3>
+                    <p-table [value]="r.totalCalls > 0 ? r.partials : []" [tableStyle]="{ 'min-width': '45rem' }" stripedRows>
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th>Período</th>
+                                <th>Chamadas (% Total)</th>
+                                <th>Atendidas (% Faixa)</th>
+                                <th>Abandonadas (% Faixa)</th>
+                                <th>TME (Espera)</th>
+                                <th>TMA (Conversado)</th>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="body" let-partial>
+                            <tr>
+                                <td>{{ partialLabel(partial, r.granularity) }}</td>
+                                <td>{{ partial.totalCalls }} ({{ partialPercentOfTotal(partial, r) }}%)</td>
+                                <td>{{ partial.answeredCalls }} ({{ partialAnsweredPercent(partial) }}%)</td>
+                                <td>{{ partial.abandonedCalls }} ({{ partialAbandonedPercent(partial) }}%)</td>
+                                <td>{{ formatHms(partial.avgWaitSeconds) }}</td>
+                                <td>{{ formatHms(partial.avgTalkSeconds) }}</td>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="footer">
+                            @if (r.totalCalls > 0) {
+                                <tr>
+                                    <td class="font-semibold">TOTAL GERAL / MÉDIAS</td>
+                                    <td class="font-semibold">{{ r.totalCalls }} (100%)</td>
+                                    <td class="font-semibold">{{ r.answeredCalls }} ({{ answeredPercent(r) }}%)</td>
+                                    <td class="font-semibold">{{ r.abandonedCalls }} ({{ abandonedPercent(r) }}%)</td>
+                                    <td class="font-semibold">{{ formatHms(r.avgWaitSeconds) }}</td>
+                                    <td class="font-semibold">{{ formatHms(r.avgTalkSeconds) }}</td>
+                                </tr>
+                            }
+                        </ng-template>
+                        <ng-template pTemplate="emptymessage">
+                            <tr>
+                                <td colspan="6" class="text-center p-4">Nenhuma chamada nesse período</td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
                 </div>
             }
         </p-card>
@@ -250,6 +293,18 @@ export class DacReportPage implements OnInit {
         return granularity === 'HOUR'
             ? `${pad(d.getHours())}:00`
             : `${pad(d.getDate())}/${pad(d.getMonth() + 1)}`;
+    }
+
+    partialPercentOfTotal(partial: DacPartial, r: DacReportResponse): number {
+        return r.totalCalls === 0 ? 0 : Math.round((partial.totalCalls / r.totalCalls) * 100);
+    }
+
+    partialAnsweredPercent(partial: DacPartial): number {
+        return partial.totalCalls === 0 ? 0 : Math.round((partial.answeredCalls / partial.totalCalls) * 100);
+    }
+
+    partialAbandonedPercent(partial: DacPartial): number {
+        return partial.totalCalls === 0 ? 0 : Math.round((partial.abandonedCalls / partial.totalCalls) * 100);
     }
 
     private showError(summary: string): void {
