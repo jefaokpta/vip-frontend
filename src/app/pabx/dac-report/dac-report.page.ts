@@ -9,8 +9,7 @@ import { Select } from 'primeng/select';
 import { Button } from 'primeng/button';
 import { ChartModule } from 'primeng/chart';
 import { TableModule } from 'primeng/table';
-import { DacReportResponse, QueueOption } from '@/pabx/types/dac-report';
-import { DacPartial } from '@/pabx/types/dac-report';
+import { DacPartial, DacReportResponse, QueueOption } from '@/pabx/types/dac-report';
 import { DacReportService } from '@/pabx/dac-report/dac-report.service';
 
 @Component({
@@ -75,7 +74,9 @@ import { DacReportService } from '@/pabx/dac-report/dac-report.service';
                 @if (report(); as r) {
                     <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4">
                         <div class="rounded-xl shadow px-4 py-3 flex flex-col gap-1 border-l-4 border-gray-200">
-                            <span class="text-xs font-semibold uppercase tracking-wide text-gray-400">TOTAL DE CHAMADAS</span>
+                            <span class="text-xs font-semibold uppercase tracking-wide text-gray-400"
+                                >TOTAL DE CHAMADAS</span
+                            >
                             <span class="text-2xl font-bold">{{ r.totalCalls }}</span>
                         </div>
                         <div class="rounded-xl shadow px-4 py-3 flex flex-col gap-1 border-l-4 border-green-500">
@@ -107,8 +108,14 @@ import { DacReportService } from '@/pabx/dac-report/dac-report.service';
                         }
                     </div>
                     <div class="rounded-xl border border-surface-200 dark:border-surface-700 p-4">
-                        <h3 class="font-semibold text-lg mb-4">Detalhamento por Faixa {{ r.granularity === 'HOUR' ? 'Horária' : 'Diária' }}</h3>
-                        <p-table [value]="r.totalCalls > 0 ? r.partials : []" [tableStyle]="{ 'min-width': '45rem' }" stripedRows>
+                        <h3 class="font-semibold text-lg mb-4">
+                            Detalhamento por Faixa {{ r.granularity === 'HOUR' ? 'Horária' : 'Diária' }}
+                        </h3>
+                        <p-table
+                            [value]="r.totalCalls > 0 ? r.partials : []"
+                            [tableStyle]="{ 'min-width': '45rem' }"
+                            stripedRows
+                        >
                             <ng-template pTemplate="header">
                                 <tr>
                                     <th>Período</th>
@@ -135,18 +142,20 @@ import { DacReportService } from '@/pabx/dac-report/dac-report.service';
                                         <td class="font-semibold">TOTAL GERAL / MÉDIAS</td>
                                         <td class="font-semibold">{{ r.totalCalls }} (100%)</td>
                                         <td class="font-semibold">{{ r.answeredCalls }} ({{ answeredPercent(r) }}%)</td>
-                                        <td class="font-semibold">{{ r.abandonedCalls }} ({{ abandonedPercent(r) }}%)</td>
+                                        <td class="font-semibold">
+                                            {{ r.abandonedCalls }} ({{ abandonedPercent(r) }}%)
+                                        </td>
                                         <td class="font-semibold">{{ formatHms(r.avgWaitSeconds) }}</td>
                                         <td class="font-semibold">{{ formatHms(r.avgTalkSeconds) }}</td>
+                                    </tr>
+                                }
+                            </ng-template>
+                            <ng-template pTemplate="emptymessage">
+                                <tr>
+                                    <td colspan="6" class="text-center p-4">Nenhuma chamada nesse período</td>
                                 </tr>
-                            }
-                        </ng-template>
-                        <ng-template pTemplate="emptymessage">
-                            <tr>
-                                <td colspan="6" class="text-center p-4">Nenhuma chamada nesse período</td>
-                            </tr>
-                        </ng-template>
-                    </p-table>
+                            </ng-template>
+                        </p-table>
                     </div>
                 }
             }
@@ -292,9 +301,7 @@ export class DacReportPage implements OnInit {
     partialLabel(partial: DacPartial, granularity: 'HOUR' | 'DAY'): string {
         const d = new Date(partial.periodStart);
         const pad = (n: number) => String(n).padStart(2, '0');
-        return granularity === 'HOUR'
-            ? `${pad(d.getHours())}:00`
-            : `${pad(d.getDate())}/${pad(d.getMonth() + 1)}`;
+        return granularity === 'HOUR' ? `${pad(d.getHours())}:00` : `${pad(d.getDate())}/${pad(d.getMonth() + 1)}`;
     }
 
     partialPercentOfTotal(partial: DacPartial, r: DacReportResponse): number {
