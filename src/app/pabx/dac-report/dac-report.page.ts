@@ -12,6 +12,7 @@ import {TableModule} from 'primeng/table';
 import {Tag} from 'primeng/tag';
 import {DacPartial, DacReportResponse, QueueOption} from '@/pabx/types/dac-report';
 import {DacReportService} from '@/pabx/dac-report/dac-report.service';
+import {abandonedPercent, answeredPercent, formatHms, percentSeverity} from '@/pabx/dac-report/dac-report.utils';
 
 @Component({
     selector: 'app-dac-report-page',
@@ -274,6 +275,11 @@ export class DacReportPage implements OnInit {
     readonly today = new Date();
     private requestId = 0;
 
+    protected readonly percentSeverity = percentSeverity;
+    protected readonly answeredPercent = answeredPercent;
+    protected readonly abandonedPercent = abandonedPercent;
+    protected readonly formatHms = formatHms;
+
     constructor(
         private readonly dacReportService: DacReportService,
         private readonly messageService: MessageService
@@ -343,28 +349,6 @@ export class DacReportPage implements OnInit {
                 this.reportError.set(true);
                 this.showError('Erro ao carregar relatório');
             });
-    }
-
-    percentSeverity(percent: number): 'success' | 'info' | 'warn' {
-        if (percent >= 70) return 'success';
-        if (percent >= 30) return 'info';
-        return 'warn';
-    }
-
-    answeredPercent(r: DacReportResponse): number {
-        return r.totalCalls === 0 ? 0 : Math.round((r.answeredCalls / r.totalCalls) * 100);
-    }
-
-    abandonedPercent(r: DacReportResponse): number {
-        return r.totalCalls === 0 ? 0 : Math.round((r.abandonedCalls / r.totalCalls) * 100);
-    }
-
-    formatHms(totalSeconds: number): string {
-        const h = Math.floor(totalSeconds / 3600);
-        const m = Math.floor((totalSeconds % 3600) / 60);
-        const s = Math.floor(totalSeconds % 60);
-        const pad = (n: number) => String(n).padStart(2, '0');
-        return `${pad(h)}:${pad(m)}:${pad(s)}`;
     }
 
     partialLabel(partial: DacPartial, granularity: 'HOUR' | 'DAY'): string {
