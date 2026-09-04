@@ -27,7 +27,7 @@ import {DacReportService} from '@/pabx/dac-report/dac-report.service';
                             Relatório DAC - Fila de Atendimento
                         </h2>
                         <span class="text-sm text-surface-500 dark:text-surface-400">
-                            Distribuição Automática de Chamadas e volumetria da fila selecionada.
+                            Volumetria da fila selecionada.
                         </span>
                     </div>
                     <div class="flex items-center gap-2">
