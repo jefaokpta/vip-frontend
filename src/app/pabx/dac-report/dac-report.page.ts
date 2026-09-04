@@ -1,22 +1,23 @@
-import { Component, OnInit, signal, computed } from '@angular/core';
-import { Card } from 'primeng/card';
-import { ProgressSpinner } from 'primeng/progressspinner';
-import { Toast } from 'primeng/toast';
-import { MessageService } from 'primeng/api';
-import { FormsModule } from '@angular/forms';
-import { DatePicker } from 'primeng/datepicker';
-import { Select } from 'primeng/select';
-import { Button } from 'primeng/button';
-import { ChartModule } from 'primeng/chart';
-import { TableModule } from 'primeng/table';
-import { DacPartial, DacReportResponse, QueueOption } from '@/pabx/types/dac-report';
-import { DacReportService } from '@/pabx/dac-report/dac-report.service';
+import {Component, computed, OnInit, signal} from '@angular/core';
+import {Card} from 'primeng/card';
+import {ProgressSpinner} from 'primeng/progressspinner';
+import {Toast} from 'primeng/toast';
+import {MessageService} from 'primeng/api';
+import {FormsModule} from '@angular/forms';
+import {DatePicker} from 'primeng/datepicker';
+import {Select} from 'primeng/select';
+import {Button} from 'primeng/button';
+import {ChartModule} from 'primeng/chart';
+import {TableModule} from 'primeng/table';
+import {Tag} from 'primeng/tag';
+import {DacPartial, DacReportResponse, QueueOption} from '@/pabx/types/dac-report';
+import {DacReportService} from '@/pabx/dac-report/dac-report.service';
 
 @Component({
     selector: 'app-dac-report-page',
     standalone: true,
     providers: [MessageService],
-    imports: [Card, ProgressSpinner, Toast, FormsModule, DatePicker, Select, Button, ChartModule, TableModule],
+    imports: [Card, ProgressSpinner, Toast, FormsModule, DatePicker, Select, Button, ChartModule, TableModule, Tag],
     template: `
         <p-card>
             <ng-template #title>
@@ -81,14 +82,33 @@ import { DacReportService } from '@/pabx/dac-report/dac-report.service';
                         </div>
                         <div class="rounded-xl shadow px-4 py-3 flex flex-col gap-1 border-l-4 border-green-500">
                             <span class="text-xs font-semibold uppercase tracking-wide text-green-600">ATENDIDAS</span>
-                            <span class="text-2xl font-bold">{{ r.answeredCalls }} ({{ answeredPercent(r) }}%)</span>
-                            <span class="text-xs text-surface-500"
-                                >Nível de Serviço: {{ r.serviceLevelPercent }}% (≤ {{ r.serviceLevelSeconds }}s)</span
-                            >
+                            <span class="text-2xl font-bold flex items-center justify-between">
+                                {{ r.answeredCalls }}
+                                <p-tag
+                                    [value]="answeredPercent(r) + '%'"
+                                    [severity]="percentSeverity(answeredPercent(r))"
+                                    styleClass="!text-xs !py-0.5 !px-2 !font-medium"
+                                />
+                            </span>
+                            <span class="text-xs text-surface-500 flex items-center justify-between">
+                                Nível de Serviço (≤ {{ r.serviceLevelSeconds }}s):
+                                <p-tag
+                                    [value]="r.serviceLevelPercent + '%'"
+                                    [severity]="percentSeverity(r.serviceLevelPercent)"
+                                    styleClass="!text-xs !py-0.5 !px-2 !font-medium"
+                                />
+                            </span>
                         </div>
                         <div class="rounded-xl shadow px-4 py-3 flex flex-col gap-1 border-l-4 border-red-500">
                             <span class="text-xs font-semibold uppercase tracking-wide text-red-500">ABANDONADAS</span>
-                            <span class="text-2xl font-bold">{{ r.abandonedCalls }} ({{ abandonedPercent(r) }}%)</span>
+                            <span class="text-2xl font-bold flex items-center justify-between">
+                                {{ r.abandonedCalls }}
+                                <p-tag
+                                    [value]="abandonedPercent(r) + '%'"
+                                    [severity]="percentSeverity(100 - abandonedPercent(r))"
+                                    styleClass="!text-xs !py-0.5 !px-2 !font-medium"
+                                />
+                            </span>
                         </div>
                         <div class="rounded-xl shadow px-4 py-3 flex flex-col gap-1 border-l-4 border-orange-400">
                             <span class="text-xs font-semibold uppercase tracking-wide text-gray-400">TME MÉDIO</span>
@@ -129,9 +149,33 @@ import { DacReportService } from '@/pabx/dac-report/dac-report.service';
                             <ng-template pTemplate="body" let-partial>
                                 <tr>
                                     <td>{{ partialLabel(partial, r.granularity) }}</td>
-                                    <td>{{ partial.totalCalls }} ({{ partialPercentOfTotal(partial, r) }}%)</td>
-                                    <td>{{ partial.answeredCalls }} ({{ partialAnsweredPercent(partial) }}%)</td>
-                                    <td>{{ partial.abandonedCalls }} ({{ partialAbandonedPercent(partial) }}%)</td>
+                                    <td>
+                                        <span class="flex items-center gap-2">
+                                            {{ partial.totalCalls }}
+                                            <p-tag
+                                                [value]="partialPercentOfTotal(partial, r) + '%'"
+                                                [severity]="percentSeverity(partialPercentOfTotal(partial, r))"
+                                            />
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="flex items-center gap-2">
+                                            {{ partial.answeredCalls }}
+                                            <p-tag
+                                                [value]="partialAnsweredPercent(partial) + '%'"
+                                                [severity]="percentSeverity(partialAnsweredPercent(partial))"
+                                            />
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="flex items-center gap-2">
+                                            {{ partial.abandonedCalls }}
+                                            <p-tag
+                                                [value]="partialAbandonedPercent(partial) + '%'"
+                                                [severity]="percentSeverity(100 - partialAbandonedPercent(partial))"
+                                            />
+                                        </span>
+                                    </td>
                                     <td>{{ formatHms(partial.avgWaitSeconds) }}</td>
                                     <td>{{ formatHms(partial.avgTalkSeconds) }}</td>
                                 </tr>
@@ -140,10 +184,29 @@ import { DacReportService } from '@/pabx/dac-report/dac-report.service';
                                 @if (r.totalCalls > 0) {
                                     <tr>
                                         <td class="font-semibold">TOTAL GERAL / MÉDIAS</td>
-                                        <td class="font-semibold">{{ r.totalCalls }} (100%)</td>
-                                        <td class="font-semibold">{{ r.answeredCalls }} ({{ answeredPercent(r) }}%)</td>
                                         <td class="font-semibold">
-                                            {{ r.abandonedCalls }} ({{ abandonedPercent(r) }}%)
+                                            <span class="flex items-center gap-2">
+                                                {{ r.totalCalls }}
+                                                <p-tag value="100%" severity="success" />
+                                            </span>
+                                        </td>
+                                        <td class="font-semibold">
+                                            <span class="flex items-center gap-2">
+                                                {{ r.answeredCalls }}
+                                                <p-tag
+                                                    [value]="answeredPercent(r) + '%'"
+                                                    [severity]="percentSeverity(answeredPercent(r))"
+                                                />
+                                            </span>
+                                        </td>
+                                        <td class="font-semibold">
+                                            <span class="flex items-center gap-2">
+                                                {{ r.abandonedCalls }}
+                                                <p-tag
+                                                    [value]="abandonedPercent(r) + '%'"
+                                                    [severity]="percentSeverity(100 - abandonedPercent(r))"
+                                                />
+                                            </span>
                                         </td>
                                         <td class="font-semibold">{{ formatHms(r.avgWaitSeconds) }}</td>
                                         <td class="font-semibold">{{ formatHms(r.avgTalkSeconds) }}</td>
@@ -280,6 +343,12 @@ export class DacReportPage implements OnInit {
                 this.reportError.set(true);
                 this.showError('Erro ao carregar relatório');
             });
+    }
+
+    percentSeverity(percent: number): 'success' | 'info' | 'warn' {
+        if (percent >= 70) return 'success';
+        if (percent >= 30) return 'info';
+        return 'warn';
     }
 
     answeredPercent(r: DacReportResponse): number {
