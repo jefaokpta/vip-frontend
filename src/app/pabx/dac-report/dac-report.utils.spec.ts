@@ -1,4 +1,11 @@
-import { abandonedPercent, answeredPercent, eventLabel, eventSeverity, formatHms, percentSeverity } from '@/pabx/dac-report/dac-report.utils';
+import {
+    abandonedPercent,
+    answeredPercent,
+    eventLabel,
+    eventSeverity,
+    formatHms,
+    percentSeverity
+} from '@/pabx/dac-report/dac-report.utils';
 
 describe('dac-report.utils', () => {
     describe('formatHms', () => {

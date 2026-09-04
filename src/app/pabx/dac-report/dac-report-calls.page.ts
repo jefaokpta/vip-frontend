@@ -170,7 +170,7 @@ import {
                                 </td>
                             </tr>
                         </ng-template>
-                        <ng-template pTemplate="rowexpansion" let-call>
+                        <ng-template pTemplate="expandedrow" let-call>
                             <tr>
                                 <td colspan="5">
                                     <p-table [value]="call.events" [tableStyle]="{ 'min-width': '30rem' }">

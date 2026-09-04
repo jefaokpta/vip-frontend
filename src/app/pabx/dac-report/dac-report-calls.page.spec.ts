@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { ActivatedRoute, convertToParamMap } from '@angular/router';
 import { DacReportCallsPage } from '@/pabx/dac-report/dac-report-calls.page';
 import { DacReportService } from '@/pabx/dac-report/dac-report.service';
-import { DacCallsResponse } from '@/pabx/types/dac-call-journey';
+import { CallJourneyEvent, DacCallsResponse } from '@/pabx/types/dac-call-journey';
 
 describe('DacReportCallsPage', () => {
     let dacReportServiceSpy: jasmine.SpyObj<DacReportService>;
@@ -82,5 +82,35 @@ describe('DacReportCallsPage', () => {
 
         expect(dacReportServiceSpy.findRecordingUrl).toHaveBeenCalledWith(1, 'call-1', '9001');
         expect(fixture.componentInstance.recordingUrls()['call-1']).toBe('https://s3.example.com/signed-url');
+    });
+
+    it('expande a linha e mostra a jornada de eventos', async () => {
+        const events: CallJourneyEvent[] = [
+            { eventType: 'CALL_ENTRY', timestamp: 1000, offsetSeconds: 0, memberPeer: null },
+            { eventType: 'CALL_ANSWERED', timestamp: 6000, offsetSeconds: 5, memberPeer: '9001' }
+        ];
+        const callWithEvents = { ...callsFixture.calls[0], events };
+
+        const fixture = setup({
+            queueId: '1',
+            queueName: 'Fila Teste',
+            start: '1000',
+            end: '5000',
+            granularity: 'HOUR'
+        });
+        dacReportServiceSpy.findCalls.and.resolveTo({ ...callsFixture, calls: [callWithEvents] });
+        fixture.componentInstance.ngOnInit();
+        await fixture.whenStable();
+        fixture.detectChanges();
+        await fixture.whenStable();
+        fixture.detectChanges();
+
+        const togglerButton = fixture.nativeElement.querySelector('tbody button') as HTMLElement;
+        togglerButton.click();
+        fixture.detectChanges();
+        await fixture.whenStable();
+        fixture.detectChanges();
+
+        expect(fixture.nativeElement.textContent).toContain('Atendida pelo membro');
     });
 });
