@@ -1,16 +1,16 @@
-import { Component, OnInit, signal } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { Location } from '@angular/common';
-import { Card } from 'primeng/card';
-import { ProgressSpinner } from 'primeng/progressspinner';
-import { Toast } from 'primeng/toast';
-import { MessageService } from 'primeng/api';
-import { ButtonModule } from 'primeng/button';
-import { TableModule, TableRowCollapseEvent, TableRowExpandEvent } from 'primeng/table';
-import { Tag } from 'primeng/tag';
-import { Tooltip } from 'primeng/tooltip';
-import { CallJourney, DacCallsResponse } from '@/pabx/types/dac-call-journey';
-import { DacReportService } from '@/pabx/dac-report/dac-report.service';
+import {Component, OnInit, signal} from '@angular/core';
+import {ActivatedRoute} from '@angular/router';
+import {Location} from '@angular/common';
+import {Card} from 'primeng/card';
+import {ProgressSpinner} from 'primeng/progressspinner';
+import {Toast} from 'primeng/toast';
+import {MessageService} from 'primeng/api';
+import {ButtonModule} from 'primeng/button';
+import {TableModule, TableRowCollapseEvent, TableRowExpandEvent} from 'primeng/table';
+import {Tag} from 'primeng/tag';
+import {Tooltip} from 'primeng/tooltip';
+import {CallJourney, DacCallsResponse} from '@/pabx/types/dac-call-journey';
+import {DacReportService} from '@/pabx/dac-report/dac-report.service';
 import {
     abandonedPercent,
     answeredPercent,
@@ -176,15 +176,15 @@ import {
                                     <p-table [value]="call.events" [tableStyle]="{ 'min-width': '30rem' }">
                                         <ng-template pTemplate="header">
                                             <tr>
-                                                <th>Membro</th>
                                                 <th>Tempo</th>
+                                                <th>Membro</th>
                                                 <th>Evento</th>
                                             </tr>
                                         </ng-template>
                                         <ng-template pTemplate="body" let-event>
                                             <tr>
-                                                <td>{{ event.memberPeer ?? '—' }}</td>
                                                 <td>{{ formatHms(event.offsetSeconds) }}</td>
+                                                <td>{{ event.memberPeer ?? '—' }}</td>
                                                 <td>
                                                     <p-tag
                                                         [value]="eventLabel(event.eventType)"
