@@ -7,6 +7,7 @@ export type DacPartialGranularity = 'HOUR' | 'DAY';
 
 export interface DacPartial {
     periodStart: number;
+    periodEnd: number;
     totalCalls: number;
     answeredCalls: number;
     abandonedCalls: number;
