@@ -52,6 +52,7 @@ import { NewPausePage } from '@/pabx/pause/new-pause.page';
 import { EditPausePage } from '@/pabx/pause/edit-pause.page';
 import { MemberActivityReportPage } from '@/pabx/member-activity-report/member-activity-report.page';
 import { DacReportPage } from '@/pabx/dac-report/dac-report.page';
+import { DacReportCallsPage } from '@/pabx/dac-report/dac-report-calls.page';
 
 export default [
     { path: 'peers', component: PeerPage, data: { breadcrumb: 'Ramais' } },
@@ -134,6 +135,11 @@ export default [
         path: 'dac-report',
         component: DacReportPage,
         data: { breadcrumb: 'Relatório DAC' }
+    },
+    {
+        path: 'dac-report-calls',
+        component: DacReportCallsPage,
+        data: { breadcrumb: 'Relatório DAC > Jornada de Chamadas' }
     },
 
     { path: 'queues', component: QueuesPage, data: { breadcrumb: 'Filas de Atendimento' } },

@@ -10,6 +10,8 @@ import {Button} from 'primeng/button';
 import {ChartModule} from 'primeng/chart';
 import {TableModule} from 'primeng/table';
 import {Tag} from 'primeng/tag';
+import {RouterLink} from '@angular/router';
+import {Tooltip} from 'primeng/tooltip';
 import {DacPartial, DacReportResponse, QueueOption} from '@/pabx/types/dac-report';
 import {DacReportService} from '@/pabx/dac-report/dac-report.service';
 import {abandonedPercent, answeredPercent, formatHms, percentSeverity} from '@/pabx/dac-report/dac-report.utils';
@@ -18,7 +20,20 @@ import {abandonedPercent, answeredPercent, formatHms, percentSeverity} from '@/p
     selector: 'app-dac-report-page',
     standalone: true,
     providers: [MessageService],
-    imports: [Card, ProgressSpinner, Toast, FormsModule, DatePicker, Select, Button, ChartModule, TableModule, Tag],
+    imports: [
+        Card,
+        ProgressSpinner,
+        Toast,
+        FormsModule,
+        DatePicker,
+        Select,
+        Button,
+        ChartModule,
+        TableModule,
+        Tag,
+        RouterLink,
+        Tooltip
+    ],
     template: `
         <p-card>
             <ng-template #title>
@@ -145,6 +160,7 @@ import {abandonedPercent, answeredPercent, formatHms, percentSeverity} from '@/p
                                     <th>Abandonadas (% Faixa)</th>
                                     <th>TME (Espera)</th>
                                     <th>TMA (Conversado)</th>
+                                    <th>Detalhes</th>
                                 </tr>
                             </ng-template>
                             <ng-template pTemplate="body" let-partial>
@@ -179,6 +195,18 @@ import {abandonedPercent, answeredPercent, formatHms, percentSeverity} from '@/p
                                     </td>
                                     <td>{{ formatHms(partial.avgWaitSeconds) }}</td>
                                     <td>{{ formatHms(partial.avgTalkSeconds) }}</td>
+                                    <td>
+                                        <p-button
+                                            icon="pi pi-search"
+                                            text
+                                            rounded
+                                            [disabled]="partial.totalCalls === 0"
+                                            pTooltip="Sem chamadas nessa faixa"
+                                            [tooltipDisabled]="partial.totalCalls > 0"
+                                            [routerLink]="['/pabx/dac-report-calls']"
+                                            [queryParams]="detailsQueryParams(partial, r)"
+                                        />
+                                    </td>
                                 </tr>
                             </ng-template>
                             <ng-template pTemplate="footer">
@@ -211,12 +239,13 @@ import {abandonedPercent, answeredPercent, formatHms, percentSeverity} from '@/p
                                         </td>
                                         <td class="font-semibold">{{ formatHms(r.avgWaitSeconds) }}</td>
                                         <td class="font-semibold">{{ formatHms(r.avgTalkSeconds) }}</td>
+                                        <td class="font-semibold"></td>
                                     </tr>
                                 }
                             </ng-template>
                             <ng-template pTemplate="emptymessage">
                                 <tr>
-                                    <td colspan="6" class="text-center p-4">Nenhuma chamada nesse período</td>
+                                    <td colspan="7" class="text-center p-4">Nenhuma chamada nesse período</td>
                                 </tr>
                             </ng-template>
                         </p-table>
@@ -367,6 +396,16 @@ export class DacReportPage implements OnInit {
 
     partialAbandonedPercent(partial: DacPartial): number {
         return partial.totalCalls === 0 ? 0 : Math.round((partial.abandonedCalls / partial.totalCalls) * 100);
+    }
+
+    detailsQueryParams(partial: DacPartial, r: DacReportResponse): Record<string, string | number> {
+        return {
+            queueId: r.queueId,
+            queueName: this.selectedQueue()?.name ?? '',
+            start: partial.periodStart,
+            end: partial.periodEnd,
+            granularity: r.granularity
+        };
     }
 
     private showError(summary: string): void {
