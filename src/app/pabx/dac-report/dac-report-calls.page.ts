@@ -5,7 +5,7 @@ import { Card } from 'primeng/card';
 import { ProgressSpinner } from 'primeng/progressspinner';
 import { Toast } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
-import { Button } from 'primeng/button';
+import { ButtonModule } from 'primeng/button';
 import { TableModule, TableRowCollapseEvent, TableRowExpandEvent } from 'primeng/table';
 import { Tag } from 'primeng/tag';
 import { Tooltip } from 'primeng/tooltip';
@@ -24,7 +24,7 @@ import {
     selector: 'app-dac-report-calls-page',
     standalone: true,
     providers: [MessageService],
-    imports: [Card, ProgressSpinner, Toast, Button, TableModule, Tag, Tooltip],
+    imports: [Card, ProgressSpinner, Toast, ButtonModule, TableModule, Tag, Tooltip],
     template: `
         <p-card>
             <ng-template #title>
@@ -136,9 +136,9 @@ import {
                                     <button
                                         type="button"
                                         pButton
-                                        pRowToggler
                                         [pRowToggler]="call"
-                                        class="p-button-text p-button-rounded"
+                                        text
+                                        rounded
                                         [icon]="
                                             expandedRows()[call.uniqueId] ? 'pi pi-chevron-down' : 'pi pi-chevron-right'
                                         "
