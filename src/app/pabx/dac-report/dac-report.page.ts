@@ -1,4 +1,4 @@
-import {Component, computed, OnInit, signal} from '@angular/core';
+import {Component, computed, inject, OnInit, signal} from '@angular/core';
 import {Card} from 'primeng/card';
 import {ProgressSpinner} from 'primeng/progressspinner';
 import {Toast} from 'primeng/toast';
@@ -14,6 +14,7 @@ import {RouterLink} from '@angular/router';
 import {Tooltip} from 'primeng/tooltip';
 import {DacPartial, DacReportResponse, QueueOption} from '@/pabx/types/dac-report';
 import {DacReportService} from '@/pabx/dac-report/dac-report.service';
+import {DacReportStateService} from '@/pabx/dac-report/dac-report-state.service';
 import {abandonedPercent, answeredPercent, formatHms, percentSeverity} from '@/pabx/dac-report/dac-report.utils';
 
 @Component({
@@ -257,10 +258,12 @@ import {abandonedPercent, answeredPercent, formatHms, percentSeverity} from '@/p
     `
 })
 export class DacReportPage implements OnInit {
+    private readonly dacReportState = inject(DacReportStateService);
+
     readonly queues = signal<QueueOption[]>([]);
-    readonly selectedQueue = signal<QueueOption | null>(null);
-    readonly dateRange = signal<Date[]>([]);
-    readonly report = signal<DacReportResponse | null>(null);
+    readonly selectedQueue = this.dacReportState.selectedQueue;
+    readonly dateRange = this.dacReportState.dateRange;
+    readonly report = this.dacReportState.report;
     readonly loading = signal<boolean>(false);
     readonly reportError = signal<boolean>(false);
     readonly maxDate = signal<Date>(new Date());
@@ -368,12 +371,11 @@ export class DacReportPage implements OnInit {
             .findReport(queue.id, start, end)
             .then((report) => {
                 if (id !== this.requestId) return;
-                this.report.set(report);
+                this.dacReportState.setReport(report);
                 this.loading.set(false);
             })
             .catch(() => {
                 if (id !== this.requestId) return;
-                this.report.set(null);
                 this.loading.set(false);
                 this.reportError.set(true);
                 this.showError('Erro ao carregar relatório');

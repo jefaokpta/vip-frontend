@@ -17,6 +17,7 @@ import {FormsModule} from '@angular/forms';
 import {CompanyService} from '@/pages/company/company.service';
 import {UserService} from '@/pages/users/user.service';
 import {ReportStateService} from '@/pabx/report/report-state.service';
+import {DacReportStateService} from '@/pabx/dac-report/dac-report-state.service';
 
 @Component({
     selector: 'app-company-page',
@@ -133,7 +134,8 @@ export class CompanyPage implements OnInit {
         private readonly userService: UserService,
         private readonly router: Router,
         private readonly messageService: MessageService,
-        private readonly reportState: ReportStateService
+        private readonly reportState: ReportStateService,
+        private readonly dacReportState: DacReportStateService
     ) {
         this.user = this.userService.getUser();
     }
@@ -150,6 +152,7 @@ export class CompanyPage implements OnInit {
             .manageOtherCompany(companyId)
             .then(() => {
                 this.reportState.reset();
+                this.dacReportState.reset();
                 this.router.navigate(['/']);
             })
             .catch(() => {

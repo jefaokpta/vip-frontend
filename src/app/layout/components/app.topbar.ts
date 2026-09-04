@@ -14,6 +14,7 @@ import {UserService} from '@/pages/users/user.service';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {ActivatePeerDialogComponent} from '@/layout/components/activate-peer-dialog.component';
 import {ReportStateService} from '@/pabx/report/report-state.service';
+import {DacReportStateService} from '@/pabx/dac-report/dac-report-state.service';
 
 @Component({
     selector: '[app-topbar]',
@@ -110,7 +111,8 @@ export class AppTopbar implements OnInit {
         public layoutService: LayoutService,
         private readonly userService: UserService,
         private readonly router: Router,
-        private readonly reportState: ReportStateService
+        private readonly reportState: ReportStateService,
+        private readonly dacReportState: DacReportStateService
     ) {}
 
     ngOnInit(): void {
@@ -143,6 +145,7 @@ export class AppTopbar implements OnInit {
     exitManagingCompany() {
         this.userService.exitManageCompany().then(() => {
             this.reportState.reset();
+            this.dacReportState.reset();
             this.router.navigate(['/']);
         });
     }
