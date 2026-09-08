@@ -1,5 +1,5 @@
-import { computed, effect, Injectable, signal } from '@angular/core';
-import { Subject } from 'rxjs';
+import {computed, effect, Injectable, signal} from '@angular/core';
+import {Subject} from 'rxjs';
 
 export type ColorScheme = 'light' | 'dark' | 'dim';
 
@@ -41,7 +41,7 @@ export class LayoutService {
     _config: layoutConfig = {
         ripple: false,
         preset: 'Aura',
-        primary: 'teal',
+        primary: 'orange',
         inputStyle: 'outlined',
         surface: null,
         darkTheme: false,

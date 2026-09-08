@@ -7,7 +7,7 @@ import {filter} from 'rxjs/operators';
     providedIn: 'root'
 })
 export class TitleService {
-    private readonly baseTitle = 'Vip';
+    private readonly baseTitle = 'Iasmin';
 
     constructor(
         private readonly titleService: Title,

@@ -1,19 +1,19 @@
-import { Component, computed, inject, OnInit } from '@angular/core';
-import { CheckboxModule } from 'primeng/checkbox';
-import { CommonModule } from '@angular/common';
-import { InputTextModule } from 'primeng/inputtext';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { LayoutService } from '@/layout/service/layout.service';
-import { AppConfigurator } from '@/layout/components/app.configurator';
-import { IconFieldModule } from 'primeng/iconfield';
-import { InputIconModule } from 'primeng/inputicon';
-import { ButtonModule } from 'primeng/button';
-import { ProgressSpinnerModule } from 'primeng/progressspinner';
-import { Image } from 'primeng/image';
-import { DropdownModule } from 'primeng/dropdown';
-import { Password } from 'primeng/password';
-import { UserService } from '@/pages/users/user.service';
+import {Component, computed, inject, OnInit} from '@angular/core';
+import {CheckboxModule} from 'primeng/checkbox';
+import {CommonModule} from '@angular/common';
+import {InputTextModule} from 'primeng/inputtext';
+import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
+import {ActivatedRoute, Router, RouterModule} from '@angular/router';
+import {LayoutService} from '@/layout/service/layout.service';
+import {AppConfigurator} from '@/layout/components/app.configurator';
+import {IconFieldModule} from 'primeng/iconfield';
+import {InputIconModule} from 'primeng/inputicon';
+import {ButtonModule} from 'primeng/button';
+import {ProgressSpinnerModule} from 'primeng/progressspinner';
+import {Image} from 'primeng/image';
+import {DropdownModule} from 'primeng/dropdown';
+import {Password} from 'primeng/password';
+import {UserService} from '@/pages/users/user.service';
 
 @Component({
     selector: 'app-login',
@@ -69,8 +69,8 @@ import { UserService } from '@/pages/users/user.service';
             >
                 <div class="mb-6">
                     <div class="mb-4">
-                        <a href="https://www.vipsolutions.com.br/" target="_blank" class="app-logo">
-                            <p-image src="layout/images/vip-white.png" alt="logo vipsolutions" width="120rem"></p-image>
+                        <a href="https://www.iasmin.io" target="_blank" class="app-logo">
+                            <p-image src="layout/images/iasmin-black.png" alt="logo Iasmin" width="180rem"></p-image>
                         </a>
                     </div>
                     <span class="text-surface-600 dark:text-surface-200 font-medium">Entre com suas credencias</span>

@@ -13,12 +13,12 @@ import {NgIf} from '@angular/common';
         <div class="sidebar-header">
             <ng-container *ngIf="layoutService.isDarkTheme(); else lightTheme">
                 <a [routerLink]="['/']" class="app-logo">
-                    <p-image src="layout/images/vip-white.png" alt="logo Vip" width="190rem"></p-image>
+                    <p-image src="layout/images/iasmin-white.png" alt="logo Vip" width="190rem"></p-image>
                 </a>
             </ng-container>
             <ng-template #lightTheme>
                 <a [routerLink]="['/']" class="app-logo">
-                    <p-image src="layout/images/vip-black.png" alt="logo Vip" width="190rem"></p-image>
+                    <p-image src="layout/images/iasmin-black.png" alt="logo Vip" width="190rem"></p-image>
                 </a>
             </ng-template>
         </div>
