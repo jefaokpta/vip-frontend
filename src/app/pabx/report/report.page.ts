@@ -144,7 +144,7 @@ interface ChartBucket {
             <!-- Chart -->
             <div class="rounded-xl border border-surface-200 dark:border-surface-700 p-4 mb-4">
                 <h3 class="font-semibold text-lg mb-2">{{ chartTitle() }}</h3>
-                <p-chart type="bar" height="280" [data]="chartData" [options]="chartOptions"></p-chart>
+                <p-chart type="line" height="280" [data]="chartData" [options]="chartOptions"></p-chart>
             </div>
 
             <!-- Search -->
@@ -319,10 +319,13 @@ export class ReportPage implements OnInit, OnDestroy {
 
     readonly chartBuckets = computed<ChartBucket[]>(() => {
         if (this.isSingleDay()) {
-            return Array.from({ length: 24 }, (_, h) => ({
-                key: String(h),
-                label: `${String(h).padStart(2, '0')}:00`
-            }));
+            const activeHours = new Set(this.filteredCdrs().map((c) => new Date(c.startTime).getHours()));
+            return Array.from(activeHours)
+                .sort((a, b) => a - b)
+                .map((h) => ({
+                    key: String(h),
+                    label: `${String(h).padStart(2, '0')}:00`
+                }));
         }
 
         const range = this.dateRange();
@@ -483,9 +486,13 @@ export class ReportPage implements OnInit, OnDestroy {
             labels: buckets.map((b) => b.label),
             datasets: dispositions.map((d) => ({
                 label: dispositionTranslate(d),
+                borderColor: this.severityColor(d, documentStyle),
                 backgroundColor: this.severityColor(d, documentStyle),
-                barThickness: 14,
-                borderRadius: 6,
+                fill: false,
+                tension: 0.4,
+                borderWidth: 2,
+                pointRadius: 3,
+                pointHoverRadius: 5,
                 data: buckets.map(
                     (b) =>
                         list.filter((c) => c.disposition === d && this.dayKey(new Date(c.startTime)) === b.key).length
