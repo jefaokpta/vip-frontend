@@ -1,10 +1,10 @@
 // peer-select.component.ts
-import { Component, forwardRef, Input, OnInit } from '@angular/core';
-import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
-import { Select } from 'primeng/select';
-import { NgIf } from '@angular/common';
-import { PeerService } from '@/pabx/peer/peer.service';
-import { PeerTransportEnum } from '@/pabx/types/peer-transport-enum';
+import {Component, forwardRef, Input, OnInit} from '@angular/core';
+import {ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule} from '@angular/forms';
+import {Select} from 'primeng/select';
+import {NgIf} from '@angular/common';
+import {PeerService} from '@/pabx/peer/peer.service';
+import {PeerTransportEnum} from '@/pabx/types/peer-transport-enum';
 
 @Component({
     selector: 'app-peer-select-component',
@@ -42,6 +42,7 @@ export class PeerSelectComponent implements ControlValueAccessor, OnInit {
     @Input() isOnlyWSS = false;
     @Input() isShowAnyPeerLabel = false;
     @Input() isOnDialplanAction = false;
+    @Input() isOnlyAvailable = false;
 
     value: string = '';
     peerOptions: { label: string; value: string }[] = [];
@@ -52,7 +53,8 @@ export class PeerSelectComponent implements ControlValueAccessor, OnInit {
     private onTouched: () => void = () => {};
 
     ngOnInit() {
-        this.peerService.findAll().then((peers) => {
+        const peers$ = this.isOnlyAvailable ? this.peerService.findAvailable() : this.peerService.findAll();
+        peers$.then((peers) => {
             this.peerOptions = peers.map((peer) => ({ label: `${peer.name} (${peer.peer})`, value: peer.peer }));
             if (this.isShowAnyPeerLabel) this.peerOptions.unshift({ label: 'TODOS', value: 'ANY' });
             if (this.isOnlyWSS) {

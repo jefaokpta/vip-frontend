@@ -1,8 +1,8 @@
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../environments/environment';
-import { executeRequest, httpHeaders } from '@/util/utils';
-import { Peer } from '@/pabx/types/peer';
+import {Injectable} from '@angular/core';
+import {HttpClient} from '@angular/common/http';
+import {environment} from '../../../environments/environment';
+import {executeRequest, httpHeaders} from '@/util/utils';
+import {Peer} from '@/pabx/types/peer';
 
 @Injectable({ providedIn: 'root' })
 export class PeerService {
@@ -12,6 +12,10 @@ export class PeerService {
 
     findAll(): Promise<Peer[]> {
         return executeRequest(this.http.get<Peer[]>(`${this.BACKEND}/peers`, httpHeaders()));
+    }
+
+    findAvailable(): Promise<Peer[]> {
+        return executeRequest(this.http.get<Peer[]>(`${this.BACKEND}/peers/available`, httpHeaders()));
     }
 
     delete(id: number) {

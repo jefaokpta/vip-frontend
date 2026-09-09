@@ -70,7 +70,7 @@ import {DacReportStateService} from '@/pabx/dac-report/dac-report-state.service'
                             <p-button severity="secondary" outlined (click)="isPeerFormDialogVisible = true">
                                 <i class="pi pi-phone"></i>
                                 <span class="ml-2">{{ activePeerNumber() }}</span>
-                                <i class="pi pi-circle-fill text-red-400"></i>
+                                <i class="pi pi-circle-fill text-gray-400"></i>
                             </p-button>
                         } @else {
                             <p-button severity="secondary" outlined (click)="isPeerFormDialogVisible = true">
