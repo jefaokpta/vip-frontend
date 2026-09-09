@@ -45,7 +45,6 @@ import {PauseService} from '@/pabx/pause/pause.service';
                         formControlName="timeLimitMinutes"
                         [min]="0"
                         [showButtons]="true"
-                        class="w-full"
                     />
                     <small class="block mt-2 text-surface-500 dark:text-surface-400">0 = tempo ilimitado</small>
                 </div>
