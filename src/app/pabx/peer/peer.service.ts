@@ -3,6 +3,8 @@ import {HttpClient} from '@angular/common/http';
 import {environment} from '../../../environments/environment';
 import {executeRequest, httpHeaders} from '@/util/utils';
 import {Peer} from '@/pabx/types/peer';
+import {NewPeerBatch} from '@/pabx/types/new-peer-batch';
+import {PeerBatchResult} from '@/pabx/types/peer-batch-result';
 
 @Injectable({ providedIn: 'root' })
 export class PeerService {
@@ -12,6 +14,12 @@ export class PeerService {
 
     findAll(): Promise<Peer[]> {
         return executeRequest(this.http.get<Peer[]>(`${this.BACKEND}/peers`, httpHeaders()));
+    }
+
+    createBatch(newPeerBatch: NewPeerBatch): Promise<PeerBatchResult> {
+        return executeRequest(
+            this.http.post<PeerBatchResult>(`${this.BACKEND}/peers/batch`, newPeerBatch, httpHeaders())
+        );
     }
 
     findAvailable(): Promise<Peer[]> {

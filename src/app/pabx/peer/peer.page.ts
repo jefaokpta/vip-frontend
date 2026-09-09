@@ -1,19 +1,21 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { Table, TableModule } from 'primeng/table';
-import { ConfirmationService, MessageService } from 'primeng/api';
-import { Card } from 'primeng/card';
-import { IconField } from 'primeng/iconfield';
-import { InputIcon } from 'primeng/inputicon';
-import { InputText } from 'primeng/inputtext';
-import { Button } from 'primeng/button';
-import { RouterLink } from '@angular/router';
-import { ProgressSpinner } from 'primeng/progressspinner';
-import { ConfirmDialog } from 'primeng/confirmdialog';
-import { Toast } from 'primeng/toast';
-import { Peer } from '@/pabx/types/peer';
-import { NgIf } from '@angular/common';
-import { Tooltip } from 'primeng/tooltip';
-import { PeerService } from '@/pabx/peer/peer.service';
+import {Component, OnInit, ViewChild} from '@angular/core';
+import {Table, TableModule} from 'primeng/table';
+import {ConfirmationService, MessageService} from 'primeng/api';
+import {Card} from 'primeng/card';
+import {IconField} from 'primeng/iconfield';
+import {InputIcon} from 'primeng/inputicon';
+import {InputText} from 'primeng/inputtext';
+import {Button} from 'primeng/button';
+import {RouterLink} from '@angular/router';
+import {ProgressSpinner} from 'primeng/progressspinner';
+import {ConfirmDialog} from 'primeng/confirmdialog';
+import {Toast} from 'primeng/toast';
+import {Peer} from '@/pabx/types/peer';
+import {NgIf} from '@angular/common';
+import {Tooltip} from 'primeng/tooltip';
+import {PeerService} from '@/pabx/peer/peer.service';
+import {NewPeerBatchDialogComponent} from '@/pabx/peer/new-peer-batch-dialog.component';
+import {PeerBatchResult} from '@/pabx/types/peer-batch-result';
 
 @Component({
     selector: 'app-peer-page',
@@ -31,7 +33,8 @@ import { PeerService } from '@/pabx/peer/peer.service';
         ConfirmDialog,
         Toast,
         NgIf,
-        Tooltip
+        Tooltip,
+        NewPeerBatchDialogComponent
     ],
     template: `
         <p-card>
@@ -50,7 +53,15 @@ import { PeerService } from '@/pabx/peer/peer.service';
                                 class="w-full"
                             />
                         </p-iconfield>
-                        <p-button icon="pi pi-plus" label="Ramal" routerLink="new" outlined class="mx-4" rounded />
+                        <p-button icon="pi pi-plus" label="Ramal" routerLink="new" outlined class="mx-2" rounded />
+                        <p-button
+                            icon="pi pi-list"
+                            label="Ramais em Lote"
+                            (click)="batchDialogVisible = true"
+                            outlined
+                            class="mx-2"
+                            rounded
+                        />
                     </div>
                 </div>
             </ng-template>
@@ -113,6 +124,7 @@ import { PeerService } from '@/pabx/peer/peer.service';
                 </ng-template>
             </p-table>
         </p-card>
+        <app-new-peer-batch-dialog [(visible)]="batchDialogVisible" (created)="onBatchCreated($event)" />
         <p-confirm-dialog />
         <p-toast />
     `
@@ -121,6 +133,7 @@ export class PeerPage implements OnInit {
     peers: Peer[] = [];
     @ViewChild('dataTable') dt!: Table;
     loading = true;
+    batchDialogVisible = false;
 
     constructor(
         private readonly confirmationService: ConfirmationService,
@@ -132,6 +145,18 @@ export class PeerPage implements OnInit {
         this.peerService.findAll().then((peers) => {
             this.peers = peers;
             this.loading = false;
+        });
+    }
+
+    onBatchCreated(result: PeerBatchResult) {
+        this.peers = [...this.peers, ...result.created];
+        this.messageService.add({
+            severity: 'success',
+            summary: `${result.created.length} ramal(is) criado(s) com sucesso`,
+            detail: result.skipped.length
+                ? `Ramais já existentes e ignorados: ${result.skipped.join(', ')}`
+                : undefined,
+            life: 15_000
         });
     }
 
