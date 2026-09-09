@@ -206,7 +206,7 @@ import {Tab, TabList, TabPanel, TabPanels, Tabs} from 'primeng/tabs';
                             </div>
 
                             <div class="field mb-4">
-                                <label for="callLimit" class="block mb-2">Limite de Chamadas *</label>
+                                <label for="callLimit" class="block mb-2">Chamadas Simultâneas *</label>
                                 <p-input-number
                                     id="callLimit"
                                     mode="decimal"
