@@ -14,11 +14,11 @@
     </ng-template>
 
     <form [formGroup]="form" (ngSubmit)="onSubmit()" class="p-fluid">
-        <div class="flex flex-col gap-4">
+        <div class="flex flex-col gap-6">
             <div class="flex items-center justify-between">
                 <div class="field">
                     <label for="name" class="block mb-2">Nome *</label>
-                    <input id="name" pInputText formControlName="name" />
+                    <input id="name" pInputText class="p-inputtext" formControlName="name" />
                     <small *ngIf="name?.invalid && (name?.dirty || name?.touched)" class="p-error block mt-2">
                         <div *ngIf="name?.errors?.['required']">Nome é obrigatório.</div>
                     </small>
@@ -30,7 +30,8 @@
                 </div>
             </div>
 
-            <p-card header="Origem">
+            <div class="flex flex-col gap-2">
+                <span class="text-lg font-semibold">Origem</span>
                 <div class="flex gap-4">
                     <div class="field">
                         <label for="src" class="block mb-2">Tipo *</label>
@@ -88,42 +89,32 @@
                         </small>
                     </div>
                 </div>
-            </p-card>
+            </div>
 
-            <p-card header="Destino">
-                <div class="flex flex-col gap-2">
-                    <div class="flex gap-2">
-                        <span>Usar Alias</span>
-                        <p-toggleswitch
-                            name="dstToggle"
-                            formControlName="dstToggle"
-                            (onChange)="toggleDstAlias($event)"
-                        />
-                    </div>
-
-                    <div class="field" *ngIf="!dstToggle?.value">
-                        <label for="extension" class="block mb-2">Expressão regular *</label>
-                        <input
-                            id="extension"
-                            pInputText
-                            class="p-inputtext"
-                            formControlName="dst"
-                            placeholder="1[34]XX"
-                        />
-                        <small *ngIf="dst?.invalid && (dst?.dirty || dst?.touched)" class="p-error block mt-2">
-                            <div *ngIf="dst?.errors?.['required']">Expressão regular é obrigatória.</div>
-                        </small>
-                    </div>
-
-                    <app-alias-select-component
-                        *ngIf="dstToggle?.value"
-                        formControlName="dstAlias"
-                        [showError]="dstAlias?.errors?.['required']"
-                    ></app-alias-select-component>
+            <div class="flex flex-col gap-2">
+                <span class="text-lg font-semibold">Destino</span>
+                <div class="flex gap-2">
+                    <span>Usar Alias</span>
+                    <p-toggleswitch name="dstToggle" formControlName="dstToggle" (onChange)="toggleDstAlias($event)" />
                 </div>
-            </p-card>
 
-            <p-card header="Configurar Ações">
+                <div class="field" *ngIf="!dstToggle?.value">
+                    <label for="extension" class="block mb-2">Expressão regular *</label>
+                    <input id="extension" pInputText class="p-inputtext" formControlName="dst" placeholder="1[34]XX" />
+                    <small *ngIf="dst?.invalid && (dst?.dirty || dst?.touched)" class="p-error block mt-2">
+                        <div *ngIf="dst?.errors?.['required']">Expressão regular é obrigatória.</div>
+                    </small>
+                </div>
+
+                <app-alias-select-component
+                    *ngIf="dstToggle?.value"
+                    formControlName="dstAlias"
+                    [showError]="dstAlias?.errors?.['required']"
+                ></app-alias-select-component>
+            </div>
+
+            <div class="flex flex-col gap-2">
+                <span class="text-lg font-semibold">Configurar Ações</span>
                 <div class="flex gap-4">
                     <div class="field">
                         <p-select
@@ -248,7 +239,7 @@
                         </ng-template>
                     </p-table>
                 </div>
-            </p-card>
+            </div>
 
             <div class="flex">
                 <p-button type="submit" label="Salvar" [disabled]="form.invalid || pending">

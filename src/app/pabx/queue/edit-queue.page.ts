@@ -8,6 +8,7 @@ import {Select} from 'primeng/select';
 import {InputNumber} from 'primeng/inputnumber';
 import {PickList} from 'primeng/picklist';
 import {ToggleSwitch} from 'primeng/toggleswitch';
+import {Tab, TabList, TabPanel, TabPanels, Tabs} from 'primeng/tabs';
 import {Moh} from '@/pabx/types/moh';
 import {Queue} from '@/pabx/types/queue';
 import {QueueStrategyEnum} from '@/pabx/types/queue-strategy-enum';
@@ -30,7 +31,12 @@ import {SurveyService} from '@/pabx/survey/survey.service';
         Select,
         InputNumber,
         PickList,
-        ToggleSwitch
+        ToggleSwitch,
+        Tabs,
+        TabList,
+        Tab,
+        TabPanels,
+        TabPanel
     ],
     template: `
         <p-card>
@@ -50,134 +56,181 @@ import {SurveyService} from '@/pabx/survey/survey.service';
 
             @if (form) {
                 <form [formGroup]="form" (ngSubmit)="onSubmit()" class="p-fluid">
-                    <div class="field mb-4">
-                        <label for="name" class="block mb-2">Nome *</label>
-                        <input id="name" pInputText class="p-inputtext" formControlName="name" />
-                        @if (name?.invalid && (name?.dirty || name?.touched)) {
-                            <small class="p-error block mt-2">
-                                <span class="text-red-500">Nome é obrigatório.</span>
-                            </small>
-                        }
-                    </div>
-
-                    <div class="field mb-4">
-                        <label for="queueStrategy" class="block mb-2">Estratégia de Distribuição *</label>
-                        <p-select
-                            id="queueStrategy"
-                            [options]="strategyOptions"
-                            formControlName="queueStrategy"
-                            optionLabel="label"
-                            optionValue="value"
-                            placeholder="Selecione uma estratégia"
-                        ></p-select>
-                    </div>
-
-                    <div class="field mb-4">
-                        <label for="ringTimeout" class="block mb-2">Timeout por Agente (segundos) *</label>
-                        <p-input-number
-                            id="ringTimeout"
-                            mode="decimal"
-                            useGrouping="false"
-                            formControlName="ringTimeout"
-                        />
-                    </div>
-
-                    <div class="field mb-4">
-                        <label for="queueTimeout" class="block mb-2">Timeout da Fila (segundos) *</label>
-                        <p-input-number
-                            id="queueTimeout"
-                            mode="decimal"
-                            useGrouping="false"
-                            formControlName="queueTimeout"
-                        />
-                    </div>
-
-                    <div class="field mb-4">
-                        <label for="serviceLevelSeconds" class="block mb-2">Nível de Serviço (segundos) *</label>
-                        <p-input-number
-                            id="serviceLevelSeconds"
-                            mode="decimal"
-                            useGrouping="false"
-                            formControlName="serviceLevelSeconds"
-                        />
-                    </div>
-
-                    <div class="field mb-4">
-                        <label for="queueSoundId" class="block mb-2">Áudio da Fila *</label>
-                        <p-select
-                            id="queueSoundId"
-                            [options]="mohs"
-                            formControlName="queueSoundId"
-                            optionLabel="name"
-                            optionValue="id"
-                            placeholder="Selecione um áudio"
-                        ></p-select>
-                    </div>
-
-                    <div class="field mb-4">
-                        <label for="surveyId" class="block mb-2">Pesquisa de Satisfação</label>
-                        <p-select
-                            id="surveyId"
-                            [options]="surveys"
-                            formControlName="surveyId"
-                            optionLabel="title"
-                            optionValue="id"
-                            placeholder="Nenhuma"
-                            [showClear]="true"
-                        ></p-select>
-                        <small class="block mt-1 text-gray-500">
-                            Se selecionada, a pesquisa é tocada pro chamador ao final do atendimento.
-                        </small>
-                    </div>
-
-                    <div class="field flex items-center gap-3 mt-2 mb-4">
-                        <label class="block">Entrar em fila vazia</label>
-                        <p-toggleswitch formControlName="isJoinWhenEmpty" />
-                    </div>
-
-                    <div class="field mb-4">
-                        <label for="maxCalls" class="block mb-2">Limite de Chamadas em Espera</label>
-                        <p-input-number id="maxCalls" mode="decimal" useGrouping="false" formControlName="maxCalls" />
-                        <small class="block mt-1 text-gray-500">0 = sem limite</small>
-                    </div>
-
-                    <div class="field mb-4">
-                        <label for="cooldownSeconds" class="block mb-2">Cooldown após Chamada (segundos)</label>
-                        <p-input-number
-                            id="cooldownSeconds"
-                            mode="decimal"
-                            useGrouping="false"
-                            formControlName="cooldownSeconds"
-                        />
-                        <small class="block mt-1 text-gray-500">0 = sem cooldown</small>
-                    </div>
-
-                    <div class="field mb-4">
-                        <label class="block mb-2">Agentes da Fila</label>
-                        <p-picklist
-                            [source]="availableUsers"
-                            [target]="selectedUsers"
-                            sourceHeader="Disponíveis"
-                            targetHeader="Selecionados"
-                            [dragdrop]="true"
-                            [responsive]="true"
-                            [sourceStyle]="{ height: '20rem' }"
-                            [targetStyle]="{ height: '20rem' }"
-                            showSourceControls="false"
-                            showTargetControls="false"
-                            filterBy="name,email"
-                            sourceFilterPlaceholder="Pesquisar"
-                            targetFilterPlaceholder="Pesquisar"
-                            breakpoint="1200px"
-                        >
-                            <ng-template let-user pTemplate="item">
-                                <div class="flex items-center gap-2">
-                                    <i class="pi pi-user"></i>
-                                    <span>{{ user.name }} ({{ user.email }})</span>
+                    <p-tabs value="0">
+                        <p-tablist>
+                            <p-tab value="0">
+                                <span class="flex items-center gap-2">
+                                    Base
+                                    @if (baseTabInvalid) {
+                                        <span class="inline-block w-2 h-2 rounded-full bg-red-500"></span>
+                                    }
+                                </span>
+                            </p-tab>
+                            <p-tab value="1">
+                                <span class="flex items-center gap-2">
+                                    Comportamento
+                                    @if (behaviorTabInvalid) {
+                                        <span class="inline-block w-2 h-2 rounded-full bg-red-500"></span>
+                                    }
+                                </span>
+                            </p-tab>
+                            <p-tab value="2">
+                                <span class="flex items-center gap-2">
+                                    Pesquisa
+                                    @if (surveyTabInvalid) {
+                                        <span class="inline-block w-2 h-2 rounded-full bg-red-500"></span>
+                                    }
+                                </span>
+                            </p-tab>
+                        </p-tablist>
+                        <p-tabpanels>
+                            <p-tabpanel value="0">
+                                <div class="field mb-4">
+                                    <label for="name" class="block mb-2">Nome *</label>
+                                    <input id="name" pInputText class="p-inputtext" formControlName="name" />
+                                    @if (name?.invalid && (name?.dirty || name?.touched)) {
+                                        <small class="p-error block mt-2">
+                                            <span class="text-red-500">Nome é obrigatório.</span>
+                                        </small>
+                                    }
                                 </div>
-                            </ng-template>
-                        </p-picklist>
-                    </div>
+
+                                <div class="field mb-4">
+                                    <label for="queueStrategy" class="block mb-2">Estratégia de Distribuição *</label>
+                                    <p-select
+                                        id="queueStrategy"
+                                        [options]="strategyOptions"
+                                        formControlName="queueStrategy"
+                                        optionLabel="label"
+                                        optionValue="value"
+                                        placeholder="Selecione uma estratégia"
+                                    ></p-select>
+                                </div>
+
+                                <div class="field mb-4">
+                                    <label for="ringTimeout" class="block mb-2">
+                                        Timeout por Agente (segundos) *
+                                    </label>
+                                    <p-input-number
+                                        id="ringTimeout"
+                                        mode="decimal"
+                                        useGrouping="false"
+                                        formControlName="ringTimeout"
+                                    />
+                                </div>
+
+                                <div class="field mb-4">
+                                    <label for="queueTimeout" class="block mb-2">Timeout da Fila (segundos) *</label>
+                                    <p-input-number
+                                        id="queueTimeout"
+                                        mode="decimal"
+                                        useGrouping="false"
+                                        formControlName="queueTimeout"
+                                    />
+                                </div>
+
+                                <div class="field mb-4">
+                                    <label for="serviceLevelSeconds" class="block mb-2">
+                                        Nível de Serviço (segundos) *
+                                    </label>
+                                    <p-input-number
+                                        id="serviceLevelSeconds"
+                                        mode="decimal"
+                                        useGrouping="false"
+                                        formControlName="serviceLevelSeconds"
+                                    />
+                                </div>
+
+                                <div class="field mb-4">
+                                    <label for="queueSoundId" class="block mb-2">Áudio da Fila *</label>
+                                    <p-select
+                                        id="queueSoundId"
+                                        [options]="mohs"
+                                        formControlName="queueSoundId"
+                                        optionLabel="name"
+                                        optionValue="id"
+                                        placeholder="Selecione um áudio"
+                                    ></p-select>
+                                </div>
+
+                                <div class="field mb-4">
+                                    <label class="block mb-2">Agentes da Fila</label>
+                                    <p-picklist
+                                        [source]="availableUsers"
+                                        [target]="selectedUsers"
+                                        sourceHeader="Disponíveis"
+                                        targetHeader="Selecionados"
+                                        [dragdrop]="true"
+                                        [responsive]="true"
+                                        [sourceStyle]="{ height: '20rem' }"
+                                        [targetStyle]="{ height: '20rem' }"
+                                        showSourceControls="false"
+                                        showTargetControls="false"
+                                        filterBy="name,email"
+                                        sourceFilterPlaceholder="Pesquisar"
+                                        targetFilterPlaceholder="Pesquisar"
+                                        breakpoint="1200px"
+                                    >
+                                        <ng-template let-user pTemplate="item">
+                                            <div class="flex items-center gap-2">
+                                                <i class="pi pi-user"></i>
+                                                <span>{{ user.name }} ({{ user.email }})</span>
+                                            </div>
+                                        </ng-template>
+                                    </p-picklist>
+                                </div>
+                            </p-tabpanel>
+
+                            <p-tabpanel value="1">
+                                <div class="field flex items-center gap-3 mt-2 mb-4">
+                                    <label class="block">Entrar em fila vazia</label>
+                                    <p-toggleswitch formControlName="isJoinWhenEmpty" />
+                                </div>
+
+                                <div class="field mb-4">
+                                    <label for="maxCalls" class="block mb-2">Limite de Chamadas em Espera</label>
+                                    <p-input-number
+                                        id="maxCalls"
+                                        mode="decimal"
+                                        useGrouping="false"
+                                        formControlName="maxCalls"
+                                    />
+                                    <small class="block mt-1 text-gray-500">0 = sem limite</small>
+                                </div>
+
+                                <div class="field mb-4">
+                                    <label for="cooldownSeconds" class="block mb-2">
+                                        Intervalo após Chamada (segundos)
+                                    </label>
+                                    <p-input-number
+                                        id="cooldownSeconds"
+                                        mode="decimal"
+                                        useGrouping="false"
+                                        formControlName="cooldownSeconds"
+                                    />
+                                    <small class="block mt-1 text-gray-500">0 = sem intervalo</small>
+                                </div>
+                            </p-tabpanel>
+
+                            <p-tabpanel value="2">
+                                <div class="field mb-4">
+                                    <label for="surveyId" class="block mb-2">Pesquisa de Satisfação</label>
+                                    <p-select
+                                        id="surveyId"
+                                        [options]="surveys"
+                                        formControlName="surveyId"
+                                        optionLabel="title"
+                                        optionValue="id"
+                                        placeholder="Nenhuma"
+                                        [showClear]="true"
+                                    ></p-select>
+                                    <small class="block mt-1 text-gray-500">
+                                        Se selecionada, a pesquisa é tocada pro chamador ao final do atendimento.
+                                    </small>
+                                </div>
+                            </p-tabpanel>
+                        </p-tabpanels>
+                    </p-tabs>
 
                     <div class="flex mt-4">
                         <p-button type="submit" label="Salvar" [disabled]="form.invalid || pending">
@@ -252,6 +305,32 @@ export class EditQueuePage implements OnInit {
 
     get name() {
         return this.form?.get('name');
+    }
+
+    get baseTabInvalid(): boolean {
+        return this.isAnyFieldInvalid([
+            'name',
+            'queueStrategy',
+            'ringTimeout',
+            'queueTimeout',
+            'serviceLevelSeconds',
+            'queueSoundId'
+        ]);
+    }
+
+    get behaviorTabInvalid(): boolean {
+        return this.isAnyFieldInvalid(['isJoinWhenEmpty', 'maxCalls', 'cooldownSeconds']);
+    }
+
+    get surveyTabInvalid(): boolean {
+        return this.isAnyFieldInvalid(['surveyId']);
+    }
+
+    private isAnyFieldInvalid(fields: string[]): boolean {
+        return fields.some((field) => {
+            const control = this.form?.get(field);
+            return !!control?.invalid && (control?.dirty || control?.touched);
+        });
     }
 
     onSubmit() {

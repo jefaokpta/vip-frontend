@@ -1,10 +1,10 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { InputTextModule } from 'primeng/inputtext';
-import { ButtonModule } from 'primeng/button';
-import { CardModule } from 'primeng/card';
-import { Router, RouterLink } from '@angular/router';
-import { MohService } from '@/pabx/moh/moh.service';
+import {Component, OnInit} from '@angular/core';
+import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {InputTextModule} from 'primeng/inputtext';
+import {ButtonModule} from 'primeng/button';
+import {CardModule} from 'primeng/card';
+import {Router, RouterLink} from '@angular/router';
+import {MohService} from '@/pabx/moh/moh.service';
 
 @Component({
     selector: 'app-new-moh-page',
@@ -43,7 +43,7 @@ import { MohService } from '@/pabx/moh/moh.service';
                         id="file"
                         type="file"
                         accept=".mp3,.wav,audio/mpeg,audio/wav"
-                        class="p-inputtext w-full"
+                        class="p-inputtext"
                         (change)="onFileChange($event)"
                     />
                     @if (fileError) {

@@ -1,22 +1,22 @@
-import { Component, OnInit } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { InputTextModule } from 'primeng/inputtext';
-import { ButtonModule } from 'primeng/button';
-import { CardModule } from 'primeng/card';
-import { Router, RouterLink } from '@angular/router';
-import { TrunkService } from '@/pabx/trunk/trunk.service';
-import { CodecEnum } from '@/pabx/types/codec-enum';
-import { DtmfModeEnum } from '@/pabx/types/dtmf-mode-enum';
-import { LanguageEnum } from '@/pabx/types/language-enum';
-import { TechnologyEnum } from '@/pabx/types/technology-enum';
-import { InputNumber } from 'primeng/inputnumber';
-import { ToggleSwitch } from 'primeng/toggleswitch';
-import { Select } from 'primeng/select';
-import { SelectButton } from 'primeng/selectbutton';
-import { Accordion, AccordionContent, AccordionHeader, AccordionPanel } from 'primeng/accordion';
-import { NgForOf } from '@angular/common';
-import { Tooltip } from 'primeng/tooltip';
-import { dtmfSelectOptions, languageSelectOptions } from '@/pabx/utils';
+import {Component, OnInit} from '@angular/core';
+import {FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {InputTextModule} from 'primeng/inputtext';
+import {ButtonModule} from 'primeng/button';
+import {CardModule} from 'primeng/card';
+import {Router, RouterLink} from '@angular/router';
+import {TrunkService} from '@/pabx/trunk/trunk.service';
+import {CodecEnum} from '@/pabx/types/codec-enum';
+import {DtmfModeEnum} from '@/pabx/types/dtmf-mode-enum';
+import {LanguageEnum} from '@/pabx/types/language-enum';
+import {TechnologyEnum} from '@/pabx/types/technology-enum';
+import {InputNumber} from 'primeng/inputnumber';
+import {ToggleSwitch} from 'primeng/toggleswitch';
+import {Select} from 'primeng/select';
+import {SelectButton} from 'primeng/selectbutton';
+import {NgForOf} from '@angular/common';
+import {Tooltip} from 'primeng/tooltip';
+import {Tab, TabList, TabPanel, TabPanels, Tabs} from 'primeng/tabs';
+import {dtmfSelectOptions, languageSelectOptions} from '@/pabx/utils';
 
 /**
  * @author Jefferson Alves Reis (jefaokpta)
@@ -36,12 +36,13 @@ import { dtmfSelectOptions, languageSelectOptions } from '@/pabx/utils';
         ToggleSwitch,
         Select,
         SelectButton,
-        Accordion,
-        AccordionPanel,
-        AccordionHeader,
-        AccordionContent,
         NgForOf,
-        Tooltip
+        Tooltip,
+        Tabs,
+        TabList,
+        Tab,
+        TabPanels,
+        TabPanel
     ],
     template: `
         <p-card>
@@ -60,57 +61,76 @@ import { dtmfSelectOptions, languageSelectOptions } from '@/pabx/utils';
             </ng-template>
 
             <form [formGroup]="form" (ngSubmit)="onSubmit()" class="p-fluid">
-                <div class="field mb-4">
-                    <label for="name" class="block mb-2">Nome *</label>
-                    <input id="name" pInputText class="p-inputtext" formControlName="name" />
-                    @if (name?.invalid && (name?.dirty || name?.touched)) {
-                        <small class="p-error block mt-2">
-                            <span class="text-red-500">Nome é obrigatório.</span>
-                        </small>
-                    }
-                </div>
+                <p-tabs value="0">
+                    <p-tablist>
+                        <p-tab value="0">
+                            <span class="flex items-center gap-2">
+                                Base
+                                @if (baseTabInvalid) {
+                                    <span class="inline-block w-2 h-2 rounded-full bg-red-500"></span>
+                                }
+                            </span>
+                        </p-tab>
+                        <p-tab value="1">
+                            <span class="flex items-center gap-2">
+                                Avançadas
+                                @if (advancedTabInvalid) {
+                                    <span class="inline-block w-2 h-2 rounded-full bg-red-500"></span>
+                                }
+                            </span>
+                        </p-tab>
+                    </p-tablist>
+                    <p-tabpanels>
+                        <p-tabpanel value="0">
+                            <div class="field mb-4">
+                                <label for="name" class="block mb-2">Nome *</label>
+                                <input id="name" pInputText class="p-inputtext" formControlName="name" />
+                                @if (name?.invalid && (name?.dirty || name?.touched)) {
+                                    <small class="p-error block mt-2">
+                                        <span class="text-red-500">Nome é obrigatório.</span>
+                                    </small>
+                                }
+                            </div>
 
-                <div class="field mb-4">
-                    <label for="username" class="block mb-2">Username *</label>
-                    <input id="username" pInputText class="p-inputtext" formControlName="username" />
-                    @if (username?.invalid && (username?.dirty || username?.touched)) {
-                        <small class="p-error block mt-2">
-                            <span class="text-red-500">Username é obrigatório.</span>
-                        </small>
-                    }
-                </div>
+                            <div class="field mb-4">
+                                <label for="username" class="block mb-2">Username *</label>
+                                <input id="username" pInputText class="p-inputtext" formControlName="username" />
+                                @if (username?.invalid && (username?.dirty || username?.touched)) {
+                                    <small class="p-error block mt-2">
+                                        <span class="text-red-500">Username é obrigatório.</span>
+                                    </small>
+                                }
+                            </div>
 
-                <div class="field mb-4">
-                    <label for="host" class="block mb-2">Endereço (Host) *</label>
-                    <input id="host" pInputText class="p-inputtext" formControlName="host" />
-                    @if (host?.invalid && (host?.dirty || host?.touched)) {
-                        <small class="p-error block mt-2">
-                            <span class="text-red-500">Endereço (Host) é obrigatório.</span>
-                        </small>
-                    }
-                </div>
+                            <div class="field mb-4">
+                                <label for="host" class="block mb-2">Endereço (Host) *</label>
+                                <input id="host" pInputText class="p-inputtext" formControlName="host" />
+                                @if (host?.invalid && (host?.dirty || host?.touched)) {
+                                    <small class="p-error block mt-2">
+                                        <span class="text-red-500">Endereço (Host) é obrigatório.</span>
+                                    </small>
+                                }
+                            </div>
 
-                <div class="field mb-4">
-                    <label for="secret" class="block mb-2">Senha</label>
-                    <input id="secret" pInputText class="p-inputtext" formControlName="secret" />
-                </div>
+                            <div class="field mb-4">
+                                <label for="secret" class="block mb-2">Senha</label>
+                                <input id="secret" pInputText class="p-inputtext" formControlName="secret" />
+                            </div>
 
-                <div class="field mb-4">
-                    <label for="language" class="block mb-2">Idioma *</label>
-                    <p-select
-                        id="language"
-                        [options]="languageOptions"
-                        formControlName="language"
-                        optionLabel="label"
-                        optionValue="value"
-                        placeholder="Selecione um idioma"
-                    ></p-select>
-                </div>
+                            <div class="field mb-4">
+                                <label for="language" class="block mb-2">Idioma *</label>
+                                <p-select
+                                    id="language"
+                                    [options]="languageOptions"
+                                    formControlName="language"
+                                    optionLabel="label"
+                                    optionValue="value"
+                                    placeholder="Selecione um idioma"
+                                ></p-select>
+                            </div>
+                        </p-tabpanel>
 
-                <p-accordion>
-                    <p-accordion-panel value="0">
-                        <p-accordion-header>Configurações Avançadas</p-accordion-header>
-                        <p-accordion-content>
+                        <p-tabpanel value="1">
                             <div class="flex justify-between">
                                 <div>
                                     <div class="field mb-4">
@@ -246,9 +266,9 @@ import { dtmfSelectOptions, languageSelectOptions } from '@/pabx/utils';
                                     </div>
                                 </div>
                             </div>
-                        </p-accordion-content>
-                    </p-accordion-panel>
-                </p-accordion>
+                        </p-tabpanel>
+                    </p-tabpanels>
+                </p-tabs>
 
                 <div class="flex mt-4">
                     <p-button type="submit" label="Salvar" [disabled]="form.invalid || pending">
@@ -340,6 +360,21 @@ export class NewTrunkPage implements OnInit {
     }
     get extraConfigs() {
         return this.form.get('extraConfigs') as FormArray;
+    }
+
+    get baseTabInvalid(): boolean {
+        return this.isAnyFieldInvalid(['name', 'username', 'host', 'secret', 'language']);
+    }
+
+    get advancedTabInvalid(): boolean {
+        return this.isAnyFieldInvalid(['techPrefix', 'port', 'callLimit', 'codecs', 'dtmfMode', 'peerQualify']);
+    }
+
+    private isAnyFieldInvalid(fields: string[]): boolean {
+        return fields.some((field) => {
+            const control = this.form.get(field);
+            return !!control?.invalid && (control?.dirty || control?.touched);
+        });
     }
 
     onSubmit() {

@@ -1,13 +1,13 @@
-import { Component, OnInit } from '@angular/core';
-import { MessageService } from 'primeng/api';
-import { Card } from 'primeng/card';
-import { Select } from 'primeng/select';
-import { Toast } from 'primeng/toast';
-import { Button } from 'primeng/button';
-import { FormsModule } from '@angular/forms';
-import { Moh } from '@/pabx/types/moh';
-import { MohService } from '@/pabx/moh/moh.service';
-import { CompanySettingsService } from '@/pabx/settings/company-settings.service';
+import {Component, OnInit} from '@angular/core';
+import {MessageService} from 'primeng/api';
+import {Card} from 'primeng/card';
+import {Select} from 'primeng/select';
+import {Toast} from 'primeng/toast';
+import {Button} from 'primeng/button';
+import {FormsModule} from '@angular/forms';
+import {Moh} from '@/pabx/types/moh';
+import {MohService} from '@/pabx/moh/moh.service';
+import {CompanySettingsService} from '@/pabx/settings/company-settings.service';
 
 @Component({
     selector: 'app-settings-page',
@@ -21,7 +21,7 @@ import { CompanySettingsService } from '@/pabx/settings/company-settings.service
             </ng-template>
 
             <div class="field mb-4">
-                <label class="block mb-2 font-medium">Music on Hold Padrão</label>
+                <label class="block mb-2 font-medium">Musica de Espera Padrão</label>
                 <p-select
                     [options]="mohOptions"
                     [(ngModel)]="selectedMohId"

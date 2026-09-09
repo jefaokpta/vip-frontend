@@ -1,11 +1,11 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
-import { AppMenuitem } from './app.menuitem';
-import { RoleEnum } from '@/types/role-enum';
-import { User } from '@/types/user';
-import { MenuItem } from 'primeng/api';
-import { UserService } from '@/pages/users/user.service';
+import {Component, OnInit} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {RouterModule} from '@angular/router';
+import {AppMenuitem} from './app.menuitem';
+import {RoleEnum} from '@/types/role-enum';
+import {User} from '@/types/user';
+import {MenuItem} from 'primeng/api';
+import {UserService} from '@/pages/users/user.service';
 
 @Component({
     selector: 'app-menu',
@@ -130,11 +130,13 @@ export class AppMenu implements OnInit {
                         {
                             label: 'Rotas de Chamada',
                             icon: 'pi pi-fw pi-list',
+                            roles: [RoleEnum.ROLE_SAAS_SUPPORT],
                             routerLink: ['/pabx/routes']
                         },
                         {
                             label: 'Troncos',
                             icon: 'pi pi-fw pi-list',
+                            roles: [RoleEnum.ROLE_SAAS_SUPPORT],
                             routerLink: ['/pabx/trunks']
                         },
                         {

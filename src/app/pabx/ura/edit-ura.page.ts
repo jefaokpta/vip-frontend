@@ -1,24 +1,24 @@
-import { Component, OnInit } from '@angular/core';
-import { AbstractControl, FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { InputText } from 'primeng/inputtext';
-import { Button } from 'primeng/button';
-import { Card } from 'primeng/card';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { Select } from 'primeng/select';
-import { ToggleSwitch } from 'primeng/toggleswitch';
-import { InputNumber } from 'primeng/inputnumber';
-import { NgForOf, NgIf } from '@angular/common';
-import { HttpErrorResponse } from '@angular/common/http';
-import { Toast } from 'primeng/toast';
-import { MessageService } from 'primeng/api';
-import { Moh } from '@/pabx/types/moh';
-import { Ura } from '@/pabx/types/ura';
-import { UraAction } from '@/pabx/types/ura-action';
-import { UraActionEnum } from '@/pabx/types/ura-action-enum';
-import { MohService } from '@/pabx/moh/moh.service';
-import { UraService } from '@/pabx/ura/ura.service';
-import { PeerSelectComponent } from '@/pabx/dialplan/components/peer-select-component';
-import { CallGroupService } from '@/pabx/call-group/call-group.service';
+import {Component, OnInit} from '@angular/core';
+import {AbstractControl, FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {InputText} from 'primeng/inputtext';
+import {Button} from 'primeng/button';
+import {Card} from 'primeng/card';
+import {ActivatedRoute, Router, RouterLink} from '@angular/router';
+import {Select} from 'primeng/select';
+import {ToggleSwitch} from 'primeng/toggleswitch';
+import {InputNumber} from 'primeng/inputnumber';
+import {NgForOf, NgIf} from '@angular/common';
+import {HttpErrorResponse} from '@angular/common/http';
+import {Toast} from 'primeng/toast';
+import {MessageService} from 'primeng/api';
+import {Moh} from '@/pabx/types/moh';
+import {Ura} from '@/pabx/types/ura';
+import {UraAction} from '@/pabx/types/ura-action';
+import {UraActionEnum} from '@/pabx/types/ura-action-enum';
+import {MohService} from '@/pabx/moh/moh.service';
+import {UraService} from '@/pabx/ura/ura.service';
+import {PeerSelectComponent} from '@/pabx/dialplan/components/peer-select-component';
+import {CallGroupService} from '@/pabx/call-group/call-group.service';
 
 @Component({
     selector: 'app-edit-ura-page',
@@ -66,7 +66,7 @@ import { CallGroupService } from '@/pabx/call-group/call-group.service';
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                         <div class="field">
                             <label for="name" class="block mb-2">Nome *</label>
-                            <input id="name" pInputText formControlName="name" class="w-full" />
+                            <input id="name" pInputText formControlName="name" />
                             @if (form.get('name')?.invalid && (form.get('name')?.dirty || form.get('name')?.touched)) {
                                 <small class="p-error block mt-2">Nome é obrigatório.</small>
                             }
@@ -247,7 +247,7 @@ import { CallGroupService } from '@/pabx/call-group/call-group.service';
                             <div
                                 *ngFor="let action of actions.controls; let i = index"
                                 [formGroupName]="i"
-                                class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 p-4 border border-surface-200 dark:border-surface-700 rounded-lg"
+                                class="grid grid-cols-1 md:grid-cols-4 mb-2 p-2 border border-surface-200 dark:border-surface-700 rounded-lg"
                             >
                                 <div class="field">
                                     <label class="block mb-2">Dígito (0–9) *</label>
