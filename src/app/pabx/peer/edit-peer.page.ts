@@ -1,23 +1,23 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { InputTextModule } from 'primeng/inputtext';
-import { ButtonModule } from 'primeng/button';
-import { CardModule } from 'primeng/card';
-import { NgIf } from '@angular/common';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { PeerService } from '@/pabx/peer/peer.service';
-import { DtmfModeEnum } from '@/pabx/types/dtmf-mode-enum';
-import { LanguageEnum } from '@/pabx/types/language-enum';
-import { PeerTransportEnum } from '@/pabx/types/peer-transport-enum';
-import { PickupGroup } from '@/pabx/types/pickup-group';
-import { Select } from 'primeng/select';
-import { PickupGroupService } from '@/pabx/pickup-group/pickup-group.service';
-import { dtmfSelectOptions, languageSelectOptions } from '@/pabx/utils';
-import { ToggleSwitch } from 'primeng/toggleswitch';
-import { InputNumber } from 'primeng/inputnumber';
-import { Accordion, AccordionContent, AccordionHeader, AccordionPanel } from 'primeng/accordion';
-import { Password } from 'primeng/password';
-import { SelectButton } from 'primeng/selectbutton';
+import {Component, OnInit} from '@angular/core';
+import {FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {InputTextModule} from 'primeng/inputtext';
+import {ButtonModule} from 'primeng/button';
+import {CardModule} from 'primeng/card';
+import {NgIf} from '@angular/common';
+import {ActivatedRoute, Router, RouterLink} from '@angular/router';
+import {PeerService} from '@/pabx/peer/peer.service';
+import {DtmfModeEnum} from '@/pabx/types/dtmf-mode-enum';
+import {LanguageEnum} from '@/pabx/types/language-enum';
+import {PeerTransportEnum} from '@/pabx/types/peer-transport-enum';
+import {PickupGroup} from '@/pabx/types/pickup-group';
+import {Select} from 'primeng/select';
+import {PickupGroupService} from '@/pabx/pickup-group/pickup-group.service';
+import {dtmfSelectOptions, languageSelectOptions} from '@/pabx/utils';
+import {ToggleSwitch} from 'primeng/toggleswitch';
+import {InputNumber} from 'primeng/inputnumber';
+import {Password} from 'primeng/password';
+import {SelectButton} from 'primeng/selectbutton';
+import {Tab, TabList, TabPanel, TabPanels, Tabs} from 'primeng/tabs';
 
 /**
  * @author Jefferson Alves Reis (jefaokpta)
@@ -37,12 +37,13 @@ import { SelectButton } from 'primeng/selectbutton';
         Select,
         ToggleSwitch,
         InputNumber,
-        Accordion,
-        AccordionContent,
-        AccordionHeader,
-        AccordionPanel,
         Password,
-        SelectButton
+        SelectButton,
+        Tabs,
+        TabList,
+        Tab,
+        TabPanels,
+        TabPanel
     ],
     template: `
         <p-card>
@@ -61,89 +62,131 @@ import { SelectButton } from 'primeng/selectbutton';
             </ng-template>
 
             <form [formGroup]="form" (ngSubmit)="onSubmit()" class="p-fluid">
-                <div class="field mb-4">
-                    <label for="name" class="block mb-2">Nome *</label>
-                    <input id="name" pInputText class="p-inputtext" formControlName="name" />
-                    <small *ngIf="name?.invalid && (name?.dirty || name?.touched)" class="p-error block mt-2">
-                        <div *ngIf="name?.errors?.['required']">Nome é obrigatório.</div>
-                    </small>
-                </div>
-
-                <div class="field mb-4">
-                    <label for="peer" class="block mb-2">Ramal *</label>
-                    <input id="peer" pInputText class="p-inputtext" formControlName="peer" />
-                    <small *ngIf="peer?.invalid && (peer?.dirty || peer?.touched)" class="p-error block mt-2">
-                        <div *ngIf="peer?.errors?.['required']">Ramal é obrigatório.</div>
-                        <div *ngIf="peer?.errors?.['minlength']">Ramal deve ter pelo menos 2 dígitos.</div>
-                        <div *ngIf="peer?.errors?.['maxlength']">Ramal deve ter no máximo 4 dígitos.</div>
-                        <div *ngIf="peer?.errors?.['pattern']">Ramal deve ter apenas números.</div>
-                    </small>
-                </div>
-
-                <div class="field mb-4">
-                    <label for="featurePassword" class="block mb-2">Senha de Facilidades *</label>
-                    <input id="featurePassword" pInputText class="p-inputtext" formControlName="featurePassword" />
-                    <small
-                        *ngIf="featurePassword?.invalid && (featurePassword?.dirty || featurePassword?.touched)"
-                        class="p-error block mt-2"
-                    >
-                        <div *ngIf="featurePassword?.errors?.['required']">Senha é obrigatória.</div>
-                        <div *ngIf="featurePassword?.errors?.['minlength']">Senha deve ter ao menos 2 dígitos.</div>
-                        <div *ngIf="featurePassword?.errors?.['maxlength']">Senha deve ter no máximo 4 dígitos.</div>
-                        <div *ngIf="featurePassword?.errors?.['pattern']">Senha deve ter apenas números.</div>
-                    </small>
-                </div>
-
-                <div class="field mb-4">
-                    <label for="isShowPassword" class="block mb-2">Alterar Senha de Registro</label>
-                    <div class="flex gap-4 items-center">
-                        <p-toggleswitch formControlName="isShowPassword" (onChange)="toggleMd5Secret()" />
-                        @if (md5Secret) {
-                            <div class="field">
-                                <p-password formControlName="md5Secret" [toggleMask]="true" feedback="false" />
+                <p-tabs value="0">
+                    <p-tablist>
+                        <p-tab value="0">
+                            <span class="flex items-center gap-2">
+                                Base
+                                @if (baseTabInvalid) {
+                                    <span class="inline-block w-2 h-2 rounded-full bg-red-500"></span>
+                                }
+                            </span>
+                        </p-tab>
+                        <p-tab value="1">
+                            <span class="flex items-center gap-2">
+                                Avançadas
+                                @if (advancedTabInvalid) {
+                                    <span class="inline-block w-2 h-2 rounded-full bg-red-500"></span>
+                                }
+                            </span>
+                        </p-tab>
+                    </p-tablist>
+                    <p-tabpanels>
+                        <p-tabpanel value="0">
+                            <div class="field mb-4">
+                                <label for="name" class="block mb-2">Nome *</label>
+                                <input id="name" pInputText class="p-inputtext" formControlName="name" />
                                 <small
-                                    *ngIf="md5Secret?.invalid && (md5Secret?.dirty || md5Secret?.touched)"
+                                    *ngIf="name?.invalid && (name?.dirty || name?.touched)"
                                     class="p-error block mt-2"
                                 >
-                                    <div *ngIf="md5Secret?.errors?.['required']">Senha é obrigatória.</div>
-                                    <div *ngIf="md5Secret?.errors?.['minlength']">
+                                    <div *ngIf="name?.errors?.['required']">Nome é obrigatório.</div>
+                                </small>
+                            </div>
+
+                            <div class="field mb-4">
+                                <label for="peer" class="block mb-2">Ramal *</label>
+                                <input id="peer" pInputText class="p-inputtext" formControlName="peer" />
+                                <small
+                                    *ngIf="peer?.invalid && (peer?.dirty || peer?.touched)"
+                                    class="p-error block mt-2"
+                                >
+                                    <div *ngIf="peer?.errors?.['required']">Ramal é obrigatório.</div>
+                                    <div *ngIf="peer?.errors?.['minlength']">Ramal deve ter pelo menos 2 dígitos.</div>
+                                    <div *ngIf="peer?.errors?.['maxlength']">Ramal deve ter no máximo 4 dígitos.</div>
+                                    <div *ngIf="peer?.errors?.['pattern']">Ramal deve ter apenas números.</div>
+                                </small>
+                            </div>
+
+                            <div class="field mb-4">
+                                <label for="featurePassword" class="block mb-2">Senha de Facilidades *</label>
+                                <input
+                                    id="featurePassword"
+                                    pInputText
+                                    class="p-inputtext"
+                                    formControlName="featurePassword"
+                                />
+                                <small
+                                    *ngIf="
+                                        featurePassword?.invalid && (featurePassword?.dirty || featurePassword?.touched)
+                                    "
+                                    class="p-error block mt-2"
+                                >
+                                    <div *ngIf="featurePassword?.errors?.['required']">Senha é obrigatória.</div>
+                                    <div *ngIf="featurePassword?.errors?.['minlength']">
                                         Senha deve ter ao menos 2 dígitos.
+                                    </div>
+                                    <div *ngIf="featurePassword?.errors?.['maxlength']">
+                                        Senha deve ter no máximo 4 dígitos.
+                                    </div>
+                                    <div *ngIf="featurePassword?.errors?.['pattern']">
+                                        Senha deve ter apenas números.
                                     </div>
                                 </small>
                             </div>
-                        }
-                    </div>
-                </div>
 
-                <div class="field mb-4">
-                    <label for="language" class="block mb-2">Idioma *</label>
-                    <p-select
-                        id="language"
-                        [options]="languageOptions"
-                        formControlName="language"
-                        optionLabel="label"
-                        optionValue="value"
-                        placeholder="Selecione um idioma"
-                    ></p-select>
-                </div>
+                            <div class="field mb-4">
+                                <label for="isShowPassword" class="block mb-2">Alterar Senha de Registro</label>
+                                <div class="flex gap-4 items-center">
+                                    <p-toggleswitch formControlName="isShowPassword" (onChange)="toggleMd5Secret()" />
+                                    @if (md5Secret) {
+                                        <div class="field">
+                                            <p-password
+                                                formControlName="md5Secret"
+                                                [toggleMask]="true"
+                                                feedback="false"
+                                            />
+                                            <small
+                                                *ngIf="md5Secret?.invalid && (md5Secret?.dirty || md5Secret?.touched)"
+                                                class="p-error block mt-2"
+                                            >
+                                                <div *ngIf="md5Secret?.errors?.['required']">Senha é obrigatória.</div>
+                                                <div *ngIf="md5Secret?.errors?.['minlength']">
+                                                    Senha deve ter ao menos 2 dígitos.
+                                                </div>
+                                            </small>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
 
-                <div class="field mb-4">
-                    <label for="pickUpGroup" class="block mb-2">Grupo de Captura</label>
-                    <p-select
-                        id="pickUpGroup"
-                        [options]="pickUpGroupOptions"
-                        formControlName="pickUpGroup"
-                        optionLabel="name"
-                        optionValue="id"
-                        placeholder="Selecione um grupo"
-                        [showClear]="true"
-                    ></p-select>
-                </div>
+                            <div class="field mb-4">
+                                <label for="language" class="block mb-2">Idioma *</label>
+                                <p-select
+                                    id="language"
+                                    [options]="languageOptions"
+                                    formControlName="language"
+                                    optionLabel="label"
+                                    optionValue="value"
+                                    placeholder="Selecione um idioma"
+                                ></p-select>
+                            </div>
 
-                <p-accordion>
-                    <p-accordion-panel value="0">
-                        <p-accordion-header>Configurações Avançadas</p-accordion-header>
-                        <p-accordion-content>
+                            <div class="field mb-4">
+                                <label for="pickUpGroup" class="block mb-2">Grupo de Captura</label>
+                                <p-select
+                                    id="pickUpGroup"
+                                    [options]="pickUpGroupOptions"
+                                    formControlName="pickUpGroup"
+                                    optionLabel="name"
+                                    optionValue="id"
+                                    placeholder="Selecione um grupo"
+                                    [showClear]="true"
+                                ></p-select>
+                            </div>
+                        </p-tabpanel>
+
+                        <p-tabpanel value="1">
                             <div class="field mb-4">
                                 <label for="peerTransportEnums" class="block mb-2">Tecnologias *</label>
                                 <p-select-button
@@ -197,9 +240,9 @@ import { SelectButton } from 'primeng/selectbutton';
                                 <label for="nat" class="block mb-2">Usar NAT</label>
                                 <p-toggleswitch formControlName="nat" />
                             </div>
-                        </p-accordion-content>
-                    </p-accordion-panel>
-                </p-accordion>
+                        </p-tabpanel>
+                    </p-tabpanels>
+                </p-tabs>
 
                 <div class="flex mt-4">
                     <p-button type="submit" label="Salvar" [disabled]="form.invalid || pending">
@@ -307,5 +350,20 @@ export class EditPeerPage implements OnInit {
     }
     get isShowPassword() {
         return this.form.get('isShowPassword');
+    }
+
+    get baseTabInvalid(): boolean {
+        return this.isAnyFieldInvalid(['name', 'peer', 'featurePassword', 'md5Secret', 'language']);
+    }
+
+    get advancedTabInvalid(): boolean {
+        return this.isAnyFieldInvalid(['peerTransportEnums', 'dtmfModeEnum', 'callLimit', 'qualify', 'nat']);
+    }
+
+    private isAnyFieldInvalid(fields: string[]): boolean {
+        return fields.some((field) => {
+            const control = this.form.get(field);
+            return !!control?.invalid && (control?.dirty || control?.touched);
+        });
     }
 }
