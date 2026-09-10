@@ -4,6 +4,7 @@ export type QueueJourneyEvent =
     | 'CALLING_MEMBER_FAILED'
     | 'CALL_ANSWERED'
     | 'CALL_ABANDON'
+    | 'CALL_TIMEOUT'
     | 'MEMBER_HANGUP'
     | 'CALLER_HANGUP';
 

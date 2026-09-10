@@ -56,12 +56,13 @@ describe('dac-report.utils', () => {
     });
 
     describe('eventLabel', () => {
-        it('traduz os 7 eventos da jornada', () => {
+        it('traduz os 8 eventos da jornada', () => {
             expect(eventLabel('CALL_ENTRY')).toBe('Entrou na fila');
             expect(eventLabel('CALLING_MEMBER')).toBe('Chamando membro');
             expect(eventLabel('CALLING_MEMBER_FAILED')).toBe('Membro não atendeu');
             expect(eventLabel('CALL_ANSWERED')).toBe('Atendida pelo membro');
             expect(eventLabel('CALL_ABANDON')).toBe('Abandonada pelo cliente');
+            expect(eventLabel('CALL_TIMEOUT')).toBe('Tempo de espera esgotado');
             expect(eventLabel('MEMBER_HANGUP')).toBe('Encerrada pelo membro');
             expect(eventLabel('CALLER_HANGUP')).toBe('Encerrada pelo cliente');
         });
@@ -76,9 +77,10 @@ describe('dac-report.utils', () => {
             expect(eventSeverity('CALLING_MEMBER')).toBe('info');
         });
 
-        it('retorna warn para CALLING_MEMBER_FAILED e CALL_ABANDON', () => {
+        it('retorna warn para CALLING_MEMBER_FAILED, CALL_ABANDON e CALL_TIMEOUT', () => {
             expect(eventSeverity('CALLING_MEMBER_FAILED')).toBe('warn');
             expect(eventSeverity('CALL_ABANDON')).toBe('warn');
+            expect(eventSeverity('CALL_TIMEOUT')).toBe('warn');
         });
 
         it('retorna secondary para os demais eventos', () => {

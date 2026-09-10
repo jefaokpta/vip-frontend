@@ -29,6 +29,7 @@ export function eventLabel(eventType: QueueJourneyEvent): string {
         CALLING_MEMBER_FAILED: 'Membro não atendeu',
         CALL_ANSWERED: 'Atendida pelo membro',
         CALL_ABANDON: 'Abandonada pelo cliente',
+        CALL_TIMEOUT: 'Tempo de espera esgotado',
         MEMBER_HANGUP: 'Encerrada pelo membro',
         CALLER_HANGUP: 'Encerrada pelo cliente'
     };
@@ -43,6 +44,7 @@ export function eventSeverity(eventType: QueueJourneyEvent): 'success' | 'info' 
             return 'info';
         case 'CALLING_MEMBER_FAILED':
         case 'CALL_ABANDON':
+        case 'CALL_TIMEOUT':
             return 'warn';
         default:
             return 'secondary';
