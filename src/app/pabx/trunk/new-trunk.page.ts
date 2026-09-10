@@ -134,17 +134,6 @@ import {dtmfSelectOptions, languageSelectOptions} from '@/pabx/utils';
                             <div class="flex justify-between">
                                 <div>
                                     <div class="field mb-4">
-                                        <label for="techPrefix" class="block mb-2">Prefixo de Discagem</label>
-                                        <input
-                                            id="techPrefix"
-                                            pInputText
-                                            placeholder="#105"
-                                            class="p-inputtext"
-                                            formControlName="techPrefix"
-                                        />
-                                    </div>
-
-                                    <div class="field mb-4">
                                         <label for="port" class="block mb-2">Porta *</label>
                                         <p-input-number
                                             id="port"
@@ -310,7 +299,6 @@ export class NewTrunkPage implements OnInit {
             language: [LanguageEnum.pt_BR, [Validators.required]],
             dtmfMode: [DtmfModeEnum.RFC4733, [Validators.required]],
             technology: [TechnologyEnum.SIP, [Validators.required]],
-            techPrefix: [''],
             codecs: [[CodecEnum.ALAW], [Validators.required]],
             extraConfigs: this.fb.array([])
         });
@@ -367,7 +355,7 @@ export class NewTrunkPage implements OnInit {
     }
 
     get advancedTabInvalid(): boolean {
-        return this.isAnyFieldInvalid(['techPrefix', 'port', 'callLimit', 'codecs', 'dtmfMode', 'peerQualify']);
+        return this.isAnyFieldInvalid(['port', 'callLimit', 'codecs', 'dtmfMode', 'peerQualify']);
     }
 
     private isAnyFieldInvalid(fields: string[]): boolean {

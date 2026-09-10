@@ -1,8 +1,8 @@
-import { CodecEnum } from '@/pabx/types/codec-enum';
-import { DtmfModeEnum } from '@/pabx/types/dtmf-mode-enum';
-import { ExtraConfig } from '@/pabx/types/extra-config';
-import { LanguageEnum } from '@/pabx/types/language-enum';
-import { TechnologyEnum } from '@/pabx/types/technology-enum';
+import {CodecEnum} from '@/pabx/types/codec-enum';
+import {DtmfModeEnum} from '@/pabx/types/dtmf-mode-enum';
+import {ExtraConfig} from '@/pabx/types/extra-config';
+import {LanguageEnum} from '@/pabx/types/language-enum';
+import {TechnologyEnum} from '@/pabx/types/technology-enum';
 
 export interface Trunk {
     readonly id: number;
@@ -18,6 +18,5 @@ export interface Trunk {
     readonly dtmfMode: DtmfModeEnum;
     readonly technology: TechnologyEnum;
     readonly codecs: CodecEnum[];
-    readonly techPrefix: string;
     readonly extraConfigs: ExtraConfig[];
 }

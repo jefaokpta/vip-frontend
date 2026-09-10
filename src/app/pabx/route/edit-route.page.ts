@@ -1,16 +1,16 @@
-import { Component, OnInit } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { InputTextModule } from 'primeng/inputtext';
-import { ButtonModule } from 'primeng/button';
-import { CardModule } from 'primeng/card';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { RouteService } from '@/pabx/route/route.service';
-import { InputNumber } from 'primeng/inputnumber';
-import { Select } from 'primeng/select';
-import { TableModule } from 'primeng/table';
-import { Tag } from 'primeng/tag';
-import { TrunkService } from '@/pabx/trunk/trunk.service';
-import { RouteTrunk } from '@/pabx/types/route-trunk';
+import {Component, OnInit} from '@angular/core';
+import {FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {InputTextModule} from 'primeng/inputtext';
+import {ButtonModule} from 'primeng/button';
+import {CardModule} from 'primeng/card';
+import {ActivatedRoute, Router, RouterLink} from '@angular/router';
+import {RouteService} from '@/pabx/route/route.service';
+import {InputNumber} from 'primeng/inputnumber';
+import {Select} from 'primeng/select';
+import {TableModule} from 'primeng/table';
+import {Tag} from 'primeng/tag';
+import {TrunkService} from '@/pabx/trunk/trunk.service';
+import {RouteTrunk} from '@/pabx/types/route-trunk';
 
 /**
  * @author Jefferson Alves Reis (jefaokpta)
@@ -71,6 +71,17 @@ import { RouteTrunk } from '@/pabx/types/route-trunk';
                 <div class="field mb-4">
                     <label for="flags" class="block mb-2">Flags de Discagem</label>
                     <input id="flags" pInputText class="p-inputtext" formControlName="flags" />
+                </div>
+
+                <div class="field mb-4">
+                    <label for="techPrefix" class="block mb-2">Prefixo de Discagem</label>
+                    <input
+                        id="techPrefix"
+                        pInputText
+                        placeholder="#105"
+                        class="p-inputtext"
+                        formControlName="techPrefix"
+                    />
                 </div>
 
                 <p-card>
@@ -169,6 +180,7 @@ export class EditRoutePage implements OnInit {
             name: ['', [Validators.required]],
             timeout: [60, [Validators.required]],
             flags: ['T'],
+            techPrefix: [''],
             routeTrunks: this.fb.array([])
         });
         this.routeService.findById(this.id).then((route) => {

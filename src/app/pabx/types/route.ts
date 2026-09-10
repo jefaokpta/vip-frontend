@@ -1,4 +1,4 @@
-import { RouteTrunk } from '@/pabx/types/route-trunk';
+import {RouteTrunk} from '@/pabx/types/route-trunk';
 
 export interface Route {
     readonly id: number;
@@ -6,5 +6,6 @@ export interface Route {
     readonly companyId: string;
     readonly timeout: number;
     readonly flags: string;
+    readonly techPrefix: string;
     readonly routeTrunks: RouteTrunk[];
 }
