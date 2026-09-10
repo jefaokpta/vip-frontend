@@ -109,7 +109,7 @@ import {SurveyService} from '@/pabx/survey/survey.service';
 
                                 <div class="field mb-4">
                                     <label for="ringTimeout" class="block mb-2">
-                                        Timeout por Agente (segundos) *
+                                        Tentativa por Membro (segundos) *
                                     </label>
                                     <p-input-number
                                         id="ringTimeout"
@@ -120,7 +120,7 @@ import {SurveyService} from '@/pabx/survey/survey.service';
                                 </div>
 
                                 <div class="field mb-4">
-                                    <label for="queueTimeout" class="block mb-2">Timeout da Fila (segundos) *</label>
+                                    <label for="queueTimeout" class="block mb-2">Tempo de Espera Total (segundos) *</label>
                                     <p-input-number
                                         id="queueTimeout"
                                         mode="decimal"
