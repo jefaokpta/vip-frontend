@@ -357,6 +357,7 @@ export class QueueDetailPage implements OnInit, OnDestroy {
     memberStatusLabel(status: QueueMemberStatusEnum): string {
         const labels: Record<QueueMemberStatusEnum, string> = {
             [QueueMemberStatusEnum.AVAILABLE]: 'Disponível',
+            [QueueMemberStatusEnum.UNAVAILABLE]: 'Indisponível',
             [QueueMemberStatusEnum.UP]: 'Em Chamada',
             [QueueMemberStatusEnum.RINGING]: 'Chamando',
             [QueueMemberStatusEnum.DIALING]: 'Discando',
@@ -373,6 +374,8 @@ export class QueueDetailPage implements OnInit, OnDestroy {
         switch (status) {
             case QueueMemberStatusEnum.AVAILABLE:
                 return 'success';
+            case QueueMemberStatusEnum.UNAVAILABLE:
+                return 'danger';
             case QueueMemberStatusEnum.UP:
                 return 'danger';
             case QueueMemberStatusEnum.RINGING:

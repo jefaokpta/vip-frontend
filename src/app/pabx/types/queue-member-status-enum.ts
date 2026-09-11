@@ -3,6 +3,7 @@ export enum QueueMemberStatusEnum {
     RINGING = 'RINGING',
     DIALING = 'DIALING',
     AVAILABLE = 'AVAILABLE',
+    UNAVAILABLE = 'UNAVAILABLE',
     PAUSED = 'PAUSED',
     COOLDOWN = 'COOLDOWN',
     UNKNOWN = 'UNKNOWN'
