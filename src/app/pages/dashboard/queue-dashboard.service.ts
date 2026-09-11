@@ -21,4 +21,10 @@ export class QueueDashboardService {
     findAllQueueStates(): Promise<QueueState[]> {
         return executeRequest(this.http.get<QueueState[]>(`${this.BACKEND}/queues/states`, httpHeaders()));
     }
+
+    forceLogoutMember(queueId: number, memberId: number): Promise<void> {
+        return executeRequest(
+            this.http.delete<void>(`${this.BACKEND}/queues/states/${queueId}/members/${memberId}/logout`, httpHeaders())
+        );
+    }
 }

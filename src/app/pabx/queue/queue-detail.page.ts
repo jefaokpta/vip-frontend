@@ -7,6 +7,9 @@ import {TableModule} from 'primeng/table';
 import {Tag} from 'primeng/tag';
 import {ProgressSpinner} from 'primeng/progressspinner';
 import {Tooltip} from 'primeng/tooltip';
+import {ConfirmationService, MessageService} from 'primeng/api';
+import {ConfirmDialog} from 'primeng/confirmdialog';
+import {Toast} from 'primeng/toast';
 import {QueueMemberStatusEnum} from '@/pabx/types/queue-member-status-enum';
 import {QueueMember} from '@/pabx/types/queue-member';
 import {QueueState} from '@/pabx/types/queue-state';
@@ -14,12 +17,13 @@ import {QueueDashboardService} from '@/pages/dashboard/queue-dashboard.service';
 import {WebsocketService} from '@/websocket/stomp/websocket.service';
 import {rxStompServiceFactory} from '@/websocket/stomp/rx-stomp-service-factory';
 import {UserService} from '@/pages/users/user.service';
+import {RoleEnum} from '@/types/role-enum';
 
 @Component({
     selector: 'app-queue-detail-page',
     standalone: true,
-    providers: [{ provide: WebsocketService, useFactory: rxStompServiceFactory }],
-    imports: [Card, Button, TableModule, Tag, ProgressSpinner, RouterLink, Tooltip],
+    providers: [{ provide: WebsocketService, useFactory: rxStompServiceFactory }, ConfirmationService, MessageService],
+    imports: [Card, Button, TableModule, Tag, ProgressSpinner, RouterLink, Tooltip, ConfirmDialog, Toast],
     template: `
         <p-card>
             <ng-template #title>
@@ -129,6 +133,7 @@ import {UserService} from '@/pages/users/user.service';
                                     <th>Duração</th>
                                     <th>Última</th>
                                     <th>Atendidas</th>
+                                    <th>Ações</th>
                                 </tr>
                             </ng-template>
                             <ng-template pTemplate="body" let-member>
@@ -175,11 +180,24 @@ import {UserService} from '@/pages/users/user.service';
                                     <td class="font-mono text-sm text-gray-500 text-center">
                                         {{ member.answeredCallCount ?? 0 }}
                                     </td>
+                                    <td>
+                                        @if (isSupervisor) {
+                                            <p-button
+                                                icon="pi pi-sign-out"
+                                                severity="danger"
+                                                outlined
+                                                size="small"
+                                                pTooltip="Deslogar da fila"
+                                                tooltipPosition="left"
+                                                (click)="confirmForceLogout(member)"
+                                            />
+                                        }
+                                    </td>
                                 </tr>
                             </ng-template>
                             <ng-template pTemplate="emptymessage">
                                 <tr>
-                                    <td colspan="6" class="text-center p-6 text-gray-400">Nenhum agente logado.</td>
+                                    <td colspan="7" class="text-center p-6 text-gray-400">Nenhum agente logado.</td>
                                 </tr>
                             </ng-template>
                         </p-table>
@@ -228,6 +246,8 @@ import {UserService} from '@/pages/users/user.service';
                 <div class="text-center p-10 text-gray-400">Fila não encontrada.</div>
             }
         </p-card>
+        <p-confirm-dialog />
+        <p-toast />
     `
 })
 export class QueueDetailPage implements OnInit, OnDestroy {
@@ -257,13 +277,19 @@ export class QueueDetailPage implements OnInit, OnDestroy {
         return Math.min(...calls.map((c) => c.timestamp));
     });
 
+    readonly isSupervisor: boolean;
+
     constructor(
         private readonly route: ActivatedRoute,
         private readonly router: Router,
         private readonly queueDashboardService: QueueDashboardService,
         private readonly webSocketService: WebsocketService,
-        private readonly userService: UserService
-    ) {}
+        private readonly userService: UserService,
+        private readonly confirmationService: ConfirmationService,
+        private readonly messageService: MessageService
+    ) {
+        this.isSupervisor = this.userService.getUser().roles.includes(RoleEnum.ROLE_COMPANY_SUPERVISOR);
+    }
 
     ngOnInit(): void {
         this.queueId = Number(this.route.snapshot.paramMap.get('id'));
@@ -360,6 +386,44 @@ export class QueueDetailPage implements OnInit, OnDestroy {
             default:
                 return 'secondary';
         }
+    }
+
+    confirmForceLogout(member: QueueMember): void {
+        this.confirmationService.confirm({
+            message: `Deslogar ${member.name} da fila?`,
+            header: 'Confirmação',
+            closable: true,
+            closeOnEscape: true,
+            icon: 'pi pi-exclamation-triangle',
+            acceptButtonProps: {
+                label: 'Deslogar',
+                severity: 'danger'
+            },
+            rejectButtonProps: {
+                label: 'Fechar',
+                severity: 'secondary',
+                outlined: true
+            },
+            accept: () => {
+                this.queueDashboardService
+                    .forceLogoutMember(this.queueId, member.id)
+                    .then(() => {
+                        this.messageService.add({
+                            severity: 'success',
+                            summary: `${member.name} deslogado da fila`,
+                            life: 15_000
+                        });
+                    })
+                    .catch(() => {
+                        this.messageService.add({
+                            severity: 'error',
+                            summary: 'Não foi possível deslogar o membro',
+                            detail: 'Tente novamente mais tarde.',
+                            life: 15_000
+                        });
+                    });
+            }
+        });
     }
 
     strategyLabel(strategy: string): string {
