@@ -176,35 +176,25 @@ export class AppMenu implements OnInit {
                     icon: 'pi pi-fw pi-whatsapp',
                     items: [
                         {
-                            label: 'Mensagens',
-                            icon: 'pi pi-envelope'
+                            label: 'SAC',
+                            icon: 'pi pi-fw pi-headphones',
+                            items: [
+                                {
+                                    label: 'Mensagens',
+                                    icon: 'pi pi-envelope'
+                                },
+                                {
+                                    label: 'Registro',
+                                    icon: 'pi pi-fw pi-image'
+                                }
+                            ]
                         },
                         {
-                            label: 'Registros',
-                            icon: 'pi pi-fw pi-image'
+                            label: 'Vendas',
+                            icon: 'pi pi-fw pi-shopping-cart'
                         }
                     ]
                 },
-                {
-                    label: 'LGPD',
-                    icon: 'pi pi-fw pi-file',
-                    items: [
-                        {
-                            label: 'Cadastros',
-                            icon: 'pi pi-envelope'
-                        }
-                    ]
-                },
-                {
-                    label: 'CRM',
-                    icon: 'pi pi-fw pi-file',
-                    items: [
-                        {
-                            label: 'Clientes',
-                            icon: 'pi pi-envelope'
-                        }
-                    ]
-                }
             ]
         },
         {
