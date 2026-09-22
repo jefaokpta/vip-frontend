@@ -120,7 +120,9 @@ import {SurveyService} from '@/pabx/survey/survey.service';
                                 </div>
 
                                 <div class="field mb-4">
-                                    <label for="queueTimeout" class="block mb-2">Tempo de Espera Total (segundos) *</label>
+                                    <label for="queueTimeout" class="block mb-2"
+                                        >Tempo de Espera Total (segundos) *</label
+                                    >
                                     <p-input-number
                                         id="queueTimeout"
                                         mode="decimal"
