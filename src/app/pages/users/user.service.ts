@@ -4,15 +4,15 @@
  * @create 4/22/25
  */
 
-import {HttpClient} from '@angular/common/http';
-import {environment} from '../../../environments/environment';
-import {LoginResponse} from '@/types/login-response';
-import {PeerRegistration} from '@/types/peer-registration';
-import {User} from '@/types/user';
-import {PeerTransportEnum} from '@/pabx/types/peer-transport-enum';
-import {computed, Injectable, signal} from '@angular/core';
-import {executeRequest, httpHeaders} from '@/util/utils';
-import {jwtDecode} from 'jwt-decode';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
+import { LoginResponse } from '@/types/login-response';
+import { PeerRegistration } from '@/types/peer-registration';
+import { User } from '@/types/user';
+import { PeerTransportEnum } from '@/pabx/types/peer-transport-enum';
+import { computed, Injectable, signal } from '@angular/core';
+import { executeRequest, httpHeaders } from '@/util/utils';
+import { jwtDecode } from 'jwt-decode';
 
 @Injectable({
     providedIn: 'root'
@@ -180,6 +180,12 @@ export class UserService {
 
     create(user: User) {
         return executeRequest(this.http.post<User>(`${this.BACKEND}/users`, user, httpHeaders()));
+    }
+
+    resendConfirmation(email: string) {
+        return executeRequest(
+            this.http.post<User>(`${this.BACKEND}/users/admin/resend-confirmation`, { email }, httpHeaders())
+        );
     }
 
     forgotPassword(email: string) {

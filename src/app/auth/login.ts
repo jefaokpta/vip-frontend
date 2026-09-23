@@ -1,19 +1,19 @@
-import {Component, computed, inject, OnInit} from '@angular/core';
-import {CheckboxModule} from 'primeng/checkbox';
-import {CommonModule} from '@angular/common';
-import {InputTextModule} from 'primeng/inputtext';
-import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
-import {ActivatedRoute, Router, RouterModule} from '@angular/router';
-import {LayoutService} from '@/layout/service/layout.service';
-import {AppConfigurator} from '@/layout/components/app.configurator';
-import {IconFieldModule} from 'primeng/iconfield';
-import {InputIconModule} from 'primeng/inputicon';
-import {ButtonModule} from 'primeng/button';
-import {ProgressSpinnerModule} from 'primeng/progressspinner';
-import {Image} from 'primeng/image';
-import {DropdownModule} from 'primeng/dropdown';
-import {Password} from 'primeng/password';
-import {UserService} from '@/pages/users/user.service';
+import { Component, computed, inject, OnInit } from '@angular/core';
+import { CheckboxModule } from 'primeng/checkbox';
+import { CommonModule } from '@angular/common';
+import { InputTextModule } from 'primeng/inputtext';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { LayoutService } from '@/layout/service/layout.service';
+import { AppConfigurator } from '@/layout/components/app.configurator';
+import { IconFieldModule } from 'primeng/iconfield';
+import { InputIconModule } from 'primeng/inputicon';
+import { ButtonModule } from 'primeng/button';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { Image } from 'primeng/image';
+import { DropdownModule } from 'primeng/dropdown';
+import { Password } from 'primeng/password';
+import { UserService } from '@/pages/users/user.service';
 
 @Component({
     selector: 'app-login',
@@ -65,7 +65,7 @@ import {UserService} from '@/pages/users/user.service';
         </svg>
         <div class="px-8 min-h-screen flex justify-center items-center">
             <div
-                class="border border-surface-200 dark:border-surface-700 bg-surface-0 dark:bg-surface-900 rounded py-16 px-6 md:px-16 z-10"
+                class="border border-surface-200 dark:border-surface-700 bg-surface-0 dark:bg-surface-900 rounded py-16 px-6 md:px-16 z-10 w-full md:w-[25rem]"
             >
                 <div class="mb-6">
                     <div class="mb-4">

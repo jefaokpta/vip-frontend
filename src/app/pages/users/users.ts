@@ -1,22 +1,22 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
-import {Button} from 'primeng/button';
-import {ConfirmDialog, ConfirmDialogModule} from 'primeng/confirmdialog';
-import {IconField} from 'primeng/iconfield';
-import {InputIcon} from 'primeng/inputicon';
-import {InputText} from 'primeng/inputtext';
-import {ConfirmationService, MessageService, PrimeTemplate} from 'primeng/api';
-import {RouterLink} from '@angular/router';
-import {Table, TableModule} from 'primeng/table';
-import {Tooltip} from 'primeng/tooltip';
-import {RoleEnum} from '@/types/role-enum';
-import {User} from '@/types/user';
-import {Card} from 'primeng/card';
-import {Toast} from 'primeng/toast';
-import {NgIf} from '@angular/common';
-import {FormsModule} from '@angular/forms';
-import {ProgressSpinner} from 'primeng/progressspinner';
-import {UserService} from './user.service';
-import {translateRole} from '@/pages/users/utils';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { Button } from 'primeng/button';
+import { ConfirmDialog, ConfirmDialogModule } from 'primeng/confirmdialog';
+import { IconField } from 'primeng/iconfield';
+import { InputIcon } from 'primeng/inputicon';
+import { InputText } from 'primeng/inputtext';
+import { ConfirmationService, MessageService, PrimeTemplate } from 'primeng/api';
+import { RouterLink } from '@angular/router';
+import { Table, TableModule } from 'primeng/table';
+import { Tooltip } from 'primeng/tooltip';
+import { RoleEnum } from '@/types/role-enum';
+import { User } from '@/types/user';
+import { Card } from 'primeng/card';
+import { Toast } from 'primeng/toast';
+import { NgIf } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { ProgressSpinner } from 'primeng/progressspinner';
+import { UserService } from './user.service';
+import { translateRole } from '@/pages/users/utils';
 
 @Component({
     selector: 'app-users',
@@ -94,9 +94,23 @@ import {translateRole} from '@/pages/users/utils';
                         <td>{{ user.name }}</td>
                         <td>{{ user.email }}</td>
                         <td>
-                            <i
-                                [class]="user.isConfirmed ? 'pi pi-check text-green-500' : 'pi pi-clock text-gray-500'"
-                            ></i>
+                            <div class="flex items-center gap-2">
+                                <i
+                                    [class]="
+                                        user.isConfirmed ? 'pi pi-check text-green-500' : 'pi pi-clock text-gray-500'
+                                    "
+                                ></i>
+                                <p-button
+                                    *ngIf="!user.isConfirmed"
+                                    icon="pi pi-send"
+                                    [loading]="resendingIds.has(user.id)"
+                                    (click)="resendConfirmation(user)"
+                                    text
+                                    size="small"
+                                    pTooltip="Reenviar e-mail de confirmação"
+                                    tooltipPosition="right"
+                                />
+                            </div>
                         </td>
                         <td>{{ translateRole(user) }}</td>
                         <td>
@@ -140,6 +154,7 @@ export class UsersPage implements OnInit {
     @ViewChild('dataTable') dt!: Table;
     protected readonly RoleEnum = RoleEnum;
     loading = true;
+    resendingIds = new Set<number>();
 
     constructor(
         private readonly confirmationService: ConfirmationService,
@@ -161,6 +176,29 @@ export class UsersPage implements OnInit {
         if (target) {
             this.dt.filterGlobal(target.value, 'contains');
         }
+    }
+
+    resendConfirmation(user: User) {
+        this.resendingIds.add(user.id);
+        this.userService
+            .resendConfirmation(user.email)
+            .then(() => {
+                this.messageService.add({
+                    severity: 'success',
+                    summary: 'E-mail reenviado',
+                    detail: `Um novo código de confirmação foi enviado para ${user.email}`,
+                    life: 15_000
+                });
+            })
+            .catch(() => {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Não foi possível reenviar o e-mail',
+                    detail: 'Tente novamente mais tarde.',
+                    life: 15_000
+                });
+            })
+            .finally(() => this.resendingIds.delete(user.id));
     }
 
     confirmDelete(user: User) {
