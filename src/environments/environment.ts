@@ -3,6 +3,8 @@ export const environment = {
 
     API_BACKEND_URL: 'http://localhost:8080',
     WEBSOCKET_BACKEND_URL: 'ws://localhost:8080/ws',
+    // API_BACKEND_URL: 'https://backend.iasmin.io',
+    // WEBSOCKET_BACKEND_URL: 'wss://backend.iasmin.io/ws',
     // API_BACKEND_URL: 'https://vip-pabx-manager.vipsolutions.com.br/vip-pabx-manager',
     // WEBSOCKET_BACKEND_URL: 'wss://vip-pabx-manager.vipsolutions.com.br/vip-pabx-manager/ws',
     PABX_URL: 'vip-register.vipsolutions.com.br'
