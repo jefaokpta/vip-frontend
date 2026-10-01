@@ -3,5 +3,5 @@ export const environment = {
 
     API_BACKEND_URL: 'https://backend.iasmin.io',
     WEBSOCKET_BACKEND_URL: 'wss://backend.iasmin.io/ws',
-    PABX_URL: 'vip-register.vipsolutions.com.br'
+    PABX_URL: 'register1.iasmin.io'
 };
