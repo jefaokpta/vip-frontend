@@ -156,8 +156,6 @@ export class WorkerInstancePage implements OnInit {
             this.updateReady(worker, true);
             return;
         }
-        // mantém ligado até o usuário confirmar a desativação
-        worker.isReady = true;
         this.confirmationService.confirm({
             message: `Desativar ${worker.name}?`,
             header: 'Confirmação',
@@ -166,7 +164,9 @@ export class WorkerInstancePage implements OnInit {
             icon: 'pi pi-exclamation-triangle',
             acceptButtonProps: { label: 'Desativar', severity: 'danger' },
             rejectButtonProps: { label: 'Fechar', severity: 'secondary', outlined: true },
-            accept: () => this.updateReady(worker, false)
+            accept: () => this.updateReady(worker, false),
+            // o switch já foi desligado pelo usuário; cancelar religa (mudança em outro ciclo, para o switch redesenhar)
+            reject: () => (worker.isReady = true)
         });
     }
 
