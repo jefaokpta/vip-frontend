@@ -67,7 +67,6 @@ import { WorkerInstanceService } from '@/pages/worker-instance/worker-instance.s
                         <th pSortableColumn="name">Nome <p-sortIcon field="name"></p-sortIcon></th>
                         <th>DNS</th>
                         <th>IP interno</th>
-                        <th>Ativo</th>
                         <th style="width: 10%">Ações</th>
                     </tr>
                 </ng-template>
@@ -75,15 +74,8 @@ import { WorkerInstanceService } from '@/pages/worker-instance/worker-instance.s
                 <ng-template pTemplate="body" let-worker>
                     <tr>
                         <td>{{ worker.name }}</td>
-                        <td>{{ worker.dns ?? '—' }}</td>
-                        <td>{{ worker.internalIp ?? '—' }}</td>
-                        <td>
-                            @if (worker.active) {
-                                <i class="pi pi-check-circle text-green-500" pTooltip="Ativo"></i>
-                            } @else {
-                                <i class="pi pi-times-circle text-red-500" pTooltip="Inativo"></i>
-                            }
-                        </td>
+                        <td>{{ worker.dns }}</td>
+                        <td>{{ worker.internalIp }}</td>
                         <td>
                             <div class="flex gap-2">
                                 <p-button

@@ -21,12 +21,12 @@ describe('WorkerInstanceService', () => {
         const promise = service.findAll();
         const req = http.expectOne(base);
         expect(req.request.method).toBe('GET');
-        req.flush([{ id: 1, name: 'WORKER1', dns: 'w1', internalIp: '10.0.0.1', active: true }]);
+        req.flush([{ id: 1, name: 'WORKER1', dns: 'w1', internalIp: '10.0.0.1' }]);
         expect((await promise).length).toBe(1);
     });
 
     it('create faz POST /workers com o corpo', async () => {
-        const body = { name: 'WORKER2', dns: 'w2', internalIp: '10.0.0.2', active: true };
+        const body = { name: 'WORKER2', dns: 'w2', internalIp: '10.0.0.2' };
         const promise = service.create(body);
         const req = http.expectOne(base);
         expect(req.request.method).toBe('POST');
@@ -36,7 +36,7 @@ describe('WorkerInstanceService', () => {
     });
 
     it('update faz PUT e delete faz DELETE em /workers/{id}', async () => {
-        const body = { name: 'WORKER2', dns: 'w2', internalIp: '10.0.0.2', active: true };
+        const body = { name: 'WORKER2', dns: 'w2', internalIp: '10.0.0.2' };
         const put = service.update(5, body);
         const putReq = http.expectOne(`${base}/5`);
         expect(putReq.request.method).toBe('PUT');

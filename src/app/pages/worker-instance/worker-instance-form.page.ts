@@ -4,7 +4,6 @@ import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { ToastModule } from 'primeng/toast';
-import { ToggleSwitch } from 'primeng/toggleswitch';
 import { NgIf } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { WorkerInstanceService } from '@/pages/worker-instance/worker-instance.service';
@@ -15,16 +14,7 @@ const HOST_PATTERN = /^[A-Za-z0-9.-]{1,253}$/;
 @Component({
     selector: 'app-worker-instance-form',
     standalone: true,
-    imports: [
-        InputTextModule,
-        ButtonModule,
-        CardModule,
-        ToastModule,
-        ToggleSwitch,
-        NgIf,
-        ReactiveFormsModule,
-        RouterLink
-    ],
+    imports: [InputTextModule, ButtonModule, CardModule, ToastModule, NgIf, ReactiveFormsModule, RouterLink],
     template: `
         <p-card>
             <ng-template #title>
@@ -67,10 +57,6 @@ const HOST_PATTERN = /^[A-Za-z0-9.-]{1,253}$/;
                         >IP interno inválido.</small
                     >
                 </div>
-                <div class="field mb-4 flex items-center gap-3">
-                    <p-toggleswitch inputId="active" formControlName="active" />
-                    <label for="active">Ativo (gera tronco nos registers)</label>
-                </div>
 
                 <div class="flex mt-4">
                     <p-button type="submit" label="Salvar" [disabled]="form.invalid || pending">
@@ -110,8 +96,7 @@ export class WorkerInstanceFormPage implements OnInit {
         this.form = this.fb.group({
             name: ['', [Validators.required, Validators.pattern(NAME_PATTERN)]],
             dns: ['', [Validators.required, Validators.pattern(HOST_PATTERN)]],
-            internalIp: ['', [Validators.required, Validators.pattern(HOST_PATTERN)]],
-            active: [true]
+            internalIp: ['', [Validators.required, Validators.pattern(HOST_PATTERN)]]
         });
         const idParam = this.activatedRoute.snapshot.paramMap.get('id');
         if (idParam) {
