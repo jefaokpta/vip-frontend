@@ -26,6 +26,10 @@ export class WorkerInstanceService {
         return executeRequest(this.http.put(`${this.BACKEND}/workers/${id}`, worker, httpHeaders()));
     }
 
+    updateReady(id: number, ready: boolean) {
+        return executeRequest(this.http.patch(`${this.BACKEND}/workers/${id}/ready/${ready}`, null, httpHeaders()));
+    }
+
     delete(id: number) {
         return executeRequest(this.http.delete(`${this.BACKEND}/workers/${id}`, httpHeaders()));
     }

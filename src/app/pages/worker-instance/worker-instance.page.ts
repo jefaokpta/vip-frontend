@@ -11,6 +11,8 @@ import { ProgressSpinner } from 'primeng/progressspinner';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { Toast } from 'primeng/toast';
 import { Tooltip } from 'primeng/tooltip';
+import { ToggleSwitch } from 'primeng/toggleswitch';
+import { FormsModule } from '@angular/forms';
 import { WorkerInstance } from '@/types/worker-instance';
 import { WorkerInstanceService } from '@/pages/worker-instance/worker-instance.service';
 
@@ -29,7 +31,9 @@ import { WorkerInstanceService } from '@/pages/worker-instance/worker-instance.s
         ProgressSpinner,
         ConfirmDialog,
         Toast,
-        Tooltip
+        Tooltip,
+        ToggleSwitch,
+        FormsModule
     ],
     template: `
         <p-card>
@@ -67,6 +71,7 @@ import { WorkerInstanceService } from '@/pages/worker-instance/worker-instance.s
                         <th pSortableColumn="name">Nome <p-sortIcon field="name"></p-sortIcon></th>
                         <th>DNS</th>
                         <th>IP interno</th>
+                        <th>Ativo</th>
                         <th style="width: 10%">Ações</th>
                     </tr>
                 </ng-template>
@@ -76,6 +81,12 @@ import { WorkerInstanceService } from '@/pages/worker-instance/worker-instance.s
                         <td>{{ worker.name }}</td>
                         <td>{{ worker.dns }}</td>
                         <td>{{ worker.internalIp }}</td>
+                        <td>
+                            <p-toggleswitch
+                                [(ngModel)]="worker.isReady"
+                                (onChange)="onToggleReady(worker, $event.checked)"
+                            />
+                        </td>
                         <td>
                             <div class="flex gap-2">
                                 <p-button
@@ -138,6 +149,40 @@ export class WorkerInstancePage implements OnInit {
         if (target) {
             this.dt.filterGlobal(target.value, 'contains');
         }
+    }
+
+    onToggleReady(worker: WorkerInstance, checked: boolean) {
+        if (checked) {
+            this.updateReady(worker, true);
+            return;
+        }
+        // mantém ligado até o usuário confirmar a desativação
+        worker.isReady = true;
+        this.confirmationService.confirm({
+            message: `Desativar ${worker.name}?`,
+            header: 'Confirmação',
+            closable: true,
+            closeOnEscape: true,
+            icon: 'pi pi-exclamation-triangle',
+            acceptButtonProps: { label: 'Desativar', severity: 'danger' },
+            rejectButtonProps: { label: 'Fechar', severity: 'secondary', outlined: true },
+            accept: () => this.updateReady(worker, false)
+        });
+    }
+
+    private updateReady(worker: WorkerInstance, ready: boolean) {
+        this.workerService
+            .updateReady(worker.id, ready)
+            .then(() => (worker.isReady = ready))
+            .catch((err) => {
+                worker.isReady = !ready;
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Não foi possível alterar o estado do worker',
+                    detail: err?.error?.message || 'Tente novamente mais tarde.',
+                    life: 15_000
+                });
+            });
     }
 
     confirmDelete(worker: WorkerInstance) {

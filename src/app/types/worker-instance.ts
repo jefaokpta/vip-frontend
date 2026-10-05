@@ -3,6 +3,7 @@ export interface WorkerInstance {
     readonly name: string;
     readonly dns: string;
     readonly internalIp: string;
+    isReady: boolean;
 }
 
 export interface NewWorkerInstance {

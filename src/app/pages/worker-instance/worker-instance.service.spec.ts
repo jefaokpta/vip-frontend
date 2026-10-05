@@ -49,4 +49,12 @@ describe('WorkerInstanceService', () => {
         delReq.flush({});
         await del;
     });
+
+    it('updateReady faz PATCH em /workers/{id}/ready/{valor}', async () => {
+        const promise = service.updateReady(5, false);
+        const req = http.expectOne(`${base}/5/ready/false`);
+        expect(req.request.method).toBe('PATCH');
+        req.flush({});
+        await promise;
+    });
 });
