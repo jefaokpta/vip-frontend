@@ -1,8 +1,8 @@
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../environments/environment';
-import { executeRequest, httpHeaders } from '@/util/utils';
-import { Trunk } from '@/pabx/types/trunk';
+import {Injectable} from '@angular/core';
+import {HttpClient} from '@angular/common/http';
+import {environment} from '../../../environments/environment';
+import {executeRequest, httpHeaders} from '@/util/utils';
+import {Trunk, TrunkOption} from '@/pabx/types/trunk';
 
 @Injectable({ providedIn: 'root' })
 export class TrunkService {
@@ -12,6 +12,10 @@ export class TrunkService {
 
     findAll(): Promise<Trunk[]> {
         return executeRequest(this.http.get<Trunk[]>(`${this.BACKEND}/trunks`, httpHeaders()));
+    }
+
+    findOptions(): Promise<TrunkOption[]> {
+        return executeRequest(this.http.get<TrunkOption[]>(`${this.BACKEND}/trunks/options`, httpHeaders()));
     }
 
     delete(id: number) {
