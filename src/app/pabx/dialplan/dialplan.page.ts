@@ -11,7 +11,7 @@ import {Toast} from 'primeng/toast';
 import {Alias} from '@/pabx/types/alias';
 import {DialPlan} from '@/pabx/types/dial-plan';
 import {SrcEnum} from '@/pabx/types/src-enum';
-import {Trunk} from '@/pabx/types/trunk';
+import {TrunkOption} from '@/pabx/types/trunk';
 import {NgIf} from '@angular/common';
 import {Tooltip} from 'primeng/tooltip';
 import {InputText} from 'primeng/inputtext';
@@ -165,8 +165,8 @@ export class DialplanPage implements OnInit {
     ) {}
 
     ngOnInit(): void {
-        Promise.all([this.dialplanService.findAll(), this.trunkService.findAll(), this.aliasService.findAll()]).then(
-            ([dialplans, trunks, aliases]: [DialPlan[], Trunk[], Alias[]]) => {
+        Promise.all([this.dialplanService.findAll(), this.trunkService.findOptions(), this.aliasService.findAll()]).then(
+            ([dialplans, trunks, aliases]: [DialPlan[], TrunkOption[], Alias[]]) => {
                 trunks.forEach((trunk) => this.trunkMap.set(String(trunk.id), trunk.name));
                 aliases.forEach((alias) => this.aliasMap.set(String(alias.id), alias.name));
                 this.dialplans = this.sortDialplansByDstAndPriority(dialplans);
