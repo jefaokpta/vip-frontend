@@ -140,6 +140,18 @@ export class AppMenu implements OnInit {
                             routerLink: ['/pabx/trunks']
                         },
                         {
+                            label: 'Registers',
+                            icon: 'pi pi-fw pi-server',
+                            roles: [RoleEnum.ROLE_SAAS_SUPPORT],
+                            routerLink: ['/pabx/register-instances']
+                        },
+                        {
+                            label: 'Workers',
+                            icon: 'pi pi-fw pi-server',
+                            roles: [RoleEnum.ROLE_SAAS_SUPPORT],
+                            routerLink: ['/pabx/worker-instances']
+                        },
+                        {
                             label: 'Audios do Sistema',
                             icon: 'fa fa-music',
                             routerLink: ['/pabx/mohs']
@@ -224,18 +236,6 @@ export class AppMenu implements OnInit {
                     roles: [RoleEnum.ROLE_SAAS_SUPPORT],
                     icon: 'pi pi-fw pi-sitemap',
                     routerLink: ['/pages/tenants']
-                },
-                {
-                    label: 'Registers',
-                    roles: [RoleEnum.ROLE_SAAS_SUPPORT],
-                    icon: 'pi pi-fw pi-server',
-                    routerLink: ['/pages/register-instances']
-                },
-                {
-                    label: 'Workers',
-                    roles: [RoleEnum.ROLE_SAAS_SUPPORT],
-                    icon: 'pi pi-fw pi-server',
-                    routerLink: ['/pages/worker-instances']
                 }
             ]
         }

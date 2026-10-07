@@ -1,8 +1,8 @@
-import { TestBed } from '@angular/core/testing';
-import { provideHttpClient } from '@angular/common/http';
-import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
-import { WorkerInstanceService } from '@/pages/worker-instance/worker-instance.service';
-import { environment } from '../../../environments/environment';
+import {TestBed} from '@angular/core/testing';
+import {provideHttpClient} from '@angular/common/http';
+import {HttpTestingController, provideHttpClientTesting} from '@angular/common/http/testing';
+import {WorkerInstanceService} from '@/pabx/worker-instance/worker-instance.service';
+import {environment} from '../../../environments/environment';
 
 describe('WorkerInstanceService', () => {
     let service: WorkerInstanceService;

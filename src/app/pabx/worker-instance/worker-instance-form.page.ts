@@ -1,12 +1,12 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { InputTextModule } from 'primeng/inputtext';
-import { ButtonModule } from 'primeng/button';
-import { CardModule } from 'primeng/card';
-import { ToastModule } from 'primeng/toast';
-import { NgIf } from '@angular/common';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { WorkerInstanceService } from '@/pages/worker-instance/worker-instance.service';
+import {Component, OnInit} from '@angular/core';
+import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {InputTextModule} from 'primeng/inputtext';
+import {ButtonModule} from 'primeng/button';
+import {CardModule} from 'primeng/card';
+import {ToastModule} from 'primeng/toast';
+import {NgIf} from '@angular/common';
+import {ActivatedRoute, Router, RouterLink} from '@angular/router';
+import {WorkerInstanceService} from '@/pabx/worker-instance/worker-instance.service';
 
 const NAME_PATTERN = /^[A-Za-z0-9_-]{1,11}$/;
 const HOST_PATTERN = /^[A-Za-z0-9.-]{1,253}$/;
@@ -26,7 +26,7 @@ const HOST_PATTERN = /^[A-Za-z0-9.-]{1,253}$/;
                         type="button"
                         label="Voltar"
                         icon="pi pi-arrow-left"
-                        routerLink="/pages/worker-instances"
+                        routerLink="/pabx/worker-instances"
                         outlined
                         severity="secondary"
                     ></p-button>
@@ -112,7 +112,7 @@ export class WorkerInstanceFormPage implements OnInit {
             ? this.workerService.update(this.id, this.form.value)
             : this.workerService.create(this.form.value);
         request
-            .then(() => this.router.navigate(['/pages/worker-instances']))
+            .then(() => this.router.navigate(['/pabx/worker-instances']))
             .catch((err) => (this.errorMessage = err?.error?.message || 'Houve um erro ao salvar o worker.'))
             .finally(() => (this.pending = false));
     }

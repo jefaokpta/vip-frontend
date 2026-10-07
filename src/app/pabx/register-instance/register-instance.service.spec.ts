@@ -1,8 +1,8 @@
-import { TestBed } from '@angular/core/testing';
-import { provideHttpClient } from '@angular/common/http';
-import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
-import { RegisterInstanceService } from '@/pages/register-instance/register-instance.service';
-import { environment } from '../../../environments/environment';
+import {TestBed} from '@angular/core/testing';
+import {provideHttpClient} from '@angular/common/http';
+import {HttpTestingController, provideHttpClientTesting} from '@angular/common/http/testing';
+import {RegisterInstanceService} from '@/pabx/register-instance/register-instance.service';
+import {environment} from '../../../environments/environment';
 
 describe('RegisterInstanceService', () => {
     let service: RegisterInstanceService;

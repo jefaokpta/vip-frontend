@@ -1,12 +1,12 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { InputTextModule } from 'primeng/inputtext';
-import { ButtonModule } from 'primeng/button';
-import { CardModule } from 'primeng/card';
-import { ToastModule } from 'primeng/toast';
-import { NgIf } from '@angular/common';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { RegisterInstanceService } from '@/pages/register-instance/register-instance.service';
+import {Component, OnInit} from '@angular/core';
+import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {InputTextModule} from 'primeng/inputtext';
+import {ButtonModule} from 'primeng/button';
+import {CardModule} from 'primeng/card';
+import {ToastModule} from 'primeng/toast';
+import {NgIf} from '@angular/common';
+import {ActivatedRoute, Router, RouterLink} from '@angular/router';
+import {RegisterInstanceService} from '@/pabx/register-instance/register-instance.service';
 
 const NAME_PATTERN = /^[A-Za-z0-9_-]{1,11}$/;
 const HOST_PATTERN = /^[A-Za-z0-9.-]{1,253}$/;
@@ -26,7 +26,7 @@ const HOST_PATTERN = /^[A-Za-z0-9.-]{1,253}$/;
                         type="button"
                         label="Voltar"
                         icon="pi pi-arrow-left"
-                        routerLink="/pages/register-instances"
+                        routerLink="/pabx/register-instances"
                         outlined
                         severity="secondary"
                     ></p-button>
@@ -112,7 +112,7 @@ export class RegisterInstanceFormPage implements OnInit {
             ? this.registerService.update(this.id, this.form.value)
             : this.registerService.create(this.form.value);
         request
-            .then(() => this.router.navigate(['/pages/register-instances']))
+            .then(() => this.router.navigate(['/pabx/register-instances']))
             .catch((err) => (this.errorMessage = err?.error?.message || 'Houve um erro ao salvar o register.'))
             .finally(() => (this.pending = false));
     }

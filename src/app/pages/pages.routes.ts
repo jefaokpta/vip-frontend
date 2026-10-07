@@ -6,8 +6,6 @@ import {QueueLoginPage} from '@/pages/queues/queue-login';
 export default [
     { path: 'companies', loadChildren: () => import('@/pages/company/company.routes') },
     { path: 'tenants', loadChildren: () => import('@/pages/tenant/tenant.routes') },
-    { path: 'register-instances', loadChildren: () => import('@/pages/register-instance/register-instance.routes') },
-    { path: 'worker-instances', loadChildren: () => import('@/pages/worker-instance/worker-instance.routes') },
     { path: 'users', loadChildren: () => import('@/pages/users/users.routes') },
     { path: 'profile', component: PersonPage, data: { breadcrumb: 'Perfil' } },
     { path: 'queues', component: QueueDashboard, data: { breadcrumb: 'Painel de Filas' } },
