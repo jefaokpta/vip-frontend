@@ -1,60 +1,70 @@
-import { Routes } from '@angular/router';
-import { DdrPage } from '@/pabx/ddr/ddr.page';
-import { NewDdrPage } from '@/pabx/ddr/new-ddr.page';
-import { EditDdrPage } from '@/pabx/ddr/edit-ddr.page';
-import { DialplanPage } from '@/pabx/dialplan/dialplan.page';
-import { AliasPage } from '@/pabx/alias/alias.page';
-import { NewAliasPage } from '@/pabx/alias/new-alias.page';
-import { EditAliasPage } from '@/pabx/alias/edit-alias.page';
-import { NewDialplanPage } from '@/pabx/dialplan/new-dialplan/new-dialplan.page';
-import { AccountCodePage } from '@/pabx/accountcode/account-code.page';
-import { NewAccountCodePage } from '@/pabx/accountcode/new-account-code.page';
-import { EditAccountCodePage } from '@/pabx/accountcode/edit-account-code.page';
-import { TrunkPage } from '@/pabx/trunk/trunks.page';
-import { NewTrunkPage } from '@/pabx/trunk/new-trunk.page';
-import { EditTrunkPage } from '@/pabx/trunk/edit-trunk.page';
-import { RoutePage } from './route/routes.page';
-import { NewRoutePage } from '@/pabx/route/new-route.page';
-import { EditRoutePage } from '@/pabx/route/edit-route.page';
-import { EditDialplanPage } from '@/pabx/dialplan/edit-dialplan/edit-dialplan.page';
-import { NewPeerPage } from '@/pabx/peer/new-peer.page';
-import { PeerPage } from '@/pabx/peer/peer.page';
-import { EditPeerPage } from '@/pabx/peer/edit-peer.page';
-import { CalendarPage } from '@/pabx/calendar/calendar.page';
-import { NewCalendarPage } from '@/pabx/calendar/new-calendar.page';
-import { EditCalendarPage } from '@/pabx/calendar/edit-calendar.page';
-import { MohsPage } from '@/pabx/moh/mohs.page';
-import { NewMohPage } from '@/pabx/moh/new-moh.page';
-import { EditMohPage } from '@/pabx/moh/edit-moh.page';
-import { SettingsPage } from '@/pabx/settings/settings.page';
-import { PickupGroupsPage } from '@/pabx/pickup-group/pickup-groups.page';
-import { NewPickupGroupPage } from '@/pabx/pickup-group/new-pickup-group.page';
-import { EditPickupGroupPage } from '@/pabx/pickup-group/edit-pickup-group.page';
-import { CallGroupsPage } from '@/pabx/call-group/call-groups.page';
-import { NewCallGroupPage } from '@/pabx/call-group/new-call-group.page';
-import { EditCallGroupPage } from '@/pabx/call-group/edit-call-group.page';
-import { UrasPage } from '@/pabx/ura/uras.page';
-import { NewUraPage } from '@/pabx/ura/new-ura.page';
-import { EditUraPage } from '@/pabx/ura/edit-ura.page';
-import { UraReportPage } from '@/pabx/ura-report/ura-report.page';
-import { SurveysPage } from '@/pabx/survey/surveys.page';
-import { NewSurveyPage } from '@/pabx/survey/new-survey.page';
-import { EditSurveyPage } from '@/pabx/survey/edit-survey.page';
-import { ReportPage } from '@/pabx/report/report.page';
-import { ReportDetailPage } from '@/pabx/report/report-detail.page';
-import { SurveyReportPage } from '@/pabx/survey-report/survey-report.page';
-import { QueuesPage } from '@/pabx/queue/queues.page';
-import { NewQueuePage } from '@/pabx/queue/new-queue.page';
-import { EditQueuePage } from '@/pabx/queue/edit-queue.page';
-import { QueueDetailPage } from '@/pabx/queue/queue-detail.page';
-import { PausePage } from '@/pabx/pause/pause.page';
-import { NewPausePage } from '@/pabx/pause/new-pause.page';
-import { EditPausePage } from '@/pabx/pause/edit-pause.page';
-import { MemberActivityReportPage } from '@/pabx/member-activity-report/member-activity-report.page';
-import { DacReportPage } from '@/pabx/dac-report/dac-report.page';
-import { DacReportCallsPage } from '@/pabx/dac-report/dac-report-calls.page';
+import {Routes} from '@angular/router';
+import {DdrPage} from '@/pabx/ddr/ddr.page';
+import {NewDdrPage} from '@/pabx/ddr/new-ddr.page';
+import {EditDdrPage} from '@/pabx/ddr/edit-ddr.page';
+import {DialplanPage} from '@/pabx/dialplan/dialplan.page';
+import {AliasPage} from '@/pabx/alias/alias.page';
+import {NewAliasPage} from '@/pabx/alias/new-alias.page';
+import {EditAliasPage} from '@/pabx/alias/edit-alias.page';
+import {NewDialplanPage} from '@/pabx/dialplan/new-dialplan/new-dialplan.page';
+import {AccountCodePage} from '@/pabx/accountcode/account-code.page';
+import {NewAccountCodePage} from '@/pabx/accountcode/new-account-code.page';
+import {EditAccountCodePage} from '@/pabx/accountcode/edit-account-code.page';
+import {TrunkPage} from '@/pabx/trunk/trunks.page';
+import {NewTrunkPage} from '@/pabx/trunk/new-trunk.page';
+import {EditTrunkPage} from '@/pabx/trunk/edit-trunk.page';
+import {RoutePage} from './route/routes.page';
+import {NewRoutePage} from '@/pabx/route/new-route.page';
+import {EditRoutePage} from '@/pabx/route/edit-route.page';
+import {EditDialplanPage} from '@/pabx/dialplan/edit-dialplan/edit-dialplan.page';
+import {NewPeerPage} from '@/pabx/peer/new-peer.page';
+import {PeerPage} from '@/pabx/peer/peer.page';
+import {EditPeerPage} from '@/pabx/peer/edit-peer.page';
+import {CalendarPage} from '@/pabx/calendar/calendar.page';
+import {NewCalendarPage} from '@/pabx/calendar/new-calendar.page';
+import {EditCalendarPage} from '@/pabx/calendar/edit-calendar.page';
+import {MohsPage} from '@/pabx/moh/mohs.page';
+import {NewMohPage} from '@/pabx/moh/new-moh.page';
+import {EditMohPage} from '@/pabx/moh/edit-moh.page';
+import {SettingsPage} from '@/pabx/settings/settings.page';
+import {PickupGroupsPage} from '@/pabx/pickup-group/pickup-groups.page';
+import {NewPickupGroupPage} from '@/pabx/pickup-group/new-pickup-group.page';
+import {EditPickupGroupPage} from '@/pabx/pickup-group/edit-pickup-group.page';
+import {CallGroupsPage} from '@/pabx/call-group/call-groups.page';
+import {NewCallGroupPage} from '@/pabx/call-group/new-call-group.page';
+import {EditCallGroupPage} from '@/pabx/call-group/edit-call-group.page';
+import {UrasPage} from '@/pabx/ura/uras.page';
+import {NewUraPage} from '@/pabx/ura/new-ura.page';
+import {EditUraPage} from '@/pabx/ura/edit-ura.page';
+import {UraReportPage} from '@/pabx/ura-report/ura-report.page';
+import {SurveysPage} from '@/pabx/survey/surveys.page';
+import {NewSurveyPage} from '@/pabx/survey/new-survey.page';
+import {EditSurveyPage} from '@/pabx/survey/edit-survey.page';
+import {ReportPage} from '@/pabx/report/report.page';
+import {ReportDetailPage} from '@/pabx/report/report-detail.page';
+import {SurveyReportPage} from '@/pabx/survey-report/survey-report.page';
+import {QueuesPage} from '@/pabx/queue/queues.page';
+import {NewQueuePage} from '@/pabx/queue/new-queue.page';
+import {EditQueuePage} from '@/pabx/queue/edit-queue.page';
+import {QueueDetailPage} from '@/pabx/queue/queue-detail.page';
+import {PausePage} from '@/pabx/pause/pause.page';
+import {NewPausePage} from '@/pabx/pause/new-pause.page';
+import {EditPausePage} from '@/pabx/pause/edit-pause.page';
+import {MemberActivityReportPage} from '@/pabx/member-activity-report/member-activity-report.page';
+import {DacReportPage} from '@/pabx/dac-report/dac-report.page';
+import {DacReportCallsPage} from '@/pabx/dac-report/dac-report-calls.page';
+import {RegisterInstancePage} from '@/pabx/register-instance/register-instance.page';
+import {RegisterInstanceFormPage} from '@/pabx/register-instance/register-instance-form.page';
+import {WorkerInstancePage} from '@/pabx/worker-instance/worker-instance.page';
+import {WorkerInstanceFormPage} from '@/pabx/worker-instance/worker-instance-form.page';
 
 export default [
+    { path: 'register-instances', component: RegisterInstancePage, data: { breadcrumb: 'Registers' } },
+    { path: 'register-instances/new', component: RegisterInstanceFormPage, data: { breadcrumb: 'Registers / Novo' } },
+    { path: 'register-instances/edit/:id', component: RegisterInstanceFormPage, data: { breadcrumb: 'Registers / Editar' } },
+    { path: 'worker-instances', component: WorkerInstancePage, data: { breadcrumb: 'Workers' } },
+    { path: 'worker-instances/new', component: WorkerInstanceFormPage, data: { breadcrumb: 'Workers / Novo' } },
+    { path: 'worker-instances/edit/:id', component: WorkerInstanceFormPage, data: { breadcrumb: 'Workers / Editar' } },
     { path: 'peers', component: PeerPage, data: { breadcrumb: 'Ramais' } },
     { path: 'peers/new', component: NewPeerPage, data: { breadcrumb: 'Ramais > Novo' } },
     { path: 'peers/edit/:id', component: EditPeerPage, data: { breadcrumb: 'Ramais > Editar' } },
