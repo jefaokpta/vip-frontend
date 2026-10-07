@@ -1,10 +1,10 @@
-import { Component, computed } from '@angular/core';
-import { ButtonModule } from 'primeng/button';
-import { DrawerModule } from 'primeng/drawer';
-import { BadgeModule } from 'primeng/badge';
-import { LayoutService } from '@/layout/service/layout.service';
-import { RouterLink } from '@angular/router';
-import { UserService } from '@/pages/users/user.service';
+import {Component, computed} from '@angular/core';
+import {ButtonModule} from 'primeng/button';
+import {DrawerModule} from 'primeng/drawer';
+import {BadgeModule} from 'primeng/badge';
+import {LayoutService} from '@/layout/service/layout.service';
+import {RouterLink} from '@angular/router';
+import {UserService} from '@/pages/users/user.service';
 
 @Component({
     selector: '[app-profilesidebar]',
@@ -51,7 +51,6 @@ import { UserService } from '@/pages/users/user.service';
                     </li>
                     <li>
                         <a
-                            (click)="openWhatsApp()"
                             class="cursor-pointer flex mb-4 p-4 items-center border border-surface-200 dark:border-surface-700 rounded hover:bg-surface-100 dark:hover:bg-surface-800 transition-colors duration-150"
                         >
                             <span>
@@ -103,7 +102,4 @@ export class AppProfileSidebar {
         this.userService.logout();
     }
 
-    openWhatsApp() {
-        window.open('https://wa.me/551154201020', '_blank');
-    }
 }
