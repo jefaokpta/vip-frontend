@@ -190,7 +190,7 @@ export class AppMenu implements OnInit {
                     ]
                 },
                 {
-                    label: 'Video Conferências',
+                    label: 'Video Chamadas',
                     icon: 'pi pi-fw pi-video',
                     items: [
                         {
@@ -200,29 +200,29 @@ export class AppMenu implements OnInit {
                     ]
                 },
                 {
-                    label: 'Whatsapp',
-                    icon: 'pi pi-fw pi-whatsapp',
+                    label: 'Vendas',
+                    icon: 'pi pi-fw pi-shopping-cart',
                     items: [
                         {
-                            label: 'SAC',
-                            icon: 'pi pi-fw pi-headphones',
-                            items: [
-                                {
-                                    label: 'Mensagens',
-                                    icon: 'pi pi-envelope'
-                                },
-                                {
-                                    label: 'Registro',
-                                    icon: 'pi pi-fw pi-image'
-                                }
-                            ]
-                        },
-                        {
-                            label: 'Vendas',
+                            label: 'Propostas',
                             icon: 'pi pi-fw pi-shopping-cart'
                         }
                     ]
-                }
+                },
+                {
+                    label: 'SAC',
+                    icon: 'pi pi-fw pi-headphones',
+                    items: [
+                        {
+                            label: 'Mensagens',
+                            icon: 'pi pi-envelope'
+                        },
+                        {
+                            label: 'Registro',
+                            icon: 'pi pi-fw pi-image'
+                        }
+                    ]
+                },
             ]
         },
         {
