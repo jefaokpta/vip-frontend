@@ -1,11 +1,11 @@
-import {Component, OnInit} from '@angular/core';
-import {CommonModule} from '@angular/common';
-import {RouterModule} from '@angular/router';
-import {AppMenuitem} from './app.menuitem';
-import {RoleEnum} from '@/types/role-enum';
-import {User} from '@/types/user';
-import {MenuItem} from 'primeng/api';
-import {UserService} from '@/pages/users/user.service';
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+import { AppMenuitem } from './app.menuitem';
+import { RoleEnum } from '@/types/role-enum';
+import { User } from '@/types/user';
+import { MenuItem } from 'primeng/api';
+import { UserService } from '@/pages/users/user.service';
 
 @Component({
     selector: 'app-menu',
@@ -34,6 +34,12 @@ export class AppMenu implements OnInit {
                     icon: 'pi pi-fw pi-chart-bar',
                     roles: [RoleEnum.ROLE_COMPANY_USER],
                     routerLink: ['/pages/queues']
+                },
+                {
+                    label: 'Painel de Workers',
+                    icon: 'pi pi-fw pi-server',
+                    roles: [RoleEnum.ROLE_SAAS_SUPPORT],
+                    routerLink: ['/pages/workers']
                 }
             ]
         },
@@ -222,7 +228,7 @@ export class AppMenu implements OnInit {
                             icon: 'pi pi-fw pi-image'
                         }
                     ]
-                },
+                }
             ]
         },
         {
