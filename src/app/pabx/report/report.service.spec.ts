@@ -21,6 +21,16 @@ describe('ReportService', () => {
         httpMock.verify();
     });
 
+    it('findMine busca as chamadas do usuario logado', async () => {
+        const promise = service.findMine();
+
+        const req = httpMock.expectOne(`${environment.API_BACKEND_URL}/cdrs/mine`);
+        expect(req.request.method).toBe('GET');
+        req.flush([]);
+
+        expect(await promise).toEqual([]);
+    });
+
     it('findById busca o detalhe da chamada por id', async () => {
         const cdrDetail: CdrDetail = {
             id: 42,

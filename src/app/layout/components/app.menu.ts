@@ -1,11 +1,11 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
-import { AppMenuitem } from './app.menuitem';
-import { RoleEnum } from '@/types/role-enum';
-import { User } from '@/types/user';
-import { MenuItem } from 'primeng/api';
-import { UserService } from '@/pages/users/user.service';
+import {Component, OnInit} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {RouterModule} from '@angular/router';
+import {AppMenuitem} from './app.menuitem';
+import {RoleEnum} from '@/types/role-enum';
+import {User} from '@/types/user';
+import {MenuItem} from 'primeng/api';
+import {UserService} from '@/pages/users/user.service';
 
 @Component({
     selector: 'app-menu',
@@ -24,10 +24,16 @@ export class AppMenu implements OnInit {
             label: 'DASHBOARDS',
             items: [
                 {
+                    label: 'Minhas Chamadas',
+                    icon: 'pi pi-fw pi-phone',
+                    roles: [RoleEnum.ROLE_COMPANY_USER],
+                    routerLink: ['/']
+                },
+                {
                     label: 'Painel de Ramais',
                     icon: 'pi pi-fw pi-chart-bar',
                     roles: [RoleEnum.ROLE_COMPANY_USER],
-                    routerLink: ['']
+                    routerLink: ['/pages/peers']
                 },
                 {
                     label: 'Painel de Filas',
