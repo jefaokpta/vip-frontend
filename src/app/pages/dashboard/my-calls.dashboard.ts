@@ -10,9 +10,6 @@ import {Card} from 'primeng/card';
 import {ProgressSpinner} from 'primeng/progressspinner';
 import {Toast} from 'primeng/toast';
 import {CurrencyPipe} from '@angular/common';
-import {FormsModule} from '@angular/forms';
-import {DatePicker} from 'primeng/datepicker';
-import {Select} from 'primeng/select';
 import {ChartModule} from 'primeng/chart';
 import {Tag} from 'primeng/tag';
 import {Button} from 'primeng/button';
@@ -24,7 +21,6 @@ import {RouterLink} from '@angular/router';
 import {debounceTime, Subscription} from 'rxjs';
 import {Cdr} from '@/pabx/types/cdr';
 import {ReportService} from '@/pabx/report/report.service';
-import {ReportStateService} from '@/pabx/report/report-state.service';
 import {
     costCenterLabel,
     dispositionSeverity,
@@ -32,22 +28,16 @@ import {
     formatDate,
     formatDuration
 } from '@/pabx/report/cdr-format';
-import {
-    answerRate as calcAnswerRate,
-    avgDurationSeconds as calcAvgDuration,
-    totalTalkSeconds as calcTalk
-} from '@/pabx/report/cdr-stats';
-import {buildCallsChart, ChartBucket, dailyBuckets, hourlyBuckets} from '@/pabx/report/cdr-chart';
+import {answerRate, avgDurationSeconds, totalTalkSeconds} from '@/pabx/report/cdr-stats';
+import {buildCallsChart, dailyBuckets} from '@/pabx/report/cdr-chart';
 import {LayoutService} from '@/layout/service/layout.service';
 import {AccountCodeService} from '@/pabx/accountcode/account-code.service';
 
-interface StatusOption {
-    label: string;
-    value: string | null;
-}
+const PERIOD_DAYS = 30;
 
+/** Tela inicial: chamadas feitas e recebidas pelo próprio usuário nos últimos 30 dias. */
 @Component({
-    selector: 'app-report-page',
+    selector: 'app-my-calls-dashboard',
     standalone: true,
     providers: [MessageService],
     imports: [
@@ -55,9 +45,6 @@ interface StatusOption {
         TableModule,
         ProgressSpinner,
         Toast,
-        FormsModule,
-        DatePicker,
-        Select,
         ChartModule,
         Tag,
         CurrencyPipe,
@@ -71,46 +58,12 @@ interface StatusOption {
     template: `
         <p-card>
             <ng-template #title>
-                <div class="flex flex-col md:flex-row md:items-start md:justify-between mb-4 gap-3">
-                    <h2 class="text-surface-900 dark:text-surface-0 text-2xl font-semibold">Relatório de Chamadas</h2>
-                    <div class="flex flex-col sm:flex-row items-start sm:items-end gap-3">
-                        <div class="flex flex-col gap-1">
-                            <label class="text-xs font-semibold uppercase tracking-wide text-surface-500">
-                                Período
-                            </label>
-                            <p-datepicker
-                                [ngModel]="dateRange()"
-                                (ngModelChange)="dateRange.set($event)"
-                                selectionMode="range"
-                                [readonlyInput]="true"
-                                [showButtonBar]="true"
-                                dateFormat="dd/mm/yy"
-                                placeholder="Selecione o período"
-                                [maxDate]="maxDate"
-                                [minDate]="minDate"
-                                (onSelect)="onDateSelect()"
-                                (onClearClick)="onClearDate()"
-                            >
-                            </p-datepicker>
-                        </div>
-                        <div class="flex flex-col gap-1">
-                            <label class="text-xs font-semibold uppercase tracking-wide text-surface-500">
-                                Status da Chamada
-                            </label>
-                            <p-select
-                                [options]="statusOptions()"
-                                [ngModel]="statusFilter()"
-                                (ngModelChange)="statusFilter.set($event)"
-                                optionLabel="label"
-                                optionValue="value"
-                                styleClass="w-44"
-                            ></p-select>
-                        </div>
-                    </div>
-                </div>
+                <h2 class="text-surface-900 dark:text-surface-0 text-2xl font-semibold mb-4">
+                    Minhas Chamadas
+                    <span class="text-base font-normal text-surface-500">(últimos {{ periodDays }} dias)</span>
+                </h2>
             </ng-template>
 
-            <!-- KPI cards -->
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
                 <div
                     class="rounded-xl shadow px-4 py-3 flex flex-col gap-1 border-l-4 border-blue-500 bg-white dark:bg-surface-900"
@@ -124,7 +77,7 @@ interface StatusOption {
                     class="rounded-xl shadow px-4 py-3 flex flex-col gap-1 border-l-4 border-purple-500 bg-white dark:bg-surface-900"
                 >
                     <span class="text-xs font-semibold uppercase tracking-wide text-surface-500"> Duração Média </span>
-                    <span class="text-2xl font-bold">{{ formatDuration(avgDurationSeconds()) }}</span>
+                    <span class="text-2xl font-bold">{{ formatDuration(avgDuration()) }}</span>
                 </div>
                 <div
                     class="rounded-xl shadow px-4 py-3 flex flex-col gap-1 border-l-4 border-green-500 bg-white dark:bg-surface-900"
@@ -132,23 +85,21 @@ interface StatusOption {
                     <span class="text-xs font-semibold uppercase tracking-wide text-surface-500">
                         Taxa de Atendimento
                     </span>
-                    <span class="text-2xl font-bold">{{ answerRate() }}%</span>
+                    <span class="text-2xl font-bold">{{ rate() }}%</span>
                 </div>
                 <div
                     class="rounded-xl shadow px-4 py-3 flex flex-col gap-1 border-l-4 border-orange-500 bg-white dark:bg-surface-900"
                 >
                     <span class="text-xs font-semibold uppercase tracking-wide text-surface-500"> Total Falado </span>
-                    <span class="text-2xl font-bold">{{ formatDuration(totalTalkSeconds()) }}</span>
+                    <span class="text-2xl font-bold">{{ formatDuration(talkSeconds()) }}</span>
                 </div>
             </div>
 
-            <!-- Chart -->
             <div class="rounded-xl border border-surface-200 dark:border-surface-700 p-4 mb-4">
-                <h3 class="font-semibold text-lg mb-2">{{ chartTitle() }}</h3>
+                <h3 class="font-semibold text-lg mb-2">Chamadas por Dia</h3>
                 <p-chart type="line" height="280" [data]="chartData" [options]="chartOptions"></p-chart>
             </div>
 
-            <!-- Search -->
             <div class="flex justify-end mb-2">
                 <p-iconfield>
                     <p-inputicon class="pi pi-search" />
@@ -219,7 +170,7 @@ interface StatusOption {
                         <td>
                             <p-button
                                 icon="pi pi-search"
-                                [routerLink]="['detail', cdr.id]"
+                                [routerLink]="['/pabx/call-report/detail', cdr.id]"
                                 outlined
                                 size="small"
                                 pTooltip="Detalhes"
@@ -248,87 +199,32 @@ interface StatusOption {
         <p-toast />
     `
 })
-export class ReportPage implements OnInit, OnDestroy {
-    private readonly reportState = inject(ReportStateService);
+export class MyCallsDashboard implements OnInit, OnDestroy {
+    private readonly reportService = inject(ReportService);
+    private readonly accountCodeService = inject(AccountCodeService);
+    private readonly messageService = inject(MessageService);
+    private readonly layoutService = inject(LayoutService);
 
-    readonly cdrs = this.reportState.cdrs;
-    readonly dateRange = this.reportState.dateRange;
-    readonly statusFilter = this.reportState.statusFilter;
-    readonly loading = signal<boolean>(!this.reportState.loaded());
+    readonly periodDays = PERIOD_DAYS;
+    readonly cdrs = signal<Cdr[]>([]);
+    readonly loading = signal<boolean>(true);
     readonly costCenterLabelsByCode = signal<Map<string, string>>(new Map());
 
     @ViewChild('dataTable') dt!: Table;
 
-    private requestId = 0;
-    private themeSubscription: Subscription;
-
-    readonly today = new Date();
-    maxDate = new Date();
-    readonly minDate: Date = (() => {
-        const d = new Date();
-        d.setMonth(d.getMonth() - 2);
-        return d;
-    })();
+    private readonly themeSubscription: Subscription;
 
     chartData: any;
     chartOptions: any;
 
-    readonly filteredCdrs = computed(() => {
-        const status = this.statusFilter();
-        const all = this.cdrs();
-        return status ? all.filter((c) => c.disposition === status) : all;
-    });
-
-    readonly statusOptions = computed<StatusOption[]>(() => {
-        const dispositions = Array.from(new Set(this.cdrs().map((c) => c.disposition))).sort();
-        return [
-            { label: 'Todos', value: null },
-            ...dispositions.map((d) => ({ label: dispositionTranslate(d), value: d }))
-        ];
-    });
-
-    readonly totalCalls = computed(() => this.filteredCdrs().length);
-
-    readonly avgDurationSeconds = computed(() => calcAvgDuration(this.filteredCdrs()));
-
-    readonly answerRate = computed(() => calcAnswerRate(this.filteredCdrs()));
-
-    readonly totalTalkSeconds = computed(() => calcTalk(this.filteredCdrs()));
-
-    readonly isSingleDay = computed(() => {
-        const range = this.dateRange();
-        if (range.length === 2 && range[0] && range[1]) {
-            return this.isSameDay(range[0], range[1]);
-        }
-        return false;
-    });
-
-    readonly chartTitle = computed(() => (this.isSingleDay() ? 'Chamadas por Hora' : 'Chamadas por Dia'));
-
-    readonly chartBuckets = computed<ChartBucket[]>(() => {
-        const list = this.filteredCdrs();
-        if (this.isSingleDay()) return hourlyBuckets(list);
-
-        const range = this.dateRange();
-        let start: Date;
-        let end: Date;
-        if (range.length === 2 && range[0] && range[1]) {
-            start = new Date(range[0]);
-            end = new Date(range[1]);
-        } else if (list.length) {
-            const times = list.map((c) => new Date(c.startTime).getTime());
-            start = new Date(Math.min(...times));
-            end = new Date(Math.max(...times));
-        } else {
-            start = new Date();
-            end = new Date();
-        }
-        return dailyBuckets(start, end);
-    });
+    readonly totalCalls = computed(() => this.cdrs().length);
+    readonly avgDuration = computed(() => avgDurationSeconds(this.cdrs()));
+    readonly rate = computed(() => answerRate(this.cdrs()));
+    readonly talkSeconds = computed(() => totalTalkSeconds(this.cdrs()));
 
     readonly tableRows = computed(() => {
         const labelsByCode = this.costCenterLabelsByCode();
-        return this.filteredCdrs().map((cdr) => ({
+        return this.cdrs().map((cdr) => ({
             ...cdr,
             dateLabel: formatDate(cdr.startTime),
             displaySrc: cdr.userfield === 'OUTBOUND' ? cdr.peer : cdr.src,
@@ -336,27 +232,23 @@ export class ReportPage implements OnInit, OnDestroy {
         }));
     });
 
-    constructor(
-        private readonly reportService: ReportService,
-        private readonly accountCodeService: AccountCodeService,
-        private readonly messageService: MessageService,
-        private readonly layoutService: LayoutService
-    ) {
+    constructor() {
         this.themeSubscription = this.layoutService.configUpdate$.pipe(debounceTime(50)).subscribe(() => {
             this.initChart();
         });
         effect(() => {
-            this.filteredCdrs();
-            this.isSingleDay();
-            this.chartBuckets();
+            this.cdrs();
             this.initChart();
         });
     }
 
     ngOnInit(): void {
-        if (!this.reportState.loaded()) {
-            this.load(() => this.reportService.findLast30());
-        }
+        this.reportService
+            .findMine()
+            .then((cdrs) => this.cdrs.set(cdrs))
+            .catch(() => this.showError('Erro ao carregar chamadas'))
+            .finally(() => this.loading.set(false));
+
         this.accountCodeService
             .findAll()
             .then((accountCodes) => {
@@ -368,42 +260,11 @@ export class ReportPage implements OnInit, OnDestroy {
                 }
                 this.costCenterLabelsByCode.set(labelsByCode);
             })
-            .catch(() => {
-                this.messageService.add({
-                    severity: 'error',
-                    summary: 'Erro ao carregar centros de custo',
-                    detail: 'Tente novamente mais tarde.',
-                    life: 10_000
-                });
-            });
+            .catch(() => this.showError('Erro ao carregar centros de custo'));
     }
 
     ngOnDestroy(): void {
         this.themeSubscription.unsubscribe();
-    }
-
-    onDateSelect(): void {
-        const range = this.dateRange();
-        if (range[0] && !range[1]) {
-            const limit = new Date(range[0]);
-            limit.setMonth(limit.getMonth() + 2);
-            this.maxDate = limit > this.today ? this.today : limit;
-            return;
-        }
-
-        if (range[0] && range[1]) {
-            const end = new Date(range[1]);
-            end.setHours(23, 59, 59, 999);
-            this.statusFilter.set(null);
-            this.load(() => this.reportService.findByDateRange(range[0], end));
-        }
-    }
-
-    onClearDate(): void {
-        this.maxDate = new Date(this.today);
-        this.dateRange.set([]);
-        this.statusFilter.set(null);
-        this.load(() => this.reportService.findLast30());
     }
 
     onFilterGlobal(event: Event): void {
@@ -417,34 +278,16 @@ export class ReportPage implements OnInit, OnDestroy {
     protected readonly dispositionSeverity = dispositionSeverity;
     protected readonly dispositionTranslate = dispositionTranslate;
 
-    private load(fetch: () => Promise<Cdr[]>): void {
-        const id = ++this.requestId;
-        this.loading.set(true);
-        fetch()
-            .then((cdrs) => {
-                if (id !== this.requestId) return;
-                this.reportState.setCdrs(cdrs);
-                this.loading.set(false);
-            })
-            .catch(() => {
-                if (id !== this.requestId) return;
-                this.loading.set(false);
-                this.messageService.add({
-                    severity: 'error',
-                    summary: 'Erro ao carregar chamadas',
-                    detail: 'Tente novamente mais tarde.',
-                    life: 10_000
-                });
-            });
-    }
-
     private initChart(): void {
-        const { data, options } = buildCallsChart(this.filteredCdrs(), this.chartBuckets(), this.isSingleDay());
+        const end = new Date();
+        const start = new Date();
+        start.setDate(start.getDate() - (PERIOD_DAYS - 1));
+        const { data, options } = buildCallsChart(this.cdrs(), dailyBuckets(start, end), false);
         this.chartData = data;
         this.chartOptions = options;
     }
 
-    private isSameDay(a: Date, b: Date): boolean {
-        return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+    private showError(summary: string): void {
+        this.messageService.add({ severity: 'error', summary, detail: 'Tente novamente mais tarde.', life: 10_000 });
     }
 }

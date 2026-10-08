@@ -1,7 +1,7 @@
-import { Routes } from '@angular/router';
-import { AppLayout } from '@/layout/components/app.layout';
-import { Notfound } from '@/pages/notfound';
-import { authGuard } from '@/security/auth-guard';
+import {Routes} from '@angular/router';
+import {AppLayout} from '@/layout/components/app.layout';
+import {Notfound} from '@/pages/notfound';
+import {authGuard} from '@/security/auth-guard';
 
 export const appRoutes: Routes = [
     {
@@ -11,8 +11,8 @@ export const appRoutes: Routes = [
         children: [
             {
                 path: '',
-                loadComponent: () => import('@/pages/dashboard/peer.dashboard').then((c) => c.PeerDashboard),
-                data: { breadcrumb: 'Painel de Ramais' }
+                loadComponent: () => import('@/pages/dashboard/my-calls.dashboard').then((c) => c.MyCallsDashboard),
+                data: { breadcrumb: 'Minhas Chamadas' }
             },
             {
                 path: 'pages',
