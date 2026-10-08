@@ -37,7 +37,8 @@ describe('WorkersDashboard', () => {
         fixture.detectChanges();
 
         const text: string = fixture.nativeElement.textContent;
-        expect(text).toContain('5');
+        expect(fixture.nativeElement.querySelector('[data-testid="total-channels"]').textContent.trim()).toBe('5');
+        expect(fixture.nativeElement.querySelector('[data-testid="worker-channels"]').textContent.trim()).toBe('5');
         expect(text).toContain('WORKER1');
         expect(text.indexOf('100002')).toBeLessThan(text.indexOf('100001'));
         fixture.destroy();
@@ -82,6 +83,54 @@ describe('WorkersDashboard', () => {
         const text: string = fixture.nativeElement.textContent;
         expect(text).toContain('WORKER1');
         expect(text).toContain('Desconectado');
+        fixture.destroy();
+    }));
+
+    it('nao mostra zero nem estado vazio quando a primeira consulta falha', fakeAsync(() => {
+        const fixture = setup();
+        serviceSpy.getOverview.and.rejectWith(new Error('timeout'));
+        fixture.detectChanges();
+        flushMicrotasks();
+        fixture.detectChanges();
+
+        const text: string = fixture.nativeElement.textContent;
+        expect(text).toContain('Desconectado');
+        expect(text).toContain('Não foi possível obter os dados');
+        expect(text).not.toContain('Nenhum canal ativo');
+        expect(text).not.toContain('Atualizado há');
+        expect(fixture.nativeElement.querySelector('[data-testid="total-channels"]')).toBeNull();
+        fixture.destroy();
+    }));
+
+    it('mostra carregando antes da primeira resposta', fakeAsync(() => {
+        const fixture = setup();
+        fixture.detectChanges();
+
+        const text: string = fixture.nativeElement.textContent;
+        expect(text).toContain('Carregando');
+        expect(text).not.toContain('Nenhum canal ativo');
+        expect(fixture.nativeElement.querySelector('[data-testid="total-channels"]')).toBeNull();
+        flushMicrotasks();
+        fixture.destroy();
+    }));
+
+    it('recupera: sucesso apos falha remove desconectado e zera o contador', fakeAsync(() => {
+        const fixture = setup();
+        serviceSpy.getOverview.and.rejectWith(new Error('timeout'));
+        fixture.detectChanges();
+        flushMicrotasks();
+        fixture.detectChanges();
+        expect(fixture.nativeElement.textContent).toContain('Desconectado');
+
+        serviceSpy.getOverview.and.resolveTo(overview);
+        tick(3000);
+        flushMicrotasks();
+        fixture.detectChanges();
+
+        const text: string = fixture.nativeElement.textContent;
+        expect(text).not.toContain('Desconectado');
+        expect(text).toContain('Atualizado há 0s');
+        expect(fixture.nativeElement.querySelector('[data-testid="total-channels"]').textContent.trim()).toBe('5');
         fixture.destroy();
     }));
 
