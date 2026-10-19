@@ -62,4 +62,16 @@ describe('AppMenu', () => {
         const all = labels(buildMenu(USER, []));
         expect(all).not.toContain('Configurações');
     });
+
+    it('usuário só com SAC vê SAC e não vê Vendas, Video Chamadas nem PABX', () => {
+        const all = labels(buildMenu(USER, [ModuleEnum.SAC]));
+        expect(all).toContain('SAC');
+        expect(all).not.toContain('Vendas');
+        expect(all).not.toContain('Video Chamadas');
+        expect(all).not.toContain('PABX');
+    });
+
+    it('usuário sem módulos não vê o grupo SERVIÇOS', () => {
+        expect(labels(buildMenu(USER, []))).not.toContain('SERVIÇOS');
+    });
 });

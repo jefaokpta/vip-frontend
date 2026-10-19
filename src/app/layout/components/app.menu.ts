@@ -208,6 +208,7 @@ export class AppMenu implements OnInit {
                 {
                     label: 'Video Chamadas',
                     icon: 'pi pi-fw pi-video',
+                    module: ModuleEnum.VIDEO,
                     items: [
                         {
                             label: 'Salas',
@@ -218,6 +219,7 @@ export class AppMenu implements OnInit {
                 {
                     label: 'Vendas',
                     icon: 'pi pi-fw pi-shopping-cart',
+                    module: ModuleEnum.VENDAS,
                     items: [
                         {
                             label: 'Propostas',
@@ -228,6 +230,7 @@ export class AppMenu implements OnInit {
                 {
                     label: 'SAC',
                     icon: 'pi pi-fw pi-headphones',
+                    module: ModuleEnum.SAC,
                     items: [
                         {
                             label: 'Mensagens',
