@@ -120,7 +120,6 @@ export default [
     { path: 'surveys/edit/:id', component: EditSurveyPage, data: { breadcrumb: 'Pesquisa de Satisfação > Editar' } },
 
     { path: 'call-report', component: ReportPage, data: { breadcrumb: 'Relatório de Chamadas' } },
-    { path: 'call-report/detail/:id', redirectTo: '/calls/:id' },
     {
         path: 'survey-report',
         component: SurveyReportPage,

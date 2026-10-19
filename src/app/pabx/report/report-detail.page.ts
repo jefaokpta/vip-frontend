@@ -151,7 +151,9 @@ import {Transcription} from '@/types/transcription';
                 }
                 <div class="flex flex-col gap-4">
                     @for (transcription of transcriptions; track transcription.summary.id) {
-                        <div class="rounded-xl shadow px-4 py-3 whitespace-pre-line">{{ transcription.transcript }}</div>
+                        <div class="rounded-xl shadow px-4 py-3 whitespace-pre-line">
+                            {{ transcription.transcript }}
+                        </div>
                     }
                 </div>
             }

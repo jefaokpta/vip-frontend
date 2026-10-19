@@ -3,11 +3,11 @@
  * @email jefaokpta@hotmail.com
  */
 
-import {HttpClient} from '@angular/common/http';
-import {Injectable} from '@angular/core';
-import {environment} from '../../../environments/environment';
-import {executeRequest, httpHeaders} from '@/util/utils';
-import {Transcription} from '@/types/transcription';
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { environment } from '../../../environments/environment';
+import { executeRequest, httpHeaders } from '@/util/utils';
+import { Transcription } from '@/types/transcription';
 
 @Injectable({ providedIn: 'root' })
 export class TranscriptionService {
@@ -17,7 +17,10 @@ export class TranscriptionService {
 
     findByCdr(uniqueId: string): Promise<Transcription[]> {
         return executeRequest(
-            this.http.get<Transcription[]>(`${this.BACKEND}/transcriptions/by-cdr/${encodeURIComponent(uniqueId)}`, httpHeaders()),
+            this.http.get<Transcription[]>(
+                `${this.BACKEND}/transcriptions/by-cdr/${encodeURIComponent(uniqueId)}`,
+                httpHeaders()
+            ),
             10_000
         );
     }

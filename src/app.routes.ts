@@ -25,6 +25,7 @@ export const appRoutes: Routes = [
                 path: 'pages',
                 loadChildren: () => import('@/pages/pages.routes')
             },
+            { path: 'pabx/call-report/detail/:id', redirectTo: '/calls/:id' },
             {
                 path: 'pabx',
                 canActivate: [moduleGuard(ModuleEnum.PABX)],

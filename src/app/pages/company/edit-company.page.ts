@@ -23,7 +23,20 @@ import { ServiceEnum } from '@/types/service-enum';
 @Component({
     selector: 'app-edit-company',
     standalone: true,
-    imports: [InputTextModule, ButtonModule, CardModule, ToastModule, NgIf, NgFor, FormsModule, ReactiveFormsModule, RouterLink, InputMask, ToggleSwitch, ConfirmDialog],
+    imports: [
+        InputTextModule,
+        ButtonModule,
+        CardModule,
+        ToastModule,
+        NgIf,
+        NgFor,
+        FormsModule,
+        ReactiveFormsModule,
+        RouterLink,
+        InputMask,
+        ToggleSwitch,
+        ConfirmDialog
+    ],
     providers: [ConfirmationService],
     template: `
         <p-card>
@@ -192,7 +205,12 @@ export class EditCompanyPage implements OnInit {
             icon: 'pi pi-exclamation-triangle',
             acceptLabel: 'Sim',
             rejectLabel: 'Não',
-            accept: () => this.saveServices(this.services.filter((s) => s !== service), toggle, true),
+            accept: () =>
+                this.saveServices(
+                    this.services.filter((s) => s !== service),
+                    toggle,
+                    true
+                ),
             reject: () => toggle.writeValue(true)
         });
     }

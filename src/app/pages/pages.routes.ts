@@ -14,8 +14,18 @@ export default [
     { path: 'tenants', loadChildren: () => import('@/pages/tenant/tenant.routes') },
     { path: 'users', loadChildren: () => import('@/pages/users/users.routes') },
     { path: 'profile', component: PersonPage, data: { breadcrumb: 'Perfil' } },
-    { path: 'peers', component: PeerDashboard, canActivate: [moduleGuard(ModuleEnum.PABX)], data: { breadcrumb: 'Painel de Ramais' } },
-    { path: 'queues', component: QueueDashboard, canActivate: [moduleGuard(ModuleEnum.PABX), roleGuard(RoleEnum.ROLE_COMPANY_SUPERVISOR)], data: { breadcrumb: 'Painel de Filas' } },
+    {
+        path: 'peers',
+        component: PeerDashboard,
+        canActivate: [moduleGuard(ModuleEnum.PABX)],
+        data: { breadcrumb: 'Painel de Ramais' }
+    },
+    {
+        path: 'queues',
+        component: QueueDashboard,
+        canActivate: [moduleGuard(ModuleEnum.PABX), roleGuard(RoleEnum.ROLE_COMPANY_SUPERVISOR)],
+        data: { breadcrumb: 'Painel de Filas' }
+    },
     { path: 'queue-login', component: QueueLoginPage, data: { breadcrumb: 'Minhas Filas' } },
     { path: 'workers', component: WorkersDashboard, data: { breadcrumb: 'Painel de Workers' } },
     { path: '**', redirectTo: '/notfound' }
