@@ -1,13 +1,19 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { ToastModule } from 'primeng/toast';
-import { NgIf } from '@angular/common';
+import { NgFor, NgIf } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CompanyService } from '@/pages/company/company.service';
 import { InputMask } from 'primeng/inputmask';
+import { ToggleSwitch } from 'primeng/toggleswitch';
+import { ConfirmDialog } from 'primeng/confirmdialog';
+import { ConfirmationService } from 'primeng/api';
+import { UserService } from '@/pages/users/user.service';
+import { RoleEnum } from '@/types/role-enum';
+import { ServiceEnum } from '@/types/service-enum';
 
 /**
  * @author Jefferson Alves Reis (jefaokpta)
@@ -17,7 +23,8 @@ import { InputMask } from 'primeng/inputmask';
 @Component({
     selector: 'app-edit-company',
     standalone: true,
-    imports: [InputTextModule, ButtonModule, CardModule, ToastModule, NgIf, ReactiveFormsModule, RouterLink, InputMask],
+    imports: [InputTextModule, ButtonModule, CardModule, ToastModule, NgIf, NgFor, FormsModule, ReactiveFormsModule, RouterLink, InputMask, ToggleSwitch, ConfirmDialog],
+    providers: [ConfirmationService],
     template: `
         <p-card>
             <ng-template #title>
@@ -90,20 +97,51 @@ import { InputMask } from 'primeng/inputmask';
                     Houve um erro, verifique se o código de controle já existe.
                 </small>
             </form>
+
+            <div *ngIf="canManageServices" class="mt-6">
+                <h3 class="font-semibold text-xl mb-4">Serviços</h3>
+                <div *ngFor="let service of serviceOptions" class="flex items-center gap-3 mb-3">
+                    <p-toggleswitch
+                        #toggle
+                        [inputId]="'service-' + service.value"
+                        [ngModel]="hasService(service.value)"
+                        (onChange)="onToggleService(service.value, $event.checked, toggle)"
+                        [disabled]="pendingServices"
+                    />
+                    <label [for]="'service-' + service.value">{{ service.label }}</label>
+                </div>
+                <small *ngIf="servicesError" class="text-red-500">{{ servicesError }}</small>
+            </div>
         </p-card>
+        <p-confirm-dialog />
     `
 })
 export class EditCompanyPage implements OnInit {
     form!: FormGroup;
     pending = false;
     showError = false;
+    services: ServiceEnum[] = [];
+    pendingServices = false;
+    servicesError = '';
+    readonly canManageServices: boolean;
+    readonly serviceOptions = [
+        { label: 'PABX', value: ServiceEnum.PABX },
+        { label: 'IA', value: ServiceEnum.IA },
+        { label: 'Vídeo', value: ServiceEnum.VIDEO },
+        { label: 'Vendas', value: ServiceEnum.VENDAS },
+        { label: 'SAC', value: ServiceEnum.SAC }
+    ];
 
     constructor(
         private readonly fb: FormBuilder,
         private readonly companyService: CompanyService,
         private readonly router: Router,
-        private readonly activatedRoute: ActivatedRoute
-    ) {}
+        private readonly activatedRoute: ActivatedRoute,
+        private readonly confirmationService: ConfirmationService,
+        userService: UserService
+    ) {
+        this.canManageServices = userService.getUser().roles.includes(RoleEnum.ROLE_SAAS_SUPPORT);
+    }
 
     get name() {
         return this.form.get('name');
@@ -135,7 +173,41 @@ export class EditCompanyPage implements OnInit {
         const companyId = this.activatedRoute.snapshot.paramMap.get('id')!;
         this.companyService.findCompanyId(companyId).then((company) => {
             this.form.patchValue(company);
+            this.services = company.services ?? [];
         });
+    }
+
+    hasService(service: ServiceEnum): boolean {
+        return this.services.includes(service);
+    }
+
+    onToggleService(service: ServiceEnum, enabled: boolean, toggle: ToggleSwitch) {
+        if (enabled) {
+            this.saveServices([...this.services, service], toggle, false);
+            return;
+        }
+        this.confirmationService.confirm({
+            message: 'Desligar este serviço remove o módulo de todos os usuários da empresa. Continuar?',
+            header: 'Confirmação',
+            icon: 'pi pi-exclamation-triangle',
+            acceptLabel: 'Sim',
+            rejectLabel: 'Não',
+            accept: () => this.saveServices(this.services.filter((s) => s !== service), toggle, true),
+            reject: () => toggle.writeValue(true)
+        });
+    }
+
+    private saveServices(services: ServiceEnum[], toggle: ToggleSwitch, previous: boolean) {
+        this.pendingServices = true;
+        this.servicesError = '';
+        this.companyService
+            .updateServices(this.companyId?.value, services)
+            .then((company) => (this.services = company.services ?? services))
+            .catch(() => {
+                this.servicesError = 'Não foi possível atualizar os serviços.';
+                toggle.writeValue(previous);
+            })
+            .finally(() => (this.pendingServices = false));
     }
 
     async onSubmit() {
