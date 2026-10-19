@@ -32,4 +32,13 @@ describe('TranscriptionService', () => {
 
         expect(await promise).toEqual([]);
     });
+
+    it('findByCdr codifica o uniqueId na url', async () => {
+        const promise = service.findByCdr('a/b');
+
+        const req = httpMock.expectOne(`${environment.IA_BACKEND_URL}/transcriptions/by-cdr/a%2Fb`);
+        req.flush([]);
+
+        expect(await promise).toEqual([]);
+    });
 });

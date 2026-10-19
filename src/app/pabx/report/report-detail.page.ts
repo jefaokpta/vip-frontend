@@ -146,7 +146,7 @@ import {Transcription} from '@/types/transcription';
 
             @if (!loading && cdr && hasIa) {
                 <h3 class="font-semibold text-lg mt-8 mb-3">Transcrição</h3>
-                @if (transcriptions.length === 0) {
+                @if (!loadingTranscriptions && transcriptions.length === 0) {
                     <div class="text-center p-6 text-gray-400">Transcrição indisponível</div>
                 }
                 <div class="flex flex-col gap-4">
@@ -167,7 +167,8 @@ export class ReportDetailPage implements OnInit {
     cdr: CdrDetail | null = null;
     loading = true;
     costCenterLabelsByCode = new Map<string, string>();
-    backLink = '/pabx/call-report';
+    backLink = '/';
+    loadingTranscriptions = false;
     hasIa = false;
     transcriptions: Transcription[] = [];
 
@@ -182,8 +183,8 @@ export class ReportDetailPage implements OnInit {
 
     ngOnInit(): void {
         const id = Number(this.route.snapshot.paramMap.get('id'));
-        if (this.route.snapshot.queryParamMap.get('from') === 'my-calls') {
-            this.backLink = '/';
+        if (this.route.snapshot.queryParamMap.get('from') === 'call-report') {
+            this.backLink = '/pabx/call-report';
         }
         this.reportService
             .findById(id)
@@ -228,10 +229,12 @@ export class ReportDetailPage implements OnInit {
         if (!this.hasIa) {
             return;
         }
+        this.loadingTranscriptions = true;
         this.transcriptionService
             .findByCdr(uniqueId)
             .then((transcriptions) => (this.transcriptions = transcriptions.filter((t) => !!t.transcript)))
-            .catch(() => (this.transcriptions = []));
+            .catch(() => (this.transcriptions = []))
+            .finally(() => (this.loadingTranscriptions = false));
     }
 
     protected readonly formatDate = formatDate;

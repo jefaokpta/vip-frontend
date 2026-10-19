@@ -17,7 +17,7 @@ export class TranscriptionService {
 
     findByCdr(uniqueId: string): Promise<Transcription[]> {
         return executeRequest(
-            this.http.get<Transcription[]>(`${this.BACKEND}/transcriptions/by-cdr/${uniqueId}`, httpHeaders()),
+            this.http.get<Transcription[]>(`${this.BACKEND}/transcriptions/by-cdr/${encodeURIComponent(uniqueId)}`, httpHeaders()),
             10_000
         );
     }

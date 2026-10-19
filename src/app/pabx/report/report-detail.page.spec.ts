@@ -85,6 +85,31 @@ describe('ReportDetailPage', () => {
         expect(fixture.nativeElement.textContent).toContain('Olá, tudo bem?');
     });
 
+    it('mostra "Transcrição indisponível" quando a lista vem vazia', async () => {
+        const fixture = setup([ServiceEnum.IA]);
+        transcriptionServiceSpy.findByCdr.and.resolveTo([]);
+        fixture.detectChanges();
+        await fixture.whenStable();
+        fixture.detectChanges();
+
+        expect(fixture.nativeElement.textContent).toContain('Transcrição indisponível');
+    });
+
+    it('nao mostra "Transcrição indisponível" enquanto busca', async () => {
+        const fixture = setup([ServiceEnum.IA]);
+        transcriptionServiceSpy.findByCdr.and.returnValue(new Promise(() => {}));
+        fixture.detectChanges();
+        await fixture.whenStable();
+        fixture.detectChanges();
+
+        expect(fixture.nativeElement.textContent).not.toContain('Transcrição indisponível');
+    });
+
+    it('voltar vai para a home por padrao', () => {
+        const fixture = setup([ServiceEnum.PABX]);
+        expect(fixture.componentInstance.backLink).toBe('/');
+    });
+
     it('mostra "Transcrição indisponível" quando a busca falha', async () => {
         const fixture = setup([ServiceEnum.IA]);
         transcriptionServiceSpy.findByCdr.and.rejectWith(new Error('rede'));
