@@ -3,14 +3,16 @@
  * @email jefaokpta@hotmail.com
  * @create 5/2/25
  */
-import { Injectable, signal } from '@angular/core';
-import { UA, WebSocketInterface } from 'jssip';
-import { environment } from '../../environments/environment';
-import { PhoneState } from '@/types/phone-state';
-import { PhoneStateEnum } from '@/types/phone-state-enum';
-import { RTCSession } from 'jssip/lib/RTCSession';
-import { RTCSessionEvent, UnRegisteredEvent } from 'jssip/lib/UA';
-import { UserService } from '@/pages/users/user.service';
+import {Injectable, signal} from '@angular/core';
+import {UA, WebSocketInterface} from 'jssip';
+import {environment} from '../../environments/environment';
+import {PhoneState} from '@/types/phone-state';
+import {PhoneStateEnum} from '@/types/phone-state-enum';
+import {RTCSession} from 'jssip/lib/RTCSession';
+import {RTCSessionEvent, UnRegisteredEvent} from 'jssip/lib/UA';
+import {UserService} from '@/pages/users/user.service';
+import {CallHistoryService} from '@/webphone/call-history.service';
+import {CallHistoryType} from '@/types/call-history';
 
 @Injectable({
     providedIn: 'root'
@@ -28,7 +30,10 @@ export class WebphoneService {
     }
     readonly phoneState$ = this.phoneState.asReadonly();
 
-    constructor(private readonly userService: UserService) {}
+    constructor(
+        private readonly userService: UserService,
+        private readonly callHistoryService: CallHistoryService
+    ) {}
 
     /**
      * Inicia registro JsSIP quando o ramal tem tecnologia WSS. Seguro chamar várias vezes.
@@ -99,6 +104,7 @@ export class WebphoneService {
             extraHeaders: [`X-CALL-TOKEN: TOKEN_PLACEHOLDER`]
         };
         const target = `sip:${telephone}@${this.PABX_URL}`;
+        this.callHistoryService.add(telephone, CallHistoryType.OUTGOING);
         this.updatePhoneStatus({ session: this.ua.call(target, options) });
     }
 
@@ -188,6 +194,7 @@ export class WebphoneService {
         });
         session.on('accepted', () => {
             console.log('accepted');
+            this.callHistoryService.add(session.remote_identity?.uri?.user, CallHistoryType.INCOMING);
             this.audio.pause();
             this.updatePhoneStatus({ state: PhoneStateEnum.TALKING });
             this.startCallTimer();
@@ -202,6 +209,7 @@ export class WebphoneService {
         });
         session.on('failed', () => {
             console.log('failed');
+            this.callHistoryService.add(session.remote_identity?.uri?.user, CallHistoryType.MISSED);
             this.audio.pause();
             this.updatePhoneStatus({ state: PhoneStateEnum.AVAILABLE, session: undefined });
             this.stopCallTimer();
