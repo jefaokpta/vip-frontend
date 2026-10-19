@@ -13,6 +13,8 @@ import {PeerTransportEnum} from '@/pabx/types/peer-transport-enum';
 import {computed, Injectable, signal} from '@angular/core';
 import {executeRequest, httpHeaders} from '@/util/utils';
 import {jwtDecode} from 'jwt-decode';
+import {ModuleEnum} from '@/types/module-enum';
+import {ServiceEnum} from '@/types/service-enum';
 
 @Injectable({
     providedIn: 'root'
@@ -120,10 +122,26 @@ export class UserService {
                 isConfirmed: false,
                 isExpired: true,
                 createdAt: new Date(),
-                roles: []
+                roles: [],
+                companyServices: [],
+                modules: []
             };
         const payload = jwtDecode<User>(token);
-        return { ...payload, isExpired: this.isUserExpired(payload), email: payload.sub };
+        return {
+            ...payload,
+            isExpired: this.isUserExpired(payload),
+            email: payload.sub,
+            companyServices: payload.companyServices ?? [],
+            modules: payload.modules ?? []
+        };
+    }
+
+    hasModule(module: ModuleEnum): boolean {
+        return this.getUser().modules.includes(module);
+    }
+
+    hasService(service: ServiceEnum): boolean {
+        return this.getUser().companyServices.includes(service);
     }
 
     isUserExpired(user: User): boolean {

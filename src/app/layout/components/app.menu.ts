@@ -6,6 +6,7 @@ import {RoleEnum} from '@/types/role-enum';
 import {User} from '@/types/user';
 import {MenuItem} from 'primeng/api';
 import {UserService} from '@/pages/users/user.service';
+import {ModuleEnum} from '@/types/module-enum';
 
 @Component({
     selector: 'app-menu',
@@ -33,12 +34,14 @@ export class AppMenu implements OnInit {
                     label: 'Painel de Ramais',
                     icon: 'pi pi-fw pi-chart-bar',
                     roles: [RoleEnum.ROLE_COMPANY_USER],
+                    module: ModuleEnum.PABX,
                     routerLink: ['/pages/peers']
                 },
                 {
                     label: 'Painel de Filas',
                     icon: 'pi pi-fw pi-chart-bar',
-                    roles: [RoleEnum.ROLE_COMPANY_USER],
+                    roles: [RoleEnum.ROLE_COMPANY_SUPERVISOR],
+                    module: ModuleEnum.PABX,
                     routerLink: ['/pages/queues']
                 },
                 {
@@ -55,6 +58,7 @@ export class AppMenu implements OnInit {
                 {
                     label: 'PABX',
                     icon: 'pi pi-fw pi-phone',
+                    module: ModuleEnum.PABX,
                     items: [
                         {
                             label: 'Relatórios',
@@ -280,13 +284,18 @@ export class AppMenu implements OnInit {
     }
 
     /**
-     * Filtra uma lista de itens de menu com base nas permissões do usuário atual.
+     * Filtra uma lista de itens de menu com base nas permissões e módulos do usuário atual.
      * Realiza filtragem recursiva em todos os níveis de itens do menu (sem limite de profundidade).
      */
     private filterByRole(items: MenuItem[]): MenuItem[] {
         return items.filter((item) => {
             // Se o item não tem permissão, exclui imediatamente
             if (item['roles'] && !this.hasRole(item['roles'])) {
+                return false;
+            }
+
+            // Se o usuário não tem o módulo do item, exclui imediatamente
+            if (item['module'] && !this.userService.hasModule(item['module'])) {
                 return false;
             }
 

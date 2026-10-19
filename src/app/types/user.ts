@@ -1,5 +1,7 @@
 import { Company } from '@/types/company';
 import { RoleEnum } from '@/types/role-enum';
+import { ServiceEnum } from '@/types/service-enum';
+import { ModuleEnum } from '@/types/module-enum';
 
 export interface User {
     readonly id: number;
@@ -12,5 +14,7 @@ export interface User {
     readonly createdAt: Date;
     readonly isExpired: boolean;
     readonly roles: RoleEnum[];
+    readonly companyServices: ServiceEnum[];
+    readonly modules: ModuleEnum[];
     readonly managingCompany?: Company;
 }

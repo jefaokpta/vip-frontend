@@ -2,6 +2,8 @@ import {Routes} from '@angular/router';
 import {AppLayout} from '@/layout/components/app.layout';
 import {Notfound} from '@/pages/notfound';
 import {authGuard} from '@/security/auth-guard';
+import {moduleGuard} from '@/security/module-guard';
+import {ModuleEnum} from '@/types/module-enum';
 
 export const appRoutes: Routes = [
     {
@@ -20,6 +22,7 @@ export const appRoutes: Routes = [
             },
             {
                 path: 'pabx',
+                canActivate: [moduleGuard(ModuleEnum.PABX)],
                 loadChildren: () => import('@/pabx/pabx.routes')
             }
         ]
