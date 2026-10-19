@@ -17,6 +17,11 @@ export const appRoutes: Routes = [
                 data: { breadcrumb: 'Minhas Chamadas' }
             },
             {
+                path: 'calls/:id',
+                loadComponent: () => import('@/pabx/report/report-detail.page').then((c) => c.ReportDetailPage),
+                data: { breadcrumb: 'Detalhe da Chamada' }
+            },
+            {
                 path: 'pages',
                 loadChildren: () => import('@/pages/pages.routes')
             },

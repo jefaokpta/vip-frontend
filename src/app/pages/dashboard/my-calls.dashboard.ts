@@ -178,7 +178,7 @@ const PERIOD_DAYS = 30;
                         <td>
                             <p-button
                                 icon="pi pi-search"
-                                [routerLink]="['/pabx/call-report/detail', cdr.id]"
+                                [routerLink]="['/calls', cdr.id]"
                                 [queryParams]="{ from: 'my-calls' }"
                                 outlined
                                 size="small"

@@ -23,6 +23,10 @@ import {
     formatDuration
 } from '@/pabx/report/cdr-format';
 import {AccountCodeService} from '@/pabx/accountcode/account-code.service';
+import {TranscriptionService} from '@/pabx/report/transcription.service';
+import {UserService} from '@/pages/users/user.service';
+import {ServiceEnum} from '@/types/service-enum';
+import {Transcription} from '@/types/transcription';
 
 @Component({
     selector: 'app-report-detail-page',
@@ -140,6 +144,18 @@ import {AccountCodeService} from '@/pabx/accountcode/account-code.service';
                 </div>
             }
 
+            @if (!loading && cdr && hasIa) {
+                <h3 class="font-semibold text-lg mt-8 mb-3">Transcrição</h3>
+                @if (transcriptions.length === 0) {
+                    <div class="text-center p-6 text-gray-400">Transcrição indisponível</div>
+                }
+                <div class="flex flex-col gap-4">
+                    @for (transcription of transcriptions; track transcription.summary.id) {
+                        <div class="rounded-xl shadow px-4 py-3 whitespace-pre-line">{{ transcription.transcript }}</div>
+                    }
+                </div>
+            }
+
             @if (!loading && !cdr) {
                 <div class="text-center p-10 text-gray-400">Chamada não encontrada.</div>
             }
@@ -152,12 +168,16 @@ export class ReportDetailPage implements OnInit {
     loading = true;
     costCenterLabelsByCode = new Map<string, string>();
     backLink = '/pabx/call-report';
+    hasIa = false;
+    transcriptions: Transcription[] = [];
 
     constructor(
         private readonly route: ActivatedRoute,
         private readonly reportService: ReportService,
         private readonly accountCodeService: AccountCodeService,
-        private readonly messageService: MessageService
+        private readonly messageService: MessageService,
+        private readonly transcriptionService: TranscriptionService,
+        private readonly userService: UserService
     ) {}
 
     ngOnInit(): void {
@@ -170,6 +190,7 @@ export class ReportDetailPage implements OnInit {
             .then((cdr) => {
                 this.cdr = cdr;
                 this.loading = false;
+                this.loadTranscriptions(cdr.uniqueId);
             })
             .catch(() => {
                 this.loading = false;
@@ -200,6 +221,17 @@ export class ReportDetailPage implements OnInit {
                     life: 10_000
                 });
             });
+    }
+
+    private loadTranscriptions(uniqueId: string): void {
+        this.hasIa = this.userService.hasService(ServiceEnum.IA);
+        if (!this.hasIa) {
+            return;
+        }
+        this.transcriptionService
+            .findByCdr(uniqueId)
+            .then((transcriptions) => (this.transcriptions = transcriptions.filter((t) => !!t.transcript)))
+            .catch(() => (this.transcriptions = []));
     }
 
     protected readonly formatDate = formatDate;
