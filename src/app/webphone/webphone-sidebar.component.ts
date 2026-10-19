@@ -1,22 +1,22 @@
-import { Component, computed, OnInit } from '@angular/core';
-import { ButtonModule } from 'primeng/button';
-import { DrawerModule } from 'primeng/drawer';
-import { BadgeModule } from 'primeng/badge';
-import { LayoutService } from '@/layout/service/layout.service';
-import { Card } from 'primeng/card';
-import { InputTextModule } from 'primeng/inputtext';
-import { FormsModule } from '@angular/forms';
-import { WebphoneService } from '@/webphone/webphone.service';
-import { NgClass, NgIf } from '@angular/common';
-import { TableModule } from 'primeng/table';
-import { telephoneFormat } from './utils';
-import { handleCalleId } from '@/webphone/utils';
-import { Cdr } from '@/pabx/types/cdr';
-import { UserFieldEnum } from '@/pabx/types/user-field-enum';
-import { PeerRegistration } from '@/types/peer-registration';
-import { User } from '@/types/user';
-import { UserService } from '@/pages/users/user.service';
-import { SplitButton } from 'primeng/splitbutton';
+import {Component, computed, OnInit} from '@angular/core';
+import {ButtonModule} from 'primeng/button';
+import {DrawerModule} from 'primeng/drawer';
+import {BadgeModule} from 'primeng/badge';
+import {LayoutService} from '@/layout/service/layout.service';
+import {Card} from 'primeng/card';
+import {InputTextModule} from 'primeng/inputtext';
+import {FormsModule} from '@angular/forms';
+import {WebphoneService} from '@/webphone/webphone.service';
+import {DatePipe, NgIf} from '@angular/common';
+import {TableModule} from 'primeng/table';
+import {telephoneFormat} from './utils';
+import {handleCalleId} from '@/webphone/utils';
+import {CallHistoryService} from '@/webphone/call-history.service';
+import {CallHistoryType} from '@/types/call-history';
+import {PeerRegistration} from '@/types/peer-registration';
+import {User} from '@/types/user';
+import {UserService} from '@/pages/users/user.service';
+import {SplitButton} from 'primeng/splitbutton';
 
 @Component({
     selector: 'app-webphone-sidebar',
@@ -29,7 +29,7 @@ import { SplitButton } from 'primeng/splitbutton';
         FormsModule,
         NgIf,
         TableModule,
-        NgClass,
+        DatePipe,
         SplitButton
     ],
     template: `
@@ -144,7 +144,7 @@ import { SplitButton } from 'primeng/splitbutton';
                         <p class="text-center font-semibold">Ligações Recentes</p>
                     </ng-template>
                     <p-table
-                        [value]="cdrs"
+                        [value]="callHistory()"
                         [rows]="10"
                         styleClass="p-datatable-sm"
                         rowHover
@@ -153,40 +153,40 @@ import { SplitButton } from 'primeng/splitbutton';
                         scrollHeight="300rem"
                         pagelinks="3"
                     >
-                        <ng-template pTemplate="body" let-cdr>
+                        <ng-template pTemplate="body" let-call>
                             <tr>
                                 <div class="flex items-center gap-2">
                                     <i
-                                        *ngIf="cdr.userfield === UserFieldEnum.UPLOAD"
-                                        class="pi pi-upload text-blue-500"
-                                        title="Upload"
+                                        *ngIf="call.type === CallHistoryType.OUTGOING"
+                                        class="pi pi-arrow-up text-green-500"
+                                        title="Feita"
                                     ></i>
                                     <i
-                                        *ngIf="cdr.userfield === UserFieldEnum.OUTBOUND"
-                                        class="pi pi-arrow-up"
-                                        [ngClass]="{
-                                            'text-green-500': cdr.disposition == 'ANSWERED',
-                                            'text-red-500': cdr.disposition != 'ANSWERED'
-                                        }"
-                                        title="Saída"
+                                        *ngIf="call.type === CallHistoryType.INCOMING"
+                                        class="pi pi-arrow-down text-green-500"
+                                        title="Recebida"
                                     ></i>
                                     <i
-                                        *ngIf="cdr.userfield === UserFieldEnum.INBOUND"
-                                        class="pi pi-arrow-down"
-                                        [ngClass]="{
-                                            'text-green-500': cdr.disposition == 'ANSWERED',
-                                            'text-red-500': cdr.disposition != 'ANSWERED'
-                                        }"
-                                        title="Entrada"
+                                        *ngIf="call.type === CallHistoryType.MISSED"
+                                        class="pi pi-arrow-down-left text-red-500"
+                                        title="Perdida"
                                     ></i>
                                     <p-button
                                         icon="pi pi-phone"
-                                        [label]="telephoneFormat(cdr.destination)"
-                                        (click)="dial(cdr.destination)"
+                                        [label]="telephoneFormat(handleCalleId(call.telephone))"
+                                        (click)="dial(call.telephone)"
                                         [link]="true"
                                         iconPos="right"
                                     />
+                                    <span class="ml-auto text-sm text-muted-color">{{
+                                        call.time | date: 'dd/MM HH:mm'
+                                    }}</span>
                                 </div>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="emptymessage">
+                            <tr>
+                                <p class="text-center text-muted-color">Nenhuma ligação</p>
                             </tr>
                         </ng-template>
                     </p-table>
@@ -198,7 +198,6 @@ import { SplitButton } from 'primeng/splitbutton';
 export class WebphoneSidebarComponent implements OnInit {
     telephoneNumber?: string = undefined;
     dialpadVisible = false;
-    cdrs: Cdr[] = [];
     user: User;
     wr: PeerRegistration;
     menuItems = [
@@ -214,7 +213,8 @@ export class WebphoneSidebarComponent implements OnInit {
     constructor(
         public layoutService: LayoutService,
         private readonly webphoneService: WebphoneService,
-        private readonly userService: UserService
+        private readonly userService: UserService,
+        private readonly callHistoryService: CallHistoryService
     ) {
         this.user = this.userService.getUser();
         this.wr = this.userService.getWebphoneRegisterSignal();
@@ -234,6 +234,10 @@ export class WebphoneSidebarComponent implements OnInit {
 
     get phoneStatus() {
         return this.webphoneService.phoneState$;
+    }
+
+    get callHistory() {
+        return this.callHistoryService.history;
     }
 
     get timer() {
@@ -272,20 +276,6 @@ export class WebphoneSidebarComponent implements OnInit {
         this.webphoneService.sendDTMF(digit);
     }
 
-    private deDuplicate(cdrs: Cdr[]): Cdr[] {
-        const destinations = cdrs
-            .filter((cdr) => cdr.userfield === UserFieldEnum.INBOUND || cdr.userfield === UserFieldEnum.OUTBOUND)
-            .map((cdr) => cdr.destination);
-        const uniqueDestinations = [...new Set(destinations)];
-        return uniqueDestinations.map((destination) =>
-            cdrs
-                .filter((cdr) => cdr.destination === destination)
-                .reduce((latest, current) =>
-                    new Date(latest.startTime) > new Date(current.startTime) ? latest : current
-                )
-        );
-    }
-
     visible = computed(() => this.layoutService.layoutState().webphoneSidebarVisible);
 
     onDrawerHide() {
@@ -295,7 +285,7 @@ export class WebphoneSidebarComponent implements OnInit {
         }));
     }
 
-    protected readonly UserFieldEnum = UserFieldEnum;
+    protected readonly CallHistoryType = CallHistoryType;
     protected readonly handleCalleId = handleCalleId;
     protected readonly telephoneFormat = telephoneFormat;
 }
