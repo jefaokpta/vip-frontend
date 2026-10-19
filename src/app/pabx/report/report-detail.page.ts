@@ -3,18 +3,18 @@
  * @email jefaokpta@hotmail.com
  */
 
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
-import { Card } from 'primeng/card';
-import { Button } from 'primeng/button';
-import { Tooltip } from 'primeng/tooltip';
-import { ProgressSpinner } from 'primeng/progressspinner';
-import { Tag } from 'primeng/tag';
-import { Toast } from 'primeng/toast';
-import { MessageService } from 'primeng/api';
-import { CurrencyPipe } from '@angular/common';
-import { CdrDetail } from '@/pabx/types/cdr-detail';
-import { ReportService } from '@/pabx/report/report.service';
+import {Component, OnInit} from '@angular/core';
+import {ActivatedRoute, RouterLink} from '@angular/router';
+import {Card} from 'primeng/card';
+import {Button} from 'primeng/button';
+import {Tooltip} from 'primeng/tooltip';
+import {ProgressSpinner} from 'primeng/progressspinner';
+import {Tag} from 'primeng/tag';
+import {Toast} from 'primeng/toast';
+import {MessageService} from 'primeng/api';
+import {CurrencyPipe} from '@angular/common';
+import {CdrDetail} from '@/pabx/types/cdr-detail';
+import {ReportService} from '@/pabx/report/report.service';
 import {
     costCenterLabel,
     dispositionSeverity,
@@ -22,7 +22,7 @@ import {
     formatDate,
     formatDuration
 } from '@/pabx/report/cdr-format';
-import { AccountCodeService } from '@/pabx/accountcode/account-code.service';
+import {AccountCodeService} from '@/pabx/accountcode/account-code.service';
 
 @Component({
     selector: 'app-report-detail-page',
@@ -35,7 +35,7 @@ import { AccountCodeService } from '@/pabx/accountcode/account-code.service';
                 <div class="flex items-center gap-3 mb-4">
                     <p-button
                         icon="pi pi-arrow-left"
-                        routerLink="/pabx/call-report"
+                        [routerLink]="backLink"
                         outlined
                         rounded
                         size="small"
@@ -151,6 +151,7 @@ export class ReportDetailPage implements OnInit {
     cdr: CdrDetail | null = null;
     loading = true;
     costCenterLabelsByCode = new Map<string, string>();
+    backLink = '/pabx/call-report';
 
     constructor(
         private readonly route: ActivatedRoute,
@@ -161,6 +162,9 @@ export class ReportDetailPage implements OnInit {
 
     ngOnInit(): void {
         const id = Number(this.route.snapshot.paramMap.get('id'));
+        if (this.route.snapshot.queryParamMap.get('from') === 'my-calls') {
+            this.backLink = '/';
+        }
         this.reportService
             .findById(id)
             .then((cdr) => {
