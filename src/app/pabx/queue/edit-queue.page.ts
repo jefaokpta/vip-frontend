@@ -132,18 +132,6 @@ import {SurveyService} from '@/pabx/survey/survey.service';
                                 </div>
 
                                 <div class="field mb-4">
-                                    <label for="serviceLevelSeconds" class="block mb-2">
-                                        Nível de Serviço (segundos) *
-                                    </label>
-                                    <p-input-number
-                                        id="serviceLevelSeconds"
-                                        mode="decimal"
-                                        useGrouping="false"
-                                        formControlName="serviceLevelSeconds"
-                                    />
-                                </div>
-
-                                <div class="field mb-4">
                                     <label for="queueSoundId" class="block mb-2">Áudio da Fila *</label>
                                     <p-select
                                         id="queueSoundId"
@@ -211,6 +199,40 @@ import {SurveyService} from '@/pabx/survey/survey.service';
                                         formControlName="cooldownSeconds"
                                     />
                                     <small class="block mt-1 text-gray-500">0 = sem intervalo</small>
+                                </div>
+
+                                <div class="field mb-4">
+                                    <label for="serviceLevelSeconds" class="block mb-2">
+                                        Nível de Serviço (segundos) *
+                                    </label>
+                                    <p-input-number
+                                        id="serviceLevelSeconds"
+                                        mode="decimal"
+                                        useGrouping="false"
+                                        formControlName="serviceLevelSeconds"
+                                    />
+                                </div>
+
+                                <div class="field mb-4">
+                                    <label for="tmeAlertSeconds" class="block mb-2">TME alvo (segundos) *</label>
+                                    <p-input-number
+                                        id="tmeAlertSeconds"
+                                        mode="decimal"
+                                        useGrouping="false"
+                                        formControlName="tmeAlertSeconds"
+                                    />
+                                </div>
+
+                                <div class="field mb-4">
+                                    <label for="callDurationAlertMinutes" class="block mb-2"
+                                        >Tempo alvo de atendimento (minutos) *</label
+                                    >
+                                    <p-input-number
+                                        id="callDurationAlertMinutes"
+                                        mode="decimal"
+                                        useGrouping="false"
+                                        formControlName="callDurationAlertMinutes"
+                                    />
                                 </div>
                             </p-tabpanel>
 
@@ -300,6 +322,8 @@ export class EditQueuePage implements OnInit {
                 isJoinWhenEmpty: [queue.isJoinWhenEmpty],
                 maxCalls: [queue.maxCalls],
                 cooldownSeconds: [queue.cooldownSeconds],
+                tmeAlertSeconds: [queue.tmeAlertSeconds, [Validators.required, Validators.min(1)]],
+                callDurationAlertMinutes: [queue.callDurationAlertMinutes, [Validators.required, Validators.min(1)]],
                 surveyId: [queue.surveyId ?? null]
             });
         });
@@ -310,18 +334,18 @@ export class EditQueuePage implements OnInit {
     }
 
     get baseTabInvalid(): boolean {
-        return this.isAnyFieldInvalid([
-            'name',
-            'queueStrategy',
-            'ringTimeout',
-            'queueTimeout',
-            'serviceLevelSeconds',
-            'queueSoundId'
-        ]);
+        return this.isAnyFieldInvalid(['name', 'queueStrategy', 'ringTimeout', 'queueTimeout', 'queueSoundId']);
     }
 
     get behaviorTabInvalid(): boolean {
-        return this.isAnyFieldInvalid(['isJoinWhenEmpty', 'maxCalls', 'cooldownSeconds']);
+        return this.isAnyFieldInvalid([
+            'isJoinWhenEmpty',
+            'maxCalls',
+            'cooldownSeconds',
+            'serviceLevelSeconds',
+            'tmeAlertSeconds',
+            'callDurationAlertMinutes'
+        ]);
     }
 
     get surveyTabInvalid(): boolean {
