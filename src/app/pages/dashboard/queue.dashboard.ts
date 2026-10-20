@@ -1,29 +1,34 @@
-import {Component, computed, OnDestroy, OnInit, signal} from '@angular/core';
-import {Subscription} from 'rxjs';
-import {NgClass, NgForOf} from '@angular/common';
-import {Card} from 'primeng/card';
-import {ChartModule} from 'primeng/chart';
-import {Button} from 'primeng/button';
-import {RouterLink} from '@angular/router';
-import {QueueDashboardService} from '@/pages/dashboard/queue-dashboard.service';
-import {QueueMemberStatusEnum} from '@/pabx/types/queue-member-status-enum';
-import {QueueState} from '@/pabx/types/queue-state';
-import {WebsocketService} from '@/websocket/stomp/websocket.service';
-import {rxStompServiceFactory} from '@/websocket/stomp/rx-stomp-service-factory';
-import {UserService} from '@/pages/users/user.service';
-
-interface AgentStatus {
-    name: string;
-    extension: string;
-    alertType: string;
-    duration: string;
-}
+import { Component, computed, OnDestroy, OnInit, signal } from '@angular/core';
+import { Subscription } from 'rxjs';
+import { NgClass, NgForOf } from '@angular/common';
+import { Card } from 'primeng/card';
+import { ChartModule } from 'primeng/chart';
+import { RouterLink } from '@angular/router';
+import { QueueDashboardService } from '@/pages/dashboard/queue-dashboard.service';
+import { HourlyCalls } from '@/pabx/types/hourly-calls';
+import {
+    formatDuration,
+    MemberAlert,
+    QueueAlert,
+    globalServiceLevel,
+    globalTmeSeconds,
+    memberAlerts,
+    memberCounts,
+    percentOf,
+    queueAlerts,
+    queueServiceLevel,
+    serviceLevelSeverity
+} from '@/pages/dashboard/queue-dashboard.metrics';
+import { QueueState } from '@/pabx/types/queue-state';
+import { WebsocketService } from '@/websocket/stomp/websocket.service';
+import { rxStompServiceFactory } from '@/websocket/stomp/rx-stomp-service-factory';
+import { UserService } from '@/pages/users/user.service';
 
 @Component({
     selector: 'app-queue-dashboard',
     standalone: true,
     providers: [{ provide: WebsocketService, useFactory: rxStompServiceFactory }],
-    imports: [NgClass, NgForOf, Card, ChartModule, Button, RouterLink],
+    imports: [NgClass, NgForOf, Card, ChartModule, RouterLink],
     template: `
         <div class="flex flex-col gap-4">
             <!-- Page Header -->
@@ -49,7 +54,11 @@ interface AgentStatus {
                     </div>
                     <div class="flex items-end gap-2">
                         <span class="text-3xl font-bold">{{ formatTwoDigits(waitingCalls()) }}</span>
-                        <span class="text-xs font-bold px-2 py-0.5 rounded bg-red-100 text-red-600 mb-1">ALERTA</span>
+                        @if (waitingCalls() > 0) {
+                            <span class="text-xs font-bold px-2 py-0.5 rounded bg-red-100 text-red-600 mb-1"
+                                >ALERTA</span
+                            >
+                        }
                     </div>
                 </div>
 
@@ -57,22 +66,26 @@ interface AgentStatus {
                 <div class="rounded-xl shadow px-4 py-3 flex flex-col gap-1 border-l-4 border-gray-200">
                     <span class="text-xs font-semibold uppercase tracking-wide text-gray-400">TME GLOBAL</span>
                     <div class="flex items-end gap-1">
-                        <span class="text-3xl font-bold">{{ globalTme() }}</span>
-                        <span class="text-sm text-gray-400 mb-1">m/s</span>
+                        <span class="text-3xl font-bold" data-testid="global-tme">{{ globalTme() }}</span>
                     </div>
                 </div>
 
                 <!-- Nível de Serviço -->
-                <div class="rounded-xl shadow px-4 py-3 flex flex-col gap-1 border-l-4 border-green-500">
+                <div
+                    class="rounded-xl shadow px-4 py-3 flex flex-col gap-1 border-l-4"
+                    [ngClass]="serviceLevelStyle().border"
+                >
                     <div class="flex items-center justify-between">
-                        <span class="text-xs font-semibold uppercase tracking-wide text-green-600"
+                        <span class="text-xs font-semibold uppercase tracking-wide" [ngClass]="serviceLevelStyle().text"
                             >NÍVEL DE SERVIÇO</span
                         >
                     </div>
                     <div class="flex items-end gap-2">
-                        <span class="text-3xl font-bold">{{ serviceLevel() }}%</span>
-                        <span class="text-xs font-bold px-2 py-0.5 rounded bg-green-100 text-green-700 mb-1"
-                            >EXCELENTE</span
+                        <span class="text-3xl font-bold" data-testid="global-sl">{{ serviceLevelLabel() }}</span>
+                        <span
+                            class="text-xs font-bold px-2 py-0.5 rounded mb-1"
+                            [ngClass]="serviceLevelStyle().badge"
+                            >{{ serviceLevelStyle().label }}</span
                         >
                     </div>
                 </div>
@@ -112,12 +125,15 @@ interface AgentStatus {
                                     <div class="flex items-center gap-2">
                                         <div class="flex flex-col">
                                             <span class="font-bold text-sm">{{ q.queue.name }}</span>
-                                            <span class="text-xs font-semibold" [ngClass]="queueStatusTextClass(q)"
-                                                >ALERTA (TME)</span
-                                            >
+                                            @if (alertsOf(q).length > 0) {
+                                                <span class="text-xs font-semibold text-red-600">{{
+                                                    alertLabels(q)
+                                                }}</span>
+                                            } @else {
+                                                <span class="text-xs font-semibold text-green-500">OPERAÇÃO OK</span>
+                                            }
                                         </div>
                                     </div>
-                                    <i class="pi pi-ellipsis-v text-gray-400 cursor-pointer"></i>
                                 </div>
 
                                 <!-- Stats row -->
@@ -142,6 +158,14 @@ interface AgentStatus {
                                             }}
                                         </span>
                                     </div>
+                                    <div class="flex flex-col">
+                                        <span class="text-xs text-gray-400 uppercase tracking-wide">TME</span>
+                                        <span class="font-bold text-sm">{{ queueTme(q) }}</span>
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <span class="text-xs text-gray-400 uppercase tracking-wide">NS</span>
+                                        <span class="font-bold text-sm">{{ queueSl(q) }}</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -151,11 +175,13 @@ interface AgentStatus {
                     <p-card>
                         <ng-template #title>
                             <div class="flex flex-col">
-                                <span class="font-semibold text-lg">Volume de Chamadas por Fila</span>
-                                <span class="text-xs text-gray-400 uppercase tracking-wide">ULTIMAS 6 HORAS</span>
+                                <span class="font-semibold text-lg">Chamadas do Dia</span>
+                                <span class="text-xs text-gray-400 uppercase tracking-wide"
+                                    >ATENDIDAS × ABANDONADAS</span
+                                >
                             </div>
                         </ng-template>
-                        <p-chart type="bar" height="260" [data]="barData" [options]="barOptions"></p-chart>
+                        <p-chart type="line" height="260" [data]="lineData()" [options]="lineOptions"></p-chart>
                     </p-card>
                 </div>
 
@@ -191,11 +217,11 @@ interface AgentStatus {
                         </ng-template>
 
                         <div class="flex flex-col gap-4">
-                            <div *ngFor="let ag of agentAlerts()" class="flex items-center gap-3">
+                            <div *ngFor="let ag of memberAlertList()" class="flex items-center gap-3">
                                 <!-- Initials avatar -->
                                 <div
                                     class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0"
-                                    [ngClass]="alertAvatarClass(ag.alertType)"
+                                    [ngClass]="alertAvatarClass(ag.type)"
                                 >
                                     {{ agentInitials(ag.name) }}
                                 </div>
@@ -210,16 +236,15 @@ interface AgentStatus {
                                 <div class="flex flex-col items-end gap-0.5">
                                     <span
                                         class="text-xs font-bold px-2 py-0.5 rounded"
-                                        [ngClass]="alertBadgeClass(ag.alertType)"
-                                        >{{ ag.alertType }}</span
+                                        [ngClass]="alertBadgeClass(ag.type)"
+                                        >{{ ag.type === 'LONG_PAUSE' ? 'PAUSA LONGA' : 'CHAMADA LONGA' }}</span
                                     >
-                                    <span class="text-xs text-gray-400">{{ ag.duration }}</span>
+                                    <span class="text-xs text-gray-400">{{ duration(ag.elapsedSeconds) }}</span>
                                 </div>
                             </div>
-                        </div>
-
-                        <div class="mt-4">
-                            <p-button label="VER TODOS OS AGENTES" [outlined]="true" styleClass="w-full" size="small" />
+                            @if (memberAlertList().length === 0) {
+                                <span class="text-sm text-gray-400">Nenhum alerta no momento.</span>
+                            }
                         </div>
                     </p-card>
                 </div>
@@ -232,63 +257,99 @@ export class QueueDashboard implements OnInit, OnDestroy {
     readonly queues = signal<QueueState[]>([]);
     readonly activeQueues = computed(() => this.queues().length);
     readonly waitingCalls = computed(() => this.queues().reduce((acc, q) => acc + q.waitingCalls.length, 0));
-    readonly globalTme = signal('01:24');
+    private readonly now = signal(Date.now());
+    private readonly hourly = signal<HourlyCalls[]>([]);
+    private tickInterval?: ReturnType<typeof setInterval>;
+    private chartInterval?: ReturnType<typeof setInterval>;
 
-    readonly serviceLevel = computed(() => {
-        const totalAnswered = this.queues().reduce((acc, q) => acc + (q.answeredCalls ?? 0), 0);
-        const totalInSla = this.queues().reduce((acc, q) => acc + (q.answeredCallsInServiceLevel ?? 0), 0);
-        if (totalAnswered === 0) return 100;
-        return Math.round((totalInSla / totalAnswered) * 1000) / 10;
+    readonly globalTme = computed(() => formatDuration(globalTmeSeconds(this.queues())));
+    readonly globalSl = computed(() => globalServiceLevel(this.queues()));
+    readonly serviceLevelLabel = computed(() => {
+        const sl = this.globalSl();
+        return sl === null ? '—' : `${sl}%`;
+    });
+    readonly serviceLevelStyle = computed(() => {
+        const styles = {
+            ok: {
+                border: 'border-green-500',
+                text: 'text-green-600',
+                badge: 'bg-green-100 text-green-700',
+                label: 'EXCELENTE'
+            },
+            warn: {
+                border: 'border-orange-500',
+                text: 'text-orange-600',
+                badge: 'bg-orange-100 text-orange-700',
+                label: 'ATENÇÃO'
+            },
+            critical: {
+                border: 'border-red-500',
+                text: 'text-red-500',
+                badge: 'bg-red-100 text-red-600',
+                label: 'CRÍTICO'
+            }
+        };
+        return styles[serviceLevelSeverity(this.globalSl())];
     });
 
-    readonly operacaoCount = computed(() => this.queues().length);
-    readonly alertaCount = computed(() => 1);
+    readonly alertaCount = computed(() => this.queues().filter((q) => queueAlerts(q).length > 0).length);
+    readonly operacaoCount = computed(() => this.activeQueues() - this.alertaCount());
 
-    readonly disponiveisCount = computed(
-        () =>
-            this.queues().filter((q) =>
-                q.loggedMembers.some((m) => m.queueMemberStatusEnum === QueueMemberStatusEnum.AVAILABLE)
-            ).length
-    );
-    readonly emChamadaCount = signal(12);
-    readonly emPausaCount = computed(
-        () =>
-            this.queues().filter((q) =>
-                q.loggedMembers.some((m) => m.queueMemberStatusEnum === QueueMemberStatusEnum.PAUSED)
-            ).length
-    );
+    readonly counts = computed(() => memberCounts(this.queues()));
+    readonly agentStatusCards = computed(() => {
+        const c = this.counts();
+        const sub = (n: number) => `${percentOf(n, c.total)}% dos logados`;
+        return [
+            {
+                label: 'DISPONÍVEIS',
+                value: c.available,
+                subtitle: sub(c.available),
+                border: 'border-green-500',
+                text: 'text-green-600'
+            },
+            {
+                label: 'EM CHAMADA',
+                value: c.onCall,
+                subtitle: sub(c.onCall),
+                border: 'border-red-500',
+                text: 'text-red-500'
+            },
+            {
+                label: 'EM PAUSA',
+                value: c.paused,
+                subtitle: sub(c.paused),
+                border: 'border-gray-200',
+                text: 'text-gray-400'
+            }
+        ];
+    });
 
-    readonly agentAlerts = signal<AgentStatus[]>([
-        { name: 'Ricardo S.', extension: 'Est.4055', alertType: 'PAUSA LONGA', duration: '45:12m' },
-        { name: 'Fernanda M.', extension: 'Est.4050', alertType: 'CHAMADA +15M', duration: '18:44m' }
-    ]);
+    readonly memberAlertList = computed(() => memberAlerts(this.queues(), this.now()));
 
-    readonly agentStatusCards = computed(() => [
-        {
-            label: 'DISPONÍVEIS',
-            value: this.disponiveisCount(),
-            subtitle: '62% do total',
-            border: 'border-green-500',
-            text: 'text-green-600'
-        },
-        {
-            label: 'EM CHAMADA',
-            value: this.emChamadaCount(),
-            subtitle: '30% do total',
-            border: 'border-red-500',
-            text: 'text-red-500'
-        },
-        {
-            label: 'EM PAUSA',
-            value: this.emPausaCount(),
-            subtitle: '98% do total',
-            border: 'border-gray-200',
-            text: 'text-gray-400'
-        }
-    ]);
+    readonly lineData = computed(() => {
+        const hours = this.hourly();
+        return {
+            labels: hours.map((h) => `${String(h.hour).padStart(2, '0')}:00`),
+            datasets: [
+                {
+                    label: 'Atendidas',
+                    borderColor: '#22c55e',
+                    backgroundColor: '#22c55e',
+                    tension: 0.3,
+                    data: hours.map((h) => h.answeredCalls)
+                },
+                {
+                    label: 'Abandonadas',
+                    borderColor: '#ef4444',
+                    backgroundColor: '#ef4444',
+                    tension: 0.3,
+                    data: hours.map((h) => h.abandonedCalls)
+                }
+            ]
+        };
+    });
 
-    barData: any;
-    barOptions: any;
+    lineOptions: any;
     constructor(
         private readonly queueDashboardService: QueueDashboardService,
         private readonly webSocketService: WebsocketService,
@@ -297,6 +358,9 @@ export class QueueDashboard implements OnInit, OnDestroy {
 
     ngOnInit(): void {
         this.initChart();
+        this.loadHourly();
+        this.chartInterval = setInterval(() => this.loadHourly(), 60_000);
+        this.tickInterval = setInterval(() => this.now.set(Date.now()), 1000);
         this.queueDashboardService.findAllQueueStates().then((queueStates) => {
             this.queues.set(queueStates);
         });
@@ -320,6 +384,15 @@ export class QueueDashboard implements OnInit, OnDestroy {
 
     ngOnDestroy(): void {
         this.subscriptions.forEach((s) => s.unsubscribe());
+        clearInterval(this.tickInterval);
+        clearInterval(this.chartInterval);
+    }
+
+    private loadHourly(): void {
+        this.queueDashboardService
+            .findTodayHourly()
+            .then((h) => this.hourly.set(h))
+            .catch(() => undefined);
     }
 
     private initChart(): void {
@@ -328,27 +401,7 @@ export class QueueDashboard implements OnInit, OnDestroy {
         const textColorSecondary = docStyle.getPropertyValue('--text-color-secondary');
         const surfaceBorder = docStyle.getPropertyValue('--surface-border');
 
-        this.barData = {
-            labels: ['09:00', '10:00', '11:00', '12:00', '13:00', '14:00'],
-            datasets: [
-                {
-                    label: 'Atendidas',
-                    backgroundColor: docStyle.getPropertyValue('--p-primary-500') || '#334155',
-                    barThickness: 14,
-                    borderRadius: 6,
-                    data: [42, 58, 35, 20, 47, 63]
-                },
-                {
-                    label: 'Abandonadas',
-                    backgroundColor: '#22c55e',
-                    barThickness: 14,
-                    borderRadius: 6,
-                    data: [5, 8, 3, 2, 6, 4]
-                }
-            ]
-        };
-
-        this.barOptions = {
+        this.lineOptions = {
             animation: { duration: 1500 },
             responsive: true,
             maintainAspectRatio: false,
@@ -366,22 +419,45 @@ export class QueueDashboard implements OnInit, OnDestroy {
             scales: {
                 x: {
                     ticks: { color: textColorSecondary, font: { weight: 500 } },
-                    grid: { display: false, drawBorder: false }
+                    grid: { display: false }
                 },
                 y: {
                     ticks: { color: textColorSecondary },
-                    grid: { color: surfaceBorder, drawBorder: false }
+                    grid: { color: surfaceBorder }
                 }
             }
         };
     }
 
-    queueBorderClass(q: QueueState): string {
-        return q.answeredCalls ? 'border-green-500' : 'border-red-500';
+    alertsOf(q: QueueState): QueueAlert[] {
+        return queueAlerts(q);
     }
 
-    queueStatusTextClass(q: QueueState): string {
-        return q.answeredCalls ? 'text-green-500' : 'text-red-600';
+    alertLabels(q: QueueState): string {
+        return queueAlerts(q)
+            .map((a) => (a === 'SLA_CRITICAL' ? 'NS CRÍTICO' : 'TME ACIMA DO ALVO'))
+            .join(' · ');
+    }
+
+    queueBorderClass(q: QueueState): string {
+        return queueAlerts(q).length > 0 ? 'border-red-500' : 'border-green-500';
+    }
+
+    private hasCalls(q: QueueState): boolean {
+        return (q.answeredCalls ?? 0) + (q.abandonedCalls ?? 0) > 0;
+    }
+
+    queueTme(q: QueueState): string {
+        return this.hasCalls(q) ? formatDuration(q.tmeSeconds ?? 0) : '—';
+    }
+
+    queueSl(q: QueueState): string {
+        const sl = queueServiceLevel(q);
+        return sl === null ? '—' : `${sl}%`;
+    }
+
+    duration(seconds: number): string {
+        return formatDuration(seconds);
     }
 
     agentInitials(name: string): string {
@@ -393,12 +469,12 @@ export class QueueDashboard implements OnInit, OnDestroy {
             .toUpperCase();
     }
 
-    alertAvatarClass(alertType: string): string {
-        return alertType.includes('PAUSA') ? 'bg-yellow-200 text-yellow-800' : 'bg-red-200 text-red-800';
+    alertAvatarClass(type: MemberAlert['type']): string {
+        return type === 'LONG_PAUSE' ? 'bg-yellow-200 text-yellow-800' : 'bg-red-200 text-red-800';
     }
 
-    alertBadgeClass(alertType: string): string {
-        return alertType.includes('PAUSA') ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-600';
+    alertBadgeClass(type: MemberAlert['type']): string {
+        return type === 'LONG_PAUSE' ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-600';
     }
 
     formatTwoDigits(n: number): string {
