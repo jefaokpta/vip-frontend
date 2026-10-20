@@ -19,7 +19,6 @@ import {InputText} from 'primeng/inputtext';
 import {Tooltip} from 'primeng/tooltip';
 import {RouterLink} from '@angular/router';
 import {debounceTime, Subscription} from 'rxjs';
-import {Cdr} from '@/pabx/types/cdr';
 import {ReportService} from '@/pabx/report/report.service';
 import {
     costCenterLabel,
@@ -32,6 +31,7 @@ import {answerRate, avgDurationSeconds, totalTalkSeconds} from '@/pabx/report/cd
 import {buildCallsChart, dailyBuckets} from '@/pabx/report/cdr-chart';
 import {LayoutService} from '@/layout/service/layout.service';
 import {AccountCodeService} from '@/pabx/accountcode/account-code.service';
+import {MyCallsStateService} from '@/pages/dashboard/my-calls-state.service';
 
 const PERIOD_DAYS = 30;
 
@@ -100,7 +100,15 @@ const PERIOD_DAYS = 30;
                 <p-chart type="line" height="280" [data]="chartData" [options]="chartOptions"></p-chart>
             </div>
 
-            <div class="flex justify-end mb-2">
+            <div class="flex justify-end gap-2 mb-2">
+                <p-button
+                    icon="pi pi-refresh"
+                    outlined
+                    [loading]="loading()"
+                    (onClick)="refresh()"
+                    pTooltip="Atualizar"
+                    tooltipPosition="left"
+                />
                 <p-iconfield>
                     <p-inputicon class="pi pi-search" />
                     <input
@@ -170,7 +178,8 @@ const PERIOD_DAYS = 30;
                         <td>
                             <p-button
                                 icon="pi pi-search"
-                                [routerLink]="['/pabx/call-report/detail', cdr.id]"
+                                [routerLink]="['/calls', cdr.id]"
+                                [queryParams]="{ from: 'my-calls' }"
                                 outlined
                                 size="small"
                                 pTooltip="Detalhes"
@@ -204,10 +213,11 @@ export class MyCallsDashboard implements OnInit, OnDestroy {
     private readonly accountCodeService = inject(AccountCodeService);
     private readonly messageService = inject(MessageService);
     private readonly layoutService = inject(LayoutService);
+    private readonly myCallsState = inject(MyCallsStateService);
 
     readonly periodDays = PERIOD_DAYS;
-    readonly cdrs = signal<Cdr[]>([]);
-    readonly loading = signal<boolean>(true);
+    readonly cdrs = this.myCallsState.cdrs;
+    readonly loading = signal<boolean>(!this.myCallsState.loaded());
     readonly costCenterLabelsByCode = signal<Map<string, string>>(new Map());
 
     @ViewChild('dataTable') dt!: Table;
@@ -243,11 +253,9 @@ export class MyCallsDashboard implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
-        this.reportService
-            .findMine()
-            .then((cdrs) => this.cdrs.set(cdrs))
-            .catch(() => this.showError('Erro ao carregar chamadas'))
-            .finally(() => this.loading.set(false));
+        if (!this.myCallsState.loaded()) {
+            this.refresh();
+        }
 
         this.accountCodeService
             .findAll()
@@ -265,6 +273,15 @@ export class MyCallsDashboard implements OnInit, OnDestroy {
 
     ngOnDestroy(): void {
         this.themeSubscription.unsubscribe();
+    }
+
+    refresh(): void {
+        this.loading.set(true);
+        this.reportService
+            .findMine()
+            .then((cdrs) => this.myCallsState.setCdrs(cdrs))
+            .catch(() => this.showError('Erro ao carregar chamadas'))
+            .finally(() => this.loading.set(false));
     }
 
     onFilterGlobal(event: Event): void {

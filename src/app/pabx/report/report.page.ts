@@ -219,7 +219,8 @@ interface StatusOption {
                         <td>
                             <p-button
                                 icon="pi pi-search"
-                                [routerLink]="['detail', cdr.id]"
+                                [routerLink]="['/calls', cdr.id]"
+                                [queryParams]="{ from: 'call-report' }"
                                 outlined
                                 size="small"
                                 pTooltip="Detalhes"

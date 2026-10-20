@@ -16,7 +16,7 @@ import { NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ProgressSpinner } from 'primeng/progressspinner';
 import { UserService } from './user.service';
-import { translateRole } from '@/pages/users/utils';
+import { translateModule, translateRole } from '@/pages/users/utils';
 
 @Component({
     selector: 'app-users',
@@ -85,6 +85,7 @@ import { translateRole } from '@/pages/users/utils';
                             Nível de Acesso
                             <p-sortIcon field="roles"></p-sortIcon>
                         </th>
+                        <th>Módulos</th>
                         <th style="width: 10%">Ações</th>
                     </tr>
                 </ng-template>
@@ -113,6 +114,7 @@ import { translateRole } from '@/pages/users/utils';
                             </div>
                         </td>
                         <td>{{ translateRole(user) }}</td>
+                        <td>{{ translateModules(user) }}</td>
                         <td>
                             <div class="flex gap-2">
                                 <p-button
@@ -245,5 +247,10 @@ export class UsersPage implements OnInit {
         const lastRole = user.roles.at(-1);
         if (!lastRole) return 'Indefinido';
         return translateRole(lastRole);
+    }
+
+    translateModules(user: User): string {
+        if (user.roles.includes(RoleEnum.ROLE_COMPANY_ADMIN)) return 'Todos';
+        return (user.modules ?? []).map(translateModule).join(', ') || '-';
     }
 }
