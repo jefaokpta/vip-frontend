@@ -14,6 +14,7 @@ import { ConfirmationService } from 'primeng/api';
 import { UserService } from '@/pages/users/user.service';
 import { RoleEnum } from '@/types/role-enum';
 import { ServiceEnum } from '@/types/service-enum';
+import { Tab, TabList, TabPanel, TabPanels, Tabs } from 'primeng/tabs';
 
 /**
  * @author Jefferson Alves Reis (jefaokpta)
@@ -35,7 +36,12 @@ import { ServiceEnum } from '@/types/service-enum';
         RouterLink,
         InputMask,
         ToggleSwitch,
-        ConfirmDialog
+        ConfirmDialog,
+        Tabs,
+        TabList,
+        Tab,
+        TabPanels,
+        TabPanel
     ],
     providers: [ConfirmationService],
     template: `
@@ -54,77 +60,100 @@ import { ServiceEnum } from '@/types/service-enum';
                 </div>
             </ng-template>
 
-            <form [formGroup]="form" (ngSubmit)="onSubmit()" class="p-fluid">
-                <div class="field mb-4">
-                    <label for="name" class="block mb-2">Nome *</label>
-                    <input id="name" pInputText class="p-inputtext" formControlName="name" />
-                    <small *ngIf="name?.invalid && (name?.dirty || name?.touched)" class="p-error block mt-2">
-                        <div *ngIf="name?.errors?.['required']">Nome é obrigatório.</div>
-                    </small>
-                </div>
+            <p-tabs value="0">
+                <p-tablist>
+                    <p-tab value="0">Dados</p-tab>
+                    <p-tab *ngIf="canManageServices" value="1">Serviços</p-tab>
+                </p-tablist>
+                <p-tabpanels>
+                    <p-tabpanel value="0">
+                        <form [formGroup]="form" (ngSubmit)="onSubmit()" class="p-fluid">
+                            <div class="field mb-4">
+                                <label for="name" class="block mb-2">Nome *</label>
+                                <input id="name" pInputText class="p-inputtext" formControlName="name" />
+                                <small
+                                    *ngIf="name?.invalid && (name?.dirty || name?.touched)"
+                                    class="p-error block mt-2"
+                                >
+                                    <div *ngIf="name?.errors?.['required']">Nome é obrigatório.</div>
+                                </small>
+                            </div>
 
-                <div class="field mb-4">
-                    <label for="corporateName" class="block mb-2">Razão Social *</label>
-                    <input id="corporateName" pInputText class="p-inputtext" formControlName="corporateName" />
-                    <small
-                        *ngIf="corporateName?.invalid && (corporateName?.dirty || corporateName?.touched)"
-                        class="p-error block mt-2"
-                    >
-                        <div *ngIf="corporateName?.errors?.['required']">Razão Social é obrigatório.</div>
-                    </small>
-                </div>
+                            <div class="field mb-4">
+                                <label for="corporateName" class="block mb-2">Razão Social *</label>
+                                <input
+                                    id="corporateName"
+                                    pInputText
+                                    class="p-inputtext"
+                                    formControlName="corporateName"
+                                />
+                                <small
+                                    *ngIf="corporateName?.invalid && (corporateName?.dirty || corporateName?.touched)"
+                                    class="p-error block mt-2"
+                                >
+                                    <div *ngIf="corporateName?.errors?.['required']">Razão Social é obrigatório.</div>
+                                </small>
+                            </div>
 
-                <div class="field mb-4">
-                    <label for="cnpj" class="block mb-2">CNPJ *</label>
-                    <p-inputmask mask="**.***.***/****-99" formControlName="cnpj" placeholder="**.***.***/****-99" />
-                    <small *ngIf="cnpj?.invalid && (cnpj?.dirty || cnpj?.touched)" class="p-error block mt-2">
-                        <div *ngIf="cnpj?.errors?.['required']">CNPJ é obrigatório.</div>
-                        <div *ngIf="cnpj?.errors?.['pattern']">
-                            CNPJ deve conter apenas números e letras (maiúsculas).
+                            <div class="field mb-4">
+                                <label for="cnpj" class="block mb-2">CNPJ *</label>
+                                <p-inputmask
+                                    mask="**.***.***/****-99"
+                                    formControlName="cnpj"
+                                    placeholder="**.***.***/****-99"
+                                />
+                                <small
+                                    *ngIf="cnpj?.invalid && (cnpj?.dirty || cnpj?.touched)"
+                                    class="p-error block mt-2"
+                                >
+                                    <div *ngIf="cnpj?.errors?.['required']">CNPJ é obrigatório.</div>
+                                    <div *ngIf="cnpj?.errors?.['pattern']">
+                                        CNPJ deve conter apenas números e letras (maiúsculas).
+                                    </div>
+                                </small>
+                            </div>
+
+                            <div class="field mb-4">
+                                <label for="companyId" class="block mb-2">Código de Controle *</label>
+                                <p-input-mask mask="999999" formControlName="companyId" placeholder="100054" readonly />
+                                <small
+                                    *ngIf="companyId?.invalid && (companyId?.dirty || companyId?.touched)"
+                                    class="p-error block mt-2"
+                                >
+                                    <div *ngIf="companyId?.errors?.['required']">Código da empresa é obrigatório.</div>
+                                    <div *ngIf="companyId?.errors?.['pattern']">
+                                        Código deve conter exatamente 6 dígitos numéricos.
+                                    </div>
+                                </small>
+                            </div>
+
+                            <div class="flex mt-4">
+                                <p-button type="submit" label="Salvar" [disabled]="form.invalid || pending">
+                                    <i *ngIf="pending" class="pi pi-spin pi-spinner"></i>
+                                    <i *ngIf="!pending" class="pi pi-save"></i>
+                                </p-button>
+                            </div>
+
+                            <small *ngIf="showError" class="text-red-500">
+                                Houve um erro, verifique se o código de controle já existe.
+                            </small>
+                        </form>
+                    </p-tabpanel>
+                    <p-tabpanel *ngIf="canManageServices" value="1">
+                        <div *ngFor="let service of serviceOptions" class="flex items-center gap-3 mb-3">
+                            <p-toggleswitch
+                                #toggle
+                                [inputId]="'service-' + service.value"
+                                [ngModel]="hasService(service.value)"
+                                (onChange)="onToggleService(service.value, $event.checked, toggle)"
+                                [disabled]="pendingServices"
+                            />
+                            <label [for]="'service-' + service.value">{{ service.label }}</label>
                         </div>
-                    </small>
-                </div>
-
-                <div class="field mb-4">
-                    <label for="companyId" class="block mb-2">Código de Controle *</label>
-                    <p-input-mask mask="999999" formControlName="companyId" placeholder="100054" readonly />
-                    <small
-                        *ngIf="companyId?.invalid && (companyId?.dirty || companyId?.touched)"
-                        class="p-error block mt-2"
-                    >
-                        <div *ngIf="companyId?.errors?.['required']">Código da empresa é obrigatório.</div>
-                        <div *ngIf="companyId?.errors?.['pattern']">
-                            Código deve conter exatamente 6 dígitos numéricos.
-                        </div>
-                    </small>
-                </div>
-
-                <div class="flex mt-4">
-                    <p-button type="submit" label="Salvar" [disabled]="form.invalid || pending">
-                        <i *ngIf="pending" class="pi pi-spin pi-spinner"></i>
-                        <i *ngIf="!pending" class="pi pi-save"></i>
-                    </p-button>
-                </div>
-
-                <small *ngIf="showError" class="text-red-500">
-                    Houve um erro, verifique se o código de controle já existe.
-                </small>
-            </form>
-
-            <div *ngIf="canManageServices" class="mt-6">
-                <h3 class="font-semibold text-xl mb-4">Serviços</h3>
-                <div *ngFor="let service of serviceOptions" class="flex items-center gap-3 mb-3">
-                    <p-toggleswitch
-                        #toggle
-                        [inputId]="'service-' + service.value"
-                        [ngModel]="hasService(service.value)"
-                        (onChange)="onToggleService(service.value, $event.checked, toggle)"
-                        [disabled]="pendingServices"
-                    />
-                    <label [for]="'service-' + service.value">{{ service.label }}</label>
-                </div>
-                <small *ngIf="servicesError" class="text-red-500">{{ servicesError }}</small>
-            </div>
+                        <small *ngIf="servicesError" class="text-red-500">{{ servicesError }}</small>
+                    </p-tabpanel>
+                </p-tabpanels>
+            </p-tabs>
         </p-card>
         <p-confirm-dialog />
     `
