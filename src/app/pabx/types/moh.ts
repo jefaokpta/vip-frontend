@@ -4,4 +4,5 @@ export interface Moh {
     readonly companyId: string;
     readonly fileName: string;
     readonly audioUrl?: string;
+    readonly isDefault: boolean;
 }

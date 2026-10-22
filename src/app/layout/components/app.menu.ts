@@ -197,12 +197,6 @@ export class AppMenu implements OnInit {
                             icon: 'fa fa-music',
                             roles: [RoleEnum.ROLE_COMPANY_USER],
                             routerLink: ['/pabx/surveys']
-                        },
-                        {
-                            label: 'Definições Gerais',
-                            icon: 'pi pi-fw pi-cog',
-                            roles: [RoleEnum.ROLE_COMPANY_ADMIN],
-                            routerLink: ['/pabx/settings']
                         }
                     ]
                 },
