@@ -66,7 +66,7 @@ import {MyCallsStateService} from '@/pages/dashboard/my-calls-state.service';
                 [value]="companies"
                 [paginator]="true"
                 [rows]="15"
-                [globalFilterFields]="['name', 'companyId']"
+                [globalFilterFields]="['name', 'companyId', 'tenantName']"
                 [tableStyle]="{ 'min-width': '40rem' }"
                 stripedRows
             >
@@ -80,6 +80,10 @@ import {MyCallsStateService} from '@/pages/dashboard/my-calls-state.service';
                             Cod. Controle
                             <p-sortIcon field="companyId"></p-sortIcon>
                         </th>
+                        <th pSortableColumn="tenantName">
+                            Tenant
+                            <p-sortIcon field="tenantName"></p-sortIcon>
+                        </th>
                         <th style="width: 10%">Ações</th>
                     </tr>
                 </ng-template>
@@ -88,6 +92,7 @@ import {MyCallsStateService} from '@/pages/dashboard/my-calls-state.service';
                     <tr>
                         <td>{{ company.name }}</td>
                         <td>{{ company.companyId }}</td>
+                        <td>{{ company.tenantName ?? '-' }}</td>
                         <td>
                             <div class="flex gap-2">
                                 <p-button

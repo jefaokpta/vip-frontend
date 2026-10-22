@@ -1,4 +1,4 @@
-import { ServiceEnum } from '@/types/service-enum';
+import {ServiceEnum} from '@/types/service-enum';
 
 export interface Company {
     readonly id: number;
@@ -8,6 +8,7 @@ export interface Company {
     readonly cnpj: string;
     readonly tenantId: number;
     readonly services?: ServiceEnum[];
+    readonly tenantName?: string;
 }
 
 export interface NewCompany {
