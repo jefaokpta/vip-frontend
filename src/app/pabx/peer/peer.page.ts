@@ -97,7 +97,22 @@ import {PeerBatchResult} from '@/pabx/types/peer-batch-result';
                     <tr>
                         <td>{{ peer.peer }}</td>
                         <td>{{ peer.name }}</td>
-                        <td>{{ peer.userName ?? '-' }}</td>
+                        <td>
+                            <div class="flex items-center gap-2">
+                                <span>{{ peer.userName ?? '-' }}</span>
+                                @if (peer.userName) {
+                                    <p-button
+                                        icon="pi pi-user-minus"
+                                        severity="warn"
+                                        (click)="confirmRelease(peer)"
+                                        text
+                                        rounded
+                                        size="small"
+                                        pTooltip="Liberar ramal do usuário"
+                                    />
+                                }
+                            </div>
+                        </td>
                         <td>
                             <div class="flex gap-2">
                                 <p-button
@@ -203,6 +218,45 @@ export class PeerPage implements OnInit {
                         this.messageService.add({
                             severity: 'error',
                             summary: 'Desculpe não foi possível remover o ramal',
+                            detail: 'Tente novamente mais tarde.',
+                            life: 15_000
+                        });
+                    });
+            }
+        });
+    }
+
+    confirmRelease(peer: Peer) {
+        this.confirmationService.confirm({
+            message: `Liberar o ramal ${peer.peer} do usuário ${peer.userName}?`,
+            header: 'Confirmação',
+            closable: true,
+            closeOnEscape: true,
+            icon: 'pi pi-exclamation-triangle',
+            acceptButtonProps: {
+                label: 'Liberar',
+                severity: 'warn'
+            },
+            rejectButtonProps: {
+                label: 'Fechar',
+                severity: 'secondary',
+                outlined: true
+            },
+            accept: () => {
+                this.peerService
+                    .releaseFromUser(peer.id)
+                    .then(() => {
+                        this.peers = this.peers.map((p) => (p.id === peer.id ? { ...p, userName: undefined } : p));
+                        this.messageService.add({
+                            severity: 'success',
+                            summary: 'Ramal liberado com sucesso',
+                            life: 15_000
+                        });
+                    })
+                    .catch(() => {
+                        this.messageService.add({
+                            severity: 'error',
+                            summary: 'Desculpe não foi possível liberar o ramal',
                             detail: 'Tente novamente mais tarde.',
                             life: 15_000
                         });
