@@ -58,6 +58,7 @@ export class AppMenu implements OnInit {
                 {
                     label: 'PABX',
                     icon: 'pi pi-fw pi-phone',
+                    roles: [RoleEnum.ROLE_COMPANY_SUPERVISOR],
                     module: ModuleEnum.PABX,
                     items: [
                         {
@@ -67,7 +68,7 @@ export class AppMenu implements OnInit {
                                 {
                                     label: 'Chamadas',
                                     icon: 'pi pi-fw pi-chart-bar',
-                                    roles: [RoleEnum.ROLE_COMPANY_ADMIN],
+                                    roles: [RoleEnum.ROLE_COMPANY_SUPERVISOR],
                                     routerLink: ['/pabx/call-report']
                                 },
                                 {
