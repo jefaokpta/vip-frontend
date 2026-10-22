@@ -18,6 +18,8 @@ import {InputNumber} from 'primeng/inputnumber';
 import {Password} from 'primeng/password';
 import {SelectButton} from 'primeng/selectbutton';
 import {Tab, TabList, TabPanel, TabPanels, Tabs} from 'primeng/tabs';
+import {UserService} from '@/pages/users/user.service';
+import {RoleEnum} from '@/types/role-enum';
 
 /**
  * @author Jefferson Alves Reis (jefaokpta)
@@ -205,25 +207,27 @@ import {Tab, TabList, TabPanel, TabPanels, Tabs} from 'primeng/tabs';
                                 ></p-select>
                             </div>
 
-                            <div class="field mb-4">
-                                <label for="callLimit" class="block mb-2">Chamadas Simultâneas *</label>
-                                <p-input-number
-                                    id="callLimit"
-                                    mode="decimal"
-                                    useGrouping="false"
-                                    formControlName="callLimit"
-                                />
-                                @if (callLimit?.invalid && (callLimit?.dirty || callLimit?.touched)) {
-                                    <small class="p-error block mt-2">
-                                        <span class="text-red-500">Limite de chamadas é obrigatório.</span>
-                                    </small>
-                                }
-                            </div>
+                            @if (isSaasSupport) {
+                                <div class="field mb-4">
+                                    <label for="callLimit" class="block mb-2">Chamadas Simultâneas *</label>
+                                    <p-input-number
+                                        id="callLimit"
+                                        mode="decimal"
+                                        useGrouping="false"
+                                        formControlName="callLimit"
+                                    />
+                                    @if (callLimit?.invalid && (callLimit?.dirty || callLimit?.touched)) {
+                                        <small class="p-error block mt-2">
+                                            <span class="text-red-500">Limite de chamadas é obrigatório.</span>
+                                        </small>
+                                    }
+                                </div>
 
-                            <div class="field">
-                                <label for="qualify" class="block mb-2">Testar Alcance</label>
-                                <p-toggleswitch formControlName="qualify" />
-                            </div>
+                                <div class="field">
+                                    <label for="qualify" class="block mb-2">Testar Alcance</label>
+                                    <p-toggleswitch formControlName="qualify" />
+                                </div>
+                            }
 
                             <div class="field">
                                 <label for="nat" class="block mb-2">Usar NAT</label>
@@ -257,8 +261,13 @@ export class NewPeerPage implements OnInit {
         private readonly fb: FormBuilder,
         private readonly router: Router,
         private readonly peerService: PeerService,
-        private readonly pickupGroupService: PickupGroupService
-    ) {}
+        private readonly pickupGroupService: PickupGroupService,
+        private readonly userService: UserService
+    ) {
+        this.isSaasSupport = userService.getUser().roles.includes(RoleEnum.ROLE_SAAS_SUPPORT);
+    }
+
+    readonly isSaasSupport: boolean;
 
     transportsOptions = Object.values(PeerTransportEnum).map((value) => ({ label: value, value }));
 
@@ -279,7 +288,7 @@ export class NewPeerPage implements OnInit {
             qualify: [false, [Validators.required]],
             nat: [true, [Validators.required]],
             dtmfModeEnum: [DtmfModeEnum.RFC4733, [Validators.required]],
-            callLimit: [1, [Validators.required]],
+            callLimit: [2, [Validators.required]],
             md5Secret: ['', [Validators.required, Validators.minLength(2)]]
         });
         this.pickupGroupService.findAll().then((groups) => (this.pickUpGroupOptions = groups));
