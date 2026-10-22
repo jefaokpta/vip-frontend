@@ -71,7 +71,7 @@ import {PeerBatchResult} from '@/pabx/types/peer-batch-result';
                 [value]="peers"
                 [paginator]="true"
                 [rows]="15"
-                [globalFilterFields]="['name', 'peer']"
+                [globalFilterFields]="['name', 'peer', 'userName']"
                 [tableStyle]="{ 'min-width': '40rem' }"
                 stripedRows
             >
@@ -85,6 +85,10 @@ import {PeerBatchResult} from '@/pabx/types/peer-batch-result';
                             Nome
                             <p-sortIcon field="name"></p-sortIcon>
                         </th>
+                        <th pSortableColumn="userName">
+                            Usuário
+                            <p-sortIcon field="userName"></p-sortIcon>
+                        </th>
                         <th style="width: 10%">Ações</th>
                     </tr>
                 </ng-template>
@@ -93,6 +97,7 @@ import {PeerBatchResult} from '@/pabx/types/peer-batch-result';
                     <tr>
                         <td>{{ peer.peer }}</td>
                         <td>{{ peer.name }}</td>
+                        <td>{{ peer.userName ?? '-' }}</td>
                         <td>
                             <div class="flex gap-2">
                                 <p-button
