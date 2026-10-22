@@ -1,6 +1,6 @@
-import { QueueState } from '@/pabx/types/queue-state';
-import { QueueMember } from '@/pabx/types/queue-member';
-import { QueueMemberStatusEnum } from '@/pabx/types/queue-member-status-enum';
+import {QueueState} from '@/pabx/types/queue-state';
+import {QueueMember} from '@/pabx/types/queue-member';
+import {QueueMemberStatusEnum} from '@/pabx/types/queue-member-status-enum';
 import {
     formatDuration,
     globalServiceLevel,
@@ -15,7 +15,7 @@ import {
 function member(id: number, status: QueueMemberStatusEnum, extra: Partial<QueueMember> = {}): QueueMember {
     return {
         id,
-        name: `Agente ${id}`,
+        name: `Membro ${id}`,
         peerRegistry: { id: `p${id}`, peer: { peer: `100${id}` } },
         queueMemberStatusEnum: status,
         ...extra
@@ -110,7 +110,7 @@ describe('queue-dashboard.metrics', () => {
             expect(alerts.length).toBe(1);
             expect(alerts[0]).toEqual({
                 memberId: 1,
-                name: 'Agente 1',
+                name: 'Membro 1',
                 extension: '1001',
                 type: 'LONG_PAUSE',
                 elapsedSeconds: 960

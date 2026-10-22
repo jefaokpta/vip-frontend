@@ -1,9 +1,9 @@
-import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { environment } from '../../../environments/environment';
-import { executeRequest, httpHeaders } from '@/util/utils';
-import { Moh } from '@/pabx/types/moh';
-import { firstValueFrom } from 'rxjs';
+import {Injectable} from '@angular/core';
+import {HttpClient, HttpHeaders} from '@angular/common/http';
+import {environment} from '../../../environments/environment';
+import {executeRequest, httpHeaders} from '@/util/utils';
+import {Moh} from '@/pabx/types/moh';
+import {firstValueFrom} from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class MohService {
@@ -40,6 +40,18 @@ export class MohService {
         const formData = new FormData();
         formData.append('name', name);
         const result = executeRequest(this.http.put<Moh>(`${this.BACKEND}/mohs/${id}`, formData, httpHeaders()));
+        this.cachedFindAllPromise = null;
+        return result;
+    }
+
+    setDefault(id: number): Promise<Moh> {
+        const result = executeRequest(this.http.put<Moh>(`${this.BACKEND}/mohs/${id}/default`, null, httpHeaders()));
+        this.cachedFindAllPromise = null;
+        return result;
+    }
+
+    unsetDefault(id: number): Promise<Moh> {
+        const result = executeRequest(this.http.delete<Moh>(`${this.BACKEND}/mohs/${id}/default`, httpHeaders()));
         this.cachedFindAllPromise = null;
         return result;
     }

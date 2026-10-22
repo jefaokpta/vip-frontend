@@ -13,6 +13,7 @@ import {Toast} from 'primeng/toast';
 import {Moh} from '@/pabx/types/moh';
 import {Tooltip} from 'primeng/tooltip';
 import {MohService} from '@/pabx/moh/moh.service';
+import {Tag} from 'primeng/tag';
 
 @Component({
     selector: 'app-mohs-page',
@@ -29,7 +30,8 @@ import {MohService} from '@/pabx/moh/moh.service';
         ProgressSpinner,
         ConfirmDialog,
         Toast,
-        Tooltip
+        Tooltip,
+        Tag
     ],
     template: `
         <p-card>
@@ -50,7 +52,7 @@ import {MohService} from '@/pabx/moh/moh.service';
                                 class="w-full"
                             />
                         </p-iconfield>
-                        <p-button icon="pi pi-plus" label="MOH" routerLink="new" outlined class="mx-4" rounded />
+                        <p-button icon="pi pi-plus" label="Audio" routerLink="new" outlined class="mx-4" rounded />
                     </div>
                 </div>
             </ng-template>
@@ -77,7 +79,12 @@ import {MohService} from '@/pabx/moh/moh.service';
 
                 <ng-template pTemplate="body" let-moh>
                     <tr>
-                        <td>{{ moh.name }}</td>
+                        <td>
+                            {{ moh.name }}
+                            @if (moh.isDefault) {
+                                <p-tag value="Padrão" severity="info" class="ml-2" />
+                            }
+                        </td>
                         <td>
                             @if (moh.audioUrl) {
                                 <audio controls [src]="moh.audioUrl" style="height: 2rem"></audio>
@@ -85,6 +92,14 @@ import {MohService} from '@/pabx/moh/moh.service';
                         </td>
                         <td>
                             <div class="flex gap-2">
+                                <p-button
+                                    [icon]="moh.isDefault ? 'pi pi-star-fill' : 'pi pi-star'"
+                                    (click)="toggleDefault(moh)"
+                                    outlined
+                                    size="small"
+                                    [pTooltip]="moh.isDefault ? 'Remover audio de espera padrão' : 'Definir audio de espera padrão'"
+                                    tooltipPosition="left"
+                                />
                                 <p-button
                                     icon="pi pi-pencil"
                                     [routerLink]="['edit', moh.id]"
@@ -147,6 +162,30 @@ export class MohsPage implements OnInit {
         }
     }
 
+    toggleDefault(moh: Moh) {
+        const request = moh.isDefault ? this.mohService.unsetDefault(moh.id) : this.mohService.setDefault(moh.id);
+        request
+            .then((updated) => {
+                this.mohs = this.mohs.map((m) => ({
+                    ...m,
+                    isDefault: m.id === updated.id ? updated.isDefault : updated.isDefault ? false : m.isDefault
+                }));
+                this.messageService.add({
+                    severity: 'success',
+                    summary: updated.isDefault ? `${moh.name} definido como audio de espera padrão` : 'Audio de espera padrão removido',
+                    life: 15_000
+                });
+            })
+            .catch((err) => {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Desculpe não foi possível alterar o audio de espera padrão',
+                    detail: err?.error?.message || 'Tente novamente mais tarde.',
+                    life: 15_000
+                });
+            });
+    }
+
     confirmDelete(moh: Moh) {
         this.confirmationService.confirm({
             message: `Deletar ${moh.name}?`,
@@ -170,16 +209,16 @@ export class MohsPage implements OnInit {
                         this.mohs = this.mohs.filter((m) => m.id !== moh.id);
                         this.messageService.add({
                             severity: 'success',
-                            summary: 'MOH removido com sucesso',
-                            life: 15_000
+                            summary: 'Audio removido com sucesso',
+                            life: 30_000
                         });
                     })
                     .catch((err) => {
                         this.messageService.add({
                             severity: 'error',
-                            summary: 'Desculpe não foi possível remover o MOH',
+                            summary: 'Desculpe não foi possível remover o Audio',
                             detail: err?.error?.message || 'Tente novamente mais tarde.',
-                            life: 15_000
+                            life: 30_000
                         });
                     });
             }

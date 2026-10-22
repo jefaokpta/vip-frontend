@@ -1,6 +1,6 @@
-import { DtmfModeEnum } from '@/pabx/types/dtmf-mode-enum';
-import { LanguageEnum } from '@/pabx/types/language-enum';
-import { PeerTransportEnum } from '@/pabx/types/peer-transport-enum';
+import {DtmfModeEnum} from '@/pabx/types/dtmf-mode-enum';
+import {LanguageEnum} from '@/pabx/types/language-enum';
+import {PeerTransportEnum} from '@/pabx/types/peer-transport-enum';
 
 export interface Peer {
     readonly id: number;
@@ -15,4 +15,5 @@ export interface Peer {
     readonly nat: boolean;
     readonly dtmfModeEnum: DtmfModeEnum;
     readonly callLimit: number;
+    readonly userName?: string;
 }

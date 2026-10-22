@@ -1,22 +1,22 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { Button } from 'primeng/button';
-import { ConfirmDialog, ConfirmDialogModule } from 'primeng/confirmdialog';
-import { IconField } from 'primeng/iconfield';
-import { InputIcon } from 'primeng/inputicon';
-import { InputText } from 'primeng/inputtext';
-import { ConfirmationService, MessageService, PrimeTemplate } from 'primeng/api';
-import { RouterLink } from '@angular/router';
-import { Table, TableModule } from 'primeng/table';
-import { Tooltip } from 'primeng/tooltip';
-import { RoleEnum } from '@/types/role-enum';
-import { User } from '@/types/user';
-import { Card } from 'primeng/card';
-import { Toast } from 'primeng/toast';
-import { NgIf } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { ProgressSpinner } from 'primeng/progressspinner';
-import { UserService } from './user.service';
-import { translateModule, translateRole } from '@/pages/users/utils';
+import {Component, OnInit, ViewChild} from '@angular/core';
+import {Button} from 'primeng/button';
+import {ConfirmDialog, ConfirmDialogModule} from 'primeng/confirmdialog';
+import {IconField} from 'primeng/iconfield';
+import {InputIcon} from 'primeng/inputicon';
+import {InputText} from 'primeng/inputtext';
+import {ConfirmationService, MessageService, PrimeTemplate} from 'primeng/api';
+import {RouterLink} from '@angular/router';
+import {Table, TableModule} from 'primeng/table';
+import {Tooltip} from 'primeng/tooltip';
+import {RoleEnum} from '@/types/role-enum';
+import {User} from '@/types/user';
+import {Card} from 'primeng/card';
+import {Toast} from 'primeng/toast';
+import {NgIf} from '@angular/common';
+import {FormsModule} from '@angular/forms';
+import {ProgressSpinner} from 'primeng/progressspinner';
+import {UserService} from './user.service';
+import {translateModule, translateRole} from '@/pages/users/utils';
 
 @Component({
     selector: 'app-users',
@@ -108,7 +108,7 @@ import { translateModule, translateRole } from '@/pages/users/utils';
                                     (click)="resendConfirmation(user)"
                                     text
                                     size="small"
-                                    pTooltip="Reenviar e-mail de confirmação"
+                                    pTooltip="Reenviar e-mail de confirmação, expira em 24 horas"
                                     tooltipPosition="right"
                                 />
                             </div>

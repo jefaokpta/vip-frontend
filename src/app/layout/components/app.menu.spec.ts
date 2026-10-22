@@ -1,10 +1,10 @@
-import { TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
-import { MenuItem } from 'primeng/api';
-import { AppMenu } from '@/layout/components/app.menu';
-import { UserService } from '@/pages/users/user.service';
-import { RoleEnum } from '@/types/role-enum';
-import { ModuleEnum } from '@/types/module-enum';
+import {TestBed} from '@angular/core/testing';
+import {provideRouter} from '@angular/router';
+import {MenuItem} from 'primeng/api';
+import {AppMenu} from '@/layout/components/app.menu';
+import {UserService} from '@/pages/users/user.service';
+import {RoleEnum} from '@/types/role-enum';
+import {ModuleEnum} from '@/types/module-enum';
 
 describe('AppMenu', () => {
     function buildMenu(roles: RoleEnum[], modules: ModuleEnum[]): MenuItem[] {
@@ -44,6 +44,16 @@ describe('AppMenu', () => {
         const all = labels(buildMenu(USER, [ModuleEnum.PABX]));
         expect(all).not.toContain('Painel de Filas');
         expect(all).toContain('Painel de Ramais');
+    });
+
+    it('usuário com PABX não vê o item PABX', () => {
+        expect(labels(buildMenu(USER, [ModuleEnum.PABX]))).not.toContain('PABX');
+    });
+
+    it('supervisor com PABX vê o item PABX e o relatório de Chamadas', () => {
+        const all = labels(buildMenu(SUPERVISOR, [ModuleEnum.PABX]));
+        expect(all).toContain('PABX');
+        expect(all).toContain('Chamadas');
     });
 
     it('supervisor com PABX vê os dois painéis', () => {

@@ -138,7 +138,7 @@ import {SurveyService} from '@/pabx/survey/survey.service';
                             </div>
 
                             <div class="field mb-4">
-                                <label class="block mb-2">Agentes da Fila</label>
+                                <label class="block mb-2">Membros da Fila</label>
                                 <p-picklist
                                     [source]="availableUsers"
                                     [target]="selectedUsers"
