@@ -50,7 +50,7 @@ import {rxStompServiceFactory} from '@/websocket/stomp/rx-stomp-service-factory'
 
                         <div class="flex gap-6 text-sm text-surface-500 dark:text-surface-400">
                             <div class="flex flex-col">
-                                <span class="text-xs uppercase tracking-wide">Agentes</span>
+                                <span class="text-xs uppercase tracking-wide">Membros</span>
                                 <span class="font-bold text-surface-700 dark:text-surface-200">{{
                                     qs.loggedMembers.length
                                 }}</span>

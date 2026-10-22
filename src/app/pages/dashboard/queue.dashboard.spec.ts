@@ -1,12 +1,12 @@
-import { ComponentFixture, fakeAsync, flushMicrotasks, TestBed, tick } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
-import { Subject } from 'rxjs';
-import { QueueDashboard } from '@/pages/dashboard/queue.dashboard';
-import { QueueDashboardService } from '@/pages/dashboard/queue-dashboard.service';
-import { WebsocketService } from '@/websocket/stomp/websocket.service';
-import { UserService } from '@/pages/users/user.service';
-import { QueueState } from '@/pabx/types/queue-state';
-import { QueueMemberStatusEnum } from '@/pabx/types/queue-member-status-enum';
+import {ComponentFixture, fakeAsync, flushMicrotasks, TestBed, tick} from '@angular/core/testing';
+import {provideRouter} from '@angular/router';
+import {Subject} from 'rxjs';
+import {QueueDashboard} from '@/pages/dashboard/queue.dashboard';
+import {QueueDashboardService} from '@/pages/dashboard/queue-dashboard.service';
+import {WebsocketService} from '@/websocket/stomp/websocket.service';
+import {UserService} from '@/pages/users/user.service';
+import {QueueState} from '@/pabx/types/queue-state';
+import {QueueMemberStatusEnum} from '@/pabx/types/queue-member-status-enum';
 
 describe('QueueDashboard', () => {
     let serviceSpy: jasmine.SpyObj<QueueDashboardService>;
@@ -86,7 +86,7 @@ describe('QueueDashboard', () => {
         expect(text).toContain('NS CRÍTICO');
         expect(text).toContain('TME ACIMA DO ALVO');
         expect(text).toContain('OPERAÇÃO OK');
-        expect(text).not.toContain('VER TODOS OS AGENTES');
+        expect(text).not.toContain('VER TODOS OS MEMBROS');
         expect(fixture.nativeElement.querySelector('[data-testid="global-sl"]').textContent.trim()).toBe('50%');
         fixture.destroy();
     }));

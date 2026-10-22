@@ -1,28 +1,28 @@
-import { Component, computed, OnDestroy, OnInit, signal } from '@angular/core';
-import { Subscription } from 'rxjs';
-import { NgClass, NgForOf } from '@angular/common';
-import { Card } from 'primeng/card';
-import { ChartModule } from 'primeng/chart';
-import { RouterLink } from '@angular/router';
-import { QueueDashboardService } from '@/pages/dashboard/queue-dashboard.service';
-import { HourlyCalls } from '@/pabx/types/hourly-calls';
+import {Component, computed, OnDestroy, OnInit, signal} from '@angular/core';
+import {Subscription} from 'rxjs';
+import {NgClass, NgForOf} from '@angular/common';
+import {Card} from 'primeng/card';
+import {ChartModule} from 'primeng/chart';
+import {RouterLink} from '@angular/router';
+import {QueueDashboardService} from '@/pages/dashboard/queue-dashboard.service';
+import {HourlyCalls} from '@/pabx/types/hourly-calls';
 import {
     formatDuration,
-    MemberAlert,
-    QueueAlert,
     globalServiceLevel,
     globalTmeSeconds,
+    MemberAlert,
     memberAlerts,
     memberCounts,
     percentOf,
+    QueueAlert,
     queueAlerts,
     queueServiceLevel,
     serviceLevelSeverity
 } from '@/pages/dashboard/queue-dashboard.metrics';
-import { QueueState } from '@/pabx/types/queue-state';
-import { WebsocketService } from '@/websocket/stomp/websocket.service';
-import { rxStompServiceFactory } from '@/websocket/stomp/rx-stomp-service-factory';
-import { UserService } from '@/pages/users/user.service';
+import {QueueState} from '@/pabx/types/queue-state';
+import {WebsocketService} from '@/websocket/stomp/websocket.service';
+import {rxStompServiceFactory} from '@/websocket/stomp/rx-stomp-service-factory';
+import {UserService} from '@/pages/users/user.service';
 
 @Component({
     selector: 'app-queue-dashboard',
@@ -195,7 +195,7 @@ import { UserService } from '@/pages/users/user.service';
 
                         <div class="flex flex-col gap-3">
                             <div
-                                *ngFor="let a of agentStatusCards()"
+                                *ngFor="let a of memberStatusCards()"
                                 class="rounded-xl shadow px-4 py-3 flex items-center justify-between border-l-4 transition-all duration-300"
                                 [ngClass]="a.border"
                             >
@@ -223,10 +223,10 @@ import { UserService } from '@/pages/users/user.service';
                                     class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0"
                                     [ngClass]="alertAvatarClass(ag.type)"
                                 >
-                                    {{ agentInitials(ag.name) }}
+                                    {{ memberInitials(ag.name) }}
                                 </div>
 
-                                <!-- Agent info -->
+                                <!-- Member info -->
                                 <div class="flex flex-col flex-1 min-w-0">
                                     <span class="font-semibold text-sm truncate">{{ ag.name }}</span>
                                     <span class="text-xs text-gray-400">{{ ag.extension }}</span>
@@ -296,7 +296,7 @@ export class QueueDashboard implements OnInit, OnDestroy {
     readonly operacaoCount = computed(() => this.activeQueues() - this.alertaCount());
 
     readonly counts = computed(() => memberCounts(this.queues()));
-    readonly agentStatusCards = computed(() => {
+    readonly memberStatusCards = computed(() => {
         const c = this.counts();
         const sub = (n: number) => `${percentOf(n, c.total)}% dos logados`;
         return [
@@ -460,7 +460,7 @@ export class QueueDashboard implements OnInit, OnDestroy {
         return formatDuration(seconds);
     }
 
-    agentInitials(name: string): string {
+    memberInitials(name: string): string {
         return name
             .split(' ')
             .map((w) => w[0])
