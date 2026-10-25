@@ -1,23 +1,23 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { Table, TableModule } from 'primeng/table';
-import { ConfirmationService, MessageService } from 'primeng/api';
-import { Card } from 'primeng/card';
-import { IconField } from 'primeng/iconfield';
-import { InputIcon } from 'primeng/inputicon';
-import { InputText } from 'primeng/inputtext';
-import { Button } from 'primeng/button';
-import { CalendarService } from '@/pabx/calendar/calendar.service';
-import { RouterLink } from '@angular/router';
-import { ProgressSpinner } from 'primeng/progressspinner';
-import { ConfirmDialog } from 'primeng/confirmdialog';
-import { Toast } from 'primeng/toast';
-import { Calendar } from '@/pabx/types/calendar';
-import { CalendarTypeEnum } from '@/pabx/types/calendar-type-enum';
-import { WeekDayEnum } from '@/pabx/types/week-day-enum';
-import { NgIf } from '@angular/common';
-import { Tooltip } from 'primeng/tooltip';
-import { Badge } from 'primeng/badge';
-import { calendarWeekDays } from '@/pabx/calendar/utils';
+import {Component, OnInit, ViewChild} from '@angular/core';
+import {Table, TableModule} from 'primeng/table';
+import {ConfirmationService, MessageService} from 'primeng/api';
+import {Card} from 'primeng/card';
+import {IconField} from 'primeng/iconfield';
+import {InputIcon} from 'primeng/inputicon';
+import {InputText} from 'primeng/inputtext';
+import {Button} from 'primeng/button';
+import {CalendarService} from '@/pabx/calendar/calendar.service';
+import {RouterLink} from '@angular/router';
+import {ProgressSpinner} from 'primeng/progressspinner';
+import {ConfirmDialog} from 'primeng/confirmdialog';
+import {Toast} from 'primeng/toast';
+import {Calendar} from '@/pabx/types/calendar';
+import {CalendarTypeEnum} from '@/pabx/types/calendar-type-enum';
+import {WeekDayEnum} from '@/pabx/types/week-day-enum';
+import {NgIf} from '@angular/common';
+import {Tooltip} from 'primeng/tooltip';
+import {Badge} from 'primeng/badge';
+import {calendarWeekDays} from '@/pabx/calendar/utils';
 
 @Component({
     selector: 'app-calendar-page',
@@ -257,11 +257,11 @@ export class CalendarPage implements OnInit {
                             life: 15_000
                         });
                     })
-                    .catch(() => {
+                    .catch((err) => {
                         this.messageService.add({
                             severity: 'error',
                             summary: 'Desculpe não foi possível remover o calendário',
-                            detail: 'Tente novamente mais tarde.',
+                            detail: err?.error?.message || 'Tente novamente mais tarde.',
                             life: 15_000
                         });
                     });
