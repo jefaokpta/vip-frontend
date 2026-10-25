@@ -10,6 +10,7 @@ import { Toast } from 'primeng/toast';
 import { DdrService } from '@/pabx/ddr/ddr.service';
 import { Ddr } from '@/pabx/types/ddr';
 import { HttpErrorResponse } from '@angular/common/http';
+import { DDR_MAX_DIGITS, ddrValidator, formatDdr, onlyDigits } from '@/pabx/ddr/ddr-format';
 
 @Component({
     selector: 'app-edit-ddr-page',
@@ -20,7 +21,7 @@ import { HttpErrorResponse } from '@angular/common/http';
         <p-card>
             <ng-template #title>
                 <div class="flex justify-between">
-                    <span class="font-semibold text-2xl">Editar DDR {{ ddrData?.ddr }}</span>
+                    <span class="font-semibold text-2xl">Editar DDR {{ ddrData ? formatDdr(ddrData.ddr) : '' }}</span>
                     <p-button
                         type="button"
                         label="Voltar"
@@ -40,12 +41,14 @@ import { HttpErrorResponse } from '@angular/common/http';
                         pInputText
                         class="p-inputtext"
                         formControlName="ddr"
-                        placeholder="Ex: 551132121234"
-                        (keypress)="onlyNumbers($event)"
+                        placeholder="Ex: (11) 3212-1234"
+                        (input)="onDdrInput($event)"
                     />
                     <small *ngIf="ddr?.invalid && (ddr?.dirty || ddr?.touched)" class="p-error block mt-2">
                         <div *ngIf="ddr?.errors?.['required']">Telefone é obrigatório.</div>
-                        <div *ngIf="ddr?.errors?.['pattern']">Somente números são permitidos.</div>
+                        <div *ngIf="ddr?.errors?.['ddrFormat']">
+                            Formato inválido. Use DDD+número, operadora+DDD+número, 0+operadora+DDD+número ou 0800.
+                        </div>
                     </small>
                 </div>
 
@@ -64,6 +67,7 @@ export class EditDdrPage implements OnInit {
     form!: FormGroup;
     pending = false;
     ddrData?: Ddr;
+    protected readonly formatDdr = formatDdr;
     private readonly id: string;
 
     constructor(
@@ -84,22 +88,23 @@ export class EditDdrPage implements OnInit {
         this.form = this.fb.group({
             id: ['', [Validators.required]],
             companyId: ['', [Validators.required]],
-            ddr: ['', [Validators.required, Validators.pattern(/^\d+$/)]]
+            ddr: ['', [Validators.required, ddrValidator]]
         });
         this.ddrService.findById(this.id).then((ddrData) => {
             this.ddrData = ddrData;
-            this.form.patchValue(ddrData);
+            this.form.patchValue({ ...ddrData, ddr: formatDdr(ddrData.ddr) });
         });
     }
 
-    onlyNumbers(event: KeyboardEvent) {
-        if (!/^\d$/.test(event.key)) event.preventDefault();
+    onDdrInput(event: Event) {
+        const digits = onlyDigits((event.target as HTMLInputElement).value).slice(0, DDR_MAX_DIGITS);
+        this.ddr?.setValue(formatDdr(digits));
     }
 
     onSubmit() {
         this.pending = true;
         this.ddrService
-            .update(this.form.value)
+            .update({ ...this.form.value, ddr: onlyDigits(this.form.value.ddr) })
             .then(() => this.router.navigate(['/pabx/ddrs']))
             .catch((error: HttpErrorResponse) => {
                 this.messageService.add({
