@@ -1,8 +1,8 @@
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../environments/environment';
-import { executeRequest, httpHeaders } from '@/util/utils';
-import { PickupGroup } from '@/pabx/types/pickup-group';
+import {Injectable} from '@angular/core';
+import {HttpClient} from '@angular/common/http';
+import {environment} from '../../../environments/environment';
+import {executeRequest, httpHeaders} from '@/util/utils';
+import {PickupGroup} from '@/pabx/types/pickup-group';
 
 @Injectable({ providedIn: 'root' })
 export class PickupGroupService {
@@ -26,6 +26,10 @@ export class PickupGroupService {
         return executeRequest(
             this.http.put<PickupGroup>(`${this.BACKEND}/pickup-groups/${id}`, { name }, httpHeaders())
         );
+    }
+
+    assignPeers(id: number, peerIds: number[]) {
+        return executeRequest(this.http.put(`${this.BACKEND}/pickup-groups/${id}/peers`, peerIds, httpHeaders()));
     }
 
     delete(id: number) {

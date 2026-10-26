@@ -163,13 +163,17 @@ export class PeerPage implements OnInit {
 
     ngOnInit(): void {
         this.peerService.findAll().then((peers) => {
-            this.peers = peers;
+            this.peers = this.sortByPeer(peers);
             this.loading = false;
         });
     }
 
+    private sortByPeer(peers: Peer[]): Peer[] {
+        return [...peers].sort((a, b) => a.peer.localeCompare(b.peer, undefined, {numeric: true}));
+    }
+
     onBatchCreated(result: PeerBatchResult) {
-        this.peers = [...this.peers, ...result.created];
+        this.peers = this.sortByPeer([...this.peers, ...result.created]);
         this.messageService.add({
             severity: 'success',
             summary: `${result.created.length} ramal(is) criado(s) com sucesso`,

@@ -94,7 +94,7 @@ import {AccountCode} from '@/pabx/types/account-code';
                         <p-table [value]="routeTrunks.controls" [tableStyle]="{ 'min-width': '50rem' }">
                             <ng-template #header>
                                 <tr>
-                                    <th style="width: 1rem">Código</th>
+                                    <th>Centro de custo</th>
                                     <th>Tronco 1</th>
                                     <th>Tronco 2</th>
                                     <th>Tronco 3</th>
@@ -104,6 +104,9 @@ import {AccountCode} from '@/pabx/types/account-code';
                                 <tr [formGroupName]="index">
                                     <td>
                                         <p-tag [value]="acc.get('accountCode').value" severity="warn" />
+                                        <span class="ml-2 whitespace-nowrap">{{
+                                                accountCodeTitles[acc.get('accountCode').value]
+                                            }}</span>
                                     </td>
                                     <td>
                                         <p-select
@@ -181,6 +184,7 @@ export class NewRoutePage implements OnInit {
         });
         this.accountCodeService.findAll().then((acc) =>
             this.filterUnwelcomeAccountCodes(acc).forEach((acc) => {
+                this.accountCodeTitles[acc.code] = acc.title;
                 this.addRouteTrunk(acc.code);
             })
         );
@@ -190,6 +194,7 @@ export class NewRoutePage implements OnInit {
     }
 
     trunkOptions: { label: string; value: number }[] = [];
+    accountCodeTitles: Record<string, string> = {};
 
     private addRouteTrunk(accountCode: string) {
         const routeTrunkRow = this.fb.group({

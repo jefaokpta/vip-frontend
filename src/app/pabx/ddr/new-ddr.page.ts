@@ -1,21 +1,21 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
-import { Card } from 'primeng/card';
-import { Button } from 'primeng/button';
-import { InputText } from 'primeng/inputtext';
-import { NgIf } from '@angular/common';
-import { MessageService } from 'primeng/api';
-import { Toast } from 'primeng/toast';
-import { DdrService } from '@/pabx/ddr/ddr.service';
-import { HttpErrorResponse } from '@angular/common/http';
-import { DDR_MAX_DIGITS, ddrValidator, formatDdr, onlyDigits } from '@/pabx/ddr/ddr-format';
+import {Component, OnInit} from '@angular/core';
+import {FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {Router, RouterLink} from '@angular/router';
+import {Card} from 'primeng/card';
+import {Button} from 'primeng/button';
+import {NgIf} from '@angular/common';
+import {MessageService} from 'primeng/api';
+import {Toast} from 'primeng/toast';
+import {DdrFieldComponent} from '@/pabx/ddr/ddr-field.component';
+import {DdrService} from '@/pabx/ddr/ddr.service';
+import {HttpErrorResponse} from '@angular/common/http';
+import {ddrValidator, onlyDigits} from '@/pabx/ddr/ddr-format';
 
 @Component({
     selector: 'app-new-ddr-page',
     standalone: true,
     providers: [MessageService],
-    imports: [Card, Button, InputText, NgIf, ReactiveFormsModule, RouterLink, Toast],
+    imports: [Card, Button, DdrFieldComponent, NgIf, ReactiveFormsModule, RouterLink, Toast],
     template: `
         <p-card>
             <ng-template #title>
@@ -33,23 +33,7 @@ import { DDR_MAX_DIGITS, ddrValidator, formatDdr, onlyDigits } from '@/pabx/ddr/
             </ng-template>
 
             <form [formGroup]="form" (ngSubmit)="onSubmit()" class="p-fluid">
-                <div class="field mb-4">
-                    <label for="ddr" class="block mb-2">Telefone *</label>
-                    <input
-                        id="ddr"
-                        pInputText
-                        class="p-inputtext"
-                        formControlName="ddr"
-                        placeholder="Ex: (11) 3212-1234"
-                        (input)="onDdrInput($event)"
-                    />
-                    <small *ngIf="ddr?.invalid && (ddr?.dirty || ddr?.touched)" class="p-error block mt-2">
-                        <div *ngIf="ddr?.errors?.['required']">Telefone é obrigatório.</div>
-                        <div *ngIf="ddr?.errors?.['ddrFormat']">
-                            Formato inválido. Use DDD+número, operadora+DDD+número, 0+operadora+DDD+número ou 0800.
-                        </div>
-                    </small>
-                </div>
+                <app-ddr-field [control]="ddrControl"/>
 
                 <div class="flex mt-4">
                     <p-button type="submit" label="Salvar" [disabled]="form.invalid || pending">
@@ -73,19 +57,14 @@ export class NewDdrPage implements OnInit {
         private readonly messageService: MessageService
     ) {}
 
-    get ddr() {
-        return this.form.get('ddr');
+    get ddrControl() {
+        return this.form.get('ddr') as FormControl;
     }
 
     ngOnInit(): void {
         this.form = this.fb.group({
             ddr: ['', [Validators.required, ddrValidator]]
         });
-    }
-
-    onDdrInput(event: Event) {
-        const digits = onlyDigits((event.target as HTMLInputElement).value).slice(0, DDR_MAX_DIGITS);
-        this.ddr?.setValue(formatDdr(digits));
     }
 
     onSubmit() {

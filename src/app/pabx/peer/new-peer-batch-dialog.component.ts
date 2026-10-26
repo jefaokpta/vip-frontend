@@ -102,6 +102,7 @@ function rangeOrderValidator(control: AbstractControl): ValidationErrors | null 
                         optionValue="id"
                         placeholder="Selecione um grupo"
                         [showClear]="true"
+                        appendTo="body"
                     ></p-select>
                 </div>
 
