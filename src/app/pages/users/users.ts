@@ -168,7 +168,7 @@ export class UsersPage implements OnInit {
 
     ngOnInit(): void {
         this.userService.findAll().then((users) => {
-            this.users = users;
+            this.users = [...users].sort((a, b) => a.name.localeCompare(b.name, 'pt-BR', {sensitivity: 'base'}));
             this.loading = false;
         });
     }
