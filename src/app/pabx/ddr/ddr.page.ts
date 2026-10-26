@@ -108,9 +108,10 @@ import { formatDdr } from '@/pabx/ddr/ddr-format';
                                     icon="pi pi-trash"
                                     severity="danger"
                                     (click)="confirmDelete(ddr)"
+                                    [disabled]="ddr.isDefault"
                                     outlined
                                     size="small"
-                                    pTooltip="Remover"
+                                    [pTooltip]="ddr.isDefault ? 'A DDR padrão não pode ser removida' : 'Remover'"
                                 />
                             </div>
                         </td>
