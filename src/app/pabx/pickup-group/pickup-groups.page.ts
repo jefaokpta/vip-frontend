@@ -1,18 +1,19 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { Table, TableModule } from 'primeng/table';
-import { ConfirmationService, MessageService } from 'primeng/api';
-import { Card } from 'primeng/card';
-import { IconField } from 'primeng/iconfield';
-import { InputIcon } from 'primeng/inputicon';
-import { InputText } from 'primeng/inputtext';
-import { Button } from 'primeng/button';
-import { RouterLink } from '@angular/router';
-import { ProgressSpinner } from 'primeng/progressspinner';
-import { ConfirmDialog } from 'primeng/confirmdialog';
-import { Toast } from 'primeng/toast';
-import { PickupGroup } from '@/pabx/types/pickup-group';
-import { Tooltip } from 'primeng/tooltip';
-import { PickupGroupService } from '@/pabx/pickup-group/pickup-group.service';
+import {Component, OnInit, ViewChild} from '@angular/core';
+import {Table, TableModule} from 'primeng/table';
+import {ConfirmationService, MessageService} from 'primeng/api';
+import {Card} from 'primeng/card';
+import {IconField} from 'primeng/iconfield';
+import {InputIcon} from 'primeng/inputicon';
+import {InputText} from 'primeng/inputtext';
+import {Button} from 'primeng/button';
+import {RouterLink} from '@angular/router';
+import {ProgressSpinner} from 'primeng/progressspinner';
+import {ConfirmDialog} from 'primeng/confirmdialog';
+import {Toast} from 'primeng/toast';
+import {PickupGroup} from '@/pabx/types/pickup-group';
+import {Tooltip} from 'primeng/tooltip';
+import {HttpErrorResponse} from '@angular/common/http';
+import {PickupGroupService} from '@/pabx/pickup-group/pickup-group.service';
 
 @Component({
     selector: 'app-pickup-groups-page',
@@ -70,6 +71,10 @@ import { PickupGroupService } from '@/pabx/pickup-group/pickup-group.service';
                             Nome
                             <p-sortIcon field="name"></p-sortIcon>
                         </th>
+                        <th pSortableColumn="peerCount" style="width: 15%">
+                            Ramais
+                            <p-sortIcon field="peerCount"></p-sortIcon>
+                        </th>
                         <th style="width: 10%">Ações</th>
                     </tr>
                 </ng-template>
@@ -77,6 +82,7 @@ import { PickupGroupService } from '@/pabx/pickup-group/pickup-group.service';
                 <ng-template pTemplate="body" let-group>
                     <tr>
                         <td>{{ group.name }}</td>
+                        <td>{{ group.peerCount }}</td>
                         <td>
                             <div class="flex gap-2">
                                 <p-button
@@ -87,14 +93,18 @@ import { PickupGroupService } from '@/pabx/pickup-group/pickup-group.service';
                                     pTooltip="Editar"
                                     tooltipPosition="left"
                                 />
-                                <p-button
-                                    icon="pi pi-trash"
-                                    severity="danger"
-                                    (click)="confirmDelete(group)"
-                                    outlined
-                                    size="small"
-                                    pTooltip="Remover"
-                                />
+                                <span
+                                    [pTooltip]="group.peerCount ? 'Retire todos os ramais antes de remover' : 'Remover'"
+                                >
+                                    <p-button
+                                        icon="pi pi-trash"
+                                        severity="danger"
+                                        (click)="confirmDelete(group)"
+                                        [disabled]="!!group.peerCount"
+                                        outlined
+                                        size="small"
+                                    />
+                                </span>
                             </div>
                         </td>
                     </tr>
@@ -106,7 +116,7 @@ import { PickupGroupService } from '@/pabx/pickup-group/pickup-group.service';
                     }
                     @if (!loading) {
                         <tr>
-                            <td colspan="2" class="text-center p-4">Nenhum grupo de captura encontrado.</td>
+                            <td colspan="3" class="text-center p-4">Nenhum grupo de captura encontrado.</td>
                         </tr>
                     }
                 </ng-template>
@@ -168,11 +178,11 @@ export class PickupGroupsPage implements OnInit {
                             life: 15_000
                         });
                     })
-                    .catch(() => {
+                    .catch((error: HttpErrorResponse) => {
                         this.messageService.add({
                             severity: 'error',
                             summary: 'Não foi possível remover o grupo de captura',
-                            detail: 'Tente novamente mais tarde.',
+                            detail: error?.error?.message ?? 'Tente novamente mais tarde.',
                             life: 15_000
                         });
                     });
