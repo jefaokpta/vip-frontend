@@ -1,15 +1,16 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { InputTextModule } from 'primeng/inputtext';
-import { ButtonModule } from 'primeng/button';
-import { CardModule } from 'primeng/card';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { PickupGroupService } from '@/pabx/pickup-group/pickup-group.service';
+import {Component, OnInit, ViewChild} from '@angular/core';
+import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {InputTextModule} from 'primeng/inputtext';
+import {ButtonModule} from 'primeng/button';
+import {CardModule} from 'primeng/card';
+import {ActivatedRoute, Router, RouterLink} from '@angular/router';
+import {PickupGroupService} from '@/pabx/pickup-group/pickup-group.service';
+import {PickupGroupPeersComponent} from '@/pabx/pickup-group/pickup-group-peers.component';
 
 @Component({
     selector: 'app-edit-pickup-group-page',
     standalone: true,
-    imports: [InputTextModule, ButtonModule, CardModule, ReactiveFormsModule, RouterLink],
+    imports: [InputTextModule, ButtonModule, CardModule, ReactiveFormsModule, RouterLink, PickupGroupPeersComponent],
     template: `
         <p-card>
             <ng-template #title>
@@ -37,6 +38,8 @@ import { PickupGroupService } from '@/pabx/pickup-group/pickup-group.service';
                     }
                 </div>
 
+                <app-pickup-group-peers [groupId]="groupId"/>
+
                 <div class="flex mt-4">
                     <p-button type="submit" label="Salvar" [disabled]="form.invalid || pending">
                         @if (pending) {
@@ -58,7 +61,8 @@ export class EditPickupGroupPage implements OnInit {
     form!: FormGroup;
     pending = false;
     showError = false;
-    private groupId!: number;
+    @ViewChild(PickupGroupPeersComponent) peersPicker!: PickupGroupPeersComponent;
+    groupId!: number;
 
     constructor(
         private readonly fb: FormBuilder,
@@ -85,6 +89,7 @@ export class EditPickupGroupPage implements OnInit {
         this.showError = false;
         this.pickupGroupService
             .update(this.groupId, this.form.value.name)
+            .then(() => this.pickupGroupService.assignPeers(this.groupId, this.peersPicker.selectedPeerIds()))
             .then(() => this.router.navigate(['/pabx/pickup-groups']))
             .catch(() => {
                 this.showError = true;
