@@ -26,6 +26,10 @@ export class DdrService {
         return executeRequest(this.http.put(`${this.BACKEND}/ddrs/${ddr.id}`, ddr, httpHeaders()));
     }
 
+    setDefault(id: number): Promise<Ddr> {
+        return executeRequest(this.http.put<Ddr>(`${this.BACKEND}/ddrs/${id}/default`, null, httpHeaders()));
+    }
+
     delete(id: number) {
         return executeRequest(this.http.delete(`${this.BACKEND}/ddrs/${id}`, httpHeaders()));
     }

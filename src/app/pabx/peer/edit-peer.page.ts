@@ -17,6 +17,8 @@ import {ToggleSwitch} from 'primeng/toggleswitch';
 import {InputNumber} from 'primeng/inputnumber';
 import {Password} from 'primeng/password';
 import {SelectButton} from 'primeng/selectbutton';
+import {DdrService} from '@/pabx/ddr/ddr.service';
+import {formatDdr} from '@/pabx/ddr/ddr-format';
 import {Tab, TabList, TabPanel, TabPanels, Tabs} from 'primeng/tabs';
 import {UserService} from '@/pages/users/user.service';
 import {RoleEnum} from '@/types/role-enum';
@@ -82,6 +84,7 @@ import {RoleEnum} from '@/types/role-enum';
                                 }
                             </span>
                         </p-tab>
+                        <p-tab value="2">Identificação</p-tab>
                     </p-tablist>
                     <p-tabpanels>
                         <p-tabpanel value="0">
@@ -245,6 +248,21 @@ import {RoleEnum} from '@/types/role-enum';
                                 <p-toggleswitch formControlName="nat" />
                             </div>
                         </p-tabpanel>
+
+                        <p-tabpanel value="2">
+                            <div class="field mb-4">
+                                <label for="clidDdrId" class="block mb-2">DDR de saída (CLID)</label>
+                                <p-select
+                                    id="clidDdrId"
+                                    [options]="ddrOptions"
+                                    formControlName="clidDdrId"
+                                    optionLabel="label"
+                                    optionValue="value"
+                                    placeholder="DDR padrão"
+                                    [showClear]="true"
+                                ></p-select>
+                            </div>
+                        </p-tabpanel>
                     </p-tabpanels>
                 </p-tabs>
 
@@ -267,6 +285,7 @@ export class EditPeerPage implements OnInit {
     languageOptions = languageSelectOptions();
     dtmfOptions = dtmfSelectOptions();
     pickUpGroupOptions: PickupGroup[] = [];
+    ddrOptions: { label: string; value: number }[] = [];
 
     constructor(
         private readonly fb: FormBuilder,
@@ -274,6 +293,7 @@ export class EditPeerPage implements OnInit {
         private readonly peerService: PeerService,
         private readonly activatedRoute: ActivatedRoute,
         private readonly pickupGroupService: PickupGroupService,
+        private readonly ddrService: DdrService,
         private readonly userService: UserService
     ) {
         this.isSaasSupport = userService.getUser().roles.includes(RoleEnum.ROLE_SAAS_SUPPORT);
@@ -297,6 +317,7 @@ export class EditPeerPage implements OnInit {
             ],
             language: [LanguageEnum.pt_BR, [Validators.required]],
             pickUpGroup: [null],
+            clidDdrId: [null],
             peerTransportEnums: [[PeerTransportEnum.UDP], [Validators.required]],
             qualify: [false, [Validators.required]],
             nat: [true, [Validators.required]],
@@ -308,10 +329,18 @@ export class EditPeerPage implements OnInit {
         this.peerService.findById(id).then((peer) => {
             this.form.patchValue(peer);
             this.form.patchValue({
-                pickUpGroup: Number(peer.pickUpGroup) || null
+                pickUpGroup: Number(peer.pickUpGroup) || null,
+                clidDdrId: peer.clidDdrId ?? null
             });
         });
         this.pickupGroupService.findAll().then((groups) => (this.pickUpGroupOptions = groups));
+        this.ddrService.findAll().then(
+            (ddrs) =>
+                (this.ddrOptions = ddrs.map((d) => ({
+                    label: formatDdr(d.ddr) + (d.isDefault ? ' (padrão)' : ''),
+                    value: d.id
+                })))
+        );
     }
 
     toggleMd5Secret() {

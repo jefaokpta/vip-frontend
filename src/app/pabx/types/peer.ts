@@ -16,4 +16,5 @@ export interface Peer {
     readonly dtmfModeEnum: DtmfModeEnum;
     readonly callLimit: number;
     readonly userName?: string;
+    readonly clidDdrId?: number | null;
 }
