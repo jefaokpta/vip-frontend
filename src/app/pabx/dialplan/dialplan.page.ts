@@ -162,14 +162,21 @@ export class DialplanPage implements OnInit {
     ) {}
 
     ngOnInit(): void {
-        Promise.all([this.dialplanService.findAll(), this.trunkService.findOptions(), this.aliasService.findAll()]).then(
-            ([dialplans, trunks, aliases]: [DialPlan[], TrunkOption[], Alias[]]) => {
+        Promise.all([this.dialplanService.findAll(), this.trunkService.findOptions(), this.aliasService.findAll()])
+            .then(([dialplans, trunks, aliases]: [DialPlan[], TrunkOption[], Alias[]]) => {
                 trunks.forEach((trunk) => this.trunkMap.set(String(trunk.id), trunk.name));
                 aliases.forEach((alias) => this.aliasMap.set(String(alias.id), alias.name));
                 this.dialplans = this.sortDialplansByDstAndPriority(dialplans);
-                this.loading = false;
-            }
-        );
+            })
+            .catch(() => {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Desculpe não foi possível carregar as regras',
+                    detail: 'Tente novamente mais tarde.',
+                    life: 15_000
+                });
+            })
+            .finally(() => (this.loading = false));
     }
 
     srcLabel(dialplan: DialPlan): string {
@@ -223,13 +230,23 @@ export class DialplanPage implements OnInit {
 
     onChangePriority(dialplan: DialPlan) {
         this.dialplans = this.sortDialplansByDstAndPriority(this.dialplans);
-        this.dialplanService.updatePriority(dialplan).then(() => {
-            this.messageService.add({
-                severity: 'success',
-                summary: 'Prioridade atualizada com sucesso',
-                life: 15_000
+        this.dialplanService
+            .updatePriority(dialplan)
+            .then(() => {
+                this.messageService.add({
+                    severity: 'success',
+                    summary: 'Prioridade atualizada com sucesso',
+                    life: 15_000
+                });
+            })
+            .catch(() => {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Desculpe não foi possível atualizar a prioridade',
+                    detail: 'Tente novamente mais tarde.',
+                    life: 15_000
+                });
             });
-        });
     }
 
     private sortDialplansByDstAndPriority(dialplans: DialPlan[]): DialPlan[] {
