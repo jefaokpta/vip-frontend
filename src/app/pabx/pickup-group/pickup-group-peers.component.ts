@@ -35,6 +35,10 @@ interface PeerOption {
                 sourceFilterPlaceholder="Pesquisar"
                 targetFilterPlaceholder="Pesquisar"
                 breakpoint="1200px"
+                (onMoveToTarget)="refreshFilters()"
+                (onMoveToSource)="refreshFilters()"
+                (onMoveAllToTarget)="refreshFilters()"
+                (onMoveAllToSource)="refreshFilters()"
             >
                 <ng-template let-peer pTemplate="item">
                     <div class="flex items-center gap-2">
@@ -72,6 +76,12 @@ export class PickupGroupPeersComponent implements OnInit {
                 .filter((p) => !ownGroup || p.pickUpGroup !== ownGroup)
                 .map((p) => this.toOption(p, p.pickUpGroup ? groupNames.get(p.pickUpGroup) : undefined));
         });
+    }
+
+    /** O PickList move itens via splice/push nos mesmos arrays; o listbox interno só refaz o filtro com nova referência. */
+    refreshFilters(): void {
+        this.availablePeers = [...this.availablePeers];
+        this.selectedPeers = [...this.selectedPeers];
     }
 
     selectedPeerIds(): number[] {
