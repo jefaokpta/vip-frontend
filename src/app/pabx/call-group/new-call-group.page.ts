@@ -1,16 +1,19 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
-import { CardModule } from 'primeng/card';
-import { Router, RouterLink } from '@angular/router';
-import { CallGroupService } from '@/pabx/call-group/call-group.service';
-import { CallGroupStrategyEnum } from '@/pabx/types/call-group-strategy-enum';
-import { Peer } from '@/pabx/types/peer';
-import { PeerService } from '@/pabx/peer/peer.service';
-import { InputTextModule } from 'primeng/inputtext';
-import { Select } from 'primeng/select';
-import { InputNumber } from 'primeng/inputnumber';
-import { PickList } from 'primeng/picklist';
+import {Component, OnInit} from '@angular/core';
+import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {ButtonModule} from 'primeng/button';
+import {CardModule} from 'primeng/card';
+import {Router, RouterLink} from '@angular/router';
+import {CallGroupService} from '@/pabx/call-group/call-group.service';
+import {CallGroupStrategyEnum} from '@/pabx/types/call-group-strategy-enum';
+import {Peer} from '@/pabx/types/peer';
+import {PeerService} from '@/pabx/peer/peer.service';
+import {InputTextModule} from 'primeng/inputtext';
+import {Select} from 'primeng/select';
+import {InputNumber} from 'primeng/inputnumber';
+import {PickList} from 'primeng/picklist';
+import {transferPickListItems} from '@/util/utils';
+
+const byName = (a: Peer, b: Peer) => a.name.localeCompare(b.name, 'pt-BR', { numeric: true, sensitivity: 'base' });
 
 @Component({
     selector: 'app-new-call-group-page',
@@ -96,6 +99,10 @@ import { PickList } from 'primeng/picklist';
                         sourceFilterPlaceholder="Pesquisar"
                         targetFilterPlaceholder="Pesquisar"
                         breakpoint="1200px"
+                        (onMoveToTarget)="moveToSelected($event.items)"
+                        (onMoveToSource)="moveToAvailable($event.items)"
+                        (onMoveAllToTarget)="moveToSelected($event.items)"
+                        (onMoveAllToSource)="moveToAvailable($event.items)"
                     >
                         <ng-template let-peer pTemplate="item">
                             <div class="flex items-center gap-2">
@@ -126,6 +133,9 @@ import { PickList } from 'primeng/picklist';
                     </p-button>
                 </div>
 
+                @if (loadError) {
+                    <small class="text-red-500"> Erro ao carregar os dados </small>
+                }
                 @if (showError) {
                     <small class="text-red-500"> Erro ao salvar o grupo de chamadas </small>
                 }
@@ -139,6 +149,7 @@ export class NewCallGroupPage implements OnInit {
     showError = false;
     availablePeers: Peer[] = [];
     selectedPeers: Peer[] = [];
+    loadError = false;
 
     strategyOptions = Object.values(CallGroupStrategyEnum).map((value) => ({
         label: this.strategyLabel(value),
@@ -159,7 +170,10 @@ export class NewCallGroupPage implements OnInit {
             timeout: [30, [Validators.required]],
             groupTimeout: [60, [Validators.required]]
         });
-        this.peerService.findAll().then((peers) => (this.availablePeers = peers));
+        this.peerService
+            .findAll()
+            .then((peers) => (this.availablePeers = [...peers].sort(byName)))
+            .catch(() => (this.loadError = true));
     }
 
     get name() {
@@ -189,5 +203,22 @@ export class NewCallGroupPage implements OnInit {
             [CallGroupStrategyEnum.RANDOM]: 'Aleatório'
         };
         return labels[strategy] ?? strategy;
+    }
+
+    // O PickList não atualiza a lista filtrada sozinho; ver transferPickListItems.
+    moveToSelected(items: Peer[]): void {
+        [this.availablePeers, this.selectedPeers] = transferPickListItems(
+            items,
+            this.availablePeers,
+            this.selectedPeers
+        );
+    }
+
+    moveToAvailable(items: Peer[]): void {
+        [this.selectedPeers, this.availablePeers] = transferPickListItems(
+            items,
+            this.selectedPeers,
+            this.availablePeers
+        );
     }
 }

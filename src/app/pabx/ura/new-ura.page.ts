@@ -17,6 +17,10 @@ import {MohService} from '@/pabx/moh/moh.service';
 import {UraService} from '@/pabx/ura/ura.service';
 import {PeerSelectComponent} from '@/pabx/dialplan/components/peer-select-component';
 import {CallGroupService} from '@/pabx/call-group/call-group.service';
+import {QueueService} from '@/pabx/queue/queue.service';
+import {DialPlanService} from '@/pabx/dialplan/dial-plan.service';
+import {DialPlan} from '@/pabx/types/dial-plan';
+import {Queue} from '@/pabx/types/queue';
 
 @Component({
     selector: 'app-new-ura-page',
@@ -157,6 +161,36 @@ import {CallGroupService} from '@/pabx/call-group/call-group.service';
                                 appendTo="body"
                             />
                         </div>
+                        <div
+                            class="field"
+                            *ngIf="form.get('invalidAction.uraActionEnum')?.value === UraActionEnum.QUEUE"
+                        >
+                            <label class="block mb-2">Fila *</label>
+                            <p-select
+                                [options]="queueOptions"
+                                formControlName="target"
+                                optionLabel="label"
+                                optionValue="value"
+                                placeholder="Selecione a fila"
+                                appendTo="body"
+                            />
+                        </div>
+                        <div
+                            class="field"
+                            *ngIf="form.get('invalidAction.uraActionEnum')?.value === UraActionEnum.DIALPLAN"
+                        >
+                            <label class="block mb-2">Regra *</label>
+                            <p-select
+                                [options]="dialPlanOptions"
+                                formControlName="target"
+                                [filter]="true"
+                                filterBy="label"
+                                optionLabel="label"
+                                optionValue="value"
+                                placeholder="Selecione a regra"
+                                appendTo="body"
+                            />
+                        </div>
                     </div>
                 </div>
 
@@ -207,6 +241,36 @@ import {CallGroupService} from '@/pabx/call-group/call-group.service';
                                 optionLabel="label"
                                 optionValue="value"
                                 placeholder="Selecione a URA"
+                                appendTo="body"
+                            />
+                        </div>
+                        <div
+                            class="field"
+                            *ngIf="form.get('timeoutAction.uraActionEnum')?.value === UraActionEnum.QUEUE"
+                        >
+                            <label class="block mb-2">Fila *</label>
+                            <p-select
+                                [options]="queueOptions"
+                                formControlName="target"
+                                optionLabel="label"
+                                optionValue="value"
+                                placeholder="Selecione a fila"
+                                appendTo="body"
+                            />
+                        </div>
+                        <div
+                            class="field"
+                            *ngIf="form.get('timeoutAction.uraActionEnum')?.value === UraActionEnum.DIALPLAN"
+                        >
+                            <label class="block mb-2">Regra *</label>
+                            <p-select
+                                [options]="dialPlanOptions"
+                                formControlName="target"
+                                [filter]="true"
+                                filterBy="label"
+                                optionLabel="label"
+                                optionValue="value"
+                                placeholder="Selecione a regra"
                                 appendTo="body"
                             />
                         </div>
@@ -280,6 +344,30 @@ import {CallGroupService} from '@/pabx/call-group/call-group.service';
                                     appendTo="body"
                                 />
                             </div>
+                            <div class="field" *ngIf="action.get('uraActionEnum')?.value === UraActionEnum.QUEUE">
+                                <label class="block mb-2">Fila *</label>
+                                <p-select
+                                    [options]="queueOptions"
+                                    formControlName="target"
+                                    optionLabel="label"
+                                    optionValue="value"
+                                    placeholder="Selecione a fila"
+                                    appendTo="body"
+                                />
+                            </div>
+                            <div class="field" *ngIf="action.get('uraActionEnum')?.value === UraActionEnum.DIALPLAN">
+                                <label class="block mb-2">Regra *</label>
+                                <p-select
+                                    [options]="dialPlanOptions"
+                                    formControlName="target"
+                                    [filter]="true"
+                                    filterBy="label"
+                                    optionLabel="label"
+                                    optionValue="value"
+                                    placeholder="Selecione a regra"
+                                    appendTo="body"
+                                />
+                            </div>
                             <div class="flex items-end">
                                 <p-button
                                     type="button"
@@ -313,6 +401,8 @@ export class NewUraPage implements OnInit {
     mohOptions: { label: string; value: number }[] = [];
     callGroupOptions: { label: string; value: string }[] = [];
     uraOptions: { label: string; value: string }[] = [];
+    queueOptions: { label: string; value: string }[] = [];
+    dialPlanOptions: { label: string; value: string }[] = [];
     readonly UraActionEnum = UraActionEnum;
 
     actionOptions = [
@@ -320,7 +410,9 @@ export class NewUraPage implements OnInit {
         { label: 'Discar para Ramal', value: UraActionEnum.DIALPEER },
         { label: 'Voltar ao Início', value: UraActionEnum.RETURN_TO_START },
         { label: 'Grupo de Chamada', value: UraActionEnum.CALLGROUP },
-        { label: 'Sub URA', value: UraActionEnum.SUBURA }
+        { label: 'Sub URA', value: UraActionEnum.SUBURA },
+        { label: 'Fila', value: UraActionEnum.QUEUE },
+        { label: 'Enviar para Regra', value: UraActionEnum.DIALPLAN }
     ];
 
     constructor(
@@ -329,6 +421,8 @@ export class NewUraPage implements OnInit {
         private readonly uraService: UraService,
         private readonly mohService: MohService,
         private readonly callGroupService: CallGroupService,
+        private readonly queueService: QueueService,
+        private readonly dialPlanService: DialPlanService,
         private readonly messageService: MessageService
     ) {}
 
@@ -350,21 +444,32 @@ export class NewUraPage implements OnInit {
             actions: this.fb.array([], [Validators.minLength(1), NewUraPage.noDuplicateOptions])
         });
 
-        Promise.all([this.mohService.findAll(), this.callGroupService.findAll(), this.uraService.findAll()]).then(
-            ([mohs, callGroups, uras]: [Moh[], any[], any[]]) => {
-                this.mohOptions = mohs.map((m) => ({ label: m.name, value: m.id }));
-                this.callGroupOptions = callGroups.map((g) => ({ label: g.name, value: g.id.toString() }));
-                this.uraOptions = uras.map((u) => ({ label: u.name, value: u.id.toString() }));
-            }
-        );
+        Promise.all([
+            this.mohService.findAll(),
+            this.callGroupService.findAll(),
+            this.uraService.findAll(),
+            this.queueService.findAll(),
+            this.dialPlanService.findAll()
+        ]).then(([mohs, callGroups, uras, queues, dialPlans]: [Moh[], any[], any[], Queue[], DialPlan[]]) => {
+            this.mohOptions = mohs.map((m) => ({ label: m.name, value: m.id }));
+            this.callGroupOptions = callGroups.map((g) => ({ label: g.name, value: g.id.toString() }));
+            this.uraOptions = uras.map((u) => ({ label: u.name, value: u.id.toString() }));
+            this.queueOptions = queues.map((q) => ({ label: q.name, value: q.id.toString() }));
+            this.dialPlanOptions = dialPlans
+                .filter((d) => d.isActive)
+                .map((d) => ({ label: d.name, value: d.id.toString() }));
+        });
     }
 
     static requireTargetValidator(control: AbstractControl) {
         const group = control as FormGroup;
         const actionEnum = group.get('uraActionEnum')?.value;
-        const needsTarget = [UraActionEnum.DIALPEER, UraActionEnum.CALLGROUP, UraActionEnum.SUBURA].includes(
-            actionEnum
-        );
+        const needsTarget = [
+            UraActionEnum.DIALPEER,
+            UraActionEnum.CALLGROUP,
+            UraActionEnum.SUBURA,
+            UraActionEnum.QUEUE
+        ].includes(actionEnum);
         if (needsTarget && !group.get('target')?.value) {
             return { targetRequired: true };
         }

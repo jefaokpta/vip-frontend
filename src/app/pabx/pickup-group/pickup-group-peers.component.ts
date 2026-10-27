@@ -4,6 +4,7 @@ import {PrimeTemplate} from 'primeng/api';
 import {PeerService} from '@/pabx/peer/peer.service';
 import {PickupGroupService} from '@/pabx/pickup-group/pickup-group.service';
 import {Peer} from '@/pabx/types/peer';
+import {transferPickListItems} from '@/util/utils';
 
 interface PeerOption {
     readonly id: number;
@@ -35,6 +36,10 @@ interface PeerOption {
                 sourceFilterPlaceholder="Pesquisar"
                 targetFilterPlaceholder="Pesquisar"
                 breakpoint="1200px"
+                (onMoveToTarget)="moveToSelected($event.items)"
+                (onMoveToSource)="moveToAvailable($event.items)"
+                (onMoveAllToTarget)="moveToSelected($event.items)"
+                (onMoveAllToSource)="moveToAvailable($event.items)"
             >
                 <ng-template let-peer pTemplate="item">
                     <div class="flex items-center gap-2">
@@ -46,6 +51,9 @@ interface PeerOption {
                     </div>
                 </ng-template>
             </p-picklist>
+            @if (loadError) {
+                <small class="text-red-500"> Erro ao carregar os ramais </small>
+            }
         </div>
     `
 })
@@ -53,25 +61,46 @@ export class PickupGroupPeersComponent implements OnInit {
     @Input() groupId?: number;
     availablePeers: PeerOption[] = [];
     selectedPeers: PeerOption[] = [];
+    loadError = false;
 
     constructor(
         private readonly peerService: PeerService,
         private readonly pickupGroupService: PickupGroupService
-    ) {
-    }
+    ) {}
 
     ngOnInit(): void {
-        Promise.all([this.peerService.findAll(), this.pickupGroupService.findAll()]).then(([peers, groups]) => {
-            const groupNames = new Map(groups.map((g) => [String(g.id), g.name]));
-            const ownGroup = this.groupId === undefined ? undefined : String(this.groupId);
-            const sorted = [...peers].sort((a, b) => a.peer.localeCompare(b.peer, undefined, {numeric: true}));
-            this.selectedPeers = sorted
-                .filter((p) => ownGroup && p.pickUpGroup === ownGroup)
-                .map((p) => this.toOption(p));
-            this.availablePeers = sorted
-                .filter((p) => !ownGroup || p.pickUpGroup !== ownGroup)
-                .map((p) => this.toOption(p, p.pickUpGroup ? groupNames.get(p.pickUpGroup) : undefined));
-        });
+        Promise.all([this.peerService.findAll(), this.pickupGroupService.findAll()])
+            .then(([peers, groups]) => {
+                const groupNames = new Map(groups.map((g) => [String(g.id), g.name]));
+                const ownGroup = this.groupId === undefined ? undefined : String(this.groupId);
+                const sorted = [...peers].sort((a, b) =>
+                    a.name.localeCompare(b.name, 'pt-BR', { numeric: true, sensitivity: 'base' })
+                );
+                this.selectedPeers = sorted
+                    .filter((p) => ownGroup && p.pickUpGroup === ownGroup)
+                    .map((p) => this.toOption(p));
+                this.availablePeers = sorted
+                    .filter((p) => !ownGroup || p.pickUpGroup !== ownGroup)
+                    .map((p) => this.toOption(p, p.pickUpGroup ? groupNames.get(p.pickUpGroup) : undefined));
+            })
+            .catch(() => (this.loadError = true));
+    }
+
+    // O PickList não atualiza a lista filtrada sozinho; ver transferPickListItems.
+    moveToSelected(items: PeerOption[]): void {
+        [this.availablePeers, this.selectedPeers] = transferPickListItems(
+            items,
+            this.availablePeers,
+            this.selectedPeers
+        );
+    }
+
+    moveToAvailable(items: PeerOption[]): void {
+        [this.selectedPeers, this.availablePeers] = transferPickListItems(
+            items,
+            this.selectedPeers,
+            this.availablePeers
+        );
     }
 
     selectedPeerIds(): number[] {
@@ -79,6 +108,6 @@ export class PickupGroupPeersComponent implements OnInit {
     }
 
     private toOption(peer: Peer, groupName?: string): PeerOption {
-        return {id: peer.id, name: peer.name, peer: peer.peer, groupName};
+        return { id: peer.id, name: peer.name, peer: peer.peer, groupName };
     }
 }

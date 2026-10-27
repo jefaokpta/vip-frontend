@@ -78,10 +78,7 @@ import {Select} from 'primeng/select';
             >
                 <ng-template pTemplate="header">
                     <tr>
-                        <th pSortableColumn="name">
-                            Nome
-                            <p-sortIcon field="name"></p-sortIcon>
-                        </th>
+                        <th>Nome</th>
                         <th>Origem</th>
                         <th>Destino</th>
                         <th style="width: 10%">Ativo</th>
@@ -165,14 +162,21 @@ export class DialplanPage implements OnInit {
     ) {}
 
     ngOnInit(): void {
-        Promise.all([this.dialplanService.findAll(), this.trunkService.findOptions(), this.aliasService.findAll()]).then(
-            ([dialplans, trunks, aliases]: [DialPlan[], TrunkOption[], Alias[]]) => {
+        Promise.all([this.dialplanService.findAll(), this.trunkService.findOptions(), this.aliasService.findAll()])
+            .then(([dialplans, trunks, aliases]: [DialPlan[], TrunkOption[], Alias[]]) => {
                 trunks.forEach((trunk) => this.trunkMap.set(String(trunk.id), trunk.name));
                 aliases.forEach((alias) => this.aliasMap.set(String(alias.id), alias.name));
                 this.dialplans = this.sortDialplansByDstAndPriority(dialplans);
-                this.loading = false;
-            }
-        );
+            })
+            .catch(() => {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Desculpe não foi possível carregar as regras',
+                    detail: 'Tente novamente mais tarde.',
+                    life: 15_000
+                });
+            })
+            .finally(() => (this.loading = false));
     }
 
     srcLabel(dialplan: DialPlan): string {
@@ -226,18 +230,32 @@ export class DialplanPage implements OnInit {
 
     onChangePriority(dialplan: DialPlan) {
         this.dialplans = this.sortDialplansByDstAndPriority(this.dialplans);
-        this.dialplanService.updatePriority(dialplan).then(() => {
-            this.messageService.add({
-                severity: 'success',
-                summary: 'Prioridade atualizada com sucesso',
-                life: 15_000
+        this.dialplanService
+            .updatePriority(dialplan)
+            .then(() => {
+                this.messageService.add({
+                    severity: 'success',
+                    summary: 'Prioridade atualizada com sucesso',
+                    life: 15_000
+                });
+            })
+            .catch(() => {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Desculpe não foi possível atualizar a prioridade',
+                    detail: 'Tente novamente mais tarde.',
+                    life: 15_000
+                });
             });
-        });
     }
 
     private sortDialplansByDstAndPriority(dialplans: DialPlan[]): DialPlan[] {
+        // Expressões regulares acima e alias abaixo; destinos idênticos ficam juntos, ordenados pela prioridade.
+        const isAlias = (d: DialPlan) => (d.dst ? 0 : 1);
         return dialplans.sort((a, b) => {
-            const dstCompare = (a.dst ?? '').localeCompare(b.dst ?? '');
+            const typeCompare = isAlias(a) - isAlias(b);
+            if (typeCompare !== 0) return typeCompare;
+            const dstCompare = this.dstLabel(a).localeCompare(this.dstLabel(b), 'pt-BR', { numeric: true });
             if (dstCompare !== 0) return dstCompare;
             return b.priority - a.priority;
         });
