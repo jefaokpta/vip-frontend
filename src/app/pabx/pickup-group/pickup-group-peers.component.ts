@@ -69,7 +69,7 @@ export class PickupGroupPeersComponent implements OnInit {
         Promise.all([this.peerService.findAll(), this.pickupGroupService.findAll()]).then(([peers, groups]) => {
             const groupNames = new Map(groups.map((g) => [String(g.id), g.name]));
             const ownGroup = this.groupId === undefined ? undefined : String(this.groupId);
-            const sorted = [...peers].sort((a, b) => a.peer.localeCompare(b.peer, undefined, {numeric: true}));
+            const sorted = [...peers].sort((a, b) => a.name.localeCompare(b.name, 'pt-BR', {numeric: true, sensitivity: 'base'}));
             this.selectedPeers = sorted
                 .filter((p) => ownGroup && p.pickUpGroup === ownGroup)
                 .map((p) => this.toOption(p));

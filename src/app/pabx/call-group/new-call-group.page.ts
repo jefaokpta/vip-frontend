@@ -13,6 +13,8 @@ import {InputNumber} from 'primeng/inputnumber';
 import {PickList} from 'primeng/picklist';
 import {transferPickListItems} from '@/util/utils';
 
+const byName = (a: Peer, b: Peer) => a.name.localeCompare(b.name, 'pt-BR', {numeric: true, sensitivity: 'base'});
+
 @Component({
     selector: 'app-new-call-group-page',
     standalone: true,
@@ -164,7 +166,7 @@ export class NewCallGroupPage implements OnInit {
             timeout: [30, [Validators.required]],
             groupTimeout: [60, [Validators.required]]
         });
-        this.peerService.findAll().then((peers) => (this.availablePeers = peers));
+        this.peerService.findAll().then((peers) => (this.availablePeers = [...peers].sort(byName)));
     }
 
     get name() {

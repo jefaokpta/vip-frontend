@@ -13,6 +13,8 @@ import {InputNumber} from 'primeng/inputnumber';
 import {PickList} from 'primeng/picklist';
 import {transferPickListItems} from '@/util/utils';
 
+const byName = (a: Peer, b: Peer) => a.name.localeCompare(b.name, 'pt-BR', {numeric: true, sensitivity: 'base'});
+
 @Component({
     selector: 'app-edit-call-group-page',
     standalone: true,
@@ -178,7 +180,7 @@ export class EditCallGroupPage implements OnInit {
                 groupTimeout: group.groupTimeout
             });
             this.selectedPeers = group.peerIds.map((id) => peers.find((p) => p.id === id)!);
-            this.availablePeers = peers.filter((p) => !group.peerIds.includes(p.id));
+            this.availablePeers = peers.filter((p) => !group.peerIds.includes(p.id)).sort(byName);
         });
     }
 
