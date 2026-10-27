@@ -13,7 +13,7 @@ import {InputNumber} from 'primeng/inputnumber';
 import {PickList} from 'primeng/picklist';
 import {transferPickListItems} from '@/util/utils';
 
-const byName = (a: Peer, b: Peer) => a.name.localeCompare(b.name, 'pt-BR', {numeric: true, sensitivity: 'base'});
+const byName = (a: Peer, b: Peer) => a.name.localeCompare(b.name, 'pt-BR', { numeric: true, sensitivity: 'base' });
 
 @Component({
     selector: 'app-edit-call-group-page',
@@ -133,6 +133,9 @@ const byName = (a: Peer, b: Peer) => a.name.localeCompare(b.name, 'pt-BR', {nume
                     </p-button>
                 </div>
 
+                @if (loadError) {
+                    <small class="text-red-500"> Erro ao carregar os dados </small>
+                }
                 @if (showError) {
                     <small class="text-red-500"> Erro ao salvar o grupo de chamadas </small>
                 }
@@ -146,6 +149,7 @@ export class EditCallGroupPage implements OnInit {
     showError = false;
     availablePeers: Peer[] = [];
     selectedPeers: Peer[] = [];
+    loadError = false;
     private groupId!: number;
 
     strategyOptions = Object.values(CallGroupStrategyEnum).map((value) => ({
@@ -172,16 +176,18 @@ export class EditCallGroupPage implements OnInit {
         const id = this.activatedRoute.snapshot.paramMap.get('id')!;
         this.groupId = +id;
 
-        Promise.all([this.callGroupService.findById(id), this.peerService.findAll()]).then(([group, peers]) => {
-            this.form.patchValue({
-                name: group.name,
-                callGroupStrategyEnum: group.callGroupStrategyEnum,
-                timeout: group.timeout,
-                groupTimeout: group.groupTimeout
-            });
-            this.selectedPeers = group.peerIds.map((id) => peers.find((p) => p.id === id)!);
-            this.availablePeers = peers.filter((p) => !group.peerIds.includes(p.id)).sort(byName);
-        });
+        Promise.all([this.callGroupService.findById(id), this.peerService.findAll()])
+            .then(([group, peers]) => {
+                this.form.patchValue({
+                    name: group.name,
+                    callGroupStrategyEnum: group.callGroupStrategyEnum,
+                    timeout: group.timeout,
+                    groupTimeout: group.groupTimeout
+                });
+                this.selectedPeers = group.peerIds.map((id) => peers.find((p) => p.id === id)!);
+                this.availablePeers = peers.filter((p) => !group.peerIds.includes(p.id)).sort(byName);
+            })
+            .catch(() => (this.loadError = true));
     }
 
     get name() {
@@ -215,10 +221,18 @@ export class EditCallGroupPage implements OnInit {
 
     // O PickList não atualiza a lista filtrada sozinho; ver transferPickListItems.
     moveToSelected(items: Peer[]): void {
-        [this.availablePeers, this.selectedPeers] = transferPickListItems(items, this.availablePeers, this.selectedPeers);
+        [this.availablePeers, this.selectedPeers] = transferPickListItems(
+            items,
+            this.availablePeers,
+            this.selectedPeers
+        );
     }
 
     moveToAvailable(items: Peer[]): void {
-        [this.selectedPeers, this.availablePeers] = transferPickListItems(items, this.selectedPeers, this.availablePeers);
+        [this.selectedPeers, this.availablePeers] = transferPickListItems(
+            items,
+            this.selectedPeers,
+            this.availablePeers
+        );
     }
 }

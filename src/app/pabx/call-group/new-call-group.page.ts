@@ -13,7 +13,7 @@ import {InputNumber} from 'primeng/inputnumber';
 import {PickList} from 'primeng/picklist';
 import {transferPickListItems} from '@/util/utils';
 
-const byName = (a: Peer, b: Peer) => a.name.localeCompare(b.name, 'pt-BR', {numeric: true, sensitivity: 'base'});
+const byName = (a: Peer, b: Peer) => a.name.localeCompare(b.name, 'pt-BR', { numeric: true, sensitivity: 'base' });
 
 @Component({
     selector: 'app-new-call-group-page',
@@ -133,6 +133,9 @@ const byName = (a: Peer, b: Peer) => a.name.localeCompare(b.name, 'pt-BR', {nume
                     </p-button>
                 </div>
 
+                @if (loadError) {
+                    <small class="text-red-500"> Erro ao carregar os dados </small>
+                }
                 @if (showError) {
                     <small class="text-red-500"> Erro ao salvar o grupo de chamadas </small>
                 }
@@ -146,6 +149,7 @@ export class NewCallGroupPage implements OnInit {
     showError = false;
     availablePeers: Peer[] = [];
     selectedPeers: Peer[] = [];
+    loadError = false;
 
     strategyOptions = Object.values(CallGroupStrategyEnum).map((value) => ({
         label: this.strategyLabel(value),
@@ -166,7 +170,10 @@ export class NewCallGroupPage implements OnInit {
             timeout: [30, [Validators.required]],
             groupTimeout: [60, [Validators.required]]
         });
-        this.peerService.findAll().then((peers) => (this.availablePeers = [...peers].sort(byName)));
+        this.peerService
+            .findAll()
+            .then((peers) => (this.availablePeers = [...peers].sort(byName)))
+            .catch(() => (this.loadError = true));
     }
 
     get name() {
@@ -200,10 +207,18 @@ export class NewCallGroupPage implements OnInit {
 
     // O PickList não atualiza a lista filtrada sozinho; ver transferPickListItems.
     moveToSelected(items: Peer[]): void {
-        [this.availablePeers, this.selectedPeers] = transferPickListItems(items, this.availablePeers, this.selectedPeers);
+        [this.availablePeers, this.selectedPeers] = transferPickListItems(
+            items,
+            this.availablePeers,
+            this.selectedPeers
+        );
     }
 
     moveToAvailable(items: Peer[]): void {
-        [this.selectedPeers, this.availablePeers] = transferPickListItems(items, this.selectedPeers, this.availablePeers);
+        [this.selectedPeers, this.availablePeers] = transferPickListItems(
+            items,
+            this.selectedPeers,
+            this.availablePeers
+        );
     }
 }

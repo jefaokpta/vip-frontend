@@ -19,7 +19,7 @@ import {UserService} from '@/pages/users/user.service';
 import {SurveyService} from '@/pabx/survey/survey.service';
 import {transferPickListItems} from '@/util/utils';
 
-const byName = (a: User, b: User) => a.name.localeCompare(b.name, 'pt-BR', {numeric: true, sensitivity: 'base'});
+const byName = (a: User, b: User) => a.name.localeCompare(b.name, 'pt-BR', { numeric: true, sensitivity: 'base' });
 
 @Component({
     selector: 'app-new-queue-page',
@@ -267,6 +267,9 @@ const byName = (a: User, b: User) => a.name.localeCompare(b.name, 'pt-BR', {nume
                     </p-button>
                 </div>
 
+                @if (loadError) {
+                    <small class="text-red-500"> Erro ao carregar os dados </small>
+                }
                 @if (showError) {
                     <small class="text-red-500"> Erro ao salvar a fila de atendimento </small>
                 }
@@ -278,6 +281,7 @@ export class NewQueuePage implements OnInit {
     form!: FormGroup;
     pending = false;
     showError = false;
+    loadError = false;
     mohs: Moh[] = [];
     surveys: Survey[] = [];
     availableUsers: User[] = [];
@@ -312,13 +316,13 @@ export class NewQueuePage implements OnInit {
             callDurationAlertMinutes: [30, [Validators.required, Validators.min(1)]],
             surveyId: [null]
         });
-        Promise.all([this.mohService.findAll(), this.userService.findAll(), this.surveyService.findAll()]).then(
-            ([mohs, users, surveys]) => {
+        Promise.all([this.mohService.findAll(), this.userService.findAll(), this.surveyService.findAll()])
+            .then(([mohs, users, surveys]) => {
                 this.mohs = mohs;
                 this.availableUsers = [...users].sort(byName);
                 this.surveys = surveys;
-            }
-        );
+            })
+            .catch(() => (this.loadError = true));
     }
 
     get name() {
@@ -376,10 +380,18 @@ export class NewQueuePage implements OnInit {
 
     // O PickList não atualiza a lista filtrada sozinho; ver transferPickListItems.
     moveToSelected(items: User[]): void {
-        [this.availableUsers, this.selectedUsers] = transferPickListItems(items, this.availableUsers, this.selectedUsers);
+        [this.availableUsers, this.selectedUsers] = transferPickListItems(
+            items,
+            this.availableUsers,
+            this.selectedUsers
+        );
     }
 
     moveToAvailable(items: User[]): void {
-        [this.selectedUsers, this.availableUsers] = transferPickListItems(items, this.selectedUsers, this.availableUsers);
+        [this.selectedUsers, this.availableUsers] = transferPickListItems(
+            items,
+            this.selectedUsers,
+            this.availableUsers
+        );
     }
 }

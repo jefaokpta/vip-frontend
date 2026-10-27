@@ -20,7 +20,7 @@ import {UserService} from '@/pages/users/user.service';
 import {SurveyService} from '@/pabx/survey/survey.service';
 import {transferPickListItems} from '@/util/utils';
 
-const byName = (a: User, b: User) => a.name.localeCompare(b.name, 'pt-BR', {numeric: true, sensitivity: 'base'});
+const byName = (a: User, b: User) => a.name.localeCompare(b.name, 'pt-BR', { numeric: true, sensitivity: 'base' });
 
 @Component({
     selector: 'app-edit-queue-page',
@@ -57,6 +57,9 @@ const byName = (a: User, b: User) => a.name.localeCompare(b.name, 'pt-BR', {nume
                 </div>
             </ng-template>
 
+            @if (loadError) {
+                <small class="text-red-500"> Erro ao carregar os dados </small>
+            }
             @if (form) {
                 <form [formGroup]="form" (ngSubmit)="onSubmit()" class="p-fluid">
                     <p-tabs value="0">
@@ -285,6 +288,7 @@ export class EditQueuePage implements OnInit {
     form!: FormGroup;
     pending = false;
     showError = false;
+    loadError = false;
     mohs: Moh[] = [];
     surveys: Survey[] = [];
     availableUsers: User[] = [];
@@ -313,27 +317,32 @@ export class EditQueuePage implements OnInit {
             this.mohService.findAll(),
             this.userService.findAll(),
             this.surveyService.findAll()
-        ]).then(([queue, mohs, users, surveys]) => {
-            this.queue = queue;
-            this.mohs = mohs;
-            this.surveys = surveys;
-            this.selectedUsers = queue.memberIds.map((id) => users.find((u) => u.id === id)!).filter(Boolean);
-            this.availableUsers = users.filter((u) => !queue.memberIds.includes(u.id)).sort(byName);
-            this.form = this.fb.group({
-                name: [queue.name, [Validators.required]],
-                queueStrategy: [queue.queueStrategy, [Validators.required]],
-                ringTimeout: [queue.ringTimeout, [Validators.required]],
-                queueTimeout: [queue.queueTimeout, [Validators.required]],
-                serviceLevelSeconds: [queue.serviceLevelSeconds, [Validators.required]],
-                queueSoundId: [queue.queueSoundId, [Validators.required]],
-                isJoinWhenEmpty: [queue.isJoinWhenEmpty],
-                maxCalls: [queue.maxCalls],
-                cooldownSeconds: [queue.cooldownSeconds],
-                tmeAlertSeconds: [queue.tmeAlertSeconds, [Validators.required, Validators.min(1)]],
-                callDurationAlertMinutes: [queue.callDurationAlertMinutes, [Validators.required, Validators.min(1)]],
-                surveyId: [queue.surveyId ?? null]
-            });
-        });
+        ])
+            .then(([queue, mohs, users, surveys]) => {
+                this.queue = queue;
+                this.mohs = mohs;
+                this.surveys = surveys;
+                this.selectedUsers = queue.memberIds.map((id) => users.find((u) => u.id === id)!).filter(Boolean);
+                this.availableUsers = users.filter((u) => !queue.memberIds.includes(u.id)).sort(byName);
+                this.form = this.fb.group({
+                    name: [queue.name, [Validators.required]],
+                    queueStrategy: [queue.queueStrategy, [Validators.required]],
+                    ringTimeout: [queue.ringTimeout, [Validators.required]],
+                    queueTimeout: [queue.queueTimeout, [Validators.required]],
+                    serviceLevelSeconds: [queue.serviceLevelSeconds, [Validators.required]],
+                    queueSoundId: [queue.queueSoundId, [Validators.required]],
+                    isJoinWhenEmpty: [queue.isJoinWhenEmpty],
+                    maxCalls: [queue.maxCalls],
+                    cooldownSeconds: [queue.cooldownSeconds],
+                    tmeAlertSeconds: [queue.tmeAlertSeconds, [Validators.required, Validators.min(1)]],
+                    callDurationAlertMinutes: [
+                        queue.callDurationAlertMinutes,
+                        [Validators.required, Validators.min(1)]
+                    ],
+                    surveyId: [queue.surveyId ?? null]
+                });
+            })
+            .catch(() => (this.loadError = true));
     }
 
     get name() {
@@ -396,10 +405,18 @@ export class EditQueuePage implements OnInit {
 
     // O PickList não atualiza a lista filtrada sozinho; ver transferPickListItems.
     moveToSelected(items: User[]): void {
-        [this.availableUsers, this.selectedUsers] = transferPickListItems(items, this.availableUsers, this.selectedUsers);
+        [this.availableUsers, this.selectedUsers] = transferPickListItems(
+            items,
+            this.availableUsers,
+            this.selectedUsers
+        );
     }
 
     moveToAvailable(items: User[]): void {
-        [this.selectedUsers, this.availableUsers] = transferPickListItems(items, this.selectedUsers, this.availableUsers);
+        [this.selectedUsers, this.availableUsers] = transferPickListItems(
+            items,
+            this.selectedUsers,
+            this.availableUsers
+        );
     }
 }
