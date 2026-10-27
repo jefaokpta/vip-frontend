@@ -35,10 +35,10 @@ interface PeerOption {
                 sourceFilterPlaceholder="Pesquisar"
                 targetFilterPlaceholder="Pesquisar"
                 breakpoint="1200px"
-                (onMoveToTarget)="refreshFilters()"
-                (onMoveToSource)="refreshFilters()"
-                (onMoveAllToTarget)="refreshFilters()"
-                (onMoveAllToSource)="refreshFilters()"
+                (onMoveToTarget)="moveToSelected($event.items)"
+                (onMoveToSource)="moveToAvailable($event.items)"
+                (onMoveAllToTarget)="moveToSelected($event.items)"
+                (onMoveAllToSource)="moveToAvailable($event.items)"
             >
                 <ng-template let-peer pTemplate="item">
                     <div class="flex items-center gap-2">
@@ -78,14 +78,25 @@ export class PickupGroupPeersComponent implements OnInit {
         });
     }
 
-    /** O PickList move itens via splice/push nos mesmos arrays; o listbox interno só refaz o filtro com nova referência. */
-    refreshFilters(): void {
-        this.availablePeers = [...this.availablePeers];
-        this.selectedPeers = [...this.selectedPeers];
+    /*
+     * O PickList move itens mutando os arrays (botões) ou só a lista filtrada do listbox (drag & drop),
+     * e o listbox só refaz o filtro com nova referência. Reconstrói os dois lados a partir dos itens movidos.
+     */
+    moveToSelected(items: PeerOption[]): void {
+        [this.availablePeers, this.selectedPeers] = this.transfer(items, this.availablePeers, this.selectedPeers);
+    }
+
+    moveToAvailable(items: PeerOption[]): void {
+        [this.selectedPeers, this.availablePeers] = this.transfer(items, this.selectedPeers, this.availablePeers);
     }
 
     selectedPeerIds(): number[] {
         return this.selectedPeers.map((p) => p.id);
+    }
+
+    private transfer(items: PeerOption[], from: PeerOption[], to: PeerOption[]): [PeerOption[], PeerOption[]] {
+        const ids = new Set(items.map((p) => p.id));
+        return [from.filter((p) => !ids.has(p.id)), [...to.filter((p) => !ids.has(p.id)), ...items]];
     }
 
     private toOption(peer: Peer, groupName?: string): PeerOption {
