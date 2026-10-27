@@ -12,10 +12,11 @@ import {PeerTransportEnum} from '@/pabx/types/peer-transport-enum';
 import {PickupGroup} from '@/pabx/types/pickup-group';
 import {Select} from 'primeng/select';
 import {PickupGroupService} from '@/pabx/pickup-group/pickup-group.service';
-import {dtmfSelectOptions, languageSelectOptions} from '@/pabx/utils';
+import {dtmfSelectOptions, generateAlphanumericSecret, languageSelectOptions} from '@/pabx/utils';
 import {ToggleSwitch} from 'primeng/toggleswitch';
 import {InputNumber} from 'primeng/inputnumber';
 import {Password} from 'primeng/password';
+import {Tooltip} from 'primeng/tooltip';
 import {SelectButton} from 'primeng/selectbutton';
 import {DdrService} from '@/pabx/ddr/ddr.service';
 import {formatDdr} from '@/pabx/ddr/ddr-format';
@@ -42,6 +43,7 @@ import {RoleEnum} from '@/types/role-enum';
         ToggleSwitch,
         InputNumber,
         Password,
+        Tooltip,
         SelectButton,
         Tabs,
         TabList,
@@ -142,7 +144,26 @@ import {RoleEnum} from '@/types/role-enum';
 
                             <div class="field mb-4">
                                 <label for="md5Secret" class="block mb-2">Senha de Registro *</label>
-                                <p-password formControlName="md5Secret" [toggleMask]="true" feedback="false" />
+                                <div class="flex gap-2 items-center">
+                                    <p-password formControlName="md5Secret" [toggleMask]="true" feedback="false"/>
+                                    <p-button
+                                        type="button"
+                                        icon="pi pi-refresh"
+                                        severity="secondary"
+                                        outlined
+                                        pTooltip="Gerar senha"
+                                        (onClick)="generateMd5Secret()"
+                                    />
+                                    <p-button
+                                        type="button"
+                                        [icon]="copied ? 'pi pi-check' : 'pi pi-copy'"
+                                        severity="secondary"
+                                        outlined
+                                        pTooltip="Copiar senha"
+                                        [disabled]="!md5Secret?.value"
+                                        (onClick)="copyMd5Secret()"
+                                    />
+                                </div>
                                 <small
                                     *ngIf="md5Secret?.invalid && (md5Secret?.dirty || md5Secret?.touched)"
                                     class="p-error block mt-2"
@@ -312,14 +333,37 @@ export class NewPeerPage implements OnInit {
             callLimit: [2, [Validators.required]],
             md5Secret: ['', [Validators.required, Validators.minLength(2)]]
         });
-        this.pickupGroupService.findAll().then((groups) => (this.pickUpGroupOptions = groups));
-        this.ddrService.findAll().then(
-            (ddrs) =>
-                (this.ddrOptions = ddrs.map((d) => ({
-                    label: formatDdr(d.ddr) + (d.isDefault ? ' (padrão)' : ''),
-                    value: d.id
-                })))
-        );
+        this.pickupGroupService
+            .findAll()
+            .then((groups) => (this.pickUpGroupOptions = groups))
+            .catch(() => (this.errorMessage = 'Erro ao carregar os grupos de captura.'));
+        this.ddrService
+            .findAll()
+            .then(
+                (ddrs) =>
+                    (this.ddrOptions = ddrs.map((d) => ({
+                        label: formatDdr(d.ddr) + (d.isDefault ? ' (padrão)' : ''),
+                        value: d.id
+                    })))
+            )
+            .catch(() => (this.errorMessage = 'Erro ao carregar os DDRs.'));
+    }
+
+    copied = false;
+
+    generateMd5Secret() {
+        this.md5Secret?.setValue(generateAlphanumericSecret());
+        this.md5Secret?.markAsDirty();
+    }
+
+    copyMd5Secret() {
+        navigator.clipboard
+            .writeText(this.md5Secret?.value ?? '')
+            .then(() => {
+                this.copied = true;
+                setTimeout(() => (this.copied = false), 2000);
+            })
+            .catch(() => (this.errorMessage = 'Não foi possível copiar a senha.'));
     }
 
     onSubmit() {
