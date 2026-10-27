@@ -37,8 +37,8 @@ export function actionHasArg1(selectedAction: DialPlanActionEnum): Validators[] 
 
 const ALPHANUMERIC_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
-/** Mesmo formato do backend (generateAlphanumericSecret): 8 caracteres alfanuméricos. */
-export function generateAlphanumericSecret(length = 8): string {
+/** Mesmo formato do backend (generateAlphanumericSecret): 16 caracteres alfanuméricos. */
+export function generateAlphanumericSecret(length = 16): string {
     const limit = 256 - (256 % ALPHANUMERIC_CHARS.length);
     let secret = '';
     while (secret.length < length) {
