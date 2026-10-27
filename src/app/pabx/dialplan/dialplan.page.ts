@@ -78,10 +78,7 @@ import {Select} from 'primeng/select';
             >
                 <ng-template pTemplate="header">
                     <tr>
-                        <th pSortableColumn="name">
-                            Nome
-                            <p-sortIcon field="name"></p-sortIcon>
-                        </th>
+                        <th>Nome</th>
                         <th>Origem</th>
                         <th>Destino</th>
                         <th style="width: 10%">Ativo</th>
@@ -236,8 +233,12 @@ export class DialplanPage implements OnInit {
     }
 
     private sortDialplansByDstAndPriority(dialplans: DialPlan[]): DialPlan[] {
+        // Expressões regulares acima e alias abaixo; destinos idênticos ficam juntos, ordenados pela prioridade.
+        const isAlias = (d: DialPlan) => (d.dst ? 0 : 1);
         return dialplans.sort((a, b) => {
-            const dstCompare = (a.dst ?? '').localeCompare(b.dst ?? '');
+            const typeCompare = isAlias(a) - isAlias(b);
+            if (typeCompare !== 0) return typeCompare;
+            const dstCompare = this.dstLabel(a).localeCompare(this.dstLabel(b), 'pt-BR', { numeric: true });
             if (dstCompare !== 0) return dstCompare;
             return b.priority - a.priority;
         });
