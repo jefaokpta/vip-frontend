@@ -347,21 +347,30 @@ export class EditPeerPage implements OnInit {
             isShowPassword: [false]
         });
         const id = this.activatedRoute.snapshot.paramMap.get('id')!;
-        this.peerService.findById(id).then((peer) => {
-            this.form.patchValue(peer);
-            this.form.patchValue({
-                pickUpGroup: Number(peer.pickUpGroup) || null,
-                clidDdrId: peer.clidDdrId ?? null
-            });
-        });
-        this.pickupGroupService.findAll().then((groups) => (this.pickUpGroupOptions = groups));
-        this.ddrService.findAll().then(
-            (ddrs) =>
-                (this.ddrOptions = ddrs.map((d) => ({
-                    label: formatDdr(d.ddr) + (d.isDefault ? ' (padrão)' : ''),
-                    value: d.id
-                })))
-        );
+        this.peerService
+            .findById(id)
+            .then((peer) => {
+                this.form.patchValue(peer);
+                this.form.patchValue({
+                    pickUpGroup: Number(peer.pickUpGroup) || null,
+                    clidDdrId: peer.clidDdrId ?? null
+                });
+            })
+            .catch(() => (this.errorMessage = 'Erro ao carregar o ramal.'));
+        this.pickupGroupService
+            .findAll()
+            .then((groups) => (this.pickUpGroupOptions = groups))
+            .catch(() => (this.errorMessage = 'Erro ao carregar os grupos de captura.'));
+        this.ddrService
+            .findAll()
+            .then(
+                (ddrs) =>
+                    (this.ddrOptions = ddrs.map((d) => ({
+                        label: formatDdr(d.ddr) + (d.isDefault ? ' (padrão)' : ''),
+                        value: d.id
+                    })))
+            )
+            .catch(() => (this.errorMessage = 'Erro ao carregar os DDRs.'));
     }
 
     toggleMd5Secret() {
@@ -379,10 +388,13 @@ export class EditPeerPage implements OnInit {
     }
 
     copyMd5Secret() {
-        navigator.clipboard.writeText(this.md5Secret?.value ?? '').then(() => {
-            this.copied = true;
-            setTimeout(() => (this.copied = false), 2000);
-        });
+        navigator.clipboard
+            .writeText(this.md5Secret?.value ?? '')
+            .then(() => {
+                this.copied = true;
+                setTimeout(() => (this.copied = false), 2000);
+            })
+            .catch(() => (this.errorMessage = 'Não foi possível copiar a senha.'));
     }
 
     onSubmit() {

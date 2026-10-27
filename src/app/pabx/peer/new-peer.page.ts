@@ -333,14 +333,20 @@ export class NewPeerPage implements OnInit {
             callLimit: [2, [Validators.required]],
             md5Secret: ['', [Validators.required, Validators.minLength(2)]]
         });
-        this.pickupGroupService.findAll().then((groups) => (this.pickUpGroupOptions = groups));
-        this.ddrService.findAll().then(
-            (ddrs) =>
-                (this.ddrOptions = ddrs.map((d) => ({
-                    label: formatDdr(d.ddr) + (d.isDefault ? ' (padrão)' : ''),
-                    value: d.id
-                })))
-        );
+        this.pickupGroupService
+            .findAll()
+            .then((groups) => (this.pickUpGroupOptions = groups))
+            .catch(() => (this.errorMessage = 'Erro ao carregar os grupos de captura.'));
+        this.ddrService
+            .findAll()
+            .then(
+                (ddrs) =>
+                    (this.ddrOptions = ddrs.map((d) => ({
+                        label: formatDdr(d.ddr) + (d.isDefault ? ' (padrão)' : ''),
+                        value: d.id
+                    })))
+            )
+            .catch(() => (this.errorMessage = 'Erro ao carregar os DDRs.'));
     }
 
     copied = false;
@@ -351,10 +357,13 @@ export class NewPeerPage implements OnInit {
     }
 
     copyMd5Secret() {
-        navigator.clipboard.writeText(this.md5Secret?.value ?? '').then(() => {
-            this.copied = true;
-            setTimeout(() => (this.copied = false), 2000);
-        });
+        navigator.clipboard
+            .writeText(this.md5Secret?.value ?? '')
+            .then(() => {
+                this.copied = true;
+                setTimeout(() => (this.copied = false), 2000);
+            })
+            .catch(() => (this.errorMessage = 'Não foi possível copiar a senha.'));
     }
 
     onSubmit() {

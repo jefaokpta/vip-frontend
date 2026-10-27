@@ -162,10 +162,20 @@ export class PeerPage implements OnInit {
     ) {}
 
     ngOnInit(): void {
-        this.peerService.findAll().then((peers) => {
-            this.peers = this.sortByPeer(peers);
-            this.loading = false;
-        });
+        this.peerService
+            .findAll()
+            .then((peers) => {
+                this.peers = this.sortByPeer(peers);
+                this.loading = false;
+            })
+            .catch(() => {
+                this.loading = false;
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Erro',
+                    detail: 'Erro ao carregar os ramais.'
+                });
+            });
     }
 
     private sortByPeer(peers: Peer[]): Peer[] {
