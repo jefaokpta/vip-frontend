@@ -20,6 +20,8 @@ import {UserService} from '@/pages/users/user.service';
 import {SurveyService} from '@/pabx/survey/survey.service';
 import {transferPickListItems} from '@/util/utils';
 
+const byName = (a: User, b: User) => a.name.localeCompare(b.name, 'pt-BR', {numeric: true, sensitivity: 'base'});
+
 @Component({
     selector: 'app-edit-queue-page',
     standalone: true,
@@ -316,7 +318,7 @@ export class EditQueuePage implements OnInit {
             this.mohs = mohs;
             this.surveys = surveys;
             this.selectedUsers = queue.memberIds.map((id) => users.find((u) => u.id === id)!).filter(Boolean);
-            this.availableUsers = users.filter((u) => !queue.memberIds.includes(u.id));
+            this.availableUsers = users.filter((u) => !queue.memberIds.includes(u.id)).sort(byName);
             this.form = this.fb.group({
                 name: [queue.name, [Validators.required]],
                 queueStrategy: [queue.queueStrategy, [Validators.required]],

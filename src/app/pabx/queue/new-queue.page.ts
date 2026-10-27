@@ -19,6 +19,8 @@ import {UserService} from '@/pages/users/user.service';
 import {SurveyService} from '@/pabx/survey/survey.service';
 import {transferPickListItems} from '@/util/utils';
 
+const byName = (a: User, b: User) => a.name.localeCompare(b.name, 'pt-BR', {numeric: true, sensitivity: 'base'});
+
 @Component({
     selector: 'app-new-queue-page',
     standalone: true,
@@ -313,7 +315,7 @@ export class NewQueuePage implements OnInit {
         Promise.all([this.mohService.findAll(), this.userService.findAll(), this.surveyService.findAll()]).then(
             ([mohs, users, surveys]) => {
                 this.mohs = mohs;
-                this.availableUsers = users;
+                this.availableUsers = [...users].sort(byName);
                 this.surveys = surveys;
             }
         );
