@@ -3,5 +3,6 @@ export enum UraActionEnum {
     DIALPEER = 'DIALPEER',
     RETURN_TO_START = 'RETURN_TO_START',
     CALLGROUP = 'CALLGROUP',
-    SUBURA = 'SUBURA'
+    SUBURA = 'SUBURA',
+    QUEUE = 'QUEUE'
 }
