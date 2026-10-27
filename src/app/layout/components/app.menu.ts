@@ -32,14 +32,14 @@ export class AppMenu implements OnInit {
                 },
                 {
                     label: 'Painel de Ramais',
-                    icon: 'pi pi-fw pi-chart-bar',
+                    icon: 'pi pi-fw pi-th-large',
                     roles: [RoleEnum.ROLE_COMPANY_USER],
                     module: ModuleEnum.PABX,
                     routerLink: ['/pages/peers']
                 },
                 {
                     label: 'Painel de Filas',
-                    icon: 'pi pi-fw pi-chart-bar',
+                    icon: 'pi pi-fw pi-objects-column',
                     roles: [RoleEnum.ROLE_COMPANY_SUPERVISOR],
                     module: ModuleEnum.PABX,
                     routerLink: ['/pages/queues']
@@ -63,11 +63,11 @@ export class AppMenu implements OnInit {
                     items: [
                         {
                             label: 'Relatórios',
-                            icon: 'pi pi-fw pi-chart-bar',
+                            icon: 'pi pi-fw pi-file',
                             items: [
                                 {
                                     label: 'Chamadas',
-                                    icon: 'pi pi-fw pi-chart-bar',
+                                    icon: 'pi pi-fw pi-phone',
                                     roles: [RoleEnum.ROLE_COMPANY_SUPERVISOR],
                                     routerLink: ['/pabx/call-report']
                                 },
@@ -80,44 +80,44 @@ export class AppMenu implements OnInit {
                                 {
                                     label: 'Pesquisa de Satisfação',
                                     roles: [RoleEnum.ROLE_COMPANY_SUPERVISOR],
-                                    icon: 'fa fa-music',
+                                    icon: 'pi pi-fw pi-star',
                                     routerLink: ['/pabx/survey-report']
                                 },
                                 {
                                     label: 'Atividade dos Membros',
                                     roles: [RoleEnum.ROLE_COMPANY_SUPERVISOR],
-                                    icon: 'pi pi-fw pi-users',
+                                    icon: 'pi pi-fw pi-user',
                                     routerLink: ['/pabx/member-activity-report']
                                 },
                                 {
                                     label: 'DAC',
                                     roles: [RoleEnum.ROLE_COMPANY_SUPERVISOR],
-                                    icon: 'pi pi-fw pi-image',
+                                    icon: 'pi pi-fw pi-chart-line',
                                     routerLink: ['/pabx/dac-report']
                                 }
                             ]
                         },
                         {
                             label: 'Ramais',
-                            icon: 'pi pi-fw pi-image',
+                            icon: 'pi pi-fw pi-id-card',
                             roles: [RoleEnum.ROLE_COMPANY_ADMIN],
                             routerLink: ['/pabx/peers']
                         },
                         {
                             label: 'Grupos de Captura',
-                            icon: 'pi pi-fw pi-users',
+                            icon: 'pi pi-fw pi-share-alt',
                             roles: [RoleEnum.ROLE_COMPANY_ADMIN],
                             routerLink: ['/pabx/pickup-groups']
                         },
                         {
                             label: 'Grupos de Chamada',
-                            icon: 'pi pi-fw pi-phone',
+                            icon: 'pi pi-fw pi-megaphone',
                             roles: [RoleEnum.ROLE_COMPANY_ADMIN],
                             routerLink: ['/pabx/call-groups']
                         },
                         {
                             label: 'Filas de Atendimento',
-                            icon: 'pi pi-fw pi-users',
+                            icon: 'pi pi-fw pi-list-check',
                             roles: [RoleEnum.ROLE_COMPANY_ADMIN],
                             routerLink: ['/pabx/queues']
                         },
@@ -129,7 +129,7 @@ export class AppMenu implements OnInit {
                         },
                         {
                             label: 'Regras de Discagem',
-                            icon: 'pi pi-fw pi-list',
+                            icon: 'pi pi-fw pi-directions',
                             roles: [RoleEnum.ROLE_COMPANY_ADMIN],
                             routerLink: ['/pabx/dialplans']
                         },
@@ -140,61 +140,61 @@ export class AppMenu implements OnInit {
                         },
                         {
                             label: 'Alias de Discagem',
-                            icon: 'pi pi-fw pi-list',
+                            icon: 'pi pi-fw pi-tags',
                             roles: [RoleEnum.ROLE_COMPANY_ADMIN],
                             routerLink: ['/pabx/aliases']
                         },
                         {
                             label: 'DDR',
-                            icon: 'pi pi-fw pi-phone',
+                            icon: 'pi pi-fw pi-hashtag',
                             roles: [RoleEnum.ROLE_TENANT_SUPPORT],
                             routerLink: ['/pabx/ddrs']
                         },
                         {
                             label: 'Centro de Custo',
-                            icon: 'pi pi-fw pi-list',
+                            icon: 'pi pi-fw pi-wallet',
                             roles: [RoleEnum.ROLE_COMPANY_ADMIN],
                             routerLink: ['/pabx/accountcodes']
                         },
                         {
                             label: 'Rotas de Chamada',
-                            icon: 'pi pi-fw pi-list',
+                            icon: 'pi pi-fw pi-arrow-right-arrow-left',
                             roles: [RoleEnum.ROLE_SAAS_SUPPORT],
                             routerLink: ['/pabx/routes']
                         },
                         {
                             label: 'Troncos',
-                            icon: 'pi pi-fw pi-list',
+                            icon: 'pi pi-fw pi-globe',
                             roles: [RoleEnum.ROLE_SAAS_SUPPORT],
                             routerLink: ['/pabx/trunks']
                         },
                         {
                             label: 'Registers',
-                            icon: 'pi pi-fw pi-server',
+                            icon: 'pi pi-fw pi-key',
                             roles: [RoleEnum.ROLE_SAAS_SUPPORT],
                             routerLink: ['/pabx/register-instances']
                         },
                         {
                             label: 'Workers',
-                            icon: 'pi pi-fw pi-server',
+                            icon: 'pi pi-fw pi-cog',
                             roles: [RoleEnum.ROLE_SAAS_SUPPORT],
                             routerLink: ['/pabx/worker-instances']
                         },
                         {
                             label: 'Audios do Sistema',
-                            icon: 'fa fa-music',
+                            icon: 'pi pi-fw pi-volume-up',
                             roles: [RoleEnum.ROLE_COMPANY_USER],
                             routerLink: ['/pabx/mohs']
                         },
                         {
                             label: 'URA',
-                            icon: 'fa fa-music',
+                            icon: 'pi pi-fw pi-microphone',
                             roles: [RoleEnum.ROLE_COMPANY_USER],
                             routerLink: ['/pabx/uras']
                         },
                         {
                             label: 'Pesquisa de Satisfação',
-                            icon: 'fa fa-music',
+                            icon: 'pi pi-fw pi-star',
                             roles: [RoleEnum.ROLE_COMPANY_USER],
                             routerLink: ['/pabx/surveys']
                         }
@@ -207,7 +207,7 @@ export class AppMenu implements OnInit {
                     items: [
                         {
                             label: 'Salas',
-                            icon: 'pi pi-fw pi-image'
+                            icon: 'pi pi-fw pi-desktop'
                         }
                     ]
                 },
@@ -218,7 +218,7 @@ export class AppMenu implements OnInit {
                     items: [
                         {
                             label: 'Propostas',
-                            icon: 'pi pi-fw pi-shopping-cart'
+                            icon: 'pi pi-fw pi-file-edit'
                         }
                     ]
                 },
@@ -229,11 +229,11 @@ export class AppMenu implements OnInit {
                     items: [
                         {
                             label: 'Mensagens',
-                            icon: 'pi pi-envelope'
+                            icon: 'pi pi-fw pi-envelope'
                         },
                         {
                             label: 'Registro',
-                            icon: 'pi pi-fw pi-image'
+                            icon: 'pi pi-fw pi-book'
                         }
                     ]
                 }
@@ -241,7 +241,7 @@ export class AppMenu implements OnInit {
         },
         {
             label: 'Configurações',
-            icon: 'pi pi-fw pi-microchip-ai',
+            icon: 'pi pi-fw pi-sliders-h',
             items: [
                 {
                     label: 'Usuários',
@@ -258,7 +258,7 @@ export class AppMenu implements OnInit {
                 {
                     label: 'Integrações',
                     roles: [RoleEnum.ROLE_COMPANY_ADMIN],
-                    icon: 'fa fa-puzzle-piece',
+                    icon: 'pi pi-fw pi-link',
                     routerLink: ['/pages/integrations']
                 },
                 {
