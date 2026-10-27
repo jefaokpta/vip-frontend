@@ -4,6 +4,7 @@ import {PrimeTemplate} from 'primeng/api';
 import {PeerService} from '@/pabx/peer/peer.service';
 import {PickupGroupService} from '@/pabx/pickup-group/pickup-group.service';
 import {Peer} from '@/pabx/types/peer';
+import {transferPickListItems} from '@/util/utils';
 
 interface PeerOption {
     readonly id: number;
@@ -78,25 +79,17 @@ export class PickupGroupPeersComponent implements OnInit {
         });
     }
 
-    /*
-     * O PickList move itens mutando os arrays (botões) ou só a lista filtrada do listbox (drag & drop),
-     * e o listbox só refaz o filtro com nova referência. Reconstrói os dois lados a partir dos itens movidos.
-     */
+    // O PickList não atualiza a lista filtrada sozinho; ver transferPickListItems.
     moveToSelected(items: PeerOption[]): void {
-        [this.availablePeers, this.selectedPeers] = this.transfer(items, this.availablePeers, this.selectedPeers);
+        [this.availablePeers, this.selectedPeers] = transferPickListItems(items, this.availablePeers, this.selectedPeers);
     }
 
     moveToAvailable(items: PeerOption[]): void {
-        [this.selectedPeers, this.availablePeers] = this.transfer(items, this.selectedPeers, this.availablePeers);
+        [this.selectedPeers, this.availablePeers] = transferPickListItems(items, this.selectedPeers, this.availablePeers);
     }
 
     selectedPeerIds(): number[] {
         return this.selectedPeers.map((p) => p.id);
-    }
-
-    private transfer(items: PeerOption[], from: PeerOption[], to: PeerOption[]): [PeerOption[], PeerOption[]] {
-        const ids = new Set(items.map((p) => p.id));
-        return [from.filter((p) => !ids.has(p.id)), [...to.filter((p) => !ids.has(p.id)), ...items]];
     }
 
     private toOption(peer: Peer, groupName?: string): PeerOption {

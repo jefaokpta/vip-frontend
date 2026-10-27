@@ -18,6 +18,7 @@ import {QueueService} from '@/pabx/queue/queue.service';
 import {MohService} from '@/pabx/moh/moh.service';
 import {UserService} from '@/pages/users/user.service';
 import {SurveyService} from '@/pabx/survey/survey.service';
+import {transferPickListItems} from '@/util/utils';
 
 @Component({
     selector: 'app-edit-queue-page',
@@ -160,6 +161,10 @@ import {SurveyService} from '@/pabx/survey/survey.service';
                                         sourceFilterPlaceholder="Pesquisar"
                                         targetFilterPlaceholder="Pesquisar"
                                         breakpoint="1200px"
+                                        (onMoveToTarget)="moveToSelected($event.items)"
+                                        (onMoveToSource)="moveToAvailable($event.items)"
+                                        (onMoveAllToTarget)="moveToSelected($event.items)"
+                                        (onMoveAllToSource)="moveToAvailable($event.items)"
                                     >
                                         <ng-template let-user pTemplate="item">
                                             <div class="flex items-center gap-2">
@@ -385,5 +390,14 @@ export class EditQueuePage implements OnInit {
             [QueueStrategyEnum.FEWEST_CALLS]: 'Menos atendimentos'
         };
         return labels[strategy] ?? strategy;
+    }
+
+    // O PickList não atualiza a lista filtrada sozinho; ver transferPickListItems.
+    moveToSelected(items: User[]): void {
+        [this.availableUsers, this.selectedUsers] = transferPickListItems(items, this.availableUsers, this.selectedUsers);
+    }
+
+    moveToAvailable(items: User[]): void {
+        [this.selectedUsers, this.availableUsers] = transferPickListItems(items, this.selectedUsers, this.availableUsers);
     }
 }
