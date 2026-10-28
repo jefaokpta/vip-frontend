@@ -47,7 +47,7 @@ import {buildModuleOptions, buildRoleOptions} from '@/pages/users/utils';
 
                 <div class="field mb-4">
                     <label for="email" class="block mb-2">Email *</label>
-                    <input id="email" pInputText class="p-inputtext" formControlName="email" />
+                    <input id="email" pInputText class="p-inputtext w-full md:w-[30rem]" formControlName="email" />
                     <small *ngIf="email?.invalid && (email?.dirty || email?.touched)" class="p-error block mt-2">
                         <div *ngIf="email?.errors?.['required']">Email é obrigatório.</div>
                         <div *ngIf="email?.errors?.['email']">Email inválido.</div>
