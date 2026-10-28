@@ -133,7 +133,7 @@ const IPV4_REGEX = /^((25[0-5]|2[0-4]\d|1?\d?\d)\.){3}(25[0-5]|2[0-4]\d|1?\d?\d)
                                     outlined
                                     size="small"
                                     pTooltip="Bloquear"
-                                    (onClick)="block(item)"
+                                    (onClick)="confirmBlock(item)"
                                 />
                                 <p-button
                                     icon="pi pi-trash"
@@ -278,8 +278,17 @@ export class BlockedIpPage implements OnInit {
         });
     }
 
-    block(item: BlockedIp) {
-        this.changeStatus(item, 'BLOCKED');
+    confirmBlock(item: BlockedIp) {
+        this.confirmationService.confirm({
+            message: `Bloquear ${item.ip}? O IP será bloqueado imediatamente.`,
+            header: 'Confirmação',
+            closable: true,
+            closeOnEscape: true,
+            icon: 'pi pi-exclamation-triangle',
+            acceptButtonProps: { label: 'Bloquear', severity: 'danger' },
+            rejectButtonProps: { label: 'Cancelar', severity: 'secondary', outlined: true },
+            accept: () => this.changeStatus(item, 'BLOCKED')
+        });
     }
 
     confirmDelete(item: BlockedIp) {
