@@ -62,6 +62,42 @@ export class AppMenu implements OnInit {
                     module: ModuleEnum.PABX,
                     items: [
                         {
+                            label: 'Relatórios',
+                            icon: 'pi pi-fw pi-file',
+                            items: [
+                                {
+                                    label: 'Chamadas',
+                                    icon: 'pi pi-fw pi-phone',
+                                    roles: [RoleEnum.ROLE_COMPANY_SUPERVISOR],
+                                    routerLink: ['/pabx/call-report']
+                                },
+                                {
+                                    label: 'URA',
+                                    roles: [RoleEnum.ROLE_COMPANY_SUPERVISOR],
+                                    icon: 'pi pi-fw pi-sitemap',
+                                    routerLink: ['/pabx/ura-report']
+                                },
+                                {
+                                    label: 'Pesquisa de Satisfação',
+                                    roles: [RoleEnum.ROLE_COMPANY_SUPERVISOR],
+                                    icon: 'pi pi-fw pi-star',
+                                    routerLink: ['/pabx/survey-report']
+                                },
+                                {
+                                    label: 'Atividade dos Membros',
+                                    roles: [RoleEnum.ROLE_COMPANY_SUPERVISOR],
+                                    icon: 'pi pi-fw pi-user',
+                                    routerLink: ['/pabx/member-activity-report']
+                                },
+                                {
+                                    label: 'DAC',
+                                    roles: [RoleEnum.ROLE_COMPANY_SUPERVISOR],
+                                    icon: 'pi pi-fw pi-chart-line',
+                                    routerLink: ['/pabx/dac-report']
+                                }
+                            ]
+                        },
+                        {
                             label: 'Ramais',
                             icon: 'pi pi-fw pi-id-card',
                             roles: [RoleEnum.ROLE_COMPANY_ADMIN],
@@ -162,42 +198,6 @@ export class AppMenu implements OnInit {
                             roles: [RoleEnum.ROLE_SAAS_SUPPORT],
                             routerLink: ['/pabx/worker-instances']
                         },
-                        {
-                            label: 'Relatórios',
-                            icon: 'pi pi-fw pi-file',
-                            items: [
-                                {
-                                    label: 'Chamadas',
-                                    icon: 'pi pi-fw pi-phone',
-                                    roles: [RoleEnum.ROLE_COMPANY_SUPERVISOR],
-                                    routerLink: ['/pabx/call-report']
-                                },
-                                {
-                                    label: 'URA',
-                                    roles: [RoleEnum.ROLE_COMPANY_SUPERVISOR],
-                                    icon: 'pi pi-fw pi-sitemap',
-                                    routerLink: ['/pabx/ura-report']
-                                },
-                                {
-                                    label: 'Pesquisa de Satisfação',
-                                    roles: [RoleEnum.ROLE_COMPANY_SUPERVISOR],
-                                    icon: 'pi pi-fw pi-star',
-                                    routerLink: ['/pabx/survey-report']
-                                },
-                                {
-                                    label: 'Atividade dos Membros',
-                                    roles: [RoleEnum.ROLE_COMPANY_SUPERVISOR],
-                                    icon: 'pi pi-fw pi-user',
-                                    routerLink: ['/pabx/member-activity-report']
-                                },
-                                {
-                                    label: 'DAC',
-                                    roles: [RoleEnum.ROLE_COMPANY_SUPERVISOR],
-                                    icon: 'pi pi-fw pi-chart-line',
-                                    routerLink: ['/pabx/dac-report']
-                                }
-                            ]
-                        }
                     ]
                 },
                 {
