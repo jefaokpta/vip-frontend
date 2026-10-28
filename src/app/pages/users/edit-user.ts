@@ -86,8 +86,15 @@ import {buildModuleOptions, buildRoleOptions} from '@/pages/users/utils';
                     <span>Administrador tem acesso a todos os módulos</span>
                 </div>
 
+                <small *ngIf="submitError" class="p-error block mb-4">{{ submitError }}</small>
+
                 <div class="flex mt-4">
-                    <p-button type="submit" label="Salvar" icon="pi pi-save" [disabled]="form.invalid"></p-button>
+                    <p-button
+                        type="submit"
+                        label="Salvar"
+                        icon="pi pi-save"
+                        [disabled]="form.invalid || pending"
+                    ></p-button>
                 </div>
             </form>
         </p-card>
@@ -98,6 +105,8 @@ export class EditUserPage implements OnInit {
     roleOptions: { label: string; value: string }[] = [];
     moduleOptions: { label: string; value: string }[] = [];
     protected readonly RoleEnum = RoleEnum;
+    submitError = '';
+    pending = false;
 
     constructor(
         private readonly fb: FormBuilder,
@@ -115,10 +124,15 @@ export class EditUserPage implements OnInit {
             modules: [[]]
         });
         const id = this.activatedRoute.snapshot.paramMap.get('id')!;
-        this.userService.findById(id).then((user) => {
-            this.form.patchValue(user);
-            this.role?.setValue(user.roles.at(-1));
-        });
+        this.userService
+            .findById(id)
+            .then((user) => {
+                this.form.patchValue(user);
+                this.role?.setValue(user.roles.at(-1));
+            })
+            .catch((err) => {
+                this.submitError = err.error?.message ?? 'Não foi possível carregar o usuário.';
+            });
         const user = this.userService.getUser();
         this.roleOptions = buildRoleOptions(user.roles);
         this.moduleOptions = buildModuleOptions(user.companyServices);
@@ -138,6 +152,14 @@ export class EditUserPage implements OnInit {
 
     onSubmit() {
         const user = { ...this.form.value, roles: [this.form.value.role] };
-        this.userService.update(user).then(() => this.router.navigate(['/pages/users']));
+        this.pending = true;
+        this.submitError = '';
+        this.userService
+            .update(user)
+            .then(() => this.router.navigate(['/pages/users']))
+            .catch((err) => {
+                this.submitError = err.error?.message ?? 'Não foi possível atualizar o usuário.';
+            })
+            .finally(() => (this.pending = false));
     }
 }

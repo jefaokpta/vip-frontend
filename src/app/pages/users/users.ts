@@ -167,10 +167,20 @@ export class UsersPage implements OnInit {
     }
 
     ngOnInit(): void {
-        this.userService.findAll().then((users) => {
-            this.users = [...users].sort((a, b) => a.name.localeCompare(b.name, 'pt-BR', {sensitivity: 'base'}));
-            this.loading = false;
-        });
+        this.userService
+            .findAll()
+            .then((users) => {
+                this.users = [...users].sort((a, b) => a.name.localeCompare(b.name, 'pt-BR', {sensitivity: 'base'}));
+            })
+            .catch(() => {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Não foi possível carregar os usuários',
+                    detail: 'Tente novamente mais tarde.',
+                    life: 15_000
+                });
+            })
+            .finally(() => (this.loading = false));
     }
 
     onFilterGlobal(event: Event) {
