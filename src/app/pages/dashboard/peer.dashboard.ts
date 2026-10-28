@@ -135,9 +135,12 @@ export class PeerDashboard implements OnDestroy, OnInit {
             })
         );
 
-        this.dashboardService.findPeerRegistries().then((list) => {
-            this.peerRegistriesMap.set(new Map(list.map((pr) => [pr.peer.peer, pr])));
-        });
+        this.dashboardService
+            .findPeerRegistries()
+            .then((list) => {
+                this.peerRegistriesMap.set(new Map(list.map((pr) => [pr.peer.peer, pr])));
+            })
+            .catch((error) => console.error('Erro ao carregar ramais', error));
     }
 
     private isActive(pr: PeerRegistry): boolean {
