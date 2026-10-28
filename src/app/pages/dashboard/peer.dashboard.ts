@@ -122,11 +122,14 @@ export class PeerDashboard implements OnDestroy, OnInit {
             this.webSocketService.watch(`/topic/peerregistries/${companyId}`).subscribe((message) => {
                 const pr: PeerRegistry = JSON.parse(message.body);
                 this.peerRegistriesMap.update((map) => {
-                    // Ramal editado com novo número: remove a entrada antiga do mesmo ramal
-                    for (const [key, value] of map) {
-                        if (value.peer.id === pr.peer.id && key !== pr.peer.peer) map.delete(key);
-                    }
                     map.set(pr.peer.peer, pr);
+                    return new Map(map);
+                });
+            }),
+            this.webSocketService.watch(`/topic/peerregistries-removed/${companyId}`).subscribe((message) => {
+                const { peer }: { peer: string } = JSON.parse(message.body);
+                this.peerRegistriesMap.update((map) => {
+                    map.delete(peer);
                     return new Map(map);
                 });
             })
