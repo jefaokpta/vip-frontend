@@ -62,6 +62,107 @@ export class AppMenu implements OnInit {
                     module: ModuleEnum.PABX,
                     items: [
                         {
+                            label: 'Ramais',
+                            icon: 'pi pi-fw pi-id-card',
+                            roles: [RoleEnum.ROLE_COMPANY_ADMIN],
+                            routerLink: ['/pabx/peers']
+                        },
+                        {
+                            label: 'Grupos de Captura',
+                            icon: 'pi pi-fw pi-share-alt',
+                            roles: [RoleEnum.ROLE_COMPANY_ADMIN],
+                            routerLink: ['/pabx/pickup-groups']
+                        },
+                        {
+                            label: 'Grupos de Chamada',
+                            icon: 'pi pi-fw pi-megaphone',
+                            roles: [RoleEnum.ROLE_COMPANY_ADMIN],
+                            routerLink: ['/pabx/call-groups']
+                        },
+                        {
+                            label: 'Filas de Atendimento',
+                            icon: 'pi pi-fw pi-list-check',
+                            roles: [RoleEnum.ROLE_COMPANY_ADMIN],
+                            routerLink: ['/pabx/queues']
+                        },
+                        {
+                            label: 'Pausas',
+                            icon: 'pi pi-fw pi-pause-circle',
+                            roles: [RoleEnum.ROLE_COMPANY_USER],
+                            routerLink: ['/pabx/pauses']
+                        },
+                        {
+                            label: 'URA',
+                            icon: 'pi pi-fw pi-microphone',
+                            roles: [RoleEnum.ROLE_COMPANY_USER],
+                            routerLink: ['/pabx/uras']
+                        },
+                        {
+                            label: 'Pesquisa de Satisfação',
+                            icon: 'pi pi-fw pi-star',
+                            roles: [RoleEnum.ROLE_COMPANY_USER],
+                            routerLink: ['/pabx/surveys']
+                        },
+                        {
+                            label: 'Audios do Sistema',
+                            icon: 'pi pi-fw pi-volume-up',
+                            roles: [RoleEnum.ROLE_COMPANY_USER],
+                            routerLink: ['/pabx/mohs']
+                        },
+                        {
+                            label: 'Calendários',
+                            icon: 'pi pi-fw pi-calendar',
+                            routerLink: ['/pabx/calendars']
+                        },
+                        {
+                            label: 'Regras de Discagem',
+                            icon: 'pi pi-fw pi-directions',
+                            roles: [RoleEnum.ROLE_COMPANY_ADMIN],
+                            routerLink: ['/pabx/dialplans']
+                        },
+                        {
+                            label: 'Alias de Discagem',
+                            icon: 'pi pi-fw pi-tags',
+                            roles: [RoleEnum.ROLE_COMPANY_ADMIN],
+                            routerLink: ['/pabx/aliases']
+                        },
+                        {
+                            label: 'Centro de Custo',
+                            icon: 'pi pi-fw pi-wallet',
+                            roles: [RoleEnum.ROLE_COMPANY_ADMIN],
+                            routerLink: ['/pabx/accountcodes']
+                        },
+                        {
+                            label: 'DDR',
+                            icon: 'pi pi-fw pi-hashtag',
+                            roles: [RoleEnum.ROLE_TENANT_SUPPORT],
+                            routerLink: ['/pabx/ddrs']
+                        },
+                        {
+                            label: 'Rotas de Chamada',
+                            icon: 'pi pi-fw pi-arrow-right-arrow-left',
+                            roles: [RoleEnum.ROLE_SAAS_SUPPORT],
+                            routerLink: ['/pabx/routes']
+                        },
+                        {
+                            label: 'Troncos',
+                            icon: 'pi pi-fw pi-globe',
+                            roles: [RoleEnum.ROLE_SAAS_SUPPORT],
+                            routerLink: ['/pabx/trunks']
+                        },
+                        {
+                            label: 'Registers',
+                            icon: 'pi pi-fw pi-key',
+                            roles: [RoleEnum.ROLE_SAAS_SUPPORT],
+                            routerLink: ['/pabx/register-instances']
+                        },
+                        {
+                            label: 'Workers',
+                            icon: 'pi pi-fw pi-cog',
+                            roles: [RoleEnum.ROLE_SAAS_SUPPORT],
+                            routerLink: ['/pabx/worker-instances']
+                        },
+                        {
                             label: 'Relatórios',
                             icon: 'pi pi-fw pi-file',
                             items: [
@@ -96,107 +197,6 @@ export class AppMenu implements OnInit {
                                     routerLink: ['/pabx/dac-report']
                                 }
                             ]
-                        },
-                        {
-                            label: 'Ramais',
-                            icon: 'pi pi-fw pi-id-card',
-                            roles: [RoleEnum.ROLE_COMPANY_ADMIN],
-                            routerLink: ['/pabx/peers']
-                        },
-                        {
-                            label: 'Grupos de Captura',
-                            icon: 'pi pi-fw pi-share-alt',
-                            roles: [RoleEnum.ROLE_COMPANY_ADMIN],
-                            routerLink: ['/pabx/pickup-groups']
-                        },
-                        {
-                            label: 'Grupos de Chamada',
-                            icon: 'pi pi-fw pi-megaphone',
-                            roles: [RoleEnum.ROLE_COMPANY_ADMIN],
-                            routerLink: ['/pabx/call-groups']
-                        },
-                        {
-                            label: 'Filas de Atendimento',
-                            icon: 'pi pi-fw pi-list-check',
-                            roles: [RoleEnum.ROLE_COMPANY_ADMIN],
-                            routerLink: ['/pabx/queues']
-                        },
-                        {
-                            label: 'Pausas',
-                            icon: 'pi pi-fw pi-pause-circle',
-                            roles: [RoleEnum.ROLE_COMPANY_USER],
-                            routerLink: ['/pabx/pauses']
-                        },
-                        {
-                            label: 'Regras de Discagem',
-                            icon: 'pi pi-fw pi-directions',
-                            roles: [RoleEnum.ROLE_COMPANY_ADMIN],
-                            routerLink: ['/pabx/dialplans']
-                        },
-                        {
-                            label: 'Calendários',
-                            icon: 'pi pi-fw pi-calendar',
-                            routerLink: ['/pabx/calendars']
-                        },
-                        {
-                            label: 'Alias de Discagem',
-                            icon: 'pi pi-fw pi-tags',
-                            roles: [RoleEnum.ROLE_COMPANY_ADMIN],
-                            routerLink: ['/pabx/aliases']
-                        },
-                        {
-                            label: 'DDR',
-                            icon: 'pi pi-fw pi-hashtag',
-                            roles: [RoleEnum.ROLE_TENANT_SUPPORT],
-                            routerLink: ['/pabx/ddrs']
-                        },
-                        {
-                            label: 'Centro de Custo',
-                            icon: 'pi pi-fw pi-wallet',
-                            roles: [RoleEnum.ROLE_COMPANY_ADMIN],
-                            routerLink: ['/pabx/accountcodes']
-                        },
-                        {
-                            label: 'Rotas de Chamada',
-                            icon: 'pi pi-fw pi-arrow-right-arrow-left',
-                            roles: [RoleEnum.ROLE_SAAS_SUPPORT],
-                            routerLink: ['/pabx/routes']
-                        },
-                        {
-                            label: 'Troncos',
-                            icon: 'pi pi-fw pi-globe',
-                            roles: [RoleEnum.ROLE_SAAS_SUPPORT],
-                            routerLink: ['/pabx/trunks']
-                        },
-                        {
-                            label: 'Registers',
-                            icon: 'pi pi-fw pi-key',
-                            roles: [RoleEnum.ROLE_SAAS_SUPPORT],
-                            routerLink: ['/pabx/register-instances']
-                        },
-                        {
-                            label: 'Workers',
-                            icon: 'pi pi-fw pi-cog',
-                            roles: [RoleEnum.ROLE_SAAS_SUPPORT],
-                            routerLink: ['/pabx/worker-instances']
-                        },
-                        {
-                            label: 'Audios do Sistema',
-                            icon: 'pi pi-fw pi-volume-up',
-                            roles: [RoleEnum.ROLE_COMPANY_USER],
-                            routerLink: ['/pabx/mohs']
-                        },
-                        {
-                            label: 'URA',
-                            icon: 'pi pi-fw pi-microphone',
-                            roles: [RoleEnum.ROLE_COMPANY_USER],
-                            routerLink: ['/pabx/uras']
-                        },
-                        {
-                            label: 'Pesquisa de Satisfação',
-                            icon: 'pi pi-fw pi-star',
-                            roles: [RoleEnum.ROLE_COMPANY_USER],
-                            routerLink: ['/pabx/surveys']
                         }
                     ]
                 },
