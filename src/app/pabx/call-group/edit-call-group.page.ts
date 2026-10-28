@@ -7,6 +7,8 @@ import {CallGroupService} from '@/pabx/call-group/call-group.service';
 import {CallGroupStrategyEnum} from '@/pabx/types/call-group-strategy-enum';
 import {Peer} from '@/pabx/types/peer';
 import {PeerService} from '@/pabx/peer/peer.service';
+import {Moh} from '@/pabx/types/moh';
+import {MohService} from '@/pabx/moh/moh.service';
 import {InputTextModule} from 'primeng/inputtext';
 import {Select} from 'primeng/select';
 import {InputNumber} from 'primeng/inputnumber';
@@ -83,6 +85,19 @@ const byName = (a: Peer, b: Peer) => a.name.localeCompare(b.name, 'pt-BR', { num
                 </div>
 
                 <div class="field mb-4">
+                    <label for="callGroupSoundId" class="block mb-2">Áudio de espera</label>
+                    <p-select
+                        id="callGroupSoundId"
+                        [options]="mohs"
+                        formControlName="callGroupSoundId"
+                        optionLabel="name"
+                        optionValue="id"
+                        [showClear]="true"
+                        placeholder="Sem áudio (tom de chamada)"
+                    ></p-select>
+                </div>
+
+                <div class="field mb-4">
                     <label class="block mb-2">Ramais</label>
                     <p-picklist
                         [source]="availablePeers"
@@ -149,6 +164,7 @@ export class EditCallGroupPage implements OnInit {
     showError = false;
     availablePeers: Peer[] = [];
     selectedPeers: Peer[] = [];
+    mohs: Moh[] = [];
     loadError = false;
     private groupId!: number;
 
@@ -162,7 +178,8 @@ export class EditCallGroupPage implements OnInit {
         private readonly router: Router,
         private readonly activatedRoute: ActivatedRoute,
         private readonly callGroupService: CallGroupService,
-        private readonly peerService: PeerService
+        private readonly peerService: PeerService,
+        private readonly mohService: MohService
     ) {}
 
     ngOnInit(): void {
@@ -170,8 +187,13 @@ export class EditCallGroupPage implements OnInit {
             name: ['', [Validators.required]],
             callGroupStrategyEnum: [CallGroupStrategyEnum.ALL, [Validators.required]],
             timeout: [30, [Validators.required]],
-            groupTimeout: [60, [Validators.required]]
+            groupTimeout: [60, [Validators.required]],
+            callGroupSoundId: [null]
         });
+        this.mohService
+            .findAll()
+            .then((mohs) => (this.mohs = mohs))
+            .catch(() => (this.loadError = true));
 
         const id = this.activatedRoute.snapshot.paramMap.get('id')!;
         this.groupId = +id;
@@ -182,7 +204,8 @@ export class EditCallGroupPage implements OnInit {
                     name: group.name,
                     callGroupStrategyEnum: group.callGroupStrategyEnum,
                     timeout: group.timeout,
-                    groupTimeout: group.groupTimeout
+                    groupTimeout: group.groupTimeout,
+                    callGroupSoundId: group.callGroupSoundId
                 });
                 this.selectedPeers = group.peerIds.map((id) => peers.find((p) => p.id === id)!);
                 this.availablePeers = peers.filter((p) => !group.peerIds.includes(p.id)).sort(byName);

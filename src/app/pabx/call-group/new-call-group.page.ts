@@ -7,6 +7,8 @@ import {CallGroupService} from '@/pabx/call-group/call-group.service';
 import {CallGroupStrategyEnum} from '@/pabx/types/call-group-strategy-enum';
 import {Peer} from '@/pabx/types/peer';
 import {PeerService} from '@/pabx/peer/peer.service';
+import {Moh} from '@/pabx/types/moh';
+import {MohService} from '@/pabx/moh/moh.service';
 import {InputTextModule} from 'primeng/inputtext';
 import {Select} from 'primeng/select';
 import {InputNumber} from 'primeng/inputnumber';
@@ -83,6 +85,19 @@ const byName = (a: Peer, b: Peer) => a.name.localeCompare(b.name, 'pt-BR', { num
                 </div>
 
                 <div class="field mb-4">
+                    <label for="callGroupSoundId" class="block mb-2">Áudio de espera</label>
+                    <p-select
+                        id="callGroupSoundId"
+                        [options]="mohs"
+                        formControlName="callGroupSoundId"
+                        optionLabel="name"
+                        optionValue="id"
+                        [showClear]="true"
+                        placeholder="Sem áudio (tom de chamada)"
+                    ></p-select>
+                </div>
+
+                <div class="field mb-4">
                     <label class="block mb-2">Ramais</label>
                     <p-picklist
                         [source]="availablePeers"
@@ -149,6 +164,7 @@ export class NewCallGroupPage implements OnInit {
     showError = false;
     availablePeers: Peer[] = [];
     selectedPeers: Peer[] = [];
+    mohs: Moh[] = [];
     loadError = false;
 
     strategyOptions = Object.values(CallGroupStrategyEnum).map((value) => ({
@@ -160,7 +176,8 @@ export class NewCallGroupPage implements OnInit {
         private readonly fb: FormBuilder,
         private readonly router: Router,
         private readonly callGroupService: CallGroupService,
-        private readonly peerService: PeerService
+        private readonly peerService: PeerService,
+        private readonly mohService: MohService
     ) {}
 
     ngOnInit(): void {
@@ -168,8 +185,13 @@ export class NewCallGroupPage implements OnInit {
             name: ['', [Validators.required]],
             callGroupStrategyEnum: [CallGroupStrategyEnum.ALL, [Validators.required]],
             timeout: [30, [Validators.required]],
-            groupTimeout: [60, [Validators.required]]
+            groupTimeout: [60, [Validators.required]],
+            callGroupSoundId: [null]
         });
+        this.mohService
+            .findAll()
+            .then((mohs) => (this.mohs = mohs))
+            .catch(() => (this.loadError = true));
         this.peerService
             .findAll()
             .then((peers) => (this.availablePeers = [...peers].sort(byName)))
