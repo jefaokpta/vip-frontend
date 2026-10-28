@@ -128,15 +128,33 @@ export class AppMenu implements OnInit {
                             routerLink: ['/pabx/pauses']
                         },
                         {
-                            label: 'Regras de Discagem',
-                            icon: 'pi pi-fw pi-directions',
-                            roles: [RoleEnum.ROLE_COMPANY_ADMIN],
-                            routerLink: ['/pabx/dialplans']
+                            label: 'URA',
+                            icon: 'pi pi-fw pi-microphone',
+                            roles: [RoleEnum.ROLE_COMPANY_USER],
+                            routerLink: ['/pabx/uras']
+                        },
+                        {
+                            label: 'Pesquisa de Satisfação',
+                            icon: 'pi pi-fw pi-star',
+                            roles: [RoleEnum.ROLE_COMPANY_USER],
+                            routerLink: ['/pabx/surveys']
+                        },
+                        {
+                            label: 'Audios do Sistema',
+                            icon: 'pi pi-fw pi-volume-up',
+                            roles: [RoleEnum.ROLE_COMPANY_USER],
+                            routerLink: ['/pabx/mohs']
                         },
                         {
                             label: 'Calendários',
                             icon: 'pi pi-fw pi-calendar',
                             routerLink: ['/pabx/calendars']
+                        },
+                        {
+                            label: 'Regras de Discagem',
+                            icon: 'pi pi-fw pi-directions',
+                            roles: [RoleEnum.ROLE_COMPANY_ADMIN],
+                            routerLink: ['/pabx/dialplans']
                         },
                         {
                             label: 'Alias de Discagem',
@@ -145,16 +163,16 @@ export class AppMenu implements OnInit {
                             routerLink: ['/pabx/aliases']
                         },
                         {
-                            label: 'DDR',
-                            icon: 'pi pi-fw pi-hashtag',
-                            roles: [RoleEnum.ROLE_TENANT_SUPPORT],
-                            routerLink: ['/pabx/ddrs']
-                        },
-                        {
                             label: 'Centro de Custo',
                             icon: 'pi pi-fw pi-wallet',
                             roles: [RoleEnum.ROLE_COMPANY_ADMIN],
                             routerLink: ['/pabx/accountcodes']
+                        },
+                        {
+                            label: 'DDR',
+                            icon: 'pi pi-fw pi-hashtag',
+                            roles: [RoleEnum.ROLE_TENANT_SUPPORT],
+                            routerLink: ['/pabx/ddrs']
                         },
                         {
                             label: 'Rotas de Chamada',
@@ -180,24 +198,6 @@ export class AppMenu implements OnInit {
                             roles: [RoleEnum.ROLE_SAAS_SUPPORT],
                             routerLink: ['/pabx/worker-instances']
                         },
-                        {
-                            label: 'Audios do Sistema',
-                            icon: 'pi pi-fw pi-volume-up',
-                            roles: [RoleEnum.ROLE_COMPANY_USER],
-                            routerLink: ['/pabx/mohs']
-                        },
-                        {
-                            label: 'URA',
-                            icon: 'pi pi-fw pi-microphone',
-                            roles: [RoleEnum.ROLE_COMPANY_USER],
-                            routerLink: ['/pabx/uras']
-                        },
-                        {
-                            label: 'Pesquisa de Satisfação',
-                            icon: 'pi pi-fw pi-star',
-                            roles: [RoleEnum.ROLE_COMPANY_USER],
-                            routerLink: ['/pabx/surveys']
-                        }
                     ]
                 },
                 {

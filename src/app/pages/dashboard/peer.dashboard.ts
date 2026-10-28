@@ -1,14 +1,14 @@
-import { Component, computed, OnDestroy, OnInit, signal } from '@angular/core';
-import { Subscription } from 'rxjs';
-import { WebsocketService } from '@/websocket/stomp/websocket.service';
-import { rxStompServiceFactory } from '@/websocket/stomp/rx-stomp-service-factory';
-import { ChannelStateEnum } from '@/pabx/types/channel-state-enum';
-import { ContactStatusEventEnum } from '@/pabx/types/contact-status-event-enum';
-import { PeerRegistry } from '@/pabx/types/peer-registry';
-import { PeerDashboardService } from '@/pages/dashboard/peer-dashboard.service';
-import { UserService } from '@/pages/users/user.service';
-import { NgClass, NgForOf } from '@angular/common';
-import { Card } from 'primeng/card';
+import {Component, computed, OnDestroy, OnInit, signal} from '@angular/core';
+import {Subscription} from 'rxjs';
+import {WebsocketService} from '@/websocket/stomp/websocket.service';
+import {rxStompServiceFactory} from '@/websocket/stomp/rx-stomp-service-factory';
+import {ChannelStateEnum} from '@/pabx/types/channel-state-enum';
+import {ContactStatusEventEnum} from '@/pabx/types/contact-status-event-enum';
+import {PeerRegistry} from '@/pabx/types/peer-registry';
+import {PeerDashboardService} from '@/pages/dashboard/peer-dashboard.service';
+import {UserService} from '@/pages/users/user.service';
+import {NgClass, NgForOf} from '@angular/common';
+import {Card} from 'primeng/card';
 
 @Component({
     selector: 'app-components-dashboard',
@@ -125,12 +125,22 @@ export class PeerDashboard implements OnDestroy, OnInit {
                     map.set(pr.peer.peer, pr);
                     return new Map(map);
                 });
+            }),
+            this.webSocketService.watch(`/topic/peerregistries-removed/${companyId}`).subscribe((message) => {
+                const { peer }: { peer: string } = JSON.parse(message.body);
+                this.peerRegistriesMap.update((map) => {
+                    map.delete(peer);
+                    return new Map(map);
+                });
             })
         );
 
-        this.dashboardService.findPeerRegistries().then((list) => {
-            this.peerRegistriesMap.set(new Map(list.map((pr) => [pr.peer.peer, pr])));
-        });
+        this.dashboardService
+            .findPeerRegistries()
+            .then((list) => {
+                this.peerRegistriesMap.set(new Map(list.map((pr) => [pr.peer.peer, pr])));
+            })
+            .catch((error) => console.error('Erro ao carregar ramais', error));
     }
 
     private isActive(pr: PeerRegistry): boolean {
