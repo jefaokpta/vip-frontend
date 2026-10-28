@@ -1,14 +1,14 @@
-import { Component, computed, OnDestroy, OnInit, signal } from '@angular/core';
-import { Subscription } from 'rxjs';
-import { WebsocketService } from '@/websocket/stomp/websocket.service';
-import { rxStompServiceFactory } from '@/websocket/stomp/rx-stomp-service-factory';
-import { ChannelStateEnum } from '@/pabx/types/channel-state-enum';
-import { ContactStatusEventEnum } from '@/pabx/types/contact-status-event-enum';
-import { PeerRegistry } from '@/pabx/types/peer-registry';
-import { PeerDashboardService } from '@/pages/dashboard/peer-dashboard.service';
-import { UserService } from '@/pages/users/user.service';
-import { NgClass, NgForOf } from '@angular/common';
-import { Card } from 'primeng/card';
+import {Component, computed, OnDestroy, OnInit, signal} from '@angular/core';
+import {Subscription} from 'rxjs';
+import {WebsocketService} from '@/websocket/stomp/websocket.service';
+import {rxStompServiceFactory} from '@/websocket/stomp/rx-stomp-service-factory';
+import {ChannelStateEnum} from '@/pabx/types/channel-state-enum';
+import {ContactStatusEventEnum} from '@/pabx/types/contact-status-event-enum';
+import {PeerRegistry} from '@/pabx/types/peer-registry';
+import {PeerDashboardService} from '@/pages/dashboard/peer-dashboard.service';
+import {UserService} from '@/pages/users/user.service';
+import {NgClass, NgForOf} from '@angular/common';
+import {Card} from 'primeng/card';
 
 @Component({
     selector: 'app-components-dashboard',
@@ -122,6 +122,10 @@ export class PeerDashboard implements OnDestroy, OnInit {
             this.webSocketService.watch(`/topic/peerregistries/${companyId}`).subscribe((message) => {
                 const pr: PeerRegistry = JSON.parse(message.body);
                 this.peerRegistriesMap.update((map) => {
+                    // Ramal editado com novo número: remove a entrada antiga do mesmo ramal
+                    for (const [key, value] of map) {
+                        if (value.peer.id === pr.peer.id && key !== pr.peer.peer) map.delete(key);
+                    }
                     map.set(pr.peer.peer, pr);
                     return new Map(map);
                 });
