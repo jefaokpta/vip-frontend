@@ -1,22 +1,22 @@
-import { Component, OnInit } from '@angular/core';
-import { DatePipe, NgIf } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { ConfirmationService, MessageService, PrimeTemplate } from 'primeng/api';
-import { Button } from 'primeng/button';
-import { Card } from 'primeng/card';
-import { ConfirmDialog } from 'primeng/confirmdialog';
-import { Dialog } from 'primeng/dialog';
-import { InputText } from 'primeng/inputtext';
-import { ProgressSpinner } from 'primeng/progressspinner';
-import { Select } from 'primeng/select';
-import { TableModule } from 'primeng/table';
-import { Tag } from 'primeng/tag';
-import { Toast } from 'primeng/toast';
-import { Tooltip } from 'primeng/tooltip';
-import { BlockedIpService } from '@/pages/blocked-ip/blocked-ip.service';
-import { UserService } from '@/pages/users/user.service';
-import { BlockedIp, BlockedIpStatus } from '@/types/blocked-ip';
-import { RoleEnum } from '@/types/role-enum';
+import {Component, OnInit} from '@angular/core';
+import {DatePipe, NgIf} from '@angular/common';
+import {FormsModule} from '@angular/forms';
+import {ConfirmationService, MessageService, PrimeTemplate} from 'primeng/api';
+import {Button} from 'primeng/button';
+import {Card} from 'primeng/card';
+import {ConfirmDialog} from 'primeng/confirmdialog';
+import {Dialog} from 'primeng/dialog';
+import {InputText} from 'primeng/inputtext';
+import {ProgressSpinner} from 'primeng/progressspinner';
+import {Select} from 'primeng/select';
+import {TableModule} from 'primeng/table';
+import {Tag} from 'primeng/tag';
+import {Toast} from 'primeng/toast';
+import {Tooltip} from 'primeng/tooltip';
+import {BlockedIpService} from '@/pages/blocked-ip/blocked-ip.service';
+import {UserService} from '@/pages/users/user.service';
+import {BlockedIp, BlockedIpStatus} from '@/types/blocked-ip';
+import {RoleEnum} from '@/types/role-enum';
 
 const IPV4_REGEX = /^((25[0-5]|2[0-4]\d|1?\d?\d)\.){3}(25[0-5]|2[0-4]\d|1?\d?\d)$/;
 
@@ -89,6 +89,8 @@ const IPV4_REGEX = /^((25[0-5]|2[0-4]\d|1?\d?\d)\.){3}(25[0-5]|2[0-4]\d|1?\d?\d)
                 [value]="filteredIps"
                 [paginator]="true"
                 [rows]="15"
+                sortField="updatedAt"
+                [sortOrder]="-1"
                 [tableStyle]="{ 'min-width': '40rem' }"
                 stripedRows
             >
