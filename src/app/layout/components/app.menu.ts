@@ -256,6 +256,12 @@ export class AppMenu implements OnInit {
                     routerLink: ['/pages/companies']
                 },
                 {
+                    label: 'Controle de IPs',
+                    roles: [RoleEnum.ROLE_TENANT_SUPPORT],
+                    icon: 'pi pi-fw pi-shield',
+                    routerLink: ['/pages/blocked-ips']
+                },
+                {
                     label: 'Integrações',
                     roles: [RoleEnum.ROLE_COMPANY_ADMIN],
                     icon: 'pi pi-fw pi-link',

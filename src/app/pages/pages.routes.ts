@@ -12,6 +12,7 @@ import {RoleEnum} from '@/types/role-enum';
 export default [
     { path: 'companies', loadChildren: () => import('@/pages/company/company.routes') },
     { path: 'tenants', loadChildren: () => import('@/pages/tenant/tenant.routes') },
+    { path: 'blocked-ips', loadChildren: () => import('@/pages/blocked-ip/blocked-ip.routes') },
     { path: 'users', loadChildren: () => import('@/pages/users/users.routes') },
     { path: 'profile', component: PersonPage, data: { breadcrumb: 'Perfil' } },
     {

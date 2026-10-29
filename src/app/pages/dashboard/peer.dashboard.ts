@@ -91,7 +91,11 @@ export class PeerDashboard implements OnDestroy, OnInit {
     private readonly now = signal(Date.now());
     private clockInterval?: ReturnType<typeof setInterval>;
 
-    readonly peerRegistries = computed(() => Array.from(this.peerRegistriesMap().values()));
+    readonly peerRegistries = computed(() =>
+        Array.from(this.peerRegistriesMap().values()).sort((a, b) =>
+            a.peer.peer.localeCompare(b.peer.peer, undefined, {numeric: true})
+        )
+    );
 
     readonly busyChannelsCount = computed(
         () => this.peerRegistries().filter((pr) => pr.channel?.channelStateEnum == ChannelStateEnum.UP).length
