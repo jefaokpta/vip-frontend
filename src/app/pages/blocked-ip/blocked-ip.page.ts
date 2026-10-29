@@ -19,6 +19,12 @@ import {BlockedIp, BlockedIpStatus} from '@/types/blocked-ip';
 import {RoleEnum} from '@/types/role-enum';
 
 const IPV4_REGEX = /^((25[0-5]|2[0-4]\d|1?\d?\d)\.){3}(25[0-5]|2[0-4]\d|1?\d?\d)$/;
+const LOCALHOST_IP = '127.0.0.1';
+
+// compara por octeto para barrar variações como 127.00.0.01
+export function isLocalhostIp(ip: string): boolean {
+    return ip.trim().split('.').map(Number).join('.') === LOCALHOST_IP;
+}
 
 @Component({
     selector: 'app-blocked-ip-page',
@@ -169,7 +175,9 @@ const IPV4_REGEX = /^((25[0-5]|2[0-4]\d|1?\d?\d)\.){3}(25[0-5]|2[0-4]\d|1?\d?\d)
                 <div class="flex flex-col gap-2">
                     <label for="ip">IP (IPv4)</label>
                     <input id="ip" pInputText type="text" placeholder="0.0.0.0" [(ngModel)]="newIp" />
-                    <small *ngIf="newIp && !isValidIp" class="text-red-500">IP inválido</small>
+                    <small *ngIf="newIp && !isValidIp" class="text-red-500">{{
+                        isLocalhost ? 'IP 127.0.0.1 não é permitido' : 'IP inválido'
+                    }}</small>
                 </div>
                 <div *ngIf="isSaasSupport" class="flex flex-col gap-2">
                     <label for="status">Situação</label>
@@ -230,8 +238,12 @@ export class BlockedIpPage implements OnInit {
         this.load();
     }
 
+    get isLocalhost(): boolean {
+        return isLocalhostIp(this.newIp);
+    }
+
     get isValidIp(): boolean {
-        return IPV4_REGEX.test(this.newIp.trim());
+        return IPV4_REGEX.test(this.newIp.trim()) && !this.isLocalhost;
     }
 
     get filteredIps(): BlockedIp[] {
