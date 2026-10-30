@@ -47,8 +47,8 @@ import {Card} from 'primeng/card';
                 <div class="flex flex-wrap gap-3">
                     <div
                         *ngFor="let pr of peerRegistries()"
-                        class="rounded-xl shadow bg-surface-50 dark:bg-surface-800 px-4 py-3 w-56 flex flex-col gap-1 transition-all duration-300 border-l-4"
-                        [ngClass]="peerCardBorderClass(pr)"
+                        class="rounded-xl shadow px-4 py-3 w-56 flex flex-col gap-1 transition-all duration-300 border-l-4"
+                        [ngClass]="peerCardClass(pr)"
                     >
                         <div class="flex items-center justify-between">
                             <span
@@ -160,16 +160,16 @@ export class PeerDashboard implements OnDestroy, OnInit {
         return pr.channel?.channelStateEnum ?? null;
     }
 
-    peerCardBorderClass(pr: PeerRegistry): string {
+    peerCardClass(pr: PeerRegistry): string {
         const state = this.getChannelState(pr);
-        if (state === ChannelStateEnum.UP) return 'border-red-500';
-        if (state === ChannelStateEnum.RINGING) return 'border-yellow-400';
-        if (state === ChannelStateEnum.DIALING) return 'border-yellow-400';
+        if (state === ChannelStateEnum.UP) return 'border-red-500 bg-red-50 dark:bg-red-500/10';
+        if (state === ChannelStateEnum.RINGING) return 'border-yellow-400 bg-yellow-50 dark:bg-yellow-400/10';
+        if (state === ChannelStateEnum.DIALING) return 'border-yellow-400 bg-yellow-50 dark:bg-yellow-400/10';
         if (!this.isActive(pr)) {
-            if (pr.contactStatusEventEnum === ContactStatusEventEnum.UNREACHABLE) return 'border-orange-400';
-            return 'border-gray-200';
+            if (pr.contactStatusEventEnum === ContactStatusEventEnum.UNREACHABLE) return 'border-orange-400 bg-orange-50 dark:bg-orange-400/10';
+            return 'border-gray-200 bg-surface-50 dark:bg-surface-800';
         }
-        return 'border-green-500';
+        return 'border-green-500 bg-green-50 dark:bg-green-500/10';
     }
 
     peerStatusTextClass(pr: PeerRegistry): string {
