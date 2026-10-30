@@ -326,7 +326,7 @@ export class NewPeerPage implements OnInit {
             language: [LanguageEnum.pt_BR, [Validators.required]],
             pickUpGroupId: [null],
             clidDdrId: [null],
-            peerTransportEnums: [[PeerTransportEnum.UDP], [Validators.required]],
+            peerTransportEnums: [[PeerTransportEnum.UDP, PeerTransportEnum.WSS], [Validators.required]],
             qualify: [false, [Validators.required]],
             nat: [true, [Validators.required]],
             dtmfModeEnum: [DtmfModeEnum.RFC4733, [Validators.required]],
