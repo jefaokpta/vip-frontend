@@ -13,6 +13,7 @@ import {RTCSessionEvent, UnRegisteredEvent} from 'jssip/lib/UA';
 import {UserService} from '@/pages/users/user.service';
 import {CallHistoryService} from '@/webphone/call-history.service';
 import {CallHistoryType} from '@/types/call-history';
+import {RingbackTone} from '@/webphone/ringback-tone';
 
 @Injectable({
     providedIn: 'root'
@@ -24,6 +25,7 @@ export class WebphoneService {
     private readonly callTimer = signal(0);
     private callTimerInterval: ReturnType<typeof setInterval> | undefined;
     private readonly audio = new Audio();
+    private readonly ringback = new RingbackTone();
 
     private updatePhoneStatus(newState: Partial<PhoneState>) {
         this.phoneState.update((state) => ({ ...state, ...newState }));
@@ -138,8 +140,14 @@ export class WebphoneService {
 
     private callEventHandlers() {
         return {
-            progress: () => {
+            progress: (e: any) => {
                 console.log('SIP: ' + new Date().toLocaleString('pt-BR') + ' Iniciando chamada');
+                // 180 sem SDP: o PABX nao envia early media, entao o tom de chamada e gerado localmente
+                if (e.response?.status_code === 180 && !e.response.body) {
+                    this.ringback.start();
+                } else if (e.response?.body) {
+                    this.ringback.stop();
+                }
                 this.updatePhoneStatus({ state: PhoneStateEnum.CALLING });
             },
             failed: (e: any) => {
@@ -148,6 +156,7 @@ export class WebphoneService {
                         new Date().toLocaleString('pt-BR') +
                         `Call falhou originator: ${e.originator} cause: ${e.cause}`
                 );
+                this.ringback.stop();
                 this.audio.src = '/audios/blip.mp3';
                 this.audio.play();
                 this.updatePhoneStatus({ state: PhoneStateEnum.AVAILABLE, session: undefined });
@@ -159,11 +168,13 @@ export class WebphoneService {
                         new Date().toLocaleString('pt-BR') +
                         `Call terminou originator: ${e.originator} with cause: ${e.cause}`
                 );
+                this.ringback.stop();
                 this.audio.src = '/audios/blip.mp3';
                 this.audio.play();
                 this.updatePhoneStatus({ state: PhoneStateEnum.AVAILABLE, session: undefined });
                 this.stopCallTimer();
             },
+            accepted: () => this.ringback.stop(),
             confirmed: () => {
                 console.log('SIP: ' + new Date().toLocaleString('pt-BR') + ' Call atendida');
                 this.updatePhoneStatus({ state: PhoneStateEnum.TALKING });
