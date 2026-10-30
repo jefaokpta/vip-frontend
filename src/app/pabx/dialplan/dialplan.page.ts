@@ -17,7 +17,7 @@ import {Tooltip} from 'primeng/tooltip';
 import {InputText} from 'primeng/inputtext';
 import {ConfirmationService, MessageService} from 'primeng/api';
 import {DialPlanService} from '@/pabx/dialplan/dial-plan.service';
-import {dialplanSrcLabel} from '@/pabx/dialplan/utils';
+import {dialplanDstLabel, dialplanSrcLabel, sortDialplansByDstAndPriority} from '@/pabx/dialplan/utils';
 import {TrunkService} from '@/pabx/trunk/trunk.service';
 import {AliasService} from '@/pabx/alias/alias.service';
 import {FormsModule} from '@angular/forms';
@@ -166,7 +166,7 @@ export class DialplanPage implements OnInit {
             .then(([dialplans, trunks, aliases]: [DialPlan[], TrunkOption[], Alias[]]) => {
                 trunks.forEach((trunk) => this.trunkMap.set(String(trunk.id), trunk.name));
                 aliases.forEach((alias) => this.aliasMap.set(String(alias.id), alias.name));
-                this.dialplans = this.sortDialplansByDstAndPriority(dialplans);
+                this.dialplans = sortDialplansByDstAndPriority(dialplans, this.aliasMap);
             })
             .catch(() => {
                 this.messageService.add({
@@ -201,8 +201,7 @@ export class DialplanPage implements OnInit {
     }
 
     dstLabel(dialplan: DialPlan): string {
-        if (dialplan.dst) return dialplan.dst;
-        return this.findAliasName(dialplan.dstAlias!.toString());
+        return dialplanDstLabel(dialplan, this.aliasMap);
     }
 
     private findTrunkName(id: string): string {
@@ -229,7 +228,7 @@ export class DialplanPage implements OnInit {
     ];
 
     onChangePriority(dialplan: DialPlan) {
-        this.dialplans = this.sortDialplansByDstAndPriority(this.dialplans);
+        this.dialplans = sortDialplansByDstAndPriority(this.dialplans, this.aliasMap);
         this.dialplanService
             .updatePriority(dialplan)
             .then(() => {
@@ -247,18 +246,6 @@ export class DialplanPage implements OnInit {
                     life: 15_000
                 });
             });
-    }
-
-    private sortDialplansByDstAndPriority(dialplans: DialPlan[]): DialPlan[] {
-        // Expressões regulares acima e alias abaixo; destinos idênticos ficam juntos, ordenados pela prioridade.
-        const isAlias = (d: DialPlan) => (d.dst ? 0 : 1);
-        return dialplans.sort((a, b) => {
-            const typeCompare = isAlias(a) - isAlias(b);
-            if (typeCompare !== 0) return typeCompare;
-            const dstCompare = this.dstLabel(a).localeCompare(this.dstLabel(b), 'pt-BR', { numeric: true });
-            if (dstCompare !== 0) return dstCompare;
-            return b.priority - a.priority;
-        });
     }
 
     confirmDelete(dialplan: DialPlan) {
