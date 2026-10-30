@@ -24,8 +24,6 @@ interface PeerOption {
             <p-picklist
                 [source]="availablePeers"
                 [target]="selectedPeers"
-                sourceHeader="Disponíveis"
-                targetHeader="Selecionados"
                 [dragdrop]="true"
                 [responsive]="true"
                 [sourceStyle]="{ height: '20rem' }"
@@ -41,6 +39,8 @@ interface PeerOption {
                 (onMoveAllToTarget)="moveToSelected($event.items)"
                 (onMoveAllToSource)="moveToAvailable($event.items)"
             >
+                <ng-template #sourceHeader><span class="font-semibold">Ramais Disponíveis</span></ng-template>
+                <ng-template #targetHeader><span class="font-semibold">Ramais Selecionados</span></ng-template>
                 <ng-template let-peer pTemplate="item">
                     <div class="flex items-center gap-2">
                         <i class="pi pi-phone"></i>

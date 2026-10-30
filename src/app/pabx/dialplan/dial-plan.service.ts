@@ -1,8 +1,8 @@
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../environments/environment';
-import { executeRequest, httpHeaders } from '@/util/utils';
-import { DialPlan } from '@/pabx/types/dial-plan';
+import {Injectable} from '@angular/core';
+import {HttpClient} from '@angular/common/http';
+import {environment} from '../../../environments/environment';
+import {executeRequest, httpHeaders} from '@/util/utils';
+import {DialPlan} from '@/pabx/types/dial-plan';
 
 @Injectable({ providedIn: 'root' })
 export class DialPlanService {
@@ -34,5 +34,9 @@ export class DialPlanService {
         return executeRequest(
             this.http.put(`${this.BACKEND}/dialplans/${dialplan.id}/priority`, dialplan, httpHeaders())
         );
+    }
+
+    updateActive(ids: number[], isActive: boolean) {
+        return executeRequest(this.http.put(`${this.BACKEND}/dialplans/active`, { ids, isActive }, httpHeaders()));
     }
 }

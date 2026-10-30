@@ -20,6 +20,9 @@ import {CallGroupService} from '@/pabx/call-group/call-group.service';
 import {QueueService} from '@/pabx/queue/queue.service';
 import {DialPlanService} from '@/pabx/dialplan/dial-plan.service';
 import {DialPlan} from '@/pabx/types/dial-plan';
+import {AliasService} from '@/pabx/alias/alias.service';
+import {Alias} from '@/pabx/types/alias';
+import {sortDialplansByDstAndPriority} from '@/pabx/dialplan/utils';
 import {Queue} from '@/pabx/types/queue';
 
 @Component({
@@ -423,6 +426,7 @@ export class NewUraPage implements OnInit {
         private readonly callGroupService: CallGroupService,
         private readonly queueService: QueueService,
         private readonly dialPlanService: DialPlanService,
+        private readonly aliasService: AliasService,
         private readonly messageService: MessageService
     ) {}
 
@@ -449,15 +453,36 @@ export class NewUraPage implements OnInit {
             this.callGroupService.findAll(),
             this.uraService.findAll(),
             this.queueService.findAll(),
-            this.dialPlanService.findAll()
-        ]).then(([mohs, callGroups, uras, queues, dialPlans]: [Moh[], any[], any[], Queue[], DialPlan[]]) => {
+            this.dialPlanService.findAll(),
+            this.loadAliases()
+        ]).then(([mohs, callGroups, uras, queues, dialPlans, aliases]: [Moh[], any[], any[], Queue[], DialPlan[], Alias[]]) => {
             this.mohOptions = mohs.map((m) => ({ label: m.name, value: m.id }));
             this.callGroupOptions = callGroups.map((g) => ({ label: g.name, value: g.id.toString() }));
             this.uraOptions = uras.map((u) => ({ label: u.name, value: u.id.toString() }));
             this.queueOptions = queues.map((q) => ({ label: q.name, value: q.id.toString() }));
-            this.dialPlanOptions = dialPlans
+            const aliasNames = new Map(aliases.map((a) => [String(a.id), a.name]));
+            this.dialPlanOptions = sortDialplansByDstAndPriority(dialPlans, aliasNames)
                 .filter((d) => d.isActive)
                 .map((d) => ({ label: d.name, value: d.id.toString() }));
+        }).catch(() => {
+            this.messageService.add({
+                severity: 'error',
+                summary: 'Erro ao carregar opções da URA',
+                detail: 'Recarregue a página para tentar novamente.',
+                life: 10_000
+            });
+        });
+    }
+
+    private loadAliases(): Promise<Alias[]> {
+        return this.aliasService.findAll().catch(() => {
+            this.messageService.add({
+                severity: 'error',
+                summary: 'Erro ao carregar aliases',
+                detail: 'As regras podem aparecer fora de ordem.',
+                life: 10_000
+            });
+            return [];
         });
     }
 

@@ -7,14 +7,23 @@ import {ContactStatusEventEnum} from '@/pabx/types/contact-status-event-enum';
 import {PeerRegistry} from '@/pabx/types/peer-registry';
 import {PeerDashboardService} from '@/pages/dashboard/peer-dashboard.service';
 import {UserService} from '@/pages/users/user.service';
-import {NgClass, NgForOf} from '@angular/common';
+import {NgClass, NgTemplateOutlet} from '@angular/common';
 import {Card} from 'primeng/card';
+import {Toast} from 'primeng/toast';
+import {MessageService} from 'primeng/api';
+import {SelectButton} from 'primeng/selectbutton';
+import {FormsModule} from '@angular/forms';
+import {PickupGroupService} from '@/pabx/pickup-group/pickup-group.service';
+
+const SEM_DEPARTAMENTO = 'Sem departamento';
+const VIEW_MODE_KEY = 'peer-dashboard-view-mode';
 
 @Component({
     selector: 'app-components-dashboard',
-    providers: [{ provide: WebsocketService, useFactory: rxStompServiceFactory }],
-    imports: [NgForOf, NgClass, Card],
+    providers: [{ provide: WebsocketService, useFactory: rxStompServiceFactory }, MessageService],
+    imports: [Toast, NgClass, NgTemplateOutlet, Card, SelectButton, FormsModule],
     template: `
+        <p-toast />
         <div class="flex flex-col gap-4">
             <p-card>
                 <ng-template #title>
@@ -41,14 +50,46 @@ import {Card} from 'primeng/card';
                 <ng-template #title>
                     <div class="flex justify-between">
                         <span class="font-semibold">Monitoramento de Ramais</span>
+                        <p-selectbutton
+                            [options]="viewModeOptions"
+                            [ngModel]="viewMode()"
+                            (ngModelChange)="setViewMode($event)"
+                            optionLabel="label"
+                            optionValue="value"
+                            [allowEmpty]="false"
+                            size="small"
+                        ></p-selectbutton>
                     </div>
                 </ng-template>
 
-                <div class="flex flex-wrap gap-3">
+                @if (viewMode() === 'unified') {
+                    <div class="flex flex-wrap gap-3">
+                        @for (pr of peerRegistries(); track pr.peer.peer) {
+                            <ng-container *ngTemplateOutlet="peerCard; context: { $implicit: pr }" />
+                        }
+                    </div>
+                } @else {
+                    <div class="flex flex-col gap-6">
+                        @for (group of peersByDepartment(); track group.name) {
+                            <section class="flex flex-col gap-3">
+                                <div class="flex items-baseline gap-2 border-b border-surface-200 dark:border-surface-700 pb-1">
+                                    <span class="font-semibold text-lg">{{ group.name }}</span>
+                                    <span class="text-sm text-muted-color">{{ group.peers.length }} ramais</span>
+                                </div>
+                                <div class="flex flex-wrap gap-3">
+                                    @for (pr of group.peers; track pr.peer.peer) {
+                                        <ng-container *ngTemplateOutlet="peerCard; context: { $implicit: pr }" />
+                                    }
+                                </div>
+                            </section>
+                        }
+                    </div>
+                }
+
+                <ng-template #peerCard let-pr>
                     <div
-                        *ngFor="let pr of peerRegistries()"
                         class="rounded-xl shadow px-4 py-3 w-56 flex flex-col gap-1 transition-all duration-300 border-l-4"
-                        [ngClass]="peerCardBorderClass(pr)"
+                        [ngClass]="peerCardClass(pr)"
                     >
                         <div class="flex items-center justify-between">
                             <span
@@ -80,7 +121,7 @@ import {Card} from 'primeng/card';
                             </div>
                         }
                     </div>
-                </div>
+                </ng-template>
             </p-card>
         </div>
     `
@@ -90,12 +131,33 @@ export class PeerDashboard implements OnDestroy, OnInit {
     private readonly peerRegistriesMap = signal(new Map<string, PeerRegistry>());
     private readonly now = signal(Date.now());
     private clockInterval?: ReturnType<typeof setInterval>;
+    private readonly pickupGroupNames = signal(new Map<string, string>());
+
+    readonly viewModeOptions = [
+        { label: 'Unificada', value: 'unified' },
+        { label: 'Departamento', value: 'department' }
+    ];
+    readonly viewMode = signal<'unified' | 'department'>(this.loadViewMode());
 
     readonly peerRegistries = computed(() =>
         Array.from(this.peerRegistriesMap().values()).sort((a, b) =>
             a.peer.peer.localeCompare(b.peer.peer, undefined, {numeric: true})
         )
     );
+
+    readonly peersByDepartment = computed(() => {
+        const names = this.pickupGroupNames();
+        const groups = new Map<string, PeerRegistry[]>();
+        for (const pr of this.peerRegistries()) {
+            const name = (pr.peer.pickUpGroup && names.get(pr.peer.pickUpGroup)) || SEM_DEPARTAMENTO;
+            groups.set(name, [...(groups.get(name) ?? []), pr]);
+        }
+        return Array.from(groups, ([name, peers]) => ({ name, peers })).sort((a, b) => {
+            if (a.name === SEM_DEPARTAMENTO) return 1;
+            if (b.name === SEM_DEPARTAMENTO) return -1;
+            return a.name.localeCompare(b.name, 'pt-BR', { numeric: true, sensitivity: 'base' });
+        });
+    });
 
     readonly busyChannelsCount = computed(
         () => this.peerRegistries().filter((pr) => pr.channel?.channelStateEnum == ChannelStateEnum.UP).length
@@ -115,7 +177,9 @@ export class PeerDashboard implements OnDestroy, OnInit {
     constructor(
         private readonly webSocketService: WebsocketService,
         private readonly dashboardService: PeerDashboardService,
-        private readonly userService: UserService
+        private readonly userService: UserService,
+        private readonly pickupGroupService: PickupGroupService,
+        private readonly messageService: MessageService
     ) {}
 
     ngOnInit() {
@@ -145,7 +209,35 @@ export class PeerDashboard implements OnDestroy, OnInit {
                 this.peerRegistriesMap.set(new Map(list.map((pr) => [pr.peer.peer, pr])));
             })
             .catch((error) => console.error('Erro ao carregar ramais', error));
+
+        this.pickupGroupService
+            .findAll()
+            .then((groups) => this.pickupGroupNames.set(new Map(groups.map((g) => [String(g.id), g.name]))))
+            .catch(() => {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Erro ao carregar grupos de captura',
+                    detail: 'A visão por departamento pode estar incompleta.',
+                    life: 10_000
+                });
+            });
     }
+
+    setViewMode(mode: 'unified' | 'department'): void {
+        this.viewMode.set(mode);
+        try {
+            localStorage.setItem(VIEW_MODE_KEY, mode);
+        } catch {}
+    }
+
+    private loadViewMode(): 'unified' | 'department' {
+        try {
+            return localStorage.getItem(VIEW_MODE_KEY) === 'department' ? 'department' : 'unified';
+        } catch {
+            return 'unified';
+        }
+    }
+
 
     private isActive(pr: PeerRegistry): boolean {
         return (
@@ -160,16 +252,16 @@ export class PeerDashboard implements OnDestroy, OnInit {
         return pr.channel?.channelStateEnum ?? null;
     }
 
-    peerCardBorderClass(pr: PeerRegistry): string {
+    peerCardClass(pr: PeerRegistry): string {
         const state = this.getChannelState(pr);
-        if (state === ChannelStateEnum.UP) return 'border-red-500';
-        if (state === ChannelStateEnum.RINGING) return 'border-yellow-400';
-        if (state === ChannelStateEnum.DIALING) return 'border-yellow-400';
+        if (state === ChannelStateEnum.UP) return 'border-red-500 bg-red-50 dark:bg-red-500/10';
+        if (state === ChannelStateEnum.RINGING) return 'border-yellow-400 bg-yellow-50 dark:bg-yellow-400/10';
+        if (state === ChannelStateEnum.DIALING) return 'border-yellow-400 bg-yellow-50 dark:bg-yellow-400/10';
         if (!this.isActive(pr)) {
-            if (pr.contactStatusEventEnum === ContactStatusEventEnum.UNREACHABLE) return 'border-orange-400';
-            return 'border-gray-200';
+            if (pr.contactStatusEventEnum === ContactStatusEventEnum.UNREACHABLE) return 'border-orange-400 bg-orange-50 dark:bg-orange-400/10';
+            return 'border-gray-200 bg-surface-50 dark:bg-surface-800';
         }
-        return 'border-green-500';
+        return 'border-green-500 bg-green-50 dark:bg-green-500/10';
     }
 
     peerStatusTextClass(pr: PeerRegistry): string {

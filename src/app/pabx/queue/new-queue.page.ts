@@ -145,8 +145,6 @@ const byName = (a: User, b: User) => a.name.localeCompare(b.name, 'pt-BR', { num
                                 <p-picklist
                                     [source]="availableUsers"
                                     [target]="selectedUsers"
-                                    sourceHeader="Disponíveis"
-                                    targetHeader="Selecionados"
                                     [dragdrop]="true"
                                     [responsive]="true"
                                     [sourceStyle]="{ height: '20rem' }"
@@ -162,6 +160,8 @@ const byName = (a: User, b: User) => a.name.localeCompare(b.name, 'pt-BR', { num
                                     (onMoveAllToTarget)="moveToSelected($event.items)"
                                     (onMoveAllToSource)="moveToAvailable($event.items)"
                                 >
+                                    <ng-template #sourceHeader><span class="font-semibold">Membros Disponíveis</span></ng-template>
+                                    <ng-template #targetHeader><span class="font-semibold">Membros Selecionados</span></ng-template>
                                     <ng-template let-user pTemplate="item">
                                         <div class="flex items-center gap-2">
                                             <i class="pi pi-user"></i>

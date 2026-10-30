@@ -240,6 +240,18 @@ export class AppMenu implements OnInit {
             ]
         },
         {
+            label: 'Segurança',
+            icon: 'pi pi-fw pi-lock',
+            items: [
+                {
+                    label: 'Controle de IPs',
+                    roles: [RoleEnum.ROLE_TENANT_SUPPORT],
+                    icon: 'pi pi-fw pi-shield',
+                    routerLink: ['/pages/blocked-ips']
+                }
+            ]
+        },
+        {
             label: 'Configurações',
             icon: 'pi pi-fw pi-sliders-h',
             items: [
@@ -254,12 +266,6 @@ export class AppMenu implements OnInit {
                     roles: [RoleEnum.ROLE_TENANT_SUPPORT],
                     icon: 'pi pi-fw pi-building',
                     routerLink: ['/pages/companies']
-                },
-                {
-                    label: 'Controle de IPs',
-                    roles: [RoleEnum.ROLE_TENANT_SUPPORT],
-                    icon: 'pi pi-fw pi-shield',
-                    routerLink: ['/pages/blocked-ips']
                 },
                 {
                     label: 'Integrações',

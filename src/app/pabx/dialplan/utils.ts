@@ -1,5 +1,6 @@
-import { DialPlanActionEnum } from '@/pabx/types/dial-plan-action-enum';
-import { SrcEnum } from '@/pabx/types/src-enum';
+import {DialPlanActionEnum} from '@/pabx/types/dial-plan-action-enum';
+import {SrcEnum} from '@/pabx/types/src-enum';
+import {DialPlan} from '@/pabx/types/dial-plan';
 
 const srcOptions = [
     { label: 'Qualquer', value: SrcEnum.ANY },
@@ -44,4 +45,22 @@ export function calendarActionOptions() {
         { label: 'Fila', value: DialPlanActionEnum.QUEUE },
         { label: 'Desligar', value: DialPlanActionEnum.HANGUP }
     ];
+}
+
+export function dialplanDstLabel(dialplan: DialPlan, aliasNames: Map<string, string>): string {
+    if (dialplan.dst) return dialplan.dst;
+    const aliasId = dialplan.dstAlias!.toString();
+    return aliasNames.get(aliasId) ?? aliasId;
+}
+
+export function sortDialplansByDstAndPriority(dialplans: DialPlan[], aliasNames: Map<string, string>): DialPlan[] {
+    // Expressões regulares acima e alias abaixo; destinos idênticos ficam juntos, ordenados pela prioridade.
+    const isAlias = (d: DialPlan) => (d.dst ? 0 : 1);
+    return dialplans.sort((a, b) => {
+        const typeCompare = isAlias(a) - isAlias(b);
+        if (typeCompare !== 0) return typeCompare;
+        const dstCompare = dialplanDstLabel(a, aliasNames).localeCompare(dialplanDstLabel(b, aliasNames), 'pt-BR', { numeric: true });
+        if (dstCompare !== 0) return dstCompare;
+        return b.priority - a.priority;
+    });
 }
