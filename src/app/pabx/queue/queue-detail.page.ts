@@ -299,6 +299,14 @@ export class QueueDetailPage implements OnInit, OnDestroy {
             const found = states.find((s) => s.queue.id === this.queueId) ?? null;
             this.queueState.set(found);
             this.loading = false;
+        }).catch(() => {
+            this.loading = false;
+            this.messageService.add({
+                severity: 'error',
+                summary: 'Não foi possível carregar a fila',
+                detail: 'Tente novamente mais tarde.',
+                life: 15_000
+            });
         });
 
         const companyId = this.userService.getUser().companyId;
