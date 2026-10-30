@@ -47,7 +47,7 @@ import {Card} from 'primeng/card';
                 <div class="flex flex-wrap gap-3">
                     <div
                         *ngFor="let pr of peerRegistries()"
-                        class="rounded-xl shadow px-4 py-3 w-56 flex flex-col gap-1 transition-all duration-300 border-l-4"
+                        class="rounded-xl shadow bg-surface-50 dark:bg-surface-800 px-4 py-3 w-56 flex flex-col gap-1 transition-all duration-300 border-l-4"
                         [ngClass]="peerCardBorderClass(pr)"
                     >
                         <div class="flex items-center justify-between">
