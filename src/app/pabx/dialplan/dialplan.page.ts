@@ -62,6 +62,49 @@ import {Select} from 'primeng/select';
                                 class="w-full"
                             />
                         </p-iconfield>
+                        @if (selectionMode) {
+                            <p-button
+                                icon="pi pi-check"
+                                label="Ativar"
+                                severity="success"
+                                outlined
+                                rounded
+                                class="ml-4"
+                                [disabled]="!selectedDialplans.length || updatingActive"
+                                (click)="updateSelectedActive(true)"
+                            />
+                            <p-button
+                                icon="pi pi-times"
+                                label="Desativar"
+                                severity="danger"
+                                outlined
+                                rounded
+                                class="ml-2"
+                                [disabled]="!selectedDialplans.length || updatingActive"
+                                (click)="updateSelectedActive(false)"
+                            />
+                            <p-button
+                                icon="pi pi-ban"
+                                severity="secondary"
+                                outlined
+                                rounded
+                                class="ml-2"
+                                pTooltip="Cancelar seleção"
+                                tooltipPosition="left"
+                                (click)="toggleSelectionMode()"
+                            />
+                        } @else {
+                            <p-button
+                                icon="pi pi-list-check"
+                                label="Selecionar"
+                                outlined
+                                rounded
+                                class="ml-4"
+                                pTooltip="Ativar/desativar várias regras"
+                                tooltipPosition="left"
+                                (click)="toggleSelectionMode()"
+                            />
+                        }
                         <p-button icon="pi pi-plus" label="Regra" routerLink="new" outlined class="mx-4" rounded />
                     </div>
                 </div>
@@ -70,6 +113,8 @@ import {Select} from 'primeng/select';
             <p-table
                 #dataTable
                 [value]="dialplans"
+                [(selection)]="selectedDialplans"
+                dataKey="id"
                 [paginator]="true"
                 [rows]="15"
                 [globalFilterFields]="['name']"
@@ -78,6 +123,9 @@ import {Select} from 'primeng/select';
             >
                 <ng-template pTemplate="header">
                     <tr>
+                        @if (selectionMode) {
+                            <th style="width: 3rem"><p-tableHeaderCheckbox /></th>
+                        }
                         <th>Nome</th>
                         <th>Origem</th>
                         <th>Destino</th>
@@ -89,6 +137,9 @@ import {Select} from 'primeng/select';
 
                 <ng-template pTemplate="body" let-dialplan>
                     <tr>
+                        @if (selectionMode) {
+                            <td><p-tableCheckbox [value]="dialplan" /></td>
+                        }
                         <td>{{ dialplan.name }}</td>
                         <td>{{ srcLabel(dialplan) }}</td>
                         <td>{{ dstLabel(dialplan) }}</td>
@@ -150,6 +201,9 @@ export class DialplanPage implements OnInit {
     dialplans: DialPlan[] = [];
     @ViewChild('dataTable') dt!: Table;
     loading = true;
+    selectionMode = false;
+    selectedDialplans: DialPlan[] = [];
+    updatingActive = false;
     private readonly trunkMap = new Map<string, string>();
     private readonly aliasMap = new Map<string, string>();
 
@@ -246,6 +300,38 @@ export class DialplanPage implements OnInit {
                     life: 15_000
                 });
             });
+    }
+
+    toggleSelectionMode() {
+        this.selectionMode = !this.selectionMode;
+        this.selectedDialplans = [];
+    }
+
+    updateSelectedActive(isActive: boolean) {
+        const ids = this.selectedDialplans.map((dialplan) => dialplan.id);
+        this.updatingActive = true;
+        this.dialplanService
+            .updateActive(ids, isActive)
+            .then(() => {
+                this.dialplans = this.dialplans.map((dialplan) =>
+                    ids.includes(dialplan.id) ? { ...dialplan, isActive } : dialplan
+                );
+                this.messageService.add({
+                    severity: 'success',
+                    summary: `${ids.length} regra(s) ${isActive ? 'ativada(s)' : 'desativada(s)'} com sucesso`,
+                    life: 15_000
+                });
+                this.toggleSelectionMode();
+            })
+            .catch(() => {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Desculpe não foi possível atualizar as regras',
+                    detail: 'Tente novamente mais tarde.',
+                    life: 15_000
+                });
+            })
+            .finally(() => (this.updatingActive = false));
     }
 
     confirmDelete(dialplan: DialPlan) {
