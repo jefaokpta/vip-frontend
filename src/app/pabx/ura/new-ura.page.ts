@@ -464,6 +464,13 @@ export class NewUraPage implements OnInit {
             this.dialPlanOptions = sortDialplansByDstAndPriority(dialPlans, aliasNames)
                 .filter((d) => d.isActive)
                 .map((d) => ({ label: d.name, value: d.id.toString() }));
+        }).catch(() => {
+            this.messageService.add({
+                severity: 'error',
+                summary: 'Erro ao carregar opções da URA',
+                detail: 'Recarregue a página para tentar novamente.',
+                life: 10_000
+            });
         });
     }
 
