@@ -129,7 +129,7 @@ import {Select} from 'primeng/select';
                         <th>Nome</th>
                         <th>Origem</th>
                         <th>Destino</th>
-                        <th style="width: 10%">Ativo</th>
+                        <th style="width: 10%" pSortableColumn="isActive">Ativo <p-sortIcon field="isActive" /></th>
                         <th style="width: 10%">Prioridade</th>
                         <th style="width: 10%">Ações</th>
                     </tr>
