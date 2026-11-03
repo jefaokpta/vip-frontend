@@ -25,6 +25,7 @@ import {UserService} from '@/pages/users/user.service';
                         <a
                             class="cursor-pointer flex mb-4 p-4 items-center border border-surface-200 dark:border-surface-700 rounded hover:bg-surface-100 dark:hover:bg-surface-800 transition-colors duration-150"
                             routerLink="/pages/profile"
+                            (click)="onDrawerHide()"
                         >
                             <span>
                                 <i class="pi pi-user text-xl text-primary"></i>
@@ -39,6 +40,7 @@ import {UserService} from '@/pages/users/user.service';
                         <a
                             class="cursor-pointer flex mb-4 p-4 items-center border border-surface-200 dark:border-surface-700 rounded hover:bg-surface-100 dark:hover:bg-surface-800 transition-colors duration-150"
                             routerLink="/pages/queue-login"
+                            (click)="onDrawerHide()"
                         >
                             <span>
                                 <i class="pi pi-users text-xl text-primary"></i>
