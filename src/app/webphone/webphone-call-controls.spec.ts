@@ -10,6 +10,7 @@ import {PhoneStateEnum} from '@/types/phone-state-enum';
 describe('Webphone controles de chamada', () => {
     let service: WebphoneService;
     let session: { sendDTMF: jasmine.Spy; terminate: jasmine.Spy };
+    const layoutState = signal({ webphoneSidebarVisible: false });
 
     function setCall(state: PhoneStateEnum) {
         (service as any).updatePhoneStatus({ state, session });
@@ -23,7 +24,7 @@ describe('Webphone controles de chamada', () => {
                     provide: UserService,
                     useValue: { getUser: () => ({}), getWebphoneRegisterSignal: () => ({}) }
                 },
-                { provide: LayoutService, useValue: { layoutState: signal({ webphoneSidebarVisible: false }) } }
+                { provide: LayoutService, useValue: { layoutState } }
             ]
         });
         service = TestBed.inject(WebphoneService);
@@ -110,10 +111,17 @@ describe('Webphone controles de chamada', () => {
         }
 
         beforeEach(() => {
+            layoutState.set({ webphoneSidebarVisible: true });
             TestBed.createComponent(WebphoneSidebarComponent);
         });
 
-        it('envia números, * e # com o painel fechado', () => {
+        it('ignora digitação com o painel fechado', () => {
+            layoutState.set({ webphoneSidebarVisible: false });
+            press('1');
+            expect(session.sendDTMF).not.toHaveBeenCalled();
+        });
+
+        it('envia números, * e # com o painel aberto', () => {
             ['5', '*', '#'].forEach((key) => press(key));
             expect(session.sendDTMF.calls.allArgs()).toEqual([['5'], ['*'], ['#']]);
         });

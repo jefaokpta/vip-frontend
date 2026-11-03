@@ -330,10 +330,10 @@ export class WebphoneSidebarComponent implements OnInit {
         this.webphoneService.park();
     }
 
-    /** Em chamada, números, * e # viram DTMF com o painel aberto ou fechado, exceto ao digitar em um campo. */
+    /** Em chamada e com o painel aberto, números, * e # viram DTMF, exceto ao digitar em um campo. */
     @HostListener('document:keydown', ['$event'])
     onKeydown(event: KeyboardEvent) {
-        if (!this.isTalking || event.repeat || event.ctrlKey || event.metaKey || event.altKey) {
+        if (!this.visible() || !this.isTalking || event.repeat || event.ctrlKey || event.metaKey || event.altKey) {
             return;
         }
         if (!/^[\d*#]$/.test(event.key) || this.isEditable(event.target)) {
