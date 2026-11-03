@@ -32,17 +32,24 @@ const VIEW_MODE_KEY = 'peer-dashboard-view-mode';
                     </div>
                 </ng-template>
 
-                <div class="flex flex-col gap-4 p-4">
-                    <div class="flex gap-6 mb-2 justify-around ">
-                        <p-card header="Ramais" class="text-center">
-                            <span class="font-bold text-3xl">{{ peerRegistries().length }}</span>
-                        </p-card>
-                        <p-card header="Registrados" class="text-center">
-                            <span class="font-bold text-3xl text-green-600">{{ registeredCount() }}</span>
-                        </p-card>
-                        <p-card header="Ocupados" class="text-center">
-                            <span class="font-bold text-3xl text-red-600">{{ busyChannelsCount() }}</span>
-                        </p-card>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div
+                        class="rounded-xl shadow px-4 py-3 flex flex-col gap-1 border-l-4 border-blue-500 bg-white dark:bg-surface-900"
+                    >
+                        <span class="text-xs font-semibold uppercase tracking-wide text-surface-500">Ramais</span>
+                        <span class="text-2xl font-bold">{{ peerRegistries().length }}</span>
+                    </div>
+                    <div
+                        class="rounded-xl shadow px-4 py-3 flex flex-col gap-1 border-l-4 border-green-500 bg-white dark:bg-surface-900"
+                    >
+                        <span class="text-xs font-semibold uppercase tracking-wide text-surface-500">Registrados</span>
+                        <span class="text-2xl font-bold">{{ registeredCount() }}</span>
+                    </div>
+                    <div
+                        class="rounded-xl shadow px-4 py-3 flex flex-col gap-1 border-l-4 border-red-500 bg-white dark:bg-surface-900"
+                    >
+                        <span class="text-xs font-semibold uppercase tracking-wide text-surface-500">Ocupados</span>
+                        <span class="text-2xl font-bold">{{ busyChannelsCount() }}</span>
                     </div>
                 </div>
             </p-card>

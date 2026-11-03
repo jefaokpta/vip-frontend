@@ -312,13 +312,25 @@ export class QueueLoginPage implements OnInit, OnDestroy {
         this.queueLoginService.getMyQueues().then((queues) => {
             this.syncPeerId();
             this.myQueues.set(queues);
-        });
+        }).catch(() =>
+            this.messageService.add({
+                severity: 'error',
+                summary: 'Erro',
+                detail: 'Não foi possível carregar suas filas'
+            })
+        );
     }
 
     private loadPauses(): void {
         this.pauseService.findAll().then((pauses: Pause[]) => {
             this.pauseOptions.set(pauses.map((p) => ({ label: p.name, value: p.id })));
-        });
+        }).catch(() =>
+            this.messageService.add({
+                severity: 'error',
+                summary: 'Erro',
+                detail: 'Não foi possível carregar as pausas'
+            })
+        );
     }
 
     private syncPeerId(): void {

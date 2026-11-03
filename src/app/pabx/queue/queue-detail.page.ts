@@ -299,6 +299,14 @@ export class QueueDetailPage implements OnInit, OnDestroy {
             const found = states.find((s) => s.queue.id === this.queueId) ?? null;
             this.queueState.set(found);
             this.loading = false;
+        }).catch(() => {
+            this.loading = false;
+            this.messageService.add({
+                severity: 'error',
+                summary: 'Não foi possível carregar a fila',
+                detail: 'Tente novamente mais tarde.',
+                life: 15_000
+            });
         });
 
         const companyId = this.userService.getUser().companyId;
@@ -337,11 +345,14 @@ export class QueueDetailPage implements OnInit, OnDestroy {
     }
 
     private formatSeconds(secs: number): string {
-        const m = Math.floor(secs / 60)
-            .toString()
-            .padStart(2, '0');
-        const s = (secs % 60).toString().padStart(2, '0');
-        return `${m}:${s}`;
+        const h = Math.floor(secs / 3600);
+        const m = Math.floor((secs % 3600) / 60);
+        const s = secs % 60;
+        const pad = (n: number) => n.toString().padStart(2, '0');
+        if (h > 0) {
+            return `${h}:${pad(m)}:${pad(s)}`;
+        }
+        return `${pad(m)}:${pad(s)}`;
     }
 
     isPausedMember(member: QueueMember): boolean {

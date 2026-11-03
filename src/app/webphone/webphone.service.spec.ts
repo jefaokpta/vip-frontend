@@ -28,7 +28,6 @@ describe('WebphoneService histórico de chamadas', () => {
             ]
         });
         service = TestBed.inject(WebphoneService);
-        spyOn(HTMLMediaElement.prototype, 'play').and.returnValue(Promise.resolve());
     });
 
     function receiveCall(): FakeSession {
@@ -51,5 +50,53 @@ describe('WebphoneService histórico de chamadas', () => {
         (service as any).ua = { call: () => ({}) };
         await service.makeCall('11888880000');
         expect(callHistory.add).toHaveBeenCalledOnceWith('11888880000', CallHistoryType.OUTGOING);
+    });
+
+    describe('aviso de fim de chamada', () => {
+        let beep: jasmine.Spy;
+
+        beforeEach(() => {
+            beep = spyOn((service as any).endCallBeep, 'play');
+        });
+
+        it('toca o beep quando chamada recebida termina', () => {
+            receiveCall().emit('ended');
+            expect(beep).toHaveBeenCalledTimes(1);
+        });
+
+        it('não toca o beep em chamada recebida perdida', () => {
+            receiveCall().emit('failed');
+            expect(beep).not.toHaveBeenCalled();
+        });
+
+        it('toca o beep quando chamada feita termina ou falha', () => {
+            const handlers = (service as any).callEventHandlers();
+            handlers.ended({ originator: 'remote', cause: 'Terminated' });
+            handlers.failed({ originator: 'remote', cause: 'Busy' });
+            expect(beep).toHaveBeenCalledTimes(2);
+        });
+    });
+
+    describe('toque de chamada recebida', () => {
+        let start: jasmine.Spy;
+        let stop: jasmine.Spy;
+
+        beforeEach(() => {
+            start = spyOn((service as any).incomingRing, 'start');
+            stop = spyOn((service as any).incomingRing, 'stop');
+            spyOn((service as any).endCallBeep, 'play');
+        });
+
+        it('toca ao receber a chamada', () => {
+            receiveCall();
+            expect(start).toHaveBeenCalledTimes(1);
+        });
+
+        ['accepted', 'failed', 'ended'].forEach((event) => {
+            it(`para quando a sessão emite ${event}`, () => {
+                receiveCall().emit(event);
+                expect(stop).toHaveBeenCalledTimes(1);
+            });
+        });
     });
 });

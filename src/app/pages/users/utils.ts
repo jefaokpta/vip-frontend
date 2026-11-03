@@ -59,3 +59,13 @@ export function buildModuleOptions(companyServices: ServiceEnum[]) {
             value: module
         }));
 }
+
+// RoleEnum está declarado em ordem crescente de hierarquia, então o índice serve como nível
+function roleLevel(roles: RoleEnum[]): number {
+    const levels = Object.values(RoleEnum);
+    return Math.max(-1, ...roles.map((role) => levels.indexOf(role)));
+}
+
+export function canManageUser(loggedRoles: RoleEnum[], targetRoles: RoleEnum[]): boolean {
+    return roleLevel(targetRoles) <= roleLevel(loggedRoles);
+}

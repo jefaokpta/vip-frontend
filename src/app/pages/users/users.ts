@@ -16,7 +16,7 @@ import {NgIf} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 import {ProgressSpinner} from 'primeng/progressspinner';
 import {UserService} from './user.service';
-import {translateModule, translateRole} from '@/pages/users/utils';
+import {canManageUser, translateModule, translateRole} from '@/pages/users/utils';
 
 @Component({
     selector: 'app-users',
@@ -102,7 +102,7 @@ import {translateModule, translateRole} from '@/pages/users/utils';
                                     "
                                 ></i>
                                 <p-button
-                                    *ngIf="!user.isConfirmed"
+                                    *ngIf="!user.isConfirmed && canManage(user)"
                                     icon="pi pi-send"
                                     [loading]="resendingIds.has(user.id)"
                                     (click)="resendConfirmation(user)"
@@ -116,7 +116,7 @@ import {translateModule, translateRole} from '@/pages/users/utils';
                         <td>{{ translateRole(user) }}</td>
                         <td>{{ translateModules(user) }}</td>
                         <td>
-                            <div class="flex gap-2">
+                            <div *ngIf="canManage(user)" class="flex gap-2">
                                 <p-button
                                     icon="pi pi-pencil"
                                     [routerLink]="['edit', user.id]"
@@ -251,6 +251,10 @@ export class UsersPage implements OnInit {
                     });
             }
         });
+    }
+
+    canManage(user: User): boolean {
+        return canManageUser(this.userLogged.roles, user.roles);
     }
 
     translateRole(user: User): string {
