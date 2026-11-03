@@ -16,6 +16,7 @@ import {CallHistoryType} from '@/types/call-history';
 import {RingbackTone} from '@/webphone/ringback-tone';
 import {EndCallBeep} from '@/webphone/end-call-beep';
 import {IncomingRingTone} from '@/webphone/incoming-ring-tone';
+import {DtmfKeyTone} from '@/webphone/dtmf-key-tone';
 
 export type TransferMode = 'blind' | 'attended';
 
@@ -35,6 +36,7 @@ export class WebphoneService {
     private readonly ringback = new RingbackTone();
     private readonly endCallBeep = new EndCallBeep();
     private readonly incomingRing = new IncomingRingTone();
+    private readonly keyTone = new DtmfKeyTone();
 
     private updatePhoneStatus(newState: Partial<PhoneState>) {
         this.phoneState.update((state) => ({ ...state, ...newState }));
@@ -127,8 +129,13 @@ export class WebphoneService {
     }
 
     sendDTMF(digit: string) {
+        this.keyTone.play(digit);
         this.phoneState().session?.sendDTMF(digit);
         this.dialedDigits.update((digits) => digits + digit);
+    }
+
+    playKeyTone(digit: string) {
+        this.keyTone.play(digit);
     }
 
     /** Envia o comando de transferência e abre o teclado para digitar o ramal de destino. */

@@ -105,6 +105,33 @@ describe('Webphone controles de chamada', () => {
         });
     });
 
+    describe('tom dos dígitos', () => {
+        let tone: jasmine.Spy;
+
+        beforeEach(() => {
+            tone = spyOn((service as any).keyTone, 'play');
+        });
+
+        it('toca ao enviar dígito na chamada', () => {
+            service.sendDTMF('5');
+            expect(tone).toHaveBeenCalledOnceWith('5');
+        });
+
+        it('não toca nos comandos enviados pelos botões', () => {
+            service.startTransfer('blind');
+            service.park();
+            expect(tone).not.toHaveBeenCalled();
+        });
+
+        it('toca ao digitar no campo de número', () => {
+            const fixture = TestBed.createComponent(WebphoneSidebarComponent);
+            const input = new KeyboardEvent('keydown', { key: '7' });
+            fixture.componentInstance.onDialInputKeydown(input);
+            fixture.componentInstance.onDialInputKeydown(new KeyboardEvent('keydown', { key: '7', repeat: true }));
+            expect(tone).toHaveBeenCalledOnceWith('7');
+        });
+    });
+
     describe('teclado físico', () => {
         function press(key: string, init: KeyboardEventInit = {}, target: EventTarget = document) {
             target.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, ...init }));

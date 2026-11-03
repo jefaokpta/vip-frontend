@@ -63,6 +63,7 @@ import {SplitButton} from 'primeng/splitbutton';
                     pInputText
                     [(ngModel)]="telephoneNumber"
                     (keydown.enter)="dial()"
+                    (keydown)="onDialInputKeydown($event)"
                 />
                 <div class="flex mt-4 justify-center">
                     <ng-container *ngIf="!phoneStatus().session; else hasSession">
@@ -340,6 +341,12 @@ export class WebphoneSidebarComponent implements OnInit {
             return;
         }
         this.sendDTMF(event.key);
+    }
+
+    onDialInputKeydown(event: KeyboardEvent) {
+        if (!event.repeat && !event.ctrlKey && !event.metaKey && !event.altKey) {
+            this.webphoneService.playKeyTone(event.key);
+        }
     }
 
     private isEditable(target: EventTarget | null): boolean {
