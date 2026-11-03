@@ -26,6 +26,10 @@ export function isLocalhostIp(ip: string): boolean {
     return ip.trim().split('.').map(Number).join('.') === LOCALHOST_IP;
 }
 
+export function countByStatus(ips: BlockedIp[], status: BlockedIpStatus): number {
+    return ips.filter((item) => item.status === status).length;
+}
+
 @Component({
     selector: 'app-blocked-ip-page',
     standalone: true,
@@ -63,6 +67,11 @@ export function isLocalhostIp(ip: string): boolean {
                     />
                 </div>
             </ng-template>
+
+            <div class="flex flex-wrap gap-2 mb-4">
+                <p-tag severity="danger" [value]="'Bloqueados: ' + totalBlocked" />
+                <p-tag severity="success" [value]="'Liberados: ' + totalAllowed" />
+            </div>
 
             <div class="flex flex-wrap gap-2 mb-4">
                 <input pInputText type="text" placeholder="Filtrar IP" [(ngModel)]="filterIp" />
@@ -244,6 +253,14 @@ export class BlockedIpPage implements OnInit {
 
     get isValidIp(): boolean {
         return IPV4_REGEX.test(this.newIp.trim()) && !this.isLocalhost;
+    }
+
+    get totalBlocked(): number {
+        return countByStatus(this.ips, 'BLOCKED');
+    }
+
+    get totalAllowed(): number {
+        return countByStatus(this.ips, 'ALLOWED');
     }
 
     get filteredIps(): BlockedIp[] {
