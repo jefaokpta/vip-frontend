@@ -15,6 +15,7 @@ import {CallHistoryService} from '@/webphone/call-history.service';
 import {CallHistoryType} from '@/types/call-history';
 import {RingbackTone} from '@/webphone/ringback-tone';
 import {EndCallBeep} from '@/webphone/end-call-beep';
+import {IncomingRingTone} from '@/webphone/incoming-ring-tone';
 
 export type TransferMode = 'blind' | 'attended';
 
@@ -31,9 +32,9 @@ export class WebphoneService {
     private readonly phoneState = signal<PhoneState>({ state: PhoneStateEnum.INITIALIZING });
     private readonly callTimer = signal(0);
     private callTimerInterval: ReturnType<typeof setInterval> | undefined;
-    private readonly audio = new Audio();
     private readonly ringback = new RingbackTone();
     private readonly endCallBeep = new EndCallBeep();
+    private readonly incomingRing = new IncomingRingTone();
 
     private updatePhoneStatus(newState: Partial<PhoneState>) {
         this.phoneState.update((state) => ({ ...state, ...newState }));
@@ -250,8 +251,7 @@ export class WebphoneService {
     }
 
     private incommingSession(session: RTCSession) {
-        this.audio.src = '/audios/calling.mp3';
-        this.audio.play();
+        this.incomingRing.start();
         this.updatePhoneStatus({ state: PhoneStateEnum.INCOMING_CALL, session });
         session.on('connecting', () => console.log('connecting'));
         session.on('peerconnection', () => {
@@ -261,13 +261,14 @@ export class WebphoneService {
         session.on('accepted', () => {
             console.log('accepted');
             this.callHistoryService.add(session.remote_identity?.uri?.user, CallHistoryType.INCOMING);
-            this.audio.pause();
+            this.incomingRing.stop();
             this.updatePhoneStatus({ state: PhoneStateEnum.TALKING });
             this.startCallTimer();
         });
         session.on('confirmed', () => console.log(' confirmed'));
         session.on('ended', () => {
             console.log('ended');
+            this.incomingRing.stop();
             this.endCallBeep.play();
             this.updatePhoneStatus({ state: PhoneStateEnum.AVAILABLE, session: undefined });
             this.stopCallTimer();
@@ -275,7 +276,7 @@ export class WebphoneService {
         session.on('failed', () => {
             console.log('failed');
             this.callHistoryService.add(session.remote_identity?.uri?.user, CallHistoryType.MISSED);
-            this.audio.pause();
+            this.incomingRing.stop();
             this.updatePhoneStatus({ state: PhoneStateEnum.AVAILABLE, session: undefined });
             this.stopCallTimer();
         });

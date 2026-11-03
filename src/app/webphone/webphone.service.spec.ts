@@ -28,7 +28,6 @@ describe('WebphoneService histórico de chamadas', () => {
             ]
         });
         service = TestBed.inject(WebphoneService);
-        spyOn(HTMLMediaElement.prototype, 'play').and.returnValue(Promise.resolve());
     });
 
     function receiveCall(): FakeSession {
@@ -63,7 +62,6 @@ describe('WebphoneService histórico de chamadas', () => {
         it('toca o beep quando chamada recebida termina', () => {
             receiveCall().emit('ended');
             expect(beep).toHaveBeenCalledTimes(1);
-            expect((service as any).audio.src).not.toContain('blip');
         });
 
         it('não toca o beep em chamada recebida perdida', () => {
@@ -76,7 +74,29 @@ describe('WebphoneService histórico de chamadas', () => {
             handlers.ended({ originator: 'remote', cause: 'Terminated' });
             handlers.failed({ originator: 'remote', cause: 'Busy' });
             expect(beep).toHaveBeenCalledTimes(2);
-            expect((service as any).audio.src).not.toContain('blip');
+        });
+    });
+
+    describe('toque de chamada recebida', () => {
+        let start: jasmine.Spy;
+        let stop: jasmine.Spy;
+
+        beforeEach(() => {
+            start = spyOn((service as any).incomingRing, 'start');
+            stop = spyOn((service as any).incomingRing, 'stop');
+            spyOn((service as any).endCallBeep, 'play');
+        });
+
+        it('toca ao receber a chamada', () => {
+            receiveCall();
+            expect(start).toHaveBeenCalledTimes(1);
+        });
+
+        ['accepted', 'failed', 'ended'].forEach((event) => {
+            it(`para quando a sessão emite ${event}`, () => {
+                receiveCall().emit(event);
+                expect(stop).toHaveBeenCalledTimes(1);
+            });
         });
     });
 });
