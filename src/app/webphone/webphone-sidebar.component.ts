@@ -1,4 +1,4 @@
-import {Component, computed, OnInit} from '@angular/core';
+import {Component, computed, HostListener, OnInit} from '@angular/core';
 import {ButtonModule} from 'primeng/button';
 import {DrawerModule} from 'primeng/drawer';
 import {BadgeModule} from 'primeng/badge';
@@ -6,7 +6,8 @@ import {LayoutService} from '@/layout/service/layout.service';
 import {Card} from 'primeng/card';
 import {InputTextModule} from 'primeng/inputtext';
 import {FormsModule} from '@angular/forms';
-import {WebphoneService} from '@/webphone/webphone.service';
+import {TransferMode, WebphoneService} from '@/webphone/webphone.service';
+import {PhoneStateEnum} from '@/types/phone-state-enum';
 import {DatePipe, NgIf} from '@angular/common';
 import {TableModule} from 'primeng/table';
 import {telephoneFormat} from './utils';
@@ -68,7 +69,15 @@ import {SplitButton} from 'primeng/splitbutton';
                         <p-button icon="pi pi-phone" severity="success" (click)="dial()" rounded outlined />
                     </ng-container>
                     <ng-template #hasSession>
-                        <p-button icon="pi pi-phone" severity="danger" (click)="hangup()" rounded outlined />
+                        <p-button
+                            icon="pi pi-phone rotate-[135deg]"
+                            severity="danger"
+                            title="Desligar"
+                            ariaLabel="Desligar"
+                            (click)="hangup()"
+                            rounded
+                            outlined
+                        />
                         <p-button
                             class="ml-4"
                             icon="pi pi-calculator"
@@ -79,17 +88,63 @@ import {SplitButton} from 'primeng/splitbutton';
                         />
                         <p-button
                             class="ml-4"
-                            icon="pi pi-microphone"
-                            severity="danger"
+                            [severity]="isMuted ? 'danger' : 'secondary'"
+                            [title]="isMuted ? 'Ativar microfone' : 'Silenciar'"
+                            [ariaLabel]="isMuted ? 'Ativar microfone' : 'Silenciar'"
                             (click)="toggleMute()"
-                            [label]="phoneStatus().session?.isMuted().audio ? 'mudo' : ''"
                             rounded
                             outlined
-                        />
+                        >
+                            <span class="relative inline-flex items-center justify-center">
+                                <i class="pi pi-microphone"></i>
+                                <span
+                                    *ngIf="isMuted"
+                                    class="absolute w-5 h-0.5 bg-current rotate-45"
+                                    data-testid="mute-slash"
+                                ></span>
+                            </span>
+                        </p-button>
                     </ng-template>
                 </div>
+                <div *ngIf="isTalking" class="flex mt-2 justify-center">
+                    <p-button
+                        icon="pi pi-arrow-right"
+                        title="Transferência cega"
+                        ariaLabel="Transferência cega"
+                        (click)="startTransfer('blind')"
+                        [outlined]="transferMode() !== 'blind'"
+                        rounded
+                    />
+                    <p-button
+                        class="ml-4"
+                        icon="pi pi-arrow-right-arrow-left"
+                        title="Transferência assistida"
+                        ariaLabel="Transferência assistida"
+                        (click)="startTransfer('attended')"
+                        [outlined]="transferMode() !== 'attended'"
+                        rounded
+                    />
+                    <p-button
+                        class="ml-4"
+                        icon="pi pi-car"
+                        title="Estacionar"
+                        ariaLabel="Estacionar"
+                        (click)="park()"
+                        rounded
+                        outlined
+                    />
+                </div>
+                <p *ngIf="transferMode() === 'blind' && phoneStatus().session" class="mt-4 text-sm text-primary">
+                    Digite o ramal de destino
+                </p>
+                <p *ngIf="transferMode() === 'attended' && phoneStatus().session" class="mt-4 text-sm text-primary">
+                    Digite o ramal. Desligue para concluir; se o ramal desligar, a chamada volta.
+                </p>
+                <p *ngIf="dialedDigits() && phoneStatus().session" class="mt-4 text-xl tracking-widest break-all">
+                    {{ dialedDigits() }}
+                </p>
                 <div
-                    *ngIf="dialpadVisible && phoneStatus().session"
+                    *ngIf="dialpadVisible() && phoneStatus().session"
                     class="flex flex-col mt-4 items-center transition-colors duration-150"
                 >
                     <div class="flex">
@@ -197,7 +252,6 @@ import {SplitButton} from 'primeng/splitbutton';
 })
 export class WebphoneSidebarComponent implements OnInit {
     telephoneNumber?: string = undefined;
-    dialpadVisible = false;
     user: User;
     wr: PeerRegistration;
     menuItems = [
@@ -244,8 +298,52 @@ export class WebphoneSidebarComponent implements OnInit {
         return this.webphoneService.callTimeFormated();
     }
 
+    get dialpadVisible() {
+        return this.webphoneService.dialpadVisible;
+    }
+
+    get transferMode() {
+        return this.webphoneService.transferMode;
+    }
+
+    get dialedDigits() {
+        return this.webphoneService.dialedDigits;
+    }
+
+    get isTalking() {
+        return this.phoneStatus().state === PhoneStateEnum.TALKING;
+    }
+
+    get isMuted() {
+        return !!this.phoneStatus().session?.isMuted().audio;
+    }
+
     toogleDialpad() {
-        this.dialpadVisible = !this.dialpadVisible;
+        this.webphoneService.toggleDialpad();
+    }
+
+    startTransfer(mode: TransferMode) {
+        this.webphoneService.startTransfer(mode);
+    }
+
+    park() {
+        this.webphoneService.park();
+    }
+
+    /** Em chamada, números, * e # viram DTMF com o painel aberto ou fechado, exceto ao digitar em um campo. */
+    @HostListener('document:keydown', ['$event'])
+    onKeydown(event: KeyboardEvent) {
+        if (!this.isTalking || event.repeat || event.ctrlKey || event.metaKey || event.altKey) {
+            return;
+        }
+        if (!/^[\d*#]$/.test(event.key) || this.isEditable(event.target)) {
+            return;
+        }
+        this.sendDTMF(event.key);
+    }
+
+    private isEditable(target: EventTarget | null): boolean {
+        return target instanceof HTMLElement && target.matches('input, textarea, select, [contenteditable]');
     }
 
     dial(telephoneNumber?: string | number) {
@@ -265,7 +363,6 @@ export class WebphoneSidebarComponent implements OnInit {
 
     hangup() {
         this.webphoneService.hangup();
-        this.dialpadVisible = false;
     }
 
     toggleMute() {

@@ -15,6 +15,12 @@ import {CallHistoryService} from '@/webphone/call-history.service';
 import {CallHistoryType} from '@/types/call-history';
 import {RingbackTone} from '@/webphone/ringback-tone';
 
+export type TransferMode = 'blind' | 'attended';
+
+const TRANSFER_COMMANDS: Record<TransferMode, string> = { blind: '*1', attended: '*2' };
+const PARK_COMMAND = '*7';
+const COMMAND_COOLDOWN_MS = 1000;
+
 @Injectable({
     providedIn: 'root'
 })
@@ -29,8 +35,15 @@ export class WebphoneService {
 
     private updatePhoneStatus(newState: Partial<PhoneState>) {
         this.phoneState.update((state) => ({ ...state, ...newState }));
+        if ('session' in newState && !newState.session) {
+            this.resetCallControls();
+        }
     }
     readonly phoneState$ = this.phoneState.asReadonly();
+    readonly dialedDigits = signal('');
+    readonly transferMode = signal<TransferMode | null>(null);
+    readonly dialpadVisible = signal(false);
+    private lastCommandAt = 0;
 
     constructor(
         private readonly userService: UserService,
@@ -112,6 +125,48 @@ export class WebphoneService {
 
     sendDTMF(digit: string) {
         this.phoneState().session?.sendDTMF(digit);
+        this.dialedDigits.update((digits) => digits + digit);
+    }
+
+    /** Envia o comando de transferência e abre o teclado para digitar o ramal de destino. */
+    startTransfer(mode: TransferMode) {
+        if (!this.sendCommand(TRANSFER_COMMANDS[mode])) {
+            return;
+        }
+        this.dialedDigits.set('');
+        this.transferMode.set(mode);
+        this.dialpadVisible.set(true);
+    }
+
+    park() {
+        if (this.sendCommand(PARK_COMMAND)) {
+            this.transferMode.set(null);
+        }
+    }
+
+    toggleDialpad() {
+        this.dialpadVisible.update((visible) => !visible);
+        if (!this.dialpadVisible()) {
+            this.transferMode.set(null);
+        }
+    }
+
+    /** O JsSIP só aceita DTMF com a chamada estabelecida; o intervalo evita enviar o comando duas vezes. */
+    private sendCommand(command: string): boolean {
+        const now = Date.now();
+        if (this.phoneState().state !== PhoneStateEnum.TALKING || now - this.lastCommandAt < COMMAND_COOLDOWN_MS) {
+            return false;
+        }
+        this.lastCommandAt = now;
+        this.phoneState().session?.sendDTMF(command);
+        return true;
+    }
+
+    private resetCallControls() {
+        this.dialedDigits.set('');
+        this.transferMode.set(null);
+        this.dialpadVisible.set(false);
+        this.lastCommandAt = 0;
     }
 
     hangup() {
