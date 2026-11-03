@@ -4,6 +4,7 @@ import {PeerDashboard} from '@/pages/dashboard/peer.dashboard';
 import {QueueDashboard} from '@/pages/dashboard/queue.dashboard';
 import {WorkersDashboard} from '@/pages/dashboard/workers.dashboard';
 import {QueueLoginPage} from '@/pages/queues/queue-login';
+import {PabxFeaturesPage} from '@/pages/pabx-features/pabx-features.page';
 import {moduleGuard} from '@/security/module-guard';
 import {roleGuard} from '@/security/role-guard';
 import {ModuleEnum} from '@/types/module-enum';
@@ -28,6 +29,7 @@ export default [
         data: { breadcrumb: 'Painel de Filas' }
     },
     { path: 'queue-login', component: QueueLoginPage, data: { breadcrumb: 'Minhas Filas' } },
+    { path: 'pabx-features', component: PabxFeaturesPage, data: { breadcrumb: 'Facilidades do PABX' } },
     { path: 'workers', component: WorkersDashboard, data: { breadcrumb: 'Painel de Workers' } },
     { path: '**', redirectTo: '/notfound' }
 ] as Routes;
