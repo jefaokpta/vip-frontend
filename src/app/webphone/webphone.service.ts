@@ -14,6 +14,7 @@ import {UserService} from '@/pages/users/user.service';
 import {CallHistoryService} from '@/webphone/call-history.service';
 import {CallHistoryType} from '@/types/call-history';
 import {RingbackTone} from '@/webphone/ringback-tone';
+import {EndCallBeep} from '@/webphone/end-call-beep';
 
 export type TransferMode = 'blind' | 'attended';
 
@@ -32,6 +33,7 @@ export class WebphoneService {
     private callTimerInterval: ReturnType<typeof setInterval> | undefined;
     private readonly audio = new Audio();
     private readonly ringback = new RingbackTone();
+    private readonly endCallBeep = new EndCallBeep();
 
     private updatePhoneStatus(newState: Partial<PhoneState>) {
         this.phoneState.update((state) => ({ ...state, ...newState }));
@@ -108,7 +110,7 @@ export class WebphoneService {
         this.ua.start();
     }
 
-    async makeCall(telephone: string) {
+    makeCall(telephone: string) {
         this.ensureUaStarted();
         if (!this.ua) {
             return;
@@ -212,8 +214,7 @@ export class WebphoneService {
                         `Call falhou originator: ${e.originator} cause: ${e.cause}`
                 );
                 this.ringback.stop();
-                this.audio.src = '/audios/blip.mp3';
-                this.audio.play();
+                this.endCallBeep.play();
                 this.updatePhoneStatus({ state: PhoneStateEnum.AVAILABLE, session: undefined });
                 this.stopCallTimer();
             },
@@ -224,8 +225,7 @@ export class WebphoneService {
                         `Call terminou originator: ${e.originator} with cause: ${e.cause}`
                 );
                 this.ringback.stop();
-                this.audio.src = '/audios/blip.mp3';
-                this.audio.play();
+                this.endCallBeep.play();
                 this.updatePhoneStatus({ state: PhoneStateEnum.AVAILABLE, session: undefined });
                 this.stopCallTimer();
             },
@@ -268,8 +268,7 @@ export class WebphoneService {
         session.on('confirmed', () => console.log(' confirmed'));
         session.on('ended', () => {
             console.log('ended');
-            this.audio.src = '/audios/blip.mp3';
-            this.audio.play();
+            this.endCallBeep.play();
             this.updatePhoneStatus({ state: PhoneStateEnum.AVAILABLE, session: undefined });
             this.stopCallTimer();
         });
