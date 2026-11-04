@@ -102,6 +102,7 @@ function rangeOrderValidator(control: AbstractControl): ValidationErrors | null 
                         optionValue="id"
                         placeholder="Selecione um grupo"
                         [showClear]="true"
+                        appendTo="body"
                     ></p-select>
                 </div>
 
@@ -148,7 +149,10 @@ export class NewPeerBatchDialogComponent implements OnInit {
             },
             { validators: rangeOrderValidator }
         );
-        this.pickupGroupService.findAll().then((groups) => (this.pickUpGroupOptions = groups));
+        this.pickupGroupService
+            .findAll()
+            .then((groups) => (this.pickUpGroupOptions = groups))
+            .catch(() => (this.errorMessage = 'Erro ao carregar os grupos de captura.'));
     }
 
     onSubmit() {

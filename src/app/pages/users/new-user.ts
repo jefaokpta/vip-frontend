@@ -13,12 +13,13 @@ import {Router, RouterLink} from '@angular/router';
 import {Card} from 'primeng/card';
 import {RoleEnum} from '@/types/role-enum';
 import {Select} from 'primeng/select';
+import {MultiSelect} from 'primeng/multiselect';
 import {UserService} from '@/pages/users/user.service';
-import {buildRoleOptions} from '@/pages/users/utils';
+import {buildModuleOptions, buildRoleOptions} from '@/pages/users/utils';
 
 @Component({
     selector: 'app-new-user',
-    imports: [Button, InputText, NgIf, ReactiveFormsModule, RouterLink, Card, Select],
+    imports: [Button, InputText, NgIf, ReactiveFormsModule, RouterLink, Card, Select, MultiSelect],
     template: `
         <p-card>
             <ng-template #title>
@@ -46,7 +47,7 @@ import {buildRoleOptions} from '@/pages/users/utils';
 
                 <div class="field mb-4">
                     <label for="email" class="block mb-2">Email *</label>
-                    <input id="email" pInputText class="p-inputtext" formControlName="email" />
+                    <input id="email" pInputText class="p-inputtext w-full md:w-[30rem]" formControlName="email" />
                     <small *ngIf="email?.invalid && (email?.dirty || email?.touched)" class="p-error block mt-2">
                         <div *ngIf="email?.errors?.['required']">Email é obrigatório.</div>
                         <div *ngIf="email?.errors?.['email']">Email inválido.</div>
@@ -68,6 +69,23 @@ import {buildRoleOptions} from '@/pages/users/utils';
                     </small>
                 </div>
 
+                <div class="field mb-4" *ngIf="role?.value !== RoleEnum.ROLE_COMPANY_ADMIN">
+                    <label for="modules" class="block mb-2">Módulos</label>
+                    <p-multiselect
+                        id="modules"
+                        [options]="moduleOptions"
+                        formControlName="modules"
+                        optionLabel="label"
+                        optionValue="value"
+                        placeholder="Selecione os módulos"
+                        display="chip"
+                    ></p-multiselect>
+                </div>
+                <div class="field mb-4" *ngIf="role?.value === RoleEnum.ROLE_COMPANY_ADMIN">
+                    <label class="block mb-2">Módulos</label>
+                    <span>Administrador tem acesso a todos os módulos</span>
+                </div>
+
                 <small *ngIf="submitError" class="p-error block mb-4">{{ submitError }}</small>
 
                 <div class="flex mt-4">
@@ -85,6 +103,8 @@ import {buildRoleOptions} from '@/pages/users/utils';
 export class NewUserPage implements OnInit {
     form!: FormGroup;
     roleOptions: { label: string; value: string }[] = [];
+    moduleOptions: { label: string; value: string }[] = [];
+    protected readonly RoleEnum = RoleEnum;
     submitError = '';
     pending = false;
 
@@ -98,10 +118,12 @@ export class NewUserPage implements OnInit {
         this.form = this.fb.group({
             name: ['', [Validators.required]],
             email: ['', [Validators.required, Validators.email]],
-            role: [RoleEnum.ROLE_COMPANY_USER, [Validators.required]]
+            role: [RoleEnum.ROLE_COMPANY_USER, [Validators.required]],
+            modules: [[]]
         });
         const user = this.userService.getUser();
         this.roleOptions = buildRoleOptions(user.roles);
+        this.moduleOptions = buildModuleOptions(user.companyServices);
     }
 
     get name() {

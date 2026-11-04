@@ -1,4 +1,4 @@
-import {QueueStrategyEnum} from '@/pabx/types/queue-strategy-enum';
+import { QueueStrategyEnum } from '@/pabx/types/queue-strategy-enum';
 
 export interface Queue {
     readonly id: number;
@@ -13,7 +13,6 @@ export interface Queue {
     readonly serviceLevelSeconds: number;
     readonly tmeAlertSeconds: number;
     readonly callDurationAlertMinutes: number;
-    readonly memberPauseDurationAlertMinutes: number;
     readonly memberIds: number[];
     readonly isJoinWhenEmpty: boolean;
     readonly cooldownSeconds: number;

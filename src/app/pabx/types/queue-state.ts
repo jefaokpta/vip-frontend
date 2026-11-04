@@ -1,6 +1,6 @@
-import {Channel} from '@/pabx/types/channel';
-import {Queue} from '@/pabx/types/queue';
-import {QueueMember} from '@/pabx/types/queue-member';
+import { Channel } from '@/pabx/types/channel';
+import { Queue } from '@/pabx/types/queue';
+import { QueueMember } from '@/pabx/types/queue-member';
 
 export interface QueueState {
     readonly queue: Queue;
@@ -10,4 +10,5 @@ export interface QueueState {
     readonly answeredCalls?: number;
     readonly answeredCallsInServiceLevel?: number;
     readonly tmeSeconds?: number;
+    readonly totalWaitTimeSeconds?: number;
 }

@@ -1,5 +1,5 @@
-import {PeerRegistry} from '@/pabx/types/peer-registry';
-import {QueueMemberStatusEnum} from '@/pabx/types/queue-member-status-enum';
+import { PeerRegistry } from '@/pabx/types/peer-registry';
+import { QueueMemberStatusEnum } from '@/pabx/types/queue-member-status-enum';
 
 export interface QueueMember {
     readonly id: number;
@@ -12,4 +12,5 @@ export interface QueueMember {
     readonly pauseTimeLimitMinutes?: number;
     readonly lastCallTimestamp?: number;
     readonly answeredCallCount?: number;
+    readonly callStartTimestamp?: number;
 }

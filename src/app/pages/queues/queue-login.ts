@@ -50,7 +50,7 @@ import {rxStompServiceFactory} from '@/websocket/stomp/rx-stomp-service-factory'
 
                         <div class="flex gap-6 text-sm text-surface-500 dark:text-surface-400">
                             <div class="flex flex-col">
-                                <span class="text-xs uppercase tracking-wide">Agentes</span>
+                                <span class="text-xs uppercase tracking-wide">Membros</span>
                                 <span class="font-bold text-surface-700 dark:text-surface-200">{{
                                     qs.loggedMembers.length
                                 }}</span>
@@ -312,13 +312,25 @@ export class QueueLoginPage implements OnInit, OnDestroy {
         this.queueLoginService.getMyQueues().then((queues) => {
             this.syncPeerId();
             this.myQueues.set(queues);
-        });
+        }).catch(() =>
+            this.messageService.add({
+                severity: 'error',
+                summary: 'Erro',
+                detail: 'Não foi possível carregar suas filas'
+            })
+        );
     }
 
     private loadPauses(): void {
         this.pauseService.findAll().then((pauses: Pause[]) => {
             this.pauseOptions.set(pauses.map((p) => ({ label: p.name, value: p.id })));
-        });
+        }).catch(() =>
+            this.messageService.add({
+                severity: 'error',
+                summary: 'Erro',
+                detail: 'Não foi possível carregar as pausas'
+            })
+        );
     }
 
     private syncPeerId(): void {

@@ -15,7 +15,7 @@ import {NgIf} from '@angular/common';
 import {Tooltip} from 'primeng/tooltip';
 import {PeerService} from '@/pabx/peer/peer.service';
 import {NewPeerBatchDialogComponent} from '@/pabx/peer/new-peer-batch-dialog.component';
-import {PeerBatchResult} from '@/pabx/types/peer-batch-result';
+import {PeerBatchResult, PeerCredential} from '@/pabx/types/peer-batch-result';
 
 @Component({
     selector: 'app-peer-page',
@@ -71,7 +71,7 @@ import {PeerBatchResult} from '@/pabx/types/peer-batch-result';
                 [value]="peers"
                 [paginator]="true"
                 [rows]="15"
-                [globalFilterFields]="['name', 'peer']"
+                [globalFilterFields]="['name', 'peer', 'userName']"
                 [tableStyle]="{ 'min-width': '40rem' }"
                 stripedRows
             >
@@ -85,6 +85,10 @@ import {PeerBatchResult} from '@/pabx/types/peer-batch-result';
                             Nome
                             <p-sortIcon field="name"></p-sortIcon>
                         </th>
+                        <th pSortableColumn="userName">
+                            Usuário
+                            <p-sortIcon field="userName"></p-sortIcon>
+                        </th>
                         <th style="width: 10%">Ações</th>
                     </tr>
                 </ng-template>
@@ -93,6 +97,22 @@ import {PeerBatchResult} from '@/pabx/types/peer-batch-result';
                     <tr>
                         <td>{{ peer.peer }}</td>
                         <td>{{ peer.name }}</td>
+                        <td>
+                            <div class="flex items-center gap-2">
+                                <span>{{ peer.userName ?? '-' }}</span>
+                                @if (peer.userName) {
+                                    <p-button
+                                        icon="pi pi-user-minus"
+                                        severity="warn"
+                                        (click)="confirmRelease(peer)"
+                                        text
+                                        rounded
+                                        size="small"
+                                        pTooltip="Liberar ramal do usuário"
+                                    />
+                                }
+                            </div>
+                        </td>
                         <td>
                             <div class="flex gap-2">
                                 <p-button
@@ -142,14 +162,29 @@ export class PeerPage implements OnInit {
     ) {}
 
     ngOnInit(): void {
-        this.peerService.findAll().then((peers) => {
-            this.peers = peers;
-            this.loading = false;
-        });
+        this.peerService
+            .findAll()
+            .then((peers) => {
+                this.peers = this.sortByPeer(peers);
+                this.loading = false;
+            })
+            .catch(() => {
+                this.loading = false;
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Erro',
+                    detail: 'Erro ao carregar os ramais.'
+                });
+            });
+    }
+
+    private sortByPeer(peers: Peer[]): Peer[] {
+        return [...peers].sort((a, b) => a.peer.localeCompare(b.peer, undefined, {numeric: true}));
     }
 
     onBatchCreated(result: PeerBatchResult) {
-        this.peers = [...this.peers, ...result.created];
+        this.peers = this.sortByPeer([...this.peers, ...result.created]);
+        this.downloadCredentialsCsv(result.credentials);
         this.messageService.add({
             severity: 'success',
             summary: `${result.created.length} ramal(is) criado(s) com sucesso`,
@@ -158,6 +193,18 @@ export class PeerPage implements OnInit {
                 : undefined,
             life: 15_000
         });
+    }
+
+    private downloadCredentialsCsv(credentials: PeerCredential[]) {
+        if (!credentials?.length) return;
+        const rows = ['ramal,senha', ...credentials.map((c) => `${c.peer},${c.md5Secret}`)];
+        const blob = new Blob([rows.join('\n')], {type: 'text/csv;charset=utf-8'});
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `ramais-${new Date().toISOString().slice(0, 10)}.csv`;
+        link.click();
+        URL.revokeObjectURL(url);
     }
 
     onFilterGlobal(event: Event) {
@@ -198,6 +245,45 @@ export class PeerPage implements OnInit {
                         this.messageService.add({
                             severity: 'error',
                             summary: 'Desculpe não foi possível remover o ramal',
+                            detail: 'Tente novamente mais tarde.',
+                            life: 15_000
+                        });
+                    });
+            }
+        });
+    }
+
+    confirmRelease(peer: Peer) {
+        this.confirmationService.confirm({
+            message: `Liberar o ramal ${peer.peer} do usuário ${peer.userName}?`,
+            header: 'Confirmação',
+            closable: true,
+            closeOnEscape: true,
+            icon: 'pi pi-exclamation-triangle',
+            acceptButtonProps: {
+                label: 'Liberar',
+                severity: 'warn'
+            },
+            rejectButtonProps: {
+                label: 'Fechar',
+                severity: 'secondary',
+                outlined: true
+            },
+            accept: () => {
+                this.peerService
+                    .releaseFromUser(peer.id)
+                    .then(() => {
+                        this.peers = this.peers.map((p) => (p.id === peer.id ? { ...p, userName: undefined } : p));
+                        this.messageService.add({
+                            severity: 'success',
+                            summary: 'Ramal liberado com sucesso',
+                            life: 15_000
+                        });
+                    })
+                    .catch(() => {
+                        this.messageService.add({
+                            severity: 'error',
+                            summary: 'Desculpe não foi possível liberar o ramal',
                             detail: 'Tente novamente mais tarde.',
                             life: 15_000
                         });

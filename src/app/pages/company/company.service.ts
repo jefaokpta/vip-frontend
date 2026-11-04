@@ -2,6 +2,7 @@ import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {Company, NewCompany} from '@/types/company';
 import {executeRequest, httpHeaders} from '@/util/utils';
+import {ServiceEnum} from '@/types/service-enum';
 import {environment} from '../../../environments/environment';
 
 @Injectable({
@@ -19,6 +20,12 @@ export class CompanyService {
     update(company: Company) {
         return executeRequest(
             this.http.put<Company>(`${this.BACKEND}/companies/${company.companyId}`, company, httpHeaders())
+        );
+    }
+
+    updateServices(companyId: string, services: ServiceEnum[]): Promise<Company> {
+        return executeRequest(
+            this.http.put<Company>(`${this.BACKEND}/companies/${companyId}/services`, { services }, httpHeaders())
         );
     }
 

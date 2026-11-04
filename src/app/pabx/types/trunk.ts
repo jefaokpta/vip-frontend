@@ -20,3 +20,6 @@ export interface Trunk {
     readonly codecs: CodecEnum[];
     readonly extraConfigs: ExtraConfig[];
 }
+
+/** Visão mínima do tronco (GET /trunks/options), acessível a COMPANY_ADMIN. */
+export type TrunkOption = Pick<Trunk, 'id' | 'name'>;

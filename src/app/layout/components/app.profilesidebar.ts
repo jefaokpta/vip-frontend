@@ -1,10 +1,10 @@
-import { Component, computed } from '@angular/core';
-import { ButtonModule } from 'primeng/button';
-import { DrawerModule } from 'primeng/drawer';
-import { BadgeModule } from 'primeng/badge';
-import { LayoutService } from '@/layout/service/layout.service';
-import { RouterLink } from '@angular/router';
-import { UserService } from '@/pages/users/user.service';
+import {Component, computed} from '@angular/core';
+import {ButtonModule} from 'primeng/button';
+import {DrawerModule} from 'primeng/drawer';
+import {BadgeModule} from 'primeng/badge';
+import {LayoutService} from '@/layout/service/layout.service';
+import {RouterLink} from '@angular/router';
+import {UserService} from '@/pages/users/user.service';
 
 @Component({
     selector: '[app-profilesidebar]',
@@ -25,6 +25,7 @@ import { UserService } from '@/pages/users/user.service';
                         <a
                             class="cursor-pointer flex mb-4 p-4 items-center border border-surface-200 dark:border-surface-700 rounded hover:bg-surface-100 dark:hover:bg-surface-800 transition-colors duration-150"
                             routerLink="/pages/profile"
+                            (click)="onDrawerHide()"
                         >
                             <span>
                                 <i class="pi pi-user text-xl text-primary"></i>
@@ -39,6 +40,7 @@ import { UserService } from '@/pages/users/user.service';
                         <a
                             class="cursor-pointer flex mb-4 p-4 items-center border border-surface-200 dark:border-surface-700 rounded hover:bg-surface-100 dark:hover:bg-surface-800 transition-colors duration-150"
                             routerLink="/pages/queue-login"
+                            (click)="onDrawerHide()"
                         >
                             <span>
                                 <i class="pi pi-users text-xl text-primary"></i>
@@ -51,7 +53,6 @@ import { UserService } from '@/pages/users/user.service';
                     </li>
                     <li>
                         <a
-                            (click)="openWhatsApp()"
                             class="cursor-pointer flex mb-4 p-4 items-center border border-surface-200 dark:border-surface-700 rounded hover:bg-surface-100 dark:hover:bg-surface-800 transition-colors duration-150"
                         >
                             <span>
@@ -60,6 +61,21 @@ import { UserService } from '@/pages/users/user.service';
                             <div class="ml-4">
                                 <span class="mb-2 font-semibold">Suporte</span>
                                 <p class="text-surface-500 dark:text-surface-400 m-0">Ajuda, Sugestões</p>
+                            </div>
+                        </a>
+                    </li>
+                    <li>
+                        <a
+                            class="cursor-pointer flex mb-4 p-4 items-center border border-surface-200 dark:border-surface-700 rounded hover:bg-surface-100 dark:hover:bg-surface-800 transition-colors duration-150"
+                            routerLink="/pages/pabx-features"
+                            (click)="onDrawerHide()"
+                        >
+                            <span>
+                                <i class="pi pi-book text-xl text-primary"></i>
+                            </span>
+                            <div class="ml-4">
+                                <span class="mb-2 font-semibold">Facilidades do PABX</span>
+                                <p class="text-surface-500 dark:text-surface-400 m-0">Transferir, Estacionar, Capturar</p>
                             </div>
                         </a>
                     </li>
@@ -103,7 +119,4 @@ export class AppProfileSidebar {
         this.userService.logout();
     }
 
-    openWhatsApp() {
-        window.open('https://wa.me/551154201020', '_blank');
-    }
 }

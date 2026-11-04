@@ -17,6 +17,9 @@ import {QueueService} from '@/pabx/queue/queue.service';
 import {MohService} from '@/pabx/moh/moh.service';
 import {UserService} from '@/pages/users/user.service';
 import {SurveyService} from '@/pabx/survey/survey.service';
+import {transferPickListItems} from '@/util/utils';
+
+const byName = (a: User, b: User) => a.name.localeCompare(b.name, 'pt-BR', { numeric: true, sensitivity: 'base' });
 
 @Component({
     selector: 'app-new-queue-page',
@@ -126,18 +129,6 @@ import {SurveyService} from '@/pabx/survey/survey.service';
                             </div>
 
                             <div class="field mb-4">
-                                <label for="serviceLevelSeconds" class="block mb-2">
-                                    Nível de Serviço (segundos) *
-                                </label>
-                                <p-input-number
-                                    id="serviceLevelSeconds"
-                                    mode="decimal"
-                                    useGrouping="false"
-                                    formControlName="serviceLevelSeconds"
-                                />
-                            </div>
-
-                            <div class="field mb-4">
                                 <label for="queueSoundId" class="block mb-2">Áudio da Fila *</label>
                                 <p-select
                                     id="queueSoundId"
@@ -150,12 +141,10 @@ import {SurveyService} from '@/pabx/survey/survey.service';
                             </div>
 
                             <div class="field mb-4">
-                                <label class="block mb-2">Agentes da Fila</label>
+                                <label class="block mb-2">Membros da Fila</label>
                                 <p-picklist
                                     [source]="availableUsers"
                                     [target]="selectedUsers"
-                                    sourceHeader="Disponíveis"
-                                    targetHeader="Selecionados"
                                     [dragdrop]="true"
                                     [responsive]="true"
                                     [sourceStyle]="{ height: '20rem' }"
@@ -166,7 +155,13 @@ import {SurveyService} from '@/pabx/survey/survey.service';
                                     sourceFilterPlaceholder="Pesquisar"
                                     targetFilterPlaceholder="Pesquisar"
                                     breakpoint="1200px"
+                                    (onMoveToTarget)="moveToSelected($event.items)"
+                                    (onMoveToSource)="moveToAvailable($event.items)"
+                                    (onMoveAllToTarget)="moveToSelected($event.items)"
+                                    (onMoveAllToSource)="moveToAvailable($event.items)"
                                 >
+                                    <ng-template #sourceHeader><span class="font-semibold">Membros Disponíveis</span></ng-template>
+                                    <ng-template #targetHeader><span class="font-semibold">Membros Selecionados</span></ng-template>
                                     <ng-template let-user pTemplate="item">
                                         <div class="flex items-center gap-2">
                                             <i class="pi pi-user"></i>
@@ -206,6 +201,40 @@ import {SurveyService} from '@/pabx/survey/survey.service';
                                 />
                                 <small class="block mt-1 text-gray-500">0 = sem intervalo</small>
                             </div>
+
+                            <div class="field mb-4">
+                                <label for="serviceLevelSeconds" class="block mb-2">
+                                    Nível de Serviço (segundos) *
+                                </label>
+                                <p-input-number
+                                    id="serviceLevelSeconds"
+                                    mode="decimal"
+                                    useGrouping="false"
+                                    formControlName="serviceLevelSeconds"
+                                />
+                            </div>
+
+                            <div class="field mb-4">
+                                <label for="tmeAlertSeconds" class="block mb-2">TME alvo (segundos) *</label>
+                                <p-input-number
+                                    id="tmeAlertSeconds"
+                                    mode="decimal"
+                                    useGrouping="false"
+                                    formControlName="tmeAlertSeconds"
+                                />
+                            </div>
+
+                            <div class="field mb-4">
+                                <label for="callDurationAlertMinutes" class="block mb-2"
+                                    >Tempo alvo de atendimento (minutos) *</label
+                                >
+                                <p-input-number
+                                    id="callDurationAlertMinutes"
+                                    mode="decimal"
+                                    useGrouping="false"
+                                    formControlName="callDurationAlertMinutes"
+                                />
+                            </div>
                         </p-tabpanel>
 
                         <p-tabpanel value="2">
@@ -238,6 +267,9 @@ import {SurveyService} from '@/pabx/survey/survey.service';
                     </p-button>
                 </div>
 
+                @if (loadError) {
+                    <small class="text-red-500"> Erro ao carregar os dados </small>
+                }
                 @if (showError) {
                     <small class="text-red-500"> Erro ao salvar a fila de atendimento </small>
                 }
@@ -249,6 +281,7 @@ export class NewQueuePage implements OnInit {
     form!: FormGroup;
     pending = false;
     showError = false;
+    loadError = false;
     mohs: Moh[] = [];
     surveys: Survey[] = [];
     availableUsers: User[] = [];
@@ -279,15 +312,17 @@ export class NewQueuePage implements OnInit {
             isJoinWhenEmpty: [true],
             maxCalls: [0],
             cooldownSeconds: [0],
+            tmeAlertSeconds: [30, [Validators.required, Validators.min(1)]],
+            callDurationAlertMinutes: [30, [Validators.required, Validators.min(1)]],
             surveyId: [null]
         });
-        Promise.all([this.mohService.findAll(), this.userService.findAll(), this.surveyService.findAll()]).then(
-            ([mohs, users, surveys]) => {
+        Promise.all([this.mohService.findAll(), this.userService.findAll(), this.surveyService.findAll()])
+            .then(([mohs, users, surveys]) => {
                 this.mohs = mohs;
-                this.availableUsers = users;
+                this.availableUsers = [...users].sort(byName);
                 this.surveys = surveys;
-            }
-        );
+            })
+            .catch(() => (this.loadError = true));
     }
 
     get name() {
@@ -295,18 +330,18 @@ export class NewQueuePage implements OnInit {
     }
 
     get baseTabInvalid(): boolean {
-        return this.isAnyFieldInvalid([
-            'name',
-            'queueStrategy',
-            'ringTimeout',
-            'queueTimeout',
-            'serviceLevelSeconds',
-            'queueSoundId'
-        ]);
+        return this.isAnyFieldInvalid(['name', 'queueStrategy', 'ringTimeout', 'queueTimeout', 'queueSoundId']);
     }
 
     get behaviorTabInvalid(): boolean {
-        return this.isAnyFieldInvalid(['isJoinWhenEmpty', 'maxCalls', 'cooldownSeconds']);
+        return this.isAnyFieldInvalid([
+            'isJoinWhenEmpty',
+            'maxCalls',
+            'cooldownSeconds',
+            'serviceLevelSeconds',
+            'tmeAlertSeconds',
+            'callDurationAlertMinutes'
+        ]);
     }
 
     get surveyTabInvalid(): boolean {
@@ -341,5 +376,22 @@ export class NewQueuePage implements OnInit {
             [QueueStrategyEnum.FEWEST_CALLS]: 'Menos atendimentos'
         };
         return labels[strategy] ?? strategy;
+    }
+
+    // O PickList não atualiza a lista filtrada sozinho; ver transferPickListItems.
+    moveToSelected(items: User[]): void {
+        [this.availableUsers, this.selectedUsers] = transferPickListItems(
+            items,
+            this.availableUsers,
+            this.selectedUsers
+        );
+    }
+
+    moveToAvailable(items: User[]): void {
+        [this.selectedUsers, this.availableUsers] = transferPickListItems(
+            items,
+            this.selectedUsers,
+            this.availableUsers
+        );
     }
 }

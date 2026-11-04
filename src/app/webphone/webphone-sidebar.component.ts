@@ -1,22 +1,23 @@
-import { Component, computed, OnInit } from '@angular/core';
-import { ButtonModule } from 'primeng/button';
-import { DrawerModule } from 'primeng/drawer';
-import { BadgeModule } from 'primeng/badge';
-import { LayoutService } from '@/layout/service/layout.service';
-import { Card } from 'primeng/card';
-import { InputTextModule } from 'primeng/inputtext';
-import { FormsModule } from '@angular/forms';
-import { WebphoneService } from '@/webphone/webphone.service';
-import { NgClass, NgIf } from '@angular/common';
-import { TableModule } from 'primeng/table';
-import { telephoneFormat } from './utils';
-import { handleCalleId } from '@/webphone/utils';
-import { Cdr } from '@/pabx/types/cdr';
-import { UserFieldEnum } from '@/pabx/types/user-field-enum';
-import { PeerRegistration } from '@/types/peer-registration';
-import { User } from '@/types/user';
-import { UserService } from '@/pages/users/user.service';
-import { SplitButton } from 'primeng/splitbutton';
+import {Component, computed, HostListener, OnInit} from '@angular/core';
+import {ButtonModule} from 'primeng/button';
+import {DrawerModule} from 'primeng/drawer';
+import {BadgeModule} from 'primeng/badge';
+import {LayoutService} from '@/layout/service/layout.service';
+import {Card} from 'primeng/card';
+import {InputTextModule} from 'primeng/inputtext';
+import {FormsModule} from '@angular/forms';
+import {TransferMode, WebphoneService} from '@/webphone/webphone.service';
+import {PhoneStateEnum} from '@/types/phone-state-enum';
+import {DatePipe, NgIf} from '@angular/common';
+import {TableModule} from 'primeng/table';
+import {telephoneFormat} from './utils';
+import {handleCalleId} from '@/webphone/utils';
+import {CallHistoryService} from '@/webphone/call-history.service';
+import {CallHistoryType} from '@/types/call-history';
+import {PeerRegistration} from '@/types/peer-registration';
+import {User} from '@/types/user';
+import {UserService} from '@/pages/users/user.service';
+import {SplitButton} from 'primeng/splitbutton';
 
 @Component({
     selector: 'app-webphone-sidebar',
@@ -29,7 +30,7 @@ import { SplitButton } from 'primeng/splitbutton';
         FormsModule,
         NgIf,
         TableModule,
-        NgClass,
+        DatePipe,
         SplitButton
     ],
     template: `
@@ -62,13 +63,22 @@ import { SplitButton } from 'primeng/splitbutton';
                     pInputText
                     [(ngModel)]="telephoneNumber"
                     (keydown.enter)="dial()"
+                    (keydown)="onDialInputKeydown($event)"
                 />
                 <div class="flex mt-4 justify-center">
                     <ng-container *ngIf="!phoneStatus().session; else hasSession">
                         <p-button icon="pi pi-phone" severity="success" (click)="dial()" rounded outlined />
                     </ng-container>
                     <ng-template #hasSession>
-                        <p-button icon="pi pi-phone" severity="danger" (click)="hangup()" rounded outlined />
+                        <p-button
+                            icon="pi pi-phone rotate-[135deg]"
+                            severity="danger"
+                            title="Desligar"
+                            ariaLabel="Desligar"
+                            (click)="hangup()"
+                            rounded
+                            outlined
+                        />
                         <p-button
                             class="ml-4"
                             icon="pi pi-calculator"
@@ -79,17 +89,63 @@ import { SplitButton } from 'primeng/splitbutton';
                         />
                         <p-button
                             class="ml-4"
-                            icon="pi pi-microphone"
-                            severity="danger"
+                            [severity]="isMuted ? 'danger' : 'secondary'"
+                            [title]="isMuted ? 'Ativar microfone' : 'Silenciar'"
+                            [ariaLabel]="isMuted ? 'Ativar microfone' : 'Silenciar'"
                             (click)="toggleMute()"
-                            [label]="phoneStatus().session?.isMuted().audio ? 'mudo' : ''"
                             rounded
                             outlined
-                        />
+                        >
+                            <span class="relative inline-flex items-center justify-center">
+                                <i class="pi pi-microphone"></i>
+                                <span
+                                    *ngIf="isMuted"
+                                    class="absolute w-5 h-0.5 bg-current rotate-45"
+                                    data-testid="mute-slash"
+                                ></span>
+                            </span>
+                        </p-button>
                     </ng-template>
                 </div>
+                <div *ngIf="isTalking" class="flex mt-2 justify-center">
+                    <p-button
+                        icon="pi pi-arrow-right"
+                        title="Transferência cega"
+                        ariaLabel="Transferência cega"
+                        (click)="startTransfer('blind')"
+                        [outlined]="transferMode() !== 'blind'"
+                        rounded
+                    />
+                    <p-button
+                        class="ml-4"
+                        icon="pi pi-arrow-right-arrow-left"
+                        title="Transferência assistida"
+                        ariaLabel="Transferência assistida"
+                        (click)="startTransfer('attended')"
+                        [outlined]="transferMode() !== 'attended'"
+                        rounded
+                    />
+                    <p-button
+                        class="ml-4"
+                        icon="pi pi-car"
+                        title="Estacionar"
+                        ariaLabel="Estacionar"
+                        (click)="park()"
+                        rounded
+                        outlined
+                    />
+                </div>
+                <p *ngIf="transferMode() === 'blind' && phoneStatus().session" class="mt-4 text-sm text-primary">
+                    Digite o ramal de destino
+                </p>
+                <p *ngIf="transferMode() === 'attended' && phoneStatus().session" class="mt-4 text-sm text-primary">
+                    Digite o ramal. Desligue para concluir; se o ramal desligar, a chamada volta.
+                </p>
+                <p *ngIf="dialedDigits() && phoneStatus().session" class="mt-4 text-xl tracking-widest break-all">
+                    {{ dialedDigits() }}
+                </p>
                 <div
-                    *ngIf="dialpadVisible && phoneStatus().session"
+                    *ngIf="dialpadVisible() && phoneStatus().session"
                     class="flex flex-col mt-4 items-center transition-colors duration-150"
                 >
                     <div class="flex">
@@ -144,7 +200,7 @@ import { SplitButton } from 'primeng/splitbutton';
                         <p class="text-center font-semibold">Ligações Recentes</p>
                     </ng-template>
                     <p-table
-                        [value]="cdrs"
+                        [value]="callHistory()"
                         [rows]="10"
                         styleClass="p-datatable-sm"
                         rowHover
@@ -153,40 +209,40 @@ import { SplitButton } from 'primeng/splitbutton';
                         scrollHeight="300rem"
                         pagelinks="3"
                     >
-                        <ng-template pTemplate="body" let-cdr>
+                        <ng-template pTemplate="body" let-call>
                             <tr>
                                 <div class="flex items-center gap-2">
                                     <i
-                                        *ngIf="cdr.userfield === UserFieldEnum.UPLOAD"
-                                        class="pi pi-upload text-blue-500"
-                                        title="Upload"
+                                        *ngIf="call.type === CallHistoryType.OUTGOING"
+                                        class="pi pi-arrow-up text-green-500"
+                                        title="Feita"
                                     ></i>
                                     <i
-                                        *ngIf="cdr.userfield === UserFieldEnum.OUTBOUND"
-                                        class="pi pi-arrow-up"
-                                        [ngClass]="{
-                                            'text-green-500': cdr.disposition == 'ANSWERED',
-                                            'text-red-500': cdr.disposition != 'ANSWERED'
-                                        }"
-                                        title="Saída"
+                                        *ngIf="call.type === CallHistoryType.INCOMING"
+                                        class="pi pi-arrow-down text-green-500"
+                                        title="Recebida"
                                     ></i>
                                     <i
-                                        *ngIf="cdr.userfield === UserFieldEnum.INBOUND"
-                                        class="pi pi-arrow-down"
-                                        [ngClass]="{
-                                            'text-green-500': cdr.disposition == 'ANSWERED',
-                                            'text-red-500': cdr.disposition != 'ANSWERED'
-                                        }"
-                                        title="Entrada"
+                                        *ngIf="call.type === CallHistoryType.MISSED"
+                                        class="pi pi-arrow-down-left text-red-500"
+                                        title="Perdida"
                                     ></i>
                                     <p-button
                                         icon="pi pi-phone"
-                                        [label]="telephoneFormat(cdr.destination)"
-                                        (click)="dial(cdr.destination)"
+                                        [label]="telephoneFormat(handleCalleId(call.telephone))"
+                                        (click)="dial(call.telephone)"
                                         [link]="true"
                                         iconPos="right"
                                     />
+                                    <span class="ml-auto text-sm text-muted-color">{{
+                                        call.time | date: 'dd/MM HH:mm'
+                                    }}</span>
                                 </div>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="emptymessage">
+                            <tr>
+                                <p class="text-center text-muted-color">Nenhuma ligação</p>
                             </tr>
                         </ng-template>
                     </p-table>
@@ -197,8 +253,6 @@ import { SplitButton } from 'primeng/splitbutton';
 })
 export class WebphoneSidebarComponent implements OnInit {
     telephoneNumber?: string = undefined;
-    dialpadVisible = false;
-    cdrs: Cdr[] = [];
     user: User;
     wr: PeerRegistration;
     menuItems = [
@@ -214,7 +268,8 @@ export class WebphoneSidebarComponent implements OnInit {
     constructor(
         public layoutService: LayoutService,
         private readonly webphoneService: WebphoneService,
-        private readonly userService: UserService
+        private readonly userService: UserService,
+        private readonly callHistoryService: CallHistoryService
     ) {
         this.user = this.userService.getUser();
         this.wr = this.userService.getWebphoneRegisterSignal();
@@ -236,12 +291,66 @@ export class WebphoneSidebarComponent implements OnInit {
         return this.webphoneService.phoneState$;
     }
 
+    get callHistory() {
+        return this.callHistoryService.history;
+    }
+
     get timer() {
         return this.webphoneService.callTimeFormated();
     }
 
+    get dialpadVisible() {
+        return this.webphoneService.dialpadVisible;
+    }
+
+    get transferMode() {
+        return this.webphoneService.transferMode;
+    }
+
+    get dialedDigits() {
+        return this.webphoneService.dialedDigits;
+    }
+
+    get isTalking() {
+        return this.phoneStatus().state === PhoneStateEnum.TALKING;
+    }
+
+    get isMuted() {
+        return !!this.phoneStatus().session?.isMuted().audio;
+    }
+
     toogleDialpad() {
-        this.dialpadVisible = !this.dialpadVisible;
+        this.webphoneService.toggleDialpad();
+    }
+
+    startTransfer(mode: TransferMode) {
+        this.webphoneService.startTransfer(mode);
+    }
+
+    park() {
+        this.webphoneService.park();
+    }
+
+    /** Em chamada e com o painel aberto, números, * e # viram DTMF, exceto ao digitar em um campo. */
+    @HostListener('document:keydown', ['$event'])
+    onKeydown(event: KeyboardEvent) {
+        if (!this.visible() || !this.isTalking || event.repeat || event.ctrlKey || event.metaKey || event.altKey) {
+            return;
+        }
+        if (!/^[\d*#]$/.test(event.key) || this.isEditable(event.target)) {
+            return;
+        }
+        this.sendDTMF(event.key);
+    }
+
+    onDialInputKeydown(event: KeyboardEvent) {
+        if (!event.repeat && !event.ctrlKey && !event.metaKey && !event.altKey) {
+            this.webphoneService.playKeyTone(event.key);
+        }
+    }
+
+    private isEditable(target: EventTarget | null): boolean {
+        return target instanceof HTMLElement && target.matches('input, textarea, select, [contenteditable]');
     }
 
     dial(telephoneNumber?: string | number) {
@@ -261,7 +370,6 @@ export class WebphoneSidebarComponent implements OnInit {
 
     hangup() {
         this.webphoneService.hangup();
-        this.dialpadVisible = false;
     }
 
     toggleMute() {
@@ -270,20 +378,6 @@ export class WebphoneSidebarComponent implements OnInit {
 
     sendDTMF(digit: string) {
         this.webphoneService.sendDTMF(digit);
-    }
-
-    private deDuplicate(cdrs: Cdr[]): Cdr[] {
-        const destinations = cdrs
-            .filter((cdr) => cdr.userfield === UserFieldEnum.INBOUND || cdr.userfield === UserFieldEnum.OUTBOUND)
-            .map((cdr) => cdr.destination);
-        const uniqueDestinations = [...new Set(destinations)];
-        return uniqueDestinations.map((destination) =>
-            cdrs
-                .filter((cdr) => cdr.destination === destination)
-                .reduce((latest, current) =>
-                    new Date(latest.startTime) > new Date(current.startTime) ? latest : current
-                )
-        );
     }
 
     visible = computed(() => this.layoutService.layoutState().webphoneSidebarVisible);
@@ -295,7 +389,7 @@ export class WebphoneSidebarComponent implements OnInit {
         }));
     }
 
-    protected readonly UserFieldEnum = UserFieldEnum;
+    protected readonly CallHistoryType = CallHistoryType;
     protected readonly handleCalleId = handleCalleId;
     protected readonly telephoneFormat = telephoneFormat;
 }

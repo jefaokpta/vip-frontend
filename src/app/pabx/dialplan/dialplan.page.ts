@@ -11,13 +11,13 @@ import {Toast} from 'primeng/toast';
 import {Alias} from '@/pabx/types/alias';
 import {DialPlan} from '@/pabx/types/dial-plan';
 import {SrcEnum} from '@/pabx/types/src-enum';
-import {Trunk} from '@/pabx/types/trunk';
+import {TrunkOption} from '@/pabx/types/trunk';
 import {NgIf} from '@angular/common';
 import {Tooltip} from 'primeng/tooltip';
 import {InputText} from 'primeng/inputtext';
 import {ConfirmationService, MessageService} from 'primeng/api';
 import {DialPlanService} from '@/pabx/dialplan/dial-plan.service';
-import {dialplanSrcLabel} from '@/pabx/dialplan/utils';
+import {dialplanDstLabel, dialplanSrcLabel, sortDialplansByDstAndPriority} from '@/pabx/dialplan/utils';
 import {TrunkService} from '@/pabx/trunk/trunk.service';
 import {AliasService} from '@/pabx/alias/alias.service';
 import {FormsModule} from '@angular/forms';
@@ -62,6 +62,49 @@ import {Select} from 'primeng/select';
                                 class="w-full"
                             />
                         </p-iconfield>
+                        @if (selectionMode) {
+                            <p-button
+                                icon="pi pi-check"
+                                label="Ativar"
+                                severity="success"
+                                outlined
+                                rounded
+                                class="ml-4"
+                                [disabled]="!selectedDialplans.length || updatingActive"
+                                (click)="updateSelectedActive(true)"
+                            />
+                            <p-button
+                                icon="pi pi-times"
+                                label="Desativar"
+                                severity="danger"
+                                outlined
+                                rounded
+                                class="ml-2"
+                                [disabled]="!selectedDialplans.length || updatingActive"
+                                (click)="updateSelectedActive(false)"
+                            />
+                            <p-button
+                                icon="pi pi-ban"
+                                severity="secondary"
+                                outlined
+                                rounded
+                                class="ml-2"
+                                pTooltip="Cancelar seleção"
+                                tooltipPosition="left"
+                                (click)="toggleSelectionMode()"
+                            />
+                        } @else {
+                            <p-button
+                                icon="pi pi-list-check"
+                                label="Selecionar"
+                                outlined
+                                rounded
+                                class="ml-4"
+                                pTooltip="Ativar/desativar várias regras"
+                                tooltipPosition="left"
+                                (click)="toggleSelectionMode()"
+                            />
+                        }
                         <p-button icon="pi pi-plus" label="Regra" routerLink="new" outlined class="mx-4" rounded />
                     </div>
                 </div>
@@ -70,6 +113,8 @@ import {Select} from 'primeng/select';
             <p-table
                 #dataTable
                 [value]="dialplans"
+                [(selection)]="selectedDialplans"
+                dataKey="id"
                 [paginator]="true"
                 [rows]="15"
                 [globalFilterFields]="['name']"
@@ -78,13 +123,13 @@ import {Select} from 'primeng/select';
             >
                 <ng-template pTemplate="header">
                     <tr>
-                        <th pSortableColumn="name">
-                            Nome
-                            <p-sortIcon field="name"></p-sortIcon>
-                        </th>
+                        @if (selectionMode) {
+                            <th style="width: 3rem"><p-tableHeaderCheckbox /></th>
+                        }
+                        <th>Nome</th>
                         <th>Origem</th>
                         <th>Destino</th>
-                        <th style="width: 10%">Ativo</th>
+                        <th style="width: 10%" pSortableColumn="isActive">Ativo <p-sortIcon field="isActive" /></th>
                         <th style="width: 10%">Prioridade</th>
                         <th style="width: 10%">Ações</th>
                     </tr>
@@ -92,6 +137,9 @@ import {Select} from 'primeng/select';
 
                 <ng-template pTemplate="body" let-dialplan>
                     <tr>
+                        @if (selectionMode) {
+                            <td><p-tableCheckbox [value]="dialplan" /></td>
+                        }
                         <td>{{ dialplan.name }}</td>
                         <td>{{ srcLabel(dialplan) }}</td>
                         <td>{{ dstLabel(dialplan) }}</td>
@@ -153,6 +201,9 @@ export class DialplanPage implements OnInit {
     dialplans: DialPlan[] = [];
     @ViewChild('dataTable') dt!: Table;
     loading = true;
+    selectionMode = false;
+    selectedDialplans: DialPlan[] = [];
+    updatingActive = false;
     private readonly trunkMap = new Map<string, string>();
     private readonly aliasMap = new Map<string, string>();
 
@@ -165,14 +216,21 @@ export class DialplanPage implements OnInit {
     ) {}
 
     ngOnInit(): void {
-        Promise.all([this.dialplanService.findAll(), this.trunkService.findAll(), this.aliasService.findAll()]).then(
-            ([dialplans, trunks, aliases]: [DialPlan[], Trunk[], Alias[]]) => {
+        Promise.all([this.dialplanService.findAll(), this.trunkService.findOptions(), this.aliasService.findAll()])
+            .then(([dialplans, trunks, aliases]: [DialPlan[], TrunkOption[], Alias[]]) => {
                 trunks.forEach((trunk) => this.trunkMap.set(String(trunk.id), trunk.name));
                 aliases.forEach((alias) => this.aliasMap.set(String(alias.id), alias.name));
-                this.dialplans = this.sortDialplansByDstAndPriority(dialplans);
-                this.loading = false;
-            }
-        );
+                this.dialplans = sortDialplansByDstAndPriority(dialplans, this.aliasMap);
+            })
+            .catch(() => {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Desculpe não foi possível carregar as regras',
+                    detail: 'Tente novamente mais tarde.',
+                    life: 15_000
+                });
+            })
+            .finally(() => (this.loading = false));
     }
 
     srcLabel(dialplan: DialPlan): string {
@@ -197,8 +255,7 @@ export class DialplanPage implements OnInit {
     }
 
     dstLabel(dialplan: DialPlan): string {
-        if (dialplan.dst) return dialplan.dst;
-        return this.findAliasName(dialplan.dstAlias!.toString());
+        return dialplanDstLabel(dialplan, this.aliasMap);
     }
 
     private findTrunkName(id: string): string {
@@ -225,22 +282,56 @@ export class DialplanPage implements OnInit {
     ];
 
     onChangePriority(dialplan: DialPlan) {
-        this.dialplans = this.sortDialplansByDstAndPriority(this.dialplans);
-        this.dialplanService.updatePriority(dialplan).then(() => {
-            this.messageService.add({
-                severity: 'success',
-                summary: 'Prioridade atualizada com sucesso',
-                life: 15_000
+        this.dialplans = sortDialplansByDstAndPriority(this.dialplans, this.aliasMap);
+        this.dialplanService
+            .updatePriority(dialplan)
+            .then(() => {
+                this.messageService.add({
+                    severity: 'success',
+                    summary: 'Prioridade atualizada com sucesso',
+                    life: 15_000
+                });
+            })
+            .catch(() => {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Desculpe não foi possível atualizar a prioridade',
+                    detail: 'Tente novamente mais tarde.',
+                    life: 15_000
+                });
             });
-        });
     }
 
-    private sortDialplansByDstAndPriority(dialplans: DialPlan[]): DialPlan[] {
-        return dialplans.sort((a, b) => {
-            const dstCompare = (a.dst ?? '').localeCompare(b.dst ?? '');
-            if (dstCompare !== 0) return dstCompare;
-            return b.priority - a.priority;
-        });
+    toggleSelectionMode() {
+        this.selectionMode = !this.selectionMode;
+        this.selectedDialplans = [];
+    }
+
+    updateSelectedActive(isActive: boolean) {
+        const ids = this.selectedDialplans.map((dialplan) => dialplan.id);
+        this.updatingActive = true;
+        this.dialplanService
+            .updateActive(ids, isActive)
+            .then(() => {
+                this.dialplans = this.dialplans.map((dialplan) =>
+                    ids.includes(dialplan.id) ? { ...dialplan, isActive } : dialplan
+                );
+                this.messageService.add({
+                    severity: 'success',
+                    summary: `${ids.length} regra(s) ${isActive ? 'ativada(s)' : 'desativada(s)'} com sucesso`,
+                    life: 15_000
+                });
+                this.toggleSelectionMode();
+            })
+            .catch(() => {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Desculpe não foi possível atualizar as regras',
+                    detail: 'Tente novamente mais tarde.',
+                    life: 15_000
+                });
+            })
+            .finally(() => (this.updatingActive = false));
     }
 
     confirmDelete(dialplan: DialPlan) {

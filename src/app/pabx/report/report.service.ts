@@ -20,6 +20,11 @@ export class ReportService {
         return executeRequest(this.http.get<Cdr[]>(`${this.BACKEND}/cdrs/last`, httpHeaders()), 10_000);
     }
 
+    /** Chamadas feitas e recebidas pelo usuário logado nos últimos 30 dias. */
+    findMine(): Promise<Cdr[]> {
+        return executeRequest(this.http.get<Cdr[]>(`${this.BACKEND}/cdrs/mine`, httpHeaders()), 10_000);
+    }
+
     findByDateRange(start: Date, end: Date): Promise<Cdr[]> {
         return executeRequest(
             this.http.get<Cdr[]>(`${this.BACKEND}/cdrs`, {

@@ -32,17 +32,18 @@ import {
     formatDate,
     formatDuration
 } from '@/pabx/report/cdr-format';
+import {
+    answerRate as calcAnswerRate,
+    avgDurationSeconds as calcAvgDuration,
+    totalTalkSeconds as calcTalk
+} from '@/pabx/report/cdr-stats';
+import {buildCallsChart, ChartBucket, dailyBuckets, hourlyBuckets} from '@/pabx/report/cdr-chart';
 import {LayoutService} from '@/layout/service/layout.service';
 import {AccountCodeService} from '@/pabx/accountcode/account-code.service';
 
 interface StatusOption {
     label: string;
     value: string | null;
-}
-
-interface ChartBucket {
-    key: string;
-    label: string;
 }
 
 @Component({
@@ -218,7 +219,8 @@ interface ChartBucket {
                         <td>
                             <p-button
                                 icon="pi pi-search"
-                                [routerLink]="['detail', cdr.id]"
+                                [routerLink]="['/calls', cdr.id]"
+                                [queryParams]="{ from: 'call-report' }"
                                 outlined
                                 size="small"
                                 pTooltip="Detalhes"
@@ -288,20 +290,11 @@ export class ReportPage implements OnInit, OnDestroy {
 
     readonly totalCalls = computed(() => this.filteredCdrs().length);
 
-    readonly avgDurationSeconds = computed(() => {
-        const list = this.filteredCdrs();
-        if (!list.length) return 0;
-        return Math.round(list.reduce((sum, c) => sum + c.billableSeconds, 0) / list.length);
-    });
+    readonly avgDurationSeconds = computed(() => calcAvgDuration(this.filteredCdrs()));
 
-    readonly answerRate = computed(() => {
-        const list = this.filteredCdrs();
-        if (!list.length) return 0;
-        const answered = list.filter((c) => c.disposition === 'ANSWERED').length;
-        return Math.round((answered / list.length) * 1000) / 10;
-    });
+    readonly answerRate = computed(() => calcAnswerRate(this.filteredCdrs()));
 
-    readonly totalTalkSeconds = computed(() => this.filteredCdrs().reduce((sum, c) => sum + c.billableSeconds, 0));
+    readonly totalTalkSeconds = computed(() => calcTalk(this.filteredCdrs()));
 
     readonly isSingleDay = computed(() => {
         const range = this.dateRange();
@@ -313,23 +306,11 @@ export class ReportPage implements OnInit, OnDestroy {
 
     readonly chartTitle = computed(() => (this.isSingleDay() ? 'Chamadas por Hora' : 'Chamadas por Dia'));
 
-    readonly chartDispositions = computed(() =>
-        Array.from(new Set(this.filteredCdrs().map((c) => c.disposition))).sort()
-    );
-
     readonly chartBuckets = computed<ChartBucket[]>(() => {
-        if (this.isSingleDay()) {
-            const activeHours = new Set(this.filteredCdrs().map((c) => new Date(c.startTime).getHours()));
-            return Array.from(activeHours)
-                .sort((a, b) => a - b)
-                .map((h) => ({
-                    key: String(h),
-                    label: `${String(h).padStart(2, '0')}:00`
-                }));
-        }
+        const list = this.filteredCdrs();
+        if (this.isSingleDay()) return hourlyBuckets(list);
 
         const range = this.dateRange();
-        const list = this.filteredCdrs();
         let start: Date;
         let end: Date;
         if (range.length === 2 && range[0] && range[1]) {
@@ -343,20 +324,7 @@ export class ReportPage implements OnInit, OnDestroy {
             start = new Date();
             end = new Date();
         }
-
-        const buckets: ChartBucket[] = [];
-        const cursor = new Date(start);
-        cursor.setHours(0, 0, 0, 0);
-        const last = new Date(end);
-        last.setHours(0, 0, 0, 0);
-        while (cursor.getTime() <= last.getTime()) {
-            buckets.push({
-                key: this.dayKey(cursor),
-                label: `${String(cursor.getDate()).padStart(2, '0')}/${String(cursor.getMonth() + 1).padStart(2, '0')}`
-            });
-            cursor.setDate(cursor.getDate() + 1);
-        }
-        return buckets;
+        return dailyBuckets(start, end);
     });
 
     readonly tableRows = computed(() => {
@@ -382,7 +350,6 @@ export class ReportPage implements OnInit, OnDestroy {
             this.filteredCdrs();
             this.isSingleDay();
             this.chartBuckets();
-            this.chartDispositions();
             this.initChart();
         });
     }
@@ -473,81 +440,9 @@ export class ReportPage implements OnInit, OnDestroy {
     }
 
     private initChart(): void {
-        const documentStyle = getComputedStyle(document.documentElement);
-        const textColor = documentStyle.getPropertyValue('--text-color');
-        const textColorSecondary = documentStyle.getPropertyValue('--text-color-secondary');
-        const surfaceBorder = documentStyle.getPropertyValue('--surface-border');
-
-        const buckets = this.chartBuckets();
-        const dispositions = this.chartDispositions();
-        const list = this.filteredCdrs();
-
-        this.chartData = {
-            labels: buckets.map((b) => b.label),
-            datasets: dispositions.map((d) => ({
-                label: dispositionTranslate(d),
-                borderColor: this.severityColor(d, documentStyle),
-                backgroundColor: this.severityColor(d, documentStyle),
-                fill: false,
-                tension: 0.4,
-                borderWidth: 2,
-                pointRadius: 3,
-                pointHoverRadius: 5,
-                data: buckets.map(
-                    (b) =>
-                        list.filter((c) => c.disposition === d && this.dayKey(new Date(c.startTime)) === b.key).length
-                )
-            }))
-        };
-
-        this.chartOptions = {
-            animation: { duration: 1000 },
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                    labels: {
-                        color: textColor,
-                        usePointStyle: true,
-                        font: { weight: 700 },
-                        padding: 20
-                    }
-                }
-            },
-            scales: {
-                x: {
-                    ticks: { color: textColorSecondary, font: { weight: 500 } },
-                    grid: { display: false, drawBorder: false }
-                },
-                y: {
-                    ticks: { color: textColorSecondary },
-                    grid: { color: surfaceBorder, drawBorder: false },
-                    beginAtZero: true
-                }
-            }
-        };
-    }
-
-    private severityColor(disposition: string, documentStyle: CSSStyleDeclaration): string {
-        switch (dispositionSeverity(disposition)) {
-            case 'success':
-                return documentStyle.getPropertyValue('--p-green-500');
-            case 'warn':
-                return documentStyle.getPropertyValue('--p-yellow-500');
-            case 'danger':
-                return documentStyle.getPropertyValue('--p-red-500');
-            default:
-                return documentStyle.getPropertyValue('--p-surface-400');
-        }
-    }
-
-    private dayKey(date: Date): string {
-        if (this.isSingleDay()) return String(date.getHours());
-        const y = date.getFullYear();
-        const m = String(date.getMonth() + 1).padStart(2, '0');
-        const d = String(date.getDate()).padStart(2, '0');
-        return `${y}-${m}-${d}`;
+        const { data, options } = buildCallsChart(this.filteredCdrs(), this.chartBuckets(), this.isSingleDay());
+        this.chartData = data;
+        this.chartOptions = options;
     }
 
     private isSameDay(a: Date, b: Date): boolean {

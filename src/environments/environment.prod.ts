@@ -1,7 +1,8 @@
 export const environment = {
     production: true,
 
-    API_BACKEND_URL: 'https://vip-pabx-manager.vipsolutions.com.br/vip-pabx-manager',
-    WEBSOCKET_BACKEND_URL: 'wss://vip-pabx-manager.vipsolutions.com.br/vip-pabx-manager/ws',
-    PABX_URL: 'vip-register.vipsolutions.com.br'
+    API_BACKEND_URL: 'https://backend.iasmin.io',
+    WEBSOCKET_BACKEND_URL: 'wss://backend.iasmin.io/ws',
+    PABX_URL: 'register1.iasmin.io',
+    IA_BACKEND_URL: 'https://ia.iasmin.io'
 };

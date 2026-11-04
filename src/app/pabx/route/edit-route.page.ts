@@ -11,6 +11,7 @@ import {TableModule} from 'primeng/table';
 import {Tag} from 'primeng/tag';
 import {TrunkService} from '@/pabx/trunk/trunk.service';
 import {RouteTrunk} from '@/pabx/types/route-trunk';
+import {AccountCodeService} from '@/pabx/accountcode/account-code.service';
 
 /**
  * @author Jefferson Alves Reis (jefaokpta)
@@ -93,7 +94,7 @@ import {RouteTrunk} from '@/pabx/types/route-trunk';
                         <p-table [value]="routeTrunks.controls" [tableStyle]="{ 'min-width': '50rem' }">
                             <ng-template #header>
                                 <tr>
-                                    <th style="width: 1rem">Código</th>
+                                    <th>Centro de custo</th>
                                     <th>Tronco 1</th>
                                     <th>Tronco 2</th>
                                     <th>Tronco 3</th>
@@ -103,6 +104,9 @@ import {RouteTrunk} from '@/pabx/types/route-trunk';
                                 <tr [formGroupName]="index">
                                     <td>
                                         <p-tag [value]="acc.get('accountCode').value" severity="warn" />
+                                        <span class="ml-2 whitespace-nowrap">{{
+                                                accountCodeTitles[acc.get('accountCode').value]
+                                            }}</span>
                                     </td>
                                     <td>
                                         <p-select
@@ -168,6 +172,7 @@ export class EditRoutePage implements OnInit {
         private readonly router: Router,
         private readonly routeService: RouteService,
         private readonly trunkService: TrunkService,
+        private readonly accountCodeService: AccountCodeService,
         private readonly activatedRoute: ActivatedRoute
     ) {
         this.id = this.activatedRoute.snapshot.paramMap.get('id')!;
@@ -189,12 +194,16 @@ export class EditRoutePage implements OnInit {
                 this.addRouteTrunk(routeTrunk);
             });
         });
+        this.accountCodeService.findAll().then((accountCodes) => {
+            this.accountCodeTitles = Object.fromEntries(accountCodes.map((acc) => [acc.code, acc.title]));
+        });
         this.trunkService.findAll().then((trunks) => {
             this.trunkOptions = trunks.map((trunk) => ({ label: trunk.name, value: trunk.id }));
         });
     }
 
     trunkOptions: { label: string; value: number }[] = [];
+    accountCodeTitles: Record<string, string> = {};
 
     private addRouteTrunk(routeTrunk: RouteTrunk) {
         const routeTrunkRow = this.fb.group({

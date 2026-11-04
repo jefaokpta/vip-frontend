@@ -16,7 +16,7 @@ import {NgIf} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 import {ProgressSpinner} from 'primeng/progressspinner';
 import {UserService} from './user.service';
-import {translateRole} from '@/pages/users/utils';
+import {canManageUser, translateModule, translateRole} from '@/pages/users/utils';
 
 @Component({
     selector: 'app-users',
@@ -85,6 +85,7 @@ import {translateRole} from '@/pages/users/utils';
                             Nível de Acesso
                             <p-sortIcon field="roles"></p-sortIcon>
                         </th>
+                        <th>Módulos</th>
                         <th style="width: 10%">Ações</th>
                     </tr>
                 </ng-template>
@@ -94,13 +95,28 @@ import {translateRole} from '@/pages/users/utils';
                         <td>{{ user.name }}</td>
                         <td>{{ user.email }}</td>
                         <td>
-                            <i
-                                [class]="user.isConfirmed ? 'pi pi-check text-green-500' : 'pi pi-clock text-gray-500'"
-                            ></i>
+                            <div class="flex items-center gap-2">
+                                <i
+                                    [class]="
+                                        user.isConfirmed ? 'pi pi-check text-green-500' : 'pi pi-clock text-gray-500'
+                                    "
+                                ></i>
+                                <p-button
+                                    *ngIf="!user.isConfirmed && canManage(user)"
+                                    icon="pi pi-send"
+                                    [loading]="resendingIds.has(user.id)"
+                                    (click)="resendConfirmation(user)"
+                                    text
+                                    size="small"
+                                    pTooltip="Reenviar e-mail de confirmação, expira em 24 horas"
+                                    tooltipPosition="right"
+                                />
+                            </div>
                         </td>
                         <td>{{ translateRole(user) }}</td>
+                        <td>{{ translateModules(user) }}</td>
                         <td>
-                            <div class="flex gap-2">
+                            <div *ngIf="canManage(user)" class="flex gap-2">
                                 <p-button
                                     icon="pi pi-pencil"
                                     [routerLink]="['edit', user.id]"
@@ -140,6 +156,7 @@ export class UsersPage implements OnInit {
     @ViewChild('dataTable') dt!: Table;
     protected readonly RoleEnum = RoleEnum;
     loading = true;
+    resendingIds = new Set<number>();
 
     constructor(
         private readonly confirmationService: ConfirmationService,
@@ -150,10 +167,20 @@ export class UsersPage implements OnInit {
     }
 
     ngOnInit(): void {
-        this.userService.findAll().then((users) => {
-            this.users = users;
-            this.loading = false;
-        });
+        this.userService
+            .findAll()
+            .then((users) => {
+                this.users = [...users].sort((a, b) => a.name.localeCompare(b.name, 'pt-BR', {sensitivity: 'base'}));
+            })
+            .catch(() => {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Não foi possível carregar os usuários',
+                    detail: 'Tente novamente mais tarde.',
+                    life: 15_000
+                });
+            })
+            .finally(() => (this.loading = false));
     }
 
     onFilterGlobal(event: Event) {
@@ -161,6 +188,29 @@ export class UsersPage implements OnInit {
         if (target) {
             this.dt.filterGlobal(target.value, 'contains');
         }
+    }
+
+    resendConfirmation(user: User) {
+        this.resendingIds.add(user.id);
+        this.userService
+            .resendConfirmation(user.email)
+            .then(() => {
+                this.messageService.add({
+                    severity: 'success',
+                    summary: 'E-mail reenviado',
+                    detail: `Um novo código de confirmação foi enviado para ${user.email}`,
+                    life: 15_000
+                });
+            })
+            .catch(() => {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Não foi possível reenviar o e-mail',
+                    detail: 'Tente novamente mais tarde.',
+                    life: 15_000
+                });
+            })
+            .finally(() => this.resendingIds.delete(user.id));
     }
 
     confirmDelete(user: User) {
@@ -203,9 +253,18 @@ export class UsersPage implements OnInit {
         });
     }
 
+    canManage(user: User): boolean {
+        return canManageUser(this.userLogged.roles, user.roles);
+    }
+
     translateRole(user: User): string {
         const lastRole = user.roles.at(-1);
         if (!lastRole) return 'Indefinido';
         return translateRole(lastRole);
+    }
+
+    translateModules(user: User): string {
+        if (user.roles.includes(RoleEnum.ROLE_COMPANY_ADMIN)) return 'Todos';
+        return (user.modules ?? []).map(translateModule).join(', ') || '-';
     }
 }

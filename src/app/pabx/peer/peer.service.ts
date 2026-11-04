@@ -30,6 +30,10 @@ export class PeerService {
         return executeRequest(this.http.delete(`${this.BACKEND}/peers/${id}`, httpHeaders()));
     }
 
+    releaseFromUser(id: number) {
+        return executeRequest(this.http.delete(`${this.BACKEND}/peers/${id}/user`, httpHeaders()));
+    }
+
     create(peer: Peer) {
         return executeRequest(this.http.post(`${this.BACKEND}/peers`, peer, httpHeaders()));
     }

@@ -18,6 +18,7 @@ import {CompanyService} from '@/pages/company/company.service';
 import {UserService} from '@/pages/users/user.service';
 import {ReportStateService} from '@/pabx/report/report-state.service';
 import {DacReportStateService} from '@/pabx/dac-report/dac-report-state.service';
+import {MyCallsStateService} from '@/pages/dashboard/my-calls-state.service';
 
 @Component({
     selector: 'app-company-page',
@@ -65,7 +66,7 @@ import {DacReportStateService} from '@/pabx/dac-report/dac-report-state.service'
                 [value]="companies"
                 [paginator]="true"
                 [rows]="15"
-                [globalFilterFields]="['name', 'companyId']"
+                [globalFilterFields]="['name', 'companyId', 'tenantName']"
                 [tableStyle]="{ 'min-width': '40rem' }"
                 stripedRows
             >
@@ -79,6 +80,10 @@ import {DacReportStateService} from '@/pabx/dac-report/dac-report-state.service'
                             Cod. Controle
                             <p-sortIcon field="companyId"></p-sortIcon>
                         </th>
+                        <th pSortableColumn="tenantName">
+                            Tenant
+                            <p-sortIcon field="tenantName"></p-sortIcon>
+                        </th>
                         <th style="width: 10%">Ações</th>
                     </tr>
                 </ng-template>
@@ -87,6 +92,7 @@ import {DacReportStateService} from '@/pabx/dac-report/dac-report-state.service'
                     <tr>
                         <td>{{ company.name }}</td>
                         <td>{{ company.companyId }}</td>
+                        <td>{{ company.tenantName ?? '-' }}</td>
                         <td>
                             <div class="flex gap-2">
                                 <p-button
@@ -135,7 +141,8 @@ export class CompanyPage implements OnInit {
         private readonly router: Router,
         private readonly messageService: MessageService,
         private readonly reportState: ReportStateService,
-        private readonly dacReportState: DacReportStateService
+        private readonly dacReportState: DacReportStateService,
+        private readonly myCallsState: MyCallsStateService
     ) {
         this.user = this.userService.getUser();
     }
@@ -153,6 +160,7 @@ export class CompanyPage implements OnInit {
             .then(() => {
                 this.reportState.reset();
                 this.dacReportState.reset();
+                this.myCallsState.reset();
                 this.router.navigate(['/']);
             })
             .catch(() => {

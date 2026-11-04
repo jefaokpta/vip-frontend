@@ -49,3 +49,13 @@ export function maskEmail(email: string): string {
     const maskedDomain = domainName.slice(0, 2) + '***';
     return `${maskedLocal}@${maskedDomain}${domainSuffix}`;
 }
+
+/**
+ * Move itens entre os lados de um PickList, devolvendo novos arrays [origem, destino].
+ * O PickList muta os arrays nos botões e só a lista filtrada do listbox no drag & drop;
+ * como o listbox só refaz o filtro com nova referência, os dois lados são reconstruídos a partir dos itens movidos.
+ */
+export function transferPickListItems<T extends { id: number }>(items: T[], from: T[], to: T[]): [T[], T[]] {
+    const ids = new Set(items.map((item) => item.id));
+    return [from.filter((item) => !ids.has(item.id)), [...to.filter((item) => !ids.has(item.id)), ...items]];
+}

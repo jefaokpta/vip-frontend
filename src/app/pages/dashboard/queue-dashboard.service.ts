@@ -9,6 +9,7 @@ import { environment } from '../../../environments/environment';
 import { Injectable } from '@angular/core';
 import { executeRequest, httpHeaders } from '@/util/utils';
 import { QueueState } from '@/pabx/types/queue-state';
+import { HourlyCalls } from '@/pabx/types/hourly-calls';
 
 @Injectable({
     providedIn: 'root'
@@ -20,6 +21,10 @@ export class QueueDashboardService {
 
     findAllQueueStates(): Promise<QueueState[]> {
         return executeRequest(this.http.get<QueueState[]>(`${this.BACKEND}/queues/states`, httpHeaders()));
+    }
+
+    findTodayHourly(): Promise<HourlyCalls[]> {
+        return executeRequest(this.http.get<HourlyCalls[]>(`${this.BACKEND}/dac-report/today-hourly`, httpHeaders()));
     }
 
     forceLogoutMember(queueId: number, memberId: number): Promise<void> {

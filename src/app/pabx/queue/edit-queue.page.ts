@@ -18,6 +18,9 @@ import {QueueService} from '@/pabx/queue/queue.service';
 import {MohService} from '@/pabx/moh/moh.service';
 import {UserService} from '@/pages/users/user.service';
 import {SurveyService} from '@/pabx/survey/survey.service';
+import {transferPickListItems} from '@/util/utils';
+
+const byName = (a: User, b: User) => a.name.localeCompare(b.name, 'pt-BR', { numeric: true, sensitivity: 'base' });
 
 @Component({
     selector: 'app-edit-queue-page',
@@ -54,6 +57,9 @@ import {SurveyService} from '@/pabx/survey/survey.service';
                 </div>
             </ng-template>
 
+            @if (loadError) {
+                <small class="text-red-500"> Erro ao carregar os dados </small>
+            }
             @if (form) {
                 <form [formGroup]="form" (ngSubmit)="onSubmit()" class="p-fluid">
                     <p-tabs value="0">
@@ -120,24 +126,14 @@ import {SurveyService} from '@/pabx/survey/survey.service';
                                 </div>
 
                                 <div class="field mb-4">
-                                    <label for="queueTimeout" class="block mb-2">Tempo de Espera Total (segundos) *</label>
+                                    <label for="queueTimeout" class="block mb-2"
+                                        >Tempo de Espera Total (segundos) *</label
+                                    >
                                     <p-input-number
                                         id="queueTimeout"
                                         mode="decimal"
                                         useGrouping="false"
                                         formControlName="queueTimeout"
-                                    />
-                                </div>
-
-                                <div class="field mb-4">
-                                    <label for="serviceLevelSeconds" class="block mb-2">
-                                        Nível de Serviço (segundos) *
-                                    </label>
-                                    <p-input-number
-                                        id="serviceLevelSeconds"
-                                        mode="decimal"
-                                        useGrouping="false"
-                                        formControlName="serviceLevelSeconds"
                                     />
                                 </div>
 
@@ -154,12 +150,10 @@ import {SurveyService} from '@/pabx/survey/survey.service';
                                 </div>
 
                                 <div class="field mb-4">
-                                    <label class="block mb-2">Agentes da Fila</label>
+                                    <label class="block mb-2">Membros da Fila</label>
                                     <p-picklist
                                         [source]="availableUsers"
                                         [target]="selectedUsers"
-                                        sourceHeader="Disponíveis"
-                                        targetHeader="Selecionados"
                                         [dragdrop]="true"
                                         [responsive]="true"
                                         [sourceStyle]="{ height: '20rem' }"
@@ -170,7 +164,13 @@ import {SurveyService} from '@/pabx/survey/survey.service';
                                         sourceFilterPlaceholder="Pesquisar"
                                         targetFilterPlaceholder="Pesquisar"
                                         breakpoint="1200px"
+                                        (onMoveToTarget)="moveToSelected($event.items)"
+                                        (onMoveToSource)="moveToAvailable($event.items)"
+                                        (onMoveAllToTarget)="moveToSelected($event.items)"
+                                        (onMoveAllToSource)="moveToAvailable($event.items)"
                                     >
+                                        <ng-template #sourceHeader><span class="font-semibold">Membros Disponíveis</span></ng-template>
+                                        <ng-template #targetHeader><span class="font-semibold">Membros Selecionados</span></ng-template>
                                         <ng-template let-user pTemplate="item">
                                             <div class="flex items-center gap-2">
                                                 <i class="pi pi-user"></i>
@@ -209,6 +209,40 @@ import {SurveyService} from '@/pabx/survey/survey.service';
                                         formControlName="cooldownSeconds"
                                     />
                                     <small class="block mt-1 text-gray-500">0 = sem intervalo</small>
+                                </div>
+
+                                <div class="field mb-4">
+                                    <label for="serviceLevelSeconds" class="block mb-2">
+                                        Nível de Serviço (segundos) *
+                                    </label>
+                                    <p-input-number
+                                        id="serviceLevelSeconds"
+                                        mode="decimal"
+                                        useGrouping="false"
+                                        formControlName="serviceLevelSeconds"
+                                    />
+                                </div>
+
+                                <div class="field mb-4">
+                                    <label for="tmeAlertSeconds" class="block mb-2">TME alvo (segundos) *</label>
+                                    <p-input-number
+                                        id="tmeAlertSeconds"
+                                        mode="decimal"
+                                        useGrouping="false"
+                                        formControlName="tmeAlertSeconds"
+                                    />
+                                </div>
+
+                                <div class="field mb-4">
+                                    <label for="callDurationAlertMinutes" class="block mb-2"
+                                        >Tempo alvo de atendimento (minutos) *</label
+                                    >
+                                    <p-input-number
+                                        id="callDurationAlertMinutes"
+                                        mode="decimal"
+                                        useGrouping="false"
+                                        formControlName="callDurationAlertMinutes"
+                                    />
                                 </div>
                             </p-tabpanel>
 
@@ -254,6 +288,7 @@ export class EditQueuePage implements OnInit {
     form!: FormGroup;
     pending = false;
     showError = false;
+    loadError = false;
     mohs: Moh[] = [];
     surveys: Survey[] = [];
     availableUsers: User[] = [];
@@ -282,25 +317,32 @@ export class EditQueuePage implements OnInit {
             this.mohService.findAll(),
             this.userService.findAll(),
             this.surveyService.findAll()
-        ]).then(([queue, mohs, users, surveys]) => {
-            this.queue = queue;
-            this.mohs = mohs;
-            this.surveys = surveys;
-            this.selectedUsers = queue.memberIds.map((id) => users.find((u) => u.id === id)!).filter(Boolean);
-            this.availableUsers = users.filter((u) => !queue.memberIds.includes(u.id));
-            this.form = this.fb.group({
-                name: [queue.name, [Validators.required]],
-                queueStrategy: [queue.queueStrategy, [Validators.required]],
-                ringTimeout: [queue.ringTimeout, [Validators.required]],
-                queueTimeout: [queue.queueTimeout, [Validators.required]],
-                serviceLevelSeconds: [queue.serviceLevelSeconds, [Validators.required]],
-                queueSoundId: [queue.queueSoundId, [Validators.required]],
-                isJoinWhenEmpty: [queue.isJoinWhenEmpty],
-                maxCalls: [queue.maxCalls],
-                cooldownSeconds: [queue.cooldownSeconds],
-                surveyId: [queue.surveyId ?? null]
-            });
-        });
+        ])
+            .then(([queue, mohs, users, surveys]) => {
+                this.queue = queue;
+                this.mohs = mohs;
+                this.surveys = surveys;
+                this.selectedUsers = queue.memberIds.map((id) => users.find((u) => u.id === id)!).filter(Boolean);
+                this.availableUsers = users.filter((u) => !queue.memberIds.includes(u.id)).sort(byName);
+                this.form = this.fb.group({
+                    name: [queue.name, [Validators.required]],
+                    queueStrategy: [queue.queueStrategy, [Validators.required]],
+                    ringTimeout: [queue.ringTimeout, [Validators.required]],
+                    queueTimeout: [queue.queueTimeout, [Validators.required]],
+                    serviceLevelSeconds: [queue.serviceLevelSeconds, [Validators.required]],
+                    queueSoundId: [queue.queueSoundId, [Validators.required]],
+                    isJoinWhenEmpty: [queue.isJoinWhenEmpty],
+                    maxCalls: [queue.maxCalls],
+                    cooldownSeconds: [queue.cooldownSeconds],
+                    tmeAlertSeconds: [queue.tmeAlertSeconds, [Validators.required, Validators.min(1)]],
+                    callDurationAlertMinutes: [
+                        queue.callDurationAlertMinutes,
+                        [Validators.required, Validators.min(1)]
+                    ],
+                    surveyId: [queue.surveyId ?? null]
+                });
+            })
+            .catch(() => (this.loadError = true));
     }
 
     get name() {
@@ -308,18 +350,18 @@ export class EditQueuePage implements OnInit {
     }
 
     get baseTabInvalid(): boolean {
-        return this.isAnyFieldInvalid([
-            'name',
-            'queueStrategy',
-            'ringTimeout',
-            'queueTimeout',
-            'serviceLevelSeconds',
-            'queueSoundId'
-        ]);
+        return this.isAnyFieldInvalid(['name', 'queueStrategy', 'ringTimeout', 'queueTimeout', 'queueSoundId']);
     }
 
     get behaviorTabInvalid(): boolean {
-        return this.isAnyFieldInvalid(['isJoinWhenEmpty', 'maxCalls', 'cooldownSeconds']);
+        return this.isAnyFieldInvalid([
+            'isJoinWhenEmpty',
+            'maxCalls',
+            'cooldownSeconds',
+            'serviceLevelSeconds',
+            'tmeAlertSeconds',
+            'callDurationAlertMinutes'
+        ]);
     }
 
     get surveyTabInvalid(): boolean {
@@ -359,5 +401,22 @@ export class EditQueuePage implements OnInit {
             [QueueStrategyEnum.FEWEST_CALLS]: 'Menos atendimentos'
         };
         return labels[strategy] ?? strategy;
+    }
+
+    // O PickList não atualiza a lista filtrada sozinho; ver transferPickListItems.
+    moveToSelected(items: User[]): void {
+        [this.availableUsers, this.selectedUsers] = transferPickListItems(
+            items,
+            this.availableUsers,
+            this.selectedUsers
+        );
+    }
+
+    moveToAvailable(items: User[]): void {
+        [this.selectedUsers, this.availableUsers] = transferPickListItems(
+            items,
+            this.selectedUsers,
+            this.availableUsers
+        );
     }
 }

@@ -1,4 +1,4 @@
-import { CallGroupStrategyEnum } from '@/pabx/types/call-group-strategy-enum';
+import {CallGroupStrategyEnum} from '@/pabx/types/call-group-strategy-enum';
 
 export interface CallGroup {
     readonly id: number;
@@ -8,4 +8,5 @@ export interface CallGroup {
     readonly peerIds: number[];
     readonly timeout: number;
     readonly groupTimeout: number;
+    readonly callGroupSoundId: number | null;
 }

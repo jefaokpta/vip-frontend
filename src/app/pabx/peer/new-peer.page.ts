@@ -12,12 +12,17 @@ import {PeerTransportEnum} from '@/pabx/types/peer-transport-enum';
 import {PickupGroup} from '@/pabx/types/pickup-group';
 import {Select} from 'primeng/select';
 import {PickupGroupService} from '@/pabx/pickup-group/pickup-group.service';
-import {dtmfSelectOptions, languageSelectOptions} from '@/pabx/utils';
+import {dtmfSelectOptions, generateAlphanumericSecret, languageSelectOptions} from '@/pabx/utils';
 import {ToggleSwitch} from 'primeng/toggleswitch';
 import {InputNumber} from 'primeng/inputnumber';
 import {Password} from 'primeng/password';
+import {Tooltip} from 'primeng/tooltip';
 import {SelectButton} from 'primeng/selectbutton';
+import {DdrService} from '@/pabx/ddr/ddr.service';
+import {formatDdr} from '@/pabx/ddr/ddr-format';
 import {Tab, TabList, TabPanel, TabPanels, Tabs} from 'primeng/tabs';
+import {UserService} from '@/pages/users/user.service';
+import {RoleEnum} from '@/types/role-enum';
 
 /**
  * @author Jefferson Alves Reis (jefaokpta)
@@ -38,6 +43,7 @@ import {Tab, TabList, TabPanel, TabPanels, Tabs} from 'primeng/tabs';
         ToggleSwitch,
         InputNumber,
         Password,
+        Tooltip,
         SelectButton,
         Tabs,
         TabList,
@@ -80,6 +86,7 @@ import {Tab, TabList, TabPanel, TabPanels, Tabs} from 'primeng/tabs';
                                 }
                             </span>
                         </p-tab>
+                        <p-tab value="2">Identificação</p-tab>
                     </p-tablist>
                     <p-tabpanels>
                         <p-tabpanel value="0">
@@ -137,7 +144,26 @@ import {Tab, TabList, TabPanel, TabPanels, Tabs} from 'primeng/tabs';
 
                             <div class="field mb-4">
                                 <label for="md5Secret" class="block mb-2">Senha de Registro *</label>
-                                <p-password formControlName="md5Secret" [toggleMask]="true" feedback="false" />
+                                <div class="flex gap-2 items-center">
+                                    <p-password formControlName="md5Secret" [toggleMask]="true" feedback="false"/>
+                                    <p-button
+                                        type="button"
+                                        icon="pi pi-refresh"
+                                        severity="secondary"
+                                        outlined
+                                        pTooltip="Gerar senha"
+                                        (onClick)="generateMd5Secret()"
+                                    />
+                                    <p-button
+                                        type="button"
+                                        [icon]="copied ? 'pi pi-check' : 'pi pi-copy'"
+                                        severity="secondary"
+                                        outlined
+                                        pTooltip="Copiar senha"
+                                        [disabled]="!md5Secret?.value"
+                                        (onClick)="copyMd5Secret()"
+                                    />
+                                </div>
                                 <small
                                     *ngIf="md5Secret?.invalid && (md5Secret?.dirty || md5Secret?.touched)"
                                     class="p-error block mt-2"
@@ -205,29 +231,46 @@ import {Tab, TabList, TabPanel, TabPanels, Tabs} from 'primeng/tabs';
                                 ></p-select>
                             </div>
 
-                            <div class="field mb-4">
-                                <label for="callLimit" class="block mb-2">Chamadas Simultâneas *</label>
-                                <p-input-number
-                                    id="callLimit"
-                                    mode="decimal"
-                                    useGrouping="false"
-                                    formControlName="callLimit"
-                                />
-                                @if (callLimit?.invalid && (callLimit?.dirty || callLimit?.touched)) {
-                                    <small class="p-error block mt-2">
-                                        <span class="text-red-500">Limite de chamadas é obrigatório.</span>
-                                    </small>
-                                }
-                            </div>
+                            @if (isSaasSupport) {
+                                <div class="field mb-4">
+                                    <label for="callLimit" class="block mb-2">Chamadas Simultâneas *</label>
+                                    <p-input-number
+                                        id="callLimit"
+                                        mode="decimal"
+                                        useGrouping="false"
+                                        formControlName="callLimit"
+                                    />
+                                    @if (callLimit?.invalid && (callLimit?.dirty || callLimit?.touched)) {
+                                        <small class="p-error block mt-2">
+                                            <span class="text-red-500">Limite de chamadas é obrigatório.</span>
+                                        </small>
+                                    }
+                                </div>
 
-                            <div class="field">
-                                <label for="qualify" class="block mb-2">Testar Alcance</label>
-                                <p-toggleswitch formControlName="qualify" />
-                            </div>
+                                <div class="field">
+                                    <label for="qualify" class="block mb-2">Testar Alcance</label>
+                                    <p-toggleswitch formControlName="qualify" />
+                                </div>
+                            }
 
                             <div class="field">
                                 <label for="nat" class="block mb-2">Usar NAT</label>
                                 <p-toggleswitch formControlName="nat" />
+                            </div>
+                        </p-tabpanel>
+
+                        <p-tabpanel value="2">
+                            <div class="field mb-4">
+                                <label for="clidDdrId" class="block mb-2">DDR de saída (CLID)</label>
+                                <p-select
+                                    id="clidDdrId"
+                                    [options]="ddrOptions"
+                                    formControlName="clidDdrId"
+                                    optionLabel="label"
+                                    optionValue="value"
+                                    placeholder="DDR padrão"
+                                    [showClear]="true"
+                                ></p-select>
                             </div>
                         </p-tabpanel>
                     </p-tabpanels>
@@ -252,13 +295,20 @@ export class NewPeerPage implements OnInit {
     languageOptions = languageSelectOptions();
     dtmfOptions = dtmfSelectOptions();
     pickUpGroupOptions: PickupGroup[] = [];
+    ddrOptions: { label: string; value: number }[] = [];
 
     constructor(
         private readonly fb: FormBuilder,
         private readonly router: Router,
         private readonly peerService: PeerService,
-        private readonly pickupGroupService: PickupGroupService
-    ) {}
+        private readonly pickupGroupService: PickupGroupService,
+        private readonly ddrService: DdrService,
+        private readonly userService: UserService
+    ) {
+        this.isSaasSupport = userService.getUser().roles.includes(RoleEnum.ROLE_SAAS_SUPPORT);
+    }
+
+    readonly isSaasSupport: boolean;
 
     transportsOptions = Object.values(PeerTransportEnum).map((value) => ({ label: value, value }));
 
@@ -275,14 +325,45 @@ export class NewPeerPage implements OnInit {
             ],
             language: [LanguageEnum.pt_BR, [Validators.required]],
             pickUpGroupId: [null],
-            peerTransportEnums: [[PeerTransportEnum.UDP], [Validators.required]],
+            clidDdrId: [null],
+            peerTransportEnums: [[PeerTransportEnum.UDP, PeerTransportEnum.WSS], [Validators.required]],
             qualify: [false, [Validators.required]],
             nat: [true, [Validators.required]],
             dtmfModeEnum: [DtmfModeEnum.RFC4733, [Validators.required]],
-            callLimit: [1, [Validators.required]],
+            callLimit: [2, [Validators.required]],
             md5Secret: ['', [Validators.required, Validators.minLength(2)]]
         });
-        this.pickupGroupService.findAll().then((groups) => (this.pickUpGroupOptions = groups));
+        this.pickupGroupService
+            .findAll()
+            .then((groups) => (this.pickUpGroupOptions = groups))
+            .catch(() => (this.errorMessage = 'Erro ao carregar os grupos de captura.'));
+        this.ddrService
+            .findAll()
+            .then(
+                (ddrs) =>
+                    (this.ddrOptions = ddrs.map((d) => ({
+                        label: formatDdr(d.ddr) + (d.isDefault ? ' (padrão)' : ''),
+                        value: d.id
+                    })))
+            )
+            .catch(() => (this.errorMessage = 'Erro ao carregar os DDRs.'));
+    }
+
+    copied = false;
+
+    generateMd5Secret() {
+        this.md5Secret?.setValue(generateAlphanumericSecret());
+        this.md5Secret?.markAsDirty();
+    }
+
+    copyMd5Secret() {
+        navigator.clipboard
+            .writeText(this.md5Secret?.value ?? '')
+            .then(() => {
+                this.copied = true;
+                setTimeout(() => (this.copied = false), 2000);
+            })
+            .catch(() => (this.errorMessage = 'Não foi possível copiar a senha.'));
     }
 
     onSubmit() {

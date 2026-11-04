@@ -3,14 +3,26 @@
  * @email jefaokpta@hotmail.com
  * @create 5/2/25
  */
-import { Injectable, signal } from '@angular/core';
-import { UA, WebSocketInterface } from 'jssip';
-import { environment } from '../../environments/environment';
-import { PhoneState } from '@/types/phone-state';
-import { PhoneStateEnum } from '@/types/phone-state-enum';
-import { RTCSession } from 'jssip/lib/RTCSession';
-import { RTCSessionEvent, UnRegisteredEvent } from 'jssip/lib/UA';
-import { UserService } from '@/pages/users/user.service';
+import {Injectable, signal} from '@angular/core';
+import {UA, WebSocketInterface} from 'jssip';
+import {environment} from '../../environments/environment';
+import {PhoneState} from '@/types/phone-state';
+import {PhoneStateEnum} from '@/types/phone-state-enum';
+import {RTCSession} from 'jssip/lib/RTCSession';
+import {RTCSessionEvent, UnRegisteredEvent} from 'jssip/lib/UA';
+import {UserService} from '@/pages/users/user.service';
+import {CallHistoryService} from '@/webphone/call-history.service';
+import {CallHistoryType} from '@/types/call-history';
+import {RingbackTone} from '@/webphone/ringback-tone';
+import {EndCallBeep} from '@/webphone/end-call-beep';
+import {IncomingRingTone} from '@/webphone/incoming-ring-tone';
+import {DtmfKeyTone} from '@/webphone/dtmf-key-tone';
+
+export type TransferMode = 'blind' | 'attended';
+
+const TRANSFER_COMMANDS: Record<TransferMode, string> = { blind: '*1', attended: '*2' };
+const PARK_COMMAND = '*7';
+const COMMAND_COOLDOWN_MS = 1000;
 
 @Injectable({
     providedIn: 'root'
@@ -21,14 +33,27 @@ export class WebphoneService {
     private readonly phoneState = signal<PhoneState>({ state: PhoneStateEnum.INITIALIZING });
     private readonly callTimer = signal(0);
     private callTimerInterval: ReturnType<typeof setInterval> | undefined;
-    private readonly audio = new Audio();
+    private readonly ringback = new RingbackTone();
+    private readonly endCallBeep = new EndCallBeep();
+    private readonly incomingRing = new IncomingRingTone();
+    private readonly keyTone = new DtmfKeyTone();
 
     private updatePhoneStatus(newState: Partial<PhoneState>) {
         this.phoneState.update((state) => ({ ...state, ...newState }));
+        if ('session' in newState && !newState.session) {
+            this.resetCallControls();
+        }
     }
     readonly phoneState$ = this.phoneState.asReadonly();
+    readonly dialedDigits = signal('');
+    readonly transferMode = signal<TransferMode | null>(null);
+    readonly dialpadVisible = signal(false);
+    private lastCommandAt = 0;
 
-    constructor(private readonly userService: UserService) {}
+    constructor(
+        private readonly userService: UserService,
+        private readonly callHistoryService: CallHistoryService
+    ) {}
 
     /**
      * Inicia registro JsSIP quando o ramal tem tecnologia WSS. Seguro chamar várias vezes.
@@ -88,7 +113,7 @@ export class WebphoneService {
         this.ua.start();
     }
 
-    async makeCall(telephone: string) {
+    makeCall(telephone: string) {
         this.ensureUaStarted();
         if (!this.ua) {
             return;
@@ -99,11 +124,59 @@ export class WebphoneService {
             extraHeaders: [`X-CALL-TOKEN: TOKEN_PLACEHOLDER`]
         };
         const target = `sip:${telephone}@${this.PABX_URL}`;
+        this.callHistoryService.add(telephone, CallHistoryType.OUTGOING);
         this.updatePhoneStatus({ session: this.ua.call(target, options) });
     }
 
     sendDTMF(digit: string) {
+        this.keyTone.play(digit);
         this.phoneState().session?.sendDTMF(digit);
+        this.dialedDigits.update((digits) => digits + digit);
+    }
+
+    playKeyTone(digit: string) {
+        this.keyTone.play(digit);
+    }
+
+    /** Envia o comando de transferência e abre o teclado para digitar o ramal de destino. */
+    startTransfer(mode: TransferMode) {
+        if (!this.sendCommand(TRANSFER_COMMANDS[mode])) {
+            return;
+        }
+        this.dialedDigits.set('');
+        this.transferMode.set(mode);
+        this.dialpadVisible.set(true);
+    }
+
+    park() {
+        if (this.sendCommand(PARK_COMMAND)) {
+            this.transferMode.set(null);
+        }
+    }
+
+    toggleDialpad() {
+        this.dialpadVisible.update((visible) => !visible);
+        if (!this.dialpadVisible()) {
+            this.transferMode.set(null);
+        }
+    }
+
+    /** O JsSIP só aceita DTMF com a chamada estabelecida; o intervalo evita enviar o comando duas vezes. */
+    private sendCommand(command: string): boolean {
+        const now = Date.now();
+        if (this.phoneState().state !== PhoneStateEnum.TALKING || now - this.lastCommandAt < COMMAND_COOLDOWN_MS) {
+            return false;
+        }
+        this.lastCommandAt = now;
+        this.phoneState().session?.sendDTMF(command);
+        return true;
+    }
+
+    private resetCallControls() {
+        this.dialedDigits.set('');
+        this.transferMode.set(null);
+        this.dialpadVisible.set(false);
+        this.lastCommandAt = 0;
     }
 
     hangup() {
@@ -132,8 +205,14 @@ export class WebphoneService {
 
     private callEventHandlers() {
         return {
-            progress: () => {
+            progress: (e: any) => {
                 console.log('SIP: ' + new Date().toLocaleString('pt-BR') + ' Iniciando chamada');
+                // 180 sem SDP: o PABX nao envia early media, entao o tom de chamada e gerado localmente
+                if (e.response?.status_code === 180 && !e.response.body) {
+                    this.ringback.start();
+                } else if (e.response?.body) {
+                    this.ringback.stop();
+                }
                 this.updatePhoneStatus({ state: PhoneStateEnum.CALLING });
             },
             failed: (e: any) => {
@@ -142,8 +221,8 @@ export class WebphoneService {
                         new Date().toLocaleString('pt-BR') +
                         `Call falhou originator: ${e.originator} cause: ${e.cause}`
                 );
-                this.audio.src = '/audios/blip.mp3';
-                this.audio.play();
+                this.ringback.stop();
+                this.endCallBeep.play();
                 this.updatePhoneStatus({ state: PhoneStateEnum.AVAILABLE, session: undefined });
                 this.stopCallTimer();
             },
@@ -153,11 +232,12 @@ export class WebphoneService {
                         new Date().toLocaleString('pt-BR') +
                         `Call terminou originator: ${e.originator} with cause: ${e.cause}`
                 );
-                this.audio.src = '/audios/blip.mp3';
-                this.audio.play();
+                this.ringback.stop();
+                this.endCallBeep.play();
                 this.updatePhoneStatus({ state: PhoneStateEnum.AVAILABLE, session: undefined });
                 this.stopCallTimer();
             },
+            accepted: () => this.ringback.stop(),
             confirmed: () => {
                 console.log('SIP: ' + new Date().toLocaleString('pt-BR') + ' Call atendida');
                 this.updatePhoneStatus({ state: PhoneStateEnum.TALKING });
@@ -178,8 +258,7 @@ export class WebphoneService {
     }
 
     private incommingSession(session: RTCSession) {
-        this.audio.src = '/audios/calling.mp3';
-        this.audio.play();
+        this.incomingRing.start();
         this.updatePhoneStatus({ state: PhoneStateEnum.INCOMING_CALL, session });
         session.on('connecting', () => console.log('connecting'));
         session.on('peerconnection', () => {
@@ -188,21 +267,23 @@ export class WebphoneService {
         });
         session.on('accepted', () => {
             console.log('accepted');
-            this.audio.pause();
+            this.callHistoryService.add(session.remote_identity?.uri?.user, CallHistoryType.INCOMING);
+            this.incomingRing.stop();
             this.updatePhoneStatus({ state: PhoneStateEnum.TALKING });
             this.startCallTimer();
         });
         session.on('confirmed', () => console.log(' confirmed'));
         session.on('ended', () => {
             console.log('ended');
-            this.audio.src = '/audios/blip.mp3';
-            this.audio.play();
+            this.incomingRing.stop();
+            this.endCallBeep.play();
             this.updatePhoneStatus({ state: PhoneStateEnum.AVAILABLE, session: undefined });
             this.stopCallTimer();
         });
         session.on('failed', () => {
             console.log('failed');
-            this.audio.pause();
+            this.callHistoryService.add(session.remote_identity?.uri?.user, CallHistoryType.MISSED);
+            this.incomingRing.stop();
             this.updatePhoneStatus({ state: PhoneStateEnum.AVAILABLE, session: undefined });
             this.stopCallTimer();
         });

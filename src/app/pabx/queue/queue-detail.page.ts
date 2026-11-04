@@ -74,7 +74,7 @@ import {RoleEnum} from '@/types/role-enum';
                 <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
                     <div class="rounded-xl shadow px-4 py-3 flex flex-col gap-1 border-l-4 border-green-500">
                         <span class="text-xs font-semibold uppercase tracking-wide text-green-600"
-                            >Agentes Logados</span
+                            >Membros Logados</span
                         >
                         <span class="text-3xl font-bold">
                             {{ queueState()!.loggedMembers.length
@@ -117,9 +117,9 @@ import {RoleEnum} from '@/types/role-enum';
 
                 <!-- Tables -->
                 <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
-                    <!-- Agents table -->
+                    <!-- Members table -->
                     <div class="lg:col-span-3">
-                        <h3 class="font-semibold text-lg mb-3">Agentes Logados</h3>
+                        <h3 class="font-semibold text-lg mb-3">Membros Logados</h3>
                         <p-table
                             [value]="queueState()!.loggedMembers"
                             [tableStyle]="{ 'min-width': '100%' }"
@@ -197,7 +197,7 @@ import {RoleEnum} from '@/types/role-enum';
                             </ng-template>
                             <ng-template pTemplate="emptymessage">
                                 <tr>
-                                    <td colspan="7" class="text-center p-6 text-gray-400">Nenhum agente logado.</td>
+                                    <td colspan="7" class="text-center p-6 text-gray-400">Nenhum membro logado.</td>
                                 </tr>
                             </ng-template>
                         </p-table>
@@ -299,6 +299,14 @@ export class QueueDetailPage implements OnInit, OnDestroy {
             const found = states.find((s) => s.queue.id === this.queueId) ?? null;
             this.queueState.set(found);
             this.loading = false;
+        }).catch(() => {
+            this.loading = false;
+            this.messageService.add({
+                severity: 'error',
+                summary: 'Não foi possível carregar a fila',
+                detail: 'Tente novamente mais tarde.',
+                life: 15_000
+            });
         });
 
         const companyId = this.userService.getUser().companyId;
@@ -337,11 +345,14 @@ export class QueueDetailPage implements OnInit, OnDestroy {
     }
 
     private formatSeconds(secs: number): string {
-        const m = Math.floor(secs / 60)
-            .toString()
-            .padStart(2, '0');
-        const s = (secs % 60).toString().padStart(2, '0');
-        return `${m}:${s}`;
+        const h = Math.floor(secs / 3600);
+        const m = Math.floor((secs % 3600) / 60);
+        const s = secs % 60;
+        const pad = (n: number) => n.toString().padStart(2, '0');
+        if (h > 0) {
+            return `${h}:${pad(m)}:${pad(s)}`;
+        }
+        return `${pad(m)}:${pad(s)}`;
     }
 
     isPausedMember(member: QueueMember): boolean {

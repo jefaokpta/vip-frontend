@@ -1,0 +1,11 @@
+{
+    "CORSRules": [
+        {
+            "AllowedOrigins": ["http://localhost:4200", "https://app.iasmin.io"],
+            "AllowedMethods": ["PUT", "GET"],
+            "AllowedHeaders": ["*"],
+            "ExposeHeaders": ["ETag"],
+            "MaxAgeSeconds": 3000
+        }
+    ]
+}

@@ -1,8 +1,8 @@
-import { Component, forwardRef, Input, OnInit } from '@angular/core';
-import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
-import { Select } from 'primeng/select';
-import { NgIf } from '@angular/common';
-import { TrunkService } from '@/pabx/trunk/trunk.service';
+import {Component, forwardRef, Input, OnInit} from '@angular/core';
+import {ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule} from '@angular/forms';
+import {Select} from 'primeng/select';
+import {NgIf} from '@angular/common';
+import {TrunkService} from '@/pabx/trunk/trunk.service';
 
 @Component({
     selector: 'app-trunk-select-component',
@@ -40,7 +40,7 @@ export class TrunkSelectComponent implements ControlValueAccessor, OnInit {
     constructor(private readonly trunkService: TrunkService) {}
 
     ngOnInit() {
-        this.trunkService.findAll().then((trunks) => {
+        this.trunkService.findOptions().then((trunks) => {
             this.trunkOptions = trunks.map((trunk) => ({ label: trunk.name, value: trunk.id.toString() }));
             if (this.isShowAnyTrunkLabel) this.trunkOptions.unshift({ label: 'TODOS', value: 'ANY' });
         });
