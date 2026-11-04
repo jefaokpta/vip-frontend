@@ -5,12 +5,12 @@ export const myRxStompConfig: RxStompConfig = {
     // Which server?
     brokerURL: environment.WEBSOCKET_BACKEND_URL,
 
-    // Headers
-    // Typical keys: login, passcode, host
-    // connectHeaders: {
-    //   login: 'guest',
-    //   passcode: 'guest',
-    // },
+    // Lê o token a cada tentativa: reconexões precisam usar o token atual (renovado ou de gerenciamento)
+    beforeConnect: (client): void => {
+        client.configure({
+            connectHeaders: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+        });
+    },
 
     // How often to heartbeat?
     // Interval in milliseconds, set to 0 to disable
