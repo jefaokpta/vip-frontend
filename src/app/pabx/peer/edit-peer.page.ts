@@ -410,9 +410,7 @@ export class EditPeerPage implements OnInit {
     }
 
     private handleErrorMessage(errorMessage?: string): string {
-        if (!errorMessage) return 'Erro ao salvar o ramal.';
-        if (errorMessage.includes('Duplicate')) return `Ramal ${this.peer?.value} já existe.`;
-        return 'Erro ao salvar o ramal.';
+        return errorMessage ?? 'Erro ao salvar o ramal.';
     }
 
     get name() {
