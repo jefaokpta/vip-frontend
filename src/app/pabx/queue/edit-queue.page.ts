@@ -332,8 +332,8 @@ export class EditQueuePage implements OnInit {
                     serviceLevelSeconds: [queue.serviceLevelSeconds, [Validators.required]],
                     queueSoundId: [queue.queueSoundId, [Validators.required]],
                     isJoinWhenEmpty: [queue.isJoinWhenEmpty],
-                    maxCalls: [queue.maxCalls],
-                    cooldownSeconds: [queue.cooldownSeconds],
+                    maxCalls: [queue.maxCalls, [Validators.required]],
+                    cooldownSeconds: [queue.cooldownSeconds, [Validators.required]],
                     tmeAlertSeconds: [queue.tmeAlertSeconds, [Validators.required, Validators.min(1)]],
                     callDurationAlertMinutes: [
                         queue.callDurationAlertMinutes,
