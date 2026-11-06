@@ -199,9 +199,9 @@ export class NewRoutePage implements OnInit {
     private addRouteTrunk(accountCode: string) {
         const routeTrunkRow = this.fb.group({
             accountCode: [accountCode, [Validators.required]],
-            trunk1: [''],
-            trunk2: [''],
-            trunk3: ['']
+            trunk1: [0],
+            trunk2: [0],
+            trunk3: [0]
         });
         this.routeTrunks.push(routeTrunkRow);
     }

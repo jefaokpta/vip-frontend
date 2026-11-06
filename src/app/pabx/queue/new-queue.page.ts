@@ -310,8 +310,8 @@ export class NewQueuePage implements OnInit {
             serviceLevelSeconds: [15, [Validators.required]],
             queueSoundId: [null, [Validators.required]],
             isJoinWhenEmpty: [true],
-            maxCalls: [0],
-            cooldownSeconds: [0],
+            maxCalls: [0, [Validators.required]],
+            cooldownSeconds: [0, [Validators.required]],
             tmeAlertSeconds: [30, [Validators.required, Validators.min(1)]],
             callDurationAlertMinutes: [30, [Validators.required, Validators.min(1)]],
             surveyId: [null]
