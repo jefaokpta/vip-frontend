@@ -1,13 +1,32 @@
-import {Component, OnInit} from '@angular/core';
-import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
-import {InputTextModule} from 'primeng/inputtext';
-import {ButtonModule} from 'primeng/button';
-import {CardModule} from 'primeng/card';
-import {ToastModule} from 'primeng/toast';
-import {NgIf} from '@angular/common';
-import {Router, RouterLink} from '@angular/router';
-import {CompanyService} from '@/pages/company/company.service';
-import {InputMask} from 'primeng/inputmask';
+import { Component, OnInit } from '@angular/core';
+import {
+    AbstractControl,
+    FormBuilder,
+    FormGroup,
+    ReactiveFormsModule,
+    ValidationErrors,
+    Validators
+} from '@angular/forms';
+import { InputTextModule } from 'primeng/inputtext';
+import { ButtonModule } from 'primeng/button';
+import { CardModule } from 'primeng/card';
+import { ToastModule } from 'primeng/toast';
+import { NgIf } from '@angular/common';
+import { Router, RouterLink } from '@angular/router';
+import { CompanyService } from '@/pages/company/company.service';
+import { InputMask } from 'primeng/inputmask';
+import { CheckboxModule } from 'primeng/checkbox';
+import { MessageModule } from 'primeng/message';
+import { NewCompany } from '@/types/company';
+
+const DDD_PATTERN = /^[1-9][1-9]$/;
+
+function dddValidator(control: AbstractControl): ValidationErrors | null {
+    if (!control.parent?.get('autoConfig')?.value) return null;
+    const ddd = String(control.value ?? '').trim();
+    if (!ddd) return { required: true };
+    return DDD_PATTERN.test(ddd) ? null : { pattern: true };
+}
 
 /**
  * @author Jefferson Alves Reis (jefaokpta)
@@ -17,7 +36,18 @@ import {InputMask} from 'primeng/inputmask';
 @Component({
     selector: 'app-new-company',
     standalone: true,
-    imports: [InputTextModule, ButtonModule, CardModule, ToastModule, NgIf, ReactiveFormsModule, RouterLink, InputMask],
+    imports: [
+        InputTextModule,
+        ButtonModule,
+        CardModule,
+        ToastModule,
+        NgIf,
+        ReactiveFormsModule,
+        RouterLink,
+        InputMask,
+        CheckboxModule,
+        MessageModule
+    ],
     template: `
         <p-card>
             <ng-template #title>
@@ -65,14 +95,40 @@ import {InputMask} from 'primeng/inputmask';
                     </small>
                 </div>
 
+                <div class="field mb-4 flex items-center gap-2">
+                    <p-checkbox inputId="autoConfig" formControlName="autoConfig" [binary]="true" />
+                    <label for="autoConfig">Criar configurações automáticas</label>
+                </div>
+
+                <div *ngIf="autoConfig?.value" class="field mb-4">
+                    <label for="autoConfigDdd" class="block mb-2">DDD *</label>
+                    <input
+                        id="autoConfigDdd"
+                        pInputText
+                        class="p-inputtext"
+                        formControlName="autoConfigDdd"
+                        maxlength="2"
+                        placeholder="21"
+                    />
+                    <small
+                        *ngIf="autoConfigDdd?.invalid && (autoConfigDdd?.dirty || autoConfigDdd?.touched)"
+                        class="p-error block mt-2"
+                    >
+                        <div *ngIf="autoConfigDdd?.errors?.['required']">DDD é obrigatório.</div>
+                        <div *ngIf="autoConfigDdd?.errors?.['pattern']">DDD deve ter 2 dígitos válidos (ex.: 21).</div>
+                    </small>
+                    <small class="block mt-2">
+                        Serão criados: rota Padrao, 5 alias (fixo/celular local e DDD, gratuitas) e 5 regras de saída.
+                    </small>
+                </div>
+
                 <div class="flex mt-4">
-                    <p-button type="submit" label="Salvar" [disabled]="form.invalid || pending">
-                        <i *ngIf="pending" class="pi pi-spin pi-spinner"></i>
+                    <p-button type="submit" label="Salvar" [disabled]="form.invalid || pending" [loading]="pending">
                         <i *ngIf="!pending" class="pi pi-save"></i>
                     </p-button>
                 </div>
 
-                <small *ngIf="showError" class="text-red-500">Houve um erro ao salvar a empresa.</small>
+                <p-message *ngIf="errorMessage" severity="error" class="mt-4">{{ errorMessage }}</p-message>
             </form>
         </p-card>
     `
@@ -80,7 +136,7 @@ import {InputMask} from 'primeng/inputmask';
 export class NewCompanyPage implements OnInit {
     form!: FormGroup;
     pending = false;
-    showError = false;
+    errorMessage = '';
 
     constructor(
         private readonly fb: FormBuilder,
@@ -93,6 +149,12 @@ export class NewCompanyPage implements OnInit {
     }
     get cnpj() {
         return this.form.get('cnpj');
+    }
+    get autoConfig() {
+        return this.form.get('autoConfig');
+    }
+    get autoConfigDdd() {
+        return this.form.get('autoConfigDdd');
     }
     get corporateName() {
         return this.form.get('corporateName');
@@ -108,18 +170,28 @@ export class NewCompanyPage implements OnInit {
                     Validators.required,
                     Validators.pattern(String.raw`^[A-Z0-9]{2}\.[A-Z0-9]{3}\.[A-Z0-9]{3}\/[A-Z0-9]{4}-[0-9]{2}$`)
                 ]
-            ]
+            ],
+            autoConfig: [false],
+            autoConfigDdd: ['', [dddValidator]]
         });
+        this.autoConfig?.valueChanges.subscribe(() => this.autoConfigDdd?.updateValueAndValidity());
     }
 
     async onSubmit() {
         this.pending = true;
-        this.showError = false;
-        this.companyService
-            .create(this.form.value)
+        this.errorMessage = '';
+        const { name, corporateName, cnpj, autoConfig, autoConfigDdd } = this.form.value;
+        const company: NewCompany = {
+            name,
+            corporateName,
+            cnpj,
+            ...(autoConfig && { autoConfigDdd: String(autoConfigDdd).trim() })
+        };
+        return this.companyService
+            .create(company)
             .then(() => this.router.navigate(['/pages/companies']))
-            .catch(() => {
-                this.showError = true;
+            .catch((error) => {
+                this.errorMessage = error?.error?.message ?? 'Houve um erro ao salvar a empresa.';
             })
             .finally(() => (this.pending = false));
     }
