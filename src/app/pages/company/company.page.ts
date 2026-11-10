@@ -11,7 +11,6 @@ import {Company} from '@/types/company';
 import {User} from '@/types/user';
 import {Card} from 'primeng/card';
 import {NgIf} from '@angular/common';
-import {Toast} from 'primeng/toast';
 import {ProgressSpinner} from 'primeng/progressspinner';
 import {FormsModule} from '@angular/forms';
 import {CompanyService} from '@/pages/company/company.service';
@@ -34,7 +33,6 @@ import {MyCallsStateService} from '@/pages/dashboard/my-calls-state.service';
         Tooltip,
         Card,
         NgIf,
-        Toast,
         ProgressSpinner,
         FormsModule
     ],
@@ -125,7 +123,6 @@ import {MyCallsStateService} from '@/pages/dashboard/my-calls-state.service';
             </p-table>
         </p-card>
 
-        <p-toast />
     `
 })
 export class CompanyPage implements OnInit {

@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { MessageService } from 'primeng/api';
+import { CompanyShellComponent } from '@/pages/company/company-shell.component';
 import { CompanyPage } from '@/pages/company/company.page';
 import { NewCompanyPage } from '@/pages/company/new-company.page';
 import { EditCompanyPage } from '@/pages/company/edit-company.page';
@@ -8,6 +9,7 @@ import { EditCompanyPage } from '@/pages/company/edit-company.page';
 export default [
     {
         path: '',
+        component: CompanyShellComponent,
         providers: [MessageService],
         children: [
             { path: '', component: CompanyPage, data: { breadcrumb: 'Empresas' } },

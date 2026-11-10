@@ -10,7 +10,6 @@ import {
 import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
-import { ToastModule } from 'primeng/toast';
 import { NgIf } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { CompanyService } from '@/pages/company/company.service';
@@ -41,7 +40,6 @@ function dddValidator(control: AbstractControl): ValidationErrors | null {
         InputTextModule,
         ButtonModule,
         CardModule,
-        ToastModule,
         NgIf,
         ReactiveFormsModule,
         RouterLink,
