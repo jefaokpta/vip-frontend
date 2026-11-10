@@ -144,6 +144,7 @@ import { TimeoutError } from 'rxjs';
             [modal]="true"
             [style]="{ width: '34rem' }"
             [closable]="!deleting"
+            [closeOnEscape]="!deleting"
             (onHide)="closeDelete()"
         >
             <p class="mb-4">
@@ -271,7 +272,16 @@ export class CompanyPage implements OnInit {
                     detail: 'A exclusão está demorando mais que o esperado. Atualize a lista em instantes para confirmar.',
                     life: 15_000
                 });
-                this.companies = await this.companyService.findAll();
+                try {
+                    this.companies = await this.companyService.findAll();
+                } catch {
+                    this.messageService.add({
+                        severity: 'error',
+                        summary: 'Erro',
+                        detail: 'Não foi possível recarregar a lista de empresas.',
+                        life: 5_000
+                    });
+                }
                 return;
             }
             this.deleteError =

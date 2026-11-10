@@ -5,6 +5,7 @@ import { RouterTestingHarness } from '@angular/router/testing';
 import { MessageService } from 'primeng/api';
 import { CompanyShellComponent } from '@/pages/company/company-shell.component';
 import { Component } from '@angular/core';
+import routes from '@/pages/company/company.routes';
 
 @Component({ selector: 'app-fake-new', standalone: true, template: 'nova' })
 class FakeNewPage {}
@@ -39,5 +40,11 @@ describe('CompanyShellComponent', () => {
         await harness.fixture.whenStable();
         harness.detectChanges();
         expect(document.body.textContent).toContain('Empresa criada');
+    });
+
+    it('rotas reais: pai sem path usa CompanyShellComponent e provê MessageService', () => {
+        const parent = routes.find((r) => r.path === '')!;
+        expect(parent.component).toBe(CompanyShellComponent);
+        expect(parent.providers).toContain(MessageService);
     });
 });

@@ -116,4 +116,18 @@ describe('CompanyPage - exclusão', () => {
         expect(page.companies).toEqual([beta]);
         expect(page.deleteDialogVisible).toBeFalse();
     });
+
+    it('falha ao recarregar a lista após timeout mostra toast de erro e libera deleting', async () => {
+        await setup([RoleEnum.ROLE_SAAS_SUPPORT]);
+        companyService.delete.and.rejectWith(new TimeoutError());
+        companyService.findAll.and.rejectWith(new Error('rede'));
+        const add = spyOn(messageService, 'add');
+        page.openDelete(acme);
+        page.confirmName = 'Acme';
+        await page.confirmDelete();
+        expect(add).toHaveBeenCalledWith(
+            jasmine.objectContaining({ severity: 'error', detail: 'Não foi possível recarregar a lista de empresas.' })
+        );
+        expect(page.deleting).toBeFalse();
+    });
 });
