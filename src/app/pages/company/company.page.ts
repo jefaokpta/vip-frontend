@@ -1,23 +1,25 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
-import {Button} from 'primeng/button';
-import {IconField} from 'primeng/iconfield';
-import {InputIcon} from 'primeng/inputicon';
-import {InputText} from 'primeng/inputtext';
-import {MessageService, PrimeTemplate} from 'primeng/api';
-import {Router, RouterLink} from '@angular/router';
-import {Table, TableModule} from 'primeng/table';
-import {Tooltip} from 'primeng/tooltip';
-import {Company} from '@/types/company';
-import {User} from '@/types/user';
-import {Card} from 'primeng/card';
-import {NgIf} from '@angular/common';
-import {ProgressSpinner} from 'primeng/progressspinner';
-import {FormsModule} from '@angular/forms';
-import {CompanyService} from '@/pages/company/company.service';
-import {UserService} from '@/pages/users/user.service';
-import {ReportStateService} from '@/pabx/report/report-state.service';
-import {DacReportStateService} from '@/pabx/dac-report/dac-report-state.service';
-import {MyCallsStateService} from '@/pages/dashboard/my-calls-state.service';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { Button } from 'primeng/button';
+import { IconField } from 'primeng/iconfield';
+import { InputIcon } from 'primeng/inputicon';
+import { InputText } from 'primeng/inputtext';
+import { MessageService, PrimeTemplate } from 'primeng/api';
+import { Router, RouterLink } from '@angular/router';
+import { Table, TableModule } from 'primeng/table';
+import { Tooltip } from 'primeng/tooltip';
+import { Company } from '@/types/company';
+import { User } from '@/types/user';
+import { Card } from 'primeng/card';
+import { NgIf } from '@angular/common';
+import { ProgressSpinner } from 'primeng/progressspinner';
+import { FormsModule } from '@angular/forms';
+import { CompanyService } from '@/pages/company/company.service';
+import { UserService } from '@/pages/users/user.service';
+import { ReportStateService } from '@/pabx/report/report-state.service';
+import { DacReportStateService } from '@/pabx/dac-report/dac-report-state.service';
+import { MyCallsStateService } from '@/pages/dashboard/my-calls-state.service';
+import { RoleEnum } from '@/types/role-enum';
+import { Dialog } from 'primeng/dialog';
 
 @Component({
     selector: 'app-company-page',
@@ -34,7 +36,8 @@ import {MyCallsStateService} from '@/pages/dashboard/my-calls-state.service';
         Card,
         NgIf,
         ProgressSpinner,
-        FormsModule
+        FormsModule,
+        Dialog
     ],
     template: `
         <p-card>
@@ -109,6 +112,17 @@ import {MyCallsStateService} from '@/pages/dashboard/my-calls-state.service';
                                     pTooltip="Gerenciar"
                                     tooltipPosition="left"
                                 />
+                                <p-button
+                                    *ngIf="canDelete"
+                                    (click)="openDelete(company)"
+                                    class="btn-excluir-empresa"
+                                    icon="pi pi-trash"
+                                    severity="danger"
+                                    outlined
+                                    size="small"
+                                    pTooltip="Excluir"
+                                    tooltipPosition="left"
+                                />
                             </div>
                         </td>
                     </tr>
@@ -123,6 +137,45 @@ import {MyCallsStateService} from '@/pages/dashboard/my-calls-state.service';
             </p-table>
         </p-card>
 
+        <p-dialog
+            header="Excluir empresa"
+            [(visible)]="deleteDialogVisible"
+            [modal]="true"
+            [style]="{ width: '34rem' }"
+            [closable]="!deleting"
+        >
+            <p class="mb-4">
+                Esta ação é irreversível. Todas as configurações da empresa serão apagadas (ramais, áudios, filas,
+                grupos de chamada e captura, pausas, pesquisas, calendários, regras, alias, centros de custo, DDRs,
+                rotas e usuários). CDRs, relatórios e gravações são preservados.
+            </p>
+            <label for="confirmCompanyName" class="block mb-2">Digite o nome da empresa para confirmar</label>
+            <input
+                id="confirmCompanyName"
+                pInputText
+                type="text"
+                class="w-full"
+                [placeholder]="companyToDelete?.name ?? ''"
+                [(ngModel)]="confirmName"
+            />
+            <small *ngIf="deleteError" class="p-error block mt-2">{{ deleteError }}</small>
+            <ng-template #footer>
+                <p-button
+                    label="Cancelar"
+                    severity="secondary"
+                    outlined
+                    [disabled]="deleting"
+                    (click)="closeDelete()"
+                />
+                <p-button
+                    label="Excluir"
+                    severity="danger"
+                    [disabled]="!canConfirmDelete() || deleting"
+                    [loading]="deleting"
+                    (click)="confirmDelete()"
+                />
+            </ng-template>
+        </p-dialog>
     `
 })
 export class CompanyPage implements OnInit {
@@ -130,6 +183,12 @@ export class CompanyPage implements OnInit {
     @ViewChild('dataTable') dt!: Table;
     readonly user: User;
     loading = true;
+    readonly canDelete: boolean;
+    deleteDialogVisible = false;
+    companyToDelete: Company | null = null;
+    confirmName = '';
+    deleting = false;
+    deleteError = '';
 
     constructor(
         private readonly companyService: CompanyService,
@@ -141,6 +200,7 @@ export class CompanyPage implements OnInit {
         private readonly myCallsState: MyCallsStateService
     ) {
         this.user = this.userService.getUser();
+        this.canDelete = this.user.roles.includes(RoleEnum.ROLE_SAAS_SUPPORT);
     }
 
     ngOnInit(): void {
@@ -167,6 +227,45 @@ export class CompanyPage implements OnInit {
                     life: 15_000
                 });
             });
+    }
+
+    openDelete(company: Company) {
+        this.companyToDelete = company;
+        this.confirmName = '';
+        this.deleteError = '';
+        this.deleteDialogVisible = true;
+    }
+
+    closeDelete() {
+        this.deleteDialogVisible = false;
+        this.companyToDelete = null;
+    }
+
+    canConfirmDelete(): boolean {
+        return !!this.companyToDelete && this.confirmName === this.companyToDelete.name;
+    }
+
+    async confirmDelete() {
+        const company = this.companyToDelete;
+        if (!company || !this.canConfirmDelete()) return;
+        this.deleting = true;
+        this.deleteError = '';
+        try {
+            await this.companyService.delete(company.companyId);
+            this.companies = this.companies.filter((c) => c.companyId !== company.companyId);
+            this.closeDelete();
+            this.messageService.add({
+                severity: 'success',
+                summary: 'Empresa excluída',
+                detail: `${company.name} foi excluída com sucesso.`,
+                life: 5_000
+            });
+        } catch (error: any) {
+            this.deleteError =
+                error?.error?.message ?? 'Não foi possível excluir a empresa. Tente novamente mais tarde.';
+        } finally {
+            this.deleting = false;
+        }
     }
 
     onFilterGlobal(event: Event) {

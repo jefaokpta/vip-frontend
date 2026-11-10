@@ -1,9 +1,9 @@
-import {Injectable} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
-import {Company, NewCompany} from '@/types/company';
-import {executeRequest, httpHeaders} from '@/util/utils';
-import {ServiceEnum} from '@/types/service-enum';
-import {environment} from '../../../environments/environment';
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Company, NewCompany } from '@/types/company';
+import { executeRequest, httpHeaders } from '@/util/utils';
+import { ServiceEnum } from '@/types/service-enum';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
     providedIn: 'root'
@@ -35,5 +35,9 @@ export class CompanyService {
 
     create(company: NewCompany) {
         return executeRequest(this.http.post(`${this.BACKEND}/companies`, company, httpHeaders()));
+    }
+
+    delete(companyId: string): Promise<void> {
+        return executeRequest(this.http.delete<void>(`${this.BACKEND}/companies/${companyId}`, httpHeaders()));
     }
 }
