@@ -162,15 +162,15 @@ export class RoutePage implements OnInit {
                         this.routes = this.routes.filter((r) => r.id !== route.id);
                         this.messageService.add({
                             severity: 'success',
-                            summary: 'Tronco removido com sucesso',
+                            summary: 'Rota removida com sucesso',
                             life: 15_000
                         });
                     })
-                    .catch(() => {
+                    .catch((error) => {
                         this.messageService.add({
                             severity: 'error',
-                            summary: 'Desculpe não foi possível remover o tronco',
-                            detail: 'Tente novamente mais tarde.',
+                            summary: 'Não foi possível remover a rota',
+                            detail: error?.error?.message ?? 'Tente novamente mais tarde.',
                             life: 15_000
                         });
                     });

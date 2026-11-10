@@ -15,4 +15,5 @@ export interface NewCompany {
     readonly name: string;
     readonly corporateName: string;
     readonly cnpj: string;
+    readonly autoConfigDdd?: string;
 }
