@@ -15,6 +15,7 @@ import { NgIf } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { CompanyService } from '@/pages/company/company.service';
 import { InputMask } from 'primeng/inputmask';
+import { MessageService } from 'primeng/api';
 import { CheckboxModule } from 'primeng/checkbox';
 import { MessageModule } from 'primeng/message';
 import { NewCompany } from '@/types/company';
@@ -123,9 +124,13 @@ function dddValidator(control: AbstractControl): ValidationErrors | null {
                 </div>
 
                 <div class="flex mt-4">
-                    <p-button type="submit" label="Salvar" [disabled]="form.invalid || pending" [loading]="pending">
-                        <i *ngIf="!pending" class="pi pi-save"></i>
-                    </p-button>
+                    <p-button
+                        type="submit"
+                        label="Salvar"
+                        [disabled]="form.invalid || pending"
+                        [loading]="pending"
+                        icon="pi pi-save"
+                    />
                 </div>
 
                 <p-message *ngIf="errorMessage" severity="error" class="mt-4">{{ errorMessage }}</p-message>
@@ -141,7 +146,8 @@ export class NewCompanyPage implements OnInit {
     constructor(
         private readonly fb: FormBuilder,
         private readonly companyService: CompanyService,
-        private readonly router: Router
+        private readonly router: Router,
+        private readonly messageService: MessageService
     ) {}
 
     get name() {
@@ -189,7 +195,10 @@ export class NewCompanyPage implements OnInit {
         };
         return this.companyService
             .create(company)
-            .then(() => this.router.navigate(['/pages/companies']))
+            .then(() => {
+                this.messageService.add({ severity: 'success', summary: 'Empresa criada', life: 5_000 });
+                return this.router.navigate(['/pages/companies']);
+            })
             .catch((error) => {
                 this.errorMessage = error?.error?.message ?? 'Houve um erro ao salvar a empresa.';
             })

@@ -38,7 +38,6 @@ import {MyCallsStateService} from '@/pages/dashboard/my-calls-state.service';
         ProgressSpinner,
         FormsModule
     ],
-    providers: [MessageService],
     template: `
         <p-card>
             <ng-template #title>

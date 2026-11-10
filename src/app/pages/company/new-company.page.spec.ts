@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MessageService } from 'primeng/api';
 import { provideRouter, Router } from '@angular/router';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { NewCompanyPage } from '@/pages/company/new-company.page';
@@ -9,6 +10,7 @@ describe('NewCompanyPage', () => {
     let page: NewCompanyPage;
     let companyService: jasmine.SpyObj<CompanyService>;
     let router: Router;
+    let messageService: MessageService;
 
     beforeEach(() => {
         companyService = jasmine.createSpyObj('CompanyService', ['create']);
@@ -17,10 +19,12 @@ describe('NewCompanyPage', () => {
             providers: [
                 { provide: CompanyService, useValue: companyService },
                 provideRouter([]),
-                provideNoopAnimations()
+                provideNoopAnimations(),
+                MessageService
             ]
         });
         router = TestBed.inject(Router);
+        messageService = TestBed.inject(MessageService);
         spyOn(router, 'navigate').and.resolveTo(true);
         fixture = TestBed.createComponent(NewCompanyPage);
         page = fixture.componentInstance;
@@ -80,5 +84,15 @@ describe('NewCompanyPage', () => {
         companyService.create.and.resolveTo({});
         await page.onSubmit();
         expect(router.navigate).toHaveBeenCalledWith(['/pages/companies']);
+    });
+
+    it('sucesso exibe toast "Empresa criada" antes de navegar', async () => {
+        companyService.create.and.resolveTo({});
+        const addSpy = spyOn(messageService, 'add');
+        await page.onSubmit();
+        expect(addSpy).toHaveBeenCalledWith(
+            jasmine.objectContaining({ severity: 'success', summary: 'Empresa criada' })
+        );
+        expect(addSpy).toHaveBeenCalledBefore(router.navigate as jasmine.Spy);
     });
 });
