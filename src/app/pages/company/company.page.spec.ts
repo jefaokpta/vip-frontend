@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { TimeoutError } from 'rxjs';
 import { MessageService } from 'primeng/api';
 import { provideRouter } from '@angular/router';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
@@ -95,5 +96,24 @@ describe('CompanyPage - exclusão', () => {
         page.confirmName = 'Acme';
         await page.confirmDelete();
         expect(page.deleteError).toBe('Não foi possível excluir a empresa. Tente novamente mais tarde.');
+    });
+
+    it('timeout avisa que está demorando e recarrega a lista', async () => {
+        await setup([RoleEnum.ROLE_SAAS_SUPPORT]);
+        companyService.delete.and.rejectWith(new TimeoutError());
+        companyService.findAll.calls.reset();
+        companyService.findAll.and.resolveTo([beta]);
+        const add = spyOn(messageService, 'add');
+        page.openDelete(acme);
+        page.confirmName = 'Acme';
+        await page.confirmDelete();
+        expect(add).toHaveBeenCalledWith(
+            jasmine.objectContaining({
+                detail: 'A exclusão está demorando mais que o esperado. Atualize a lista em instantes para confirmar.'
+            })
+        );
+        expect(companyService.findAll).toHaveBeenCalled();
+        expect(page.companies).toEqual([beta]);
+        expect(page.deleteDialogVisible).toBeFalse();
     });
 });

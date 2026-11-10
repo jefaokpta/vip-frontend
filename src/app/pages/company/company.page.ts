@@ -20,6 +20,7 @@ import { DacReportStateService } from '@/pabx/dac-report/dac-report-state.servic
 import { MyCallsStateService } from '@/pages/dashboard/my-calls-state.service';
 import { RoleEnum } from '@/types/role-enum';
 import { Dialog } from 'primeng/dialog';
+import { TimeoutError } from 'rxjs';
 
 @Component({
     selector: 'app-company-page',
@@ -143,6 +144,7 @@ import { Dialog } from 'primeng/dialog';
             [modal]="true"
             [style]="{ width: '34rem' }"
             [closable]="!deleting"
+            (onHide)="closeDelete()"
         >
             <p class="mb-4">
                 Esta ação é irreversível. Todas as configurações da empresa serão apagadas (ramais, áudios, filas,
@@ -261,6 +263,17 @@ export class CompanyPage implements OnInit {
                 life: 5_000
             });
         } catch (error: any) {
+            if (error instanceof TimeoutError) {
+                this.closeDelete();
+                this.messageService.add({
+                    severity: 'warn',
+                    summary: 'Exclusão em andamento',
+                    detail: 'A exclusão está demorando mais que o esperado. Atualize a lista em instantes para confirmar.',
+                    life: 15_000
+                });
+                this.companies = await this.companyService.findAll();
+                return;
+            }
             this.deleteError =
                 error?.error?.message ?? 'Não foi possível excluir a empresa. Tente novamente mais tarde.';
         } finally {

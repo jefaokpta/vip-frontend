@@ -5,6 +5,9 @@ import { executeRequest, httpHeaders } from '@/util/utils';
 import { ServiceEnum } from '@/types/service-enum';
 import { environment } from '../../../environments/environment';
 
+// Criação com auto-config e exclusão em cascata podem demorar mais que o timeout padrão
+const LONG_TIMEOUT = 60_000;
+
 @Injectable({
     providedIn: 'root'
 })
@@ -34,10 +37,13 @@ export class CompanyService {
     }
 
     create(company: NewCompany) {
-        return executeRequest(this.http.post(`${this.BACKEND}/companies`, company, httpHeaders()));
+        return executeRequest(this.http.post(`${this.BACKEND}/companies`, company, httpHeaders()), LONG_TIMEOUT);
     }
 
     delete(companyId: string): Promise<void> {
-        return executeRequest(this.http.delete<void>(`${this.BACKEND}/companies/${companyId}`, httpHeaders()));
+        return executeRequest(
+            this.http.delete<void>(`${this.BACKEND}/companies/${companyId}`, httpHeaders()),
+            LONG_TIMEOUT
+        );
     }
 }

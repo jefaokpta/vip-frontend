@@ -1,4 +1,4 @@
-import { TestBed } from '@angular/core/testing';
+import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { CompanyService } from '@/pages/company/company.service';
@@ -33,4 +33,26 @@ describe('CompanyService', () => {
         req.flush(null, { status: 204, statusText: 'No Content' });
         await promise;
     });
+
+    it('delete usa timeout longo (não falha aos 5s)', fakeAsync(() => {
+        let erro: unknown;
+        service.delete('100001').catch((e) => (erro = e));
+        const req = http.expectOne(`${environment.API_BACKEND_URL}/companies/100001`);
+        tick(5_001);
+        expect(erro).toBeUndefined();
+        expect(req.cancelled).toBeFalse();
+        req.flush(null);
+        tick();
+    }));
+
+    it('create usa timeout longo (não falha aos 5s)', fakeAsync(() => {
+        let erro: unknown;
+        service.create({ name: 'Acme' } as any).catch((e) => (erro = e));
+        const req = http.expectOne(`${environment.API_BACKEND_URL}/companies`);
+        tick(5_001);
+        expect(erro).toBeUndefined();
+        expect(req.cancelled).toBeFalse();
+        req.flush({});
+        tick();
+    }));
 });
