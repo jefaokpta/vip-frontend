@@ -164,7 +164,7 @@ export class AppMenuitem implements OnInit, OnDestroy {
                         this.active = false;
                     }
                 }
-            });
+            }).catch((err) => console.error('Erro ao atualizar estado do menu', err));
         });
 
         this.menuResetSubscription = this.layoutService.resetSource$.subscribe(() => {
