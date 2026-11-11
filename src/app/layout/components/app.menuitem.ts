@@ -1,5 +1,5 @@
 import {Component, computed, ElementRef, HostBinding, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {NavigationEnd, Router, RouterModule} from '@angular/router';
+import {IsActiveMatchOptions, NavigationEnd, Router, RouterModule} from '@angular/router';
 import {animate, AnimationEvent, state, style, transition, trigger} from '@angular/animations';
 import {Subscription} from 'rxjs';
 import {filter} from 'rxjs/operators';
@@ -41,14 +41,7 @@ import {LayoutService} from '@/layout/service/layout.service';
                 [ngClass]="item.class"
                 [routerLink]="item.routerLink"
                 routerLinkActive="active-route"
-                [routerLinkActiveOptions]="
-                    item.routerLinkActiveOptions || {
-                        paths: 'exact',
-                        queryParams: 'ignored',
-                        matrixParams: 'ignored',
-                        fragment: 'ignored'
-                    }
-                "
+                [routerLinkActiveOptions]="item.routerLinkActiveOptions || linkMatchOptions"
                 [fragment]="item.fragment"
                 [queryParamsHandling]="item.queryParamsHandling"
                 [preserveFragment]="item.preserveFragment"
@@ -133,6 +126,8 @@ export class AppMenuitem implements OnInit, OnDestroy {
 
     key: string = '';
 
+    linkMatchOptions!: IsActiveMatchOptions;
+
     get submenuAnimation() {
         if (
             this.layoutService.isDesktop() &&
@@ -169,7 +164,7 @@ export class AppMenuitem implements OnInit, OnDestroy {
                         this.active = false;
                     }
                 }
-            });
+            }).catch((err) => console.error('Erro ao atualizar estado do menu', err));
         });
 
         this.menuResetSubscription = this.layoutService.resetSource$.subscribe(() => {
@@ -189,6 +184,8 @@ export class AppMenuitem implements OnInit, OnDestroy {
 
     ngOnInit() {
         this.key = this.parentKey ? this.parentKey + '-' + this.index : String(this.index);
+        // calculado uma vez: um objeto novo a cada change detection faz o RouterLinkActive entrar em loop
+        this.linkMatchOptions = this.matchOptions();
 
         if (!(this.isSlimPlus() || this.isSlim() || this.isHorizontal()) && this.item.routerLink) {
             this.updateActiveStateFromRoute();
@@ -201,13 +198,19 @@ export class AppMenuitem implements OnInit, OnDestroy {
         }
     }
 
-    updateActiveStateFromRoute() {
-        let activeRoute = this.router.isActive(this.item.routerLink[0], {
-            paths: 'exact',
+    /** Sub-rotas (ex: /pabx/peers/new) mantêm o item ativo; a raiz '/' exige match exato. */
+    matchOptions(): IsActiveMatchOptions {
+        const link = this.item?.routerLink?.[0];
+        return {
+            paths: link === '/' || link === '' ? 'exact' : 'subset',
             queryParams: 'ignored',
             matrixParams: 'ignored',
             fragment: 'ignored'
-        });
+        };
+    }
+
+    updateActiveStateFromRoute() {
+        const activeRoute = this.router.isActive(this.item.routerLink[0], this.matchOptions());
 
         if (activeRoute) {
             this.layoutService.onMenuStateChange({
