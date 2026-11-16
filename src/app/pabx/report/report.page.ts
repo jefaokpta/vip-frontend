@@ -106,6 +106,19 @@ interface StatusOption {
                                 styleClass="w-44"
                             ></p-select>
                         </div>
+                        <div class="flex flex-col gap-1">
+                            <label class="text-xs font-semibold uppercase tracking-wide text-surface-500">
+                                Centro de Custo
+                            </label>
+                            <p-select
+                                [options]="costCenterOptions()"
+                                [ngModel]="costCenterFilter()"
+                                (ngModelChange)="costCenterFilter.set($event)"
+                                optionLabel="label"
+                                optionValue="value"
+                                styleClass="w-44"
+                            ></p-select>
+                        </div>
                     </div>
                 </div>
             </ng-template>
@@ -255,6 +268,7 @@ export class ReportPage implements OnInit, OnDestroy {
     readonly cdrs = this.reportState.cdrs;
     readonly dateRange = this.reportState.dateRange;
     readonly statusFilter = this.reportState.statusFilter;
+    readonly costCenterFilter = this.reportState.costCenterFilter;
     readonly loading = signal<boolean>(!this.reportState.loaded());
     readonly costCenterLabelsByCode = signal<Map<string, string>>(new Map());
 
@@ -276,8 +290,23 @@ export class ReportPage implements OnInit, OnDestroy {
 
     readonly filteredCdrs = computed(() => {
         const status = this.statusFilter();
-        const all = this.cdrs();
-        return status ? all.filter((c) => c.disposition === status) : all;
+        const costCenter = this.costCenterFilter();
+        return this.cdrs().filter(
+            (c) =>
+                (!status || c.disposition === status) &&
+                (costCenter === null || (c.accountCode ?? '') === costCenter)
+        );
+    });
+
+    readonly costCenterOptions = computed<StatusOption[]>(() => {
+        const labelsByCode = this.costCenterLabelsByCode();
+        const codes = Array.from(new Set(this.cdrs().map((c) => c.accountCode ?? '')));
+        const options = codes
+            .filter((code) => code !== '')
+            .map((code) => ({ label: labelsByCode.get(code) ?? code, value: code }))
+            .sort((a, b) => a.label.localeCompare(b.label));
+        if (codes.includes('')) options.push({ label: 'Sem centro de custo', value: '' });
+        return [{ label: 'Todos', value: null }, ...options];
     });
 
     readonly statusOptions = computed<StatusOption[]>(() => {
@@ -396,6 +425,7 @@ export class ReportPage implements OnInit, OnDestroy {
             const end = new Date(range[1]);
             end.setHours(23, 59, 59, 999);
             this.statusFilter.set(null);
+            this.costCenterFilter.set(null);
             this.load(() => this.reportService.findByDateRange(range[0], end));
         }
     }
@@ -404,6 +434,7 @@ export class ReportPage implements OnInit, OnDestroy {
         this.maxDate = new Date(this.today);
         this.dateRange.set([]);
         this.statusFilter.set(null);
+        this.costCenterFilter.set(null);
         this.load(() => this.reportService.findLast30());
     }
 
