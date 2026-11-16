@@ -30,6 +30,14 @@ export function actionArg2HasDefaultValue(selectedAction: DialPlanActionEnum): s
     return '';
 }
 
+export const DEFAULT_DIAL_PEER_TIMEOUT = '30';
+
+/** arg3 da ação DIAL_PEER guarda o tempo de toque do ramal, em segundos. */
+export function actionArg3DefaultValue(selectedAction: DialPlanActionEnum): string {
+    if (selectedAction === DialPlanActionEnum.DIAL_PEER) return DEFAULT_DIAL_PEER_TIMEOUT;
+    return '';
+}
+
 export function actionHasArg1(selectedAction: DialPlanActionEnum): Validators[] {
     if (selectedAction === DialPlanActionEnum.ANSWER || selectedAction === DialPlanActionEnum.HANGUP) return [];
     return [Validators.required];

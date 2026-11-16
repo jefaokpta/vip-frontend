@@ -152,6 +152,8 @@
                                         <app-peer-action-component
                                             formControlName="arg1"
                                             [flags]="action.get('arg2').value"
+                                            (timeoutChange)="action.get('arg3').setValue($event)"
+                                            [timeout]="action.get('arg3').value"
                                             (flagsChange)="action.get('arg2').setValue($event)"
                                             [showError]="action.get('arg1').errors?.['required']"
                                         ></app-peer-action-component>
