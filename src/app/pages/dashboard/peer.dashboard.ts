@@ -14,6 +14,9 @@ import {MessageService} from 'primeng/api';
 import {SelectButton} from 'primeng/selectbutton';
 import {FormsModule} from '@angular/forms';
 import {PickupGroupService} from '@/pabx/pickup-group/pickup-group.service';
+import {WebphoneService} from '@/webphone/webphone.service';
+import {LayoutService} from '@/layout/service/layout.service';
+import {Tooltip} from 'primeng/tooltip';
 
 const SEM_DEPARTAMENTO = 'Sem departamento';
 const VIEW_MODE_KEY = 'peer-dashboard-view-mode';
@@ -21,7 +24,7 @@ const VIEW_MODE_KEY = 'peer-dashboard-view-mode';
 @Component({
     selector: 'app-components-dashboard',
     providers: [{ provide: WebsocketService, useFactory: rxStompServiceFactory }, MessageService],
-    imports: [Toast, NgClass, NgTemplateOutlet, Card, SelectButton, FormsModule],
+    imports: [Toast, NgClass, NgTemplateOutlet, Card, SelectButton, FormsModule, Tooltip],
     template: `
         <p-toast />
         <div class="flex flex-col gap-4">
@@ -112,7 +115,19 @@ const VIEW_MODE_KEY = 'peer-dashboard-view-mode';
                                 {{ peerBadgeLabel(pr) }}
                             </span>
                         </div>
-                        <span class="font-bold text-base">{{ pr.peer.peer }}</span>
+                        <div class="flex items-center justify-between">
+                            <span class="font-bold text-base">{{ pr.peer.peer }}</span>
+                            @if (canCall(pr)) {
+                                <button
+                                    type="button"
+                                    class="pi pi-phone text-green-500 hover:text-green-700 cursor-pointer p-1"
+                                    (click)="callPeer(pr)"
+                                    pTooltip="Ligar pelo webphone"
+                                    tooltipPosition="top"
+                                    [attr.aria-label]="'Ligar para ' + pr.peer.peer"
+                                ></button>
+                            }
+                        </div>
                         <span class="text-sm">{{ pr.peer.name }}</span>
                         @if (pr.channel) {
                             <div class="flex items-center gap-2 mt-1">
@@ -186,8 +201,31 @@ export class PeerDashboard implements OnDestroy, OnInit {
         private readonly dashboardService: PeerDashboardService,
         private readonly userService: UserService,
         private readonly pickupGroupService: PickupGroupService,
-        private readonly messageService: MessageService
+        private readonly messageService: MessageService,
+        private readonly webphoneService: WebphoneService,
+        private readonly layoutService: LayoutService
     ) {}
+
+    /** Só oferece ligar quando o usuário tem webphone (ramal WSS atrelado) e o ramal não é o dele. */
+    canCall(pr: PeerRegistry): boolean {
+        if (!this.userService.webphoneJsSipEnabledSignal()()) return false;
+        console.log('pr pee', pr.peer.peer, 'endpoint', this.userService.getWebphoneRegisterSignal().endpoint);
+        return pr.peer.peer !== this.userService.getWebphoneRegisterSignal().endpoint;
+    }
+
+    callPeer(pr: PeerRegistry): void {
+        if (!this.canCall(pr)) return;
+        this.layoutService.showWebphoneSidebar();
+        if (this.webphoneService.phoneState$().session) {
+            this.messageService.add({
+                severity: 'warn',
+                summary: 'Webphone em chamada',
+                detail: 'Encerre a chamada atual antes de ligar para outro ramal.'
+            });
+            return;
+        }
+        this.webphoneService.makeCall(pr.peer.peer);
+    }
 
     ngOnInit() {
         this.clockInterval = setInterval(() => this.now.set(Date.now()), 1000);
