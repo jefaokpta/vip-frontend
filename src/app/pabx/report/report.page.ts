@@ -3,7 +3,7 @@
  * @email jefaokpta@hotmail.com
  */
 
-import {Component, computed, effect, inject, OnDestroy, OnInit, signal, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, computed, effect, inject, OnDestroy, OnInit, signal, ViewChild} from '@angular/core';
 import {Table, TableModule} from 'primeng/table';
 import {MessageService} from 'primeng/api';
 import {Card} from 'primeng/card';
@@ -168,6 +168,7 @@ interface StatusOption {
                     <input
                         pInputText
                         type="text"
+                        [value]="searchText()"
                         (input)="onFilterGlobal($event)"
                         placeholder="Pesquisar"
                         class="w-full"
@@ -262,13 +263,14 @@ interface StatusOption {
         <p-toast />
     `
 })
-export class ReportPage implements OnInit, OnDestroy {
+export class ReportPage implements OnInit, AfterViewInit, OnDestroy {
     private readonly reportState = inject(ReportStateService);
 
     readonly cdrs = this.reportState.cdrs;
     readonly dateRange = this.reportState.dateRange;
     readonly statusFilter = this.reportState.statusFilter;
     readonly costCenterFilter = this.reportState.costCenterFilter;
+    readonly searchText = this.reportState.searchText;
     readonly loading = signal<boolean>(!this.reportState.loaded());
     readonly costCenterLabelsByCode = signal<Map<string, string>>(new Map());
 
@@ -408,6 +410,11 @@ export class ReportPage implements OnInit, OnDestroy {
             });
     }
 
+    ngAfterViewInit(): void {
+        const text = this.searchText();
+        if (text) this.dt.filterGlobal(text, 'contains');
+    }
+
     ngOnDestroy(): void {
         this.themeSubscription.unsubscribe();
     }
@@ -441,6 +448,7 @@ export class ReportPage implements OnInit, OnDestroy {
     onFilterGlobal(event: Event): void {
         const target = event.target as HTMLInputElement | null;
         if (target) {
+            this.searchText.set(target.value);
             this.dt.filterGlobal(target.value, 'contains');
         }
     }

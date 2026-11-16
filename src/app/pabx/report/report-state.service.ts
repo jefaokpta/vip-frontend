@@ -12,6 +12,7 @@ export class ReportStateService {
     readonly statusFilter = signal<string | null>(null);
     /** Código do centro de custo; '' = chamadas sem centro de custo; null = todos. */
     readonly costCenterFilter = signal<string | null>(null);
+    readonly searchText = signal<string>('');
 
     private readonly _cdrs = signal<Cdr[]>([]);
     private readonly _loaded = signal<boolean>(false);
@@ -29,5 +30,6 @@ export class ReportStateService {
         this.dateRange.set([]);
         this.statusFilter.set(null);
         this.costCenterFilter.set(null);
+        this.searchText.set('');
     }
 }
