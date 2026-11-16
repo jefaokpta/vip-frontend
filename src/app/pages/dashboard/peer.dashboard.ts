@@ -209,8 +209,7 @@ export class PeerDashboard implements OnDestroy, OnInit {
     /** Só oferece ligar quando o usuário tem webphone (ramal WSS atrelado) e o ramal não é o dele. */
     canCall(pr: PeerRegistry): boolean {
         if (!this.userService.webphoneJsSipEnabledSignal()()) return false;
-        console.log('pr pee', pr.peer.peer, 'endpoint', this.userService.getWebphoneRegisterSignal().endpoint);
-        return pr.peer.peer !== this.userService.getWebphoneRegisterSignal().endpoint;
+        return pr.peer.peer !== this.userService.getWebphoneRegisterSignal().endpoint?.split('_')[0];
     }
 
     callPeer(pr: PeerRegistry): void {
