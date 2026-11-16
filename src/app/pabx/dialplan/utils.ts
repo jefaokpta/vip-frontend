@@ -53,6 +53,15 @@ export function dialplanDstLabel(dialplan: DialPlan, aliasNames: Map<string, str
     return aliasNames.get(aliasId) ?? aliasId;
 }
 
+/** Pesquisa da lista de regras: nome ou destino exibido (expressão ou nome do alias). */
+export function matchesDialplanSearch(dialplan: DialPlan, text: string, aliasNames: Map<string, string>): boolean {
+    const term = text.trim().toLocaleLowerCase('pt-BR');
+    if (!term) return true;
+    return [dialplan.name, dialplanDstLabel(dialplan, aliasNames)].some((field) =>
+        (field ?? '').toLocaleLowerCase('pt-BR').includes(term)
+    );
+}
+
 export function sortDialplansByDstAndPriority(dialplans: DialPlan[], aliasNames: Map<string, string>): DialPlan[] {
     // Expressões regulares acima e alias abaixo; destinos idênticos ficam juntos, ordenados pela prioridade.
     const isAlias = (d: DialPlan) => (d.dst ? 0 : 1);

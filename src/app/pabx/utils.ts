@@ -2,7 +2,7 @@ import {Cdr} from '@/pabx/types/cdr';
 import {DialPlanActionEnum} from '@/pabx/types/dial-plan-action-enum';
 import {DtmfModeEnum} from '@/pabx/types/dtmf-mode-enum';
 import {LanguageEnum} from '@/pabx/types/language-enum';
-import {Validators} from '@angular/forms';
+import {ValidatorFn, Validators} from '@angular/forms';
 
 export function sortCdrByDate(cdrs: Cdr[]) {
     return cdrs.sort((a, b) => new Date(b.startTime).getTime() - new Date(a.startTime).getTime());
@@ -28,6 +28,20 @@ export function dtmfSelectOptions(): { value: string; label: string }[] {
 export function actionArg2HasDefaultValue(selectedAction: DialPlanActionEnum): string {
     if (selectedAction === DialPlanActionEnum.DIAL_PEER) return 't';
     return '';
+}
+
+export const DEFAULT_DIAL_PEER_TIMEOUT = '30';
+
+/** arg3 da ação DIAL_PEER guarda o tempo de toque do ramal, em segundos. */
+export function actionArg3DefaultValue(selectedAction: DialPlanActionEnum): string {
+    if (selectedAction === DialPlanActionEnum.DIAL_PEER) return DEFAULT_DIAL_PEER_TIMEOUT;
+    return '';
+}
+
+/** DIAL_PEER: tempo de toque entre 5 e 300s; vazio é aceito (o worker usa 30). */
+export function actionArg3Validators(selectedAction: DialPlanActionEnum): ValidatorFn[] {
+    if (selectedAction === DialPlanActionEnum.DIAL_PEER) return [Validators.min(5), Validators.max(300)];
+    return [];
 }
 
 export function actionHasArg1(selectedAction: DialPlanActionEnum): Validators[] {

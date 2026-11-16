@@ -399,6 +399,15 @@ import {Queue} from '@/pabx/types/queue';
                                         (onClick)="removeAction(i)"
                                     />
                                 </div>
+                                <div class="field md:col-span-4">
+                                    <label class="block mb-2">Descrição</label>
+                                    <input
+                                        pInputText
+                                        formControlName="description"
+                                        maxlength="60"
+                                        placeholder="Equipe de Vendas"
+                                    />
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -509,7 +518,8 @@ export class EditUraPage implements OnInit {
             {
                 option: [action.option, [Validators.required]],
                 uraActionEnum: [action.uraActionEnum, [Validators.required]],
-                target: [action.target ?? null]
+                target: [action.target ?? null],
+                description: [action.description ?? null]
             },
             { validators: [EditUraPage.requireTargetValidator] }
         );
@@ -558,7 +568,8 @@ export class EditUraPage implements OnInit {
                 {
                     option: [null, [Validators.required, Validators.min(0), Validators.max(9)]],
                     uraActionEnum: [UraActionEnum.HANGUP, [Validators.required]],
-                    target: [null]
+                    target: [null],
+                    description: [null]
                 },
                 { validators: [EditUraPage.requireTargetValidator] }
             )

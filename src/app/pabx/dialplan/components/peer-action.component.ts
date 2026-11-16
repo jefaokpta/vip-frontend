@@ -3,6 +3,7 @@ import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModu
 import { Panel } from 'primeng/panel';
 import { PeerSelectComponent } from '@/pabx/dialplan/components/peer-select-component';
 import { InputText } from 'primeng/inputtext';
+import { DEFAULT_DIAL_PEER_TIMEOUT } from '@/pabx/utils';
 
 @Component({
     selector: 'app-peer-action-component',
@@ -35,6 +36,22 @@ import { InputText } from 'primeng/inputtext';
                         (ngModelChange)="onFlagsChange($event)"
                     />
                 </div>
+                <div class="field">
+                    <label for="timeout" class="block">Tempo de toque (segundos)</label>
+                    <input
+                        id="timeout"
+                        pInputText
+                        type="number"
+                        min="5"
+                        max="300"
+                        class="p-inputtext"
+                        [ngModel]="timeout"
+                        (ngModelChange)="onTimeoutChange($event)"
+                    />
+                    @if (timeoutError) {
+                        <small class="p-error block mt-2">Informe entre 5 e 300 segundos.</small>
+                    }
+                </div>
             </div>
         </p-panel>
     `
@@ -43,6 +60,9 @@ export class PeerActionComponent implements ControlValueAccessor {
     @Input() showError = false;
     @Input() flags: string = '';
     @Output() flagsChange = new EventEmitter<string>();
+    @Input() timeout: string = DEFAULT_DIAL_PEER_TIMEOUT;
+    @Output() timeoutChange = new EventEmitter<string>();
+    @Input() timeoutError = false;
     value: string = '';
 
     constructor() {}
@@ -72,5 +92,10 @@ export class PeerActionComponent implements ControlValueAccessor {
     onFlagsChange(flags: string): void {
         this.flags = flags;
         this.flagsChange.emit(flags);
+    }
+
+    onTimeoutChange(timeout: number | string | null): void {
+        this.timeout = timeout == null ? '' : String(timeout);
+        this.timeoutChange.emit(this.timeout);
     }
 }
