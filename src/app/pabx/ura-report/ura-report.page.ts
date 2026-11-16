@@ -12,7 +12,8 @@ import {Ura} from '@/pabx/types/ura';
 import {UraSelection} from '@/pabx/types/ura-selection';
 import {UraService} from '@/pabx/ura/ura.service';
 import {UraReportService} from '@/pabx/ura-report/ura-report.service';
-import {buildOptionBarChart, uraOptionLabel} from '@/pabx/ura-report/ura-option';
+import {uraOptionLabel} from '@/pabx/ura-report/ura-option';
+import {buildCountBarChart} from '@/pabx/report/count-bar-chart';
 import {ChartModule} from 'primeng/chart';
 
 interface OptionSummary {
@@ -128,9 +129,7 @@ export class UraReportPage implements OnInit {
 
     set selections(selections: UraSelection[]) {
         this._selections = selections;
-        const { data, options } = buildOptionBarChart(
-            this.optionSummaries
-        );
+        const { data, options } = buildCountBarChart(this.optionSummaries, 'Seleções');
         this.chartData = data;
         this.chartOptions = options;
     }

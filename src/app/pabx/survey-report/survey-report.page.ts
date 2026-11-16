@@ -12,12 +12,20 @@ import {Survey} from '@/pabx/types/survey';
 import {SurveyResponse} from '@/pabx/types/survey-response';
 import {SurveyService} from '@/pabx/survey/survey.service';
 import {SurveyReportService} from '@/pabx/survey-report/survey-report.service';
+import {answerBars, buildCountBarChart} from '@/pabx/report/count-bar-chart';
+import {ChartModule} from 'primeng/chart';
+
+interface QuestionChart {
+    readonly title: string;
+    readonly data: unknown;
+    readonly options: unknown;
+}
 
 @Component({
     selector: 'app-survey-report-page',
     standalone: true,
     providers: [MessageService],
-    imports: [Card, TableModule, ProgressSpinner, Toast, NgIf, FormsModule, DatePicker, Select],
+    imports: [Card, TableModule, ProgressSpinner, Toast, NgIf, FormsModule, DatePicker, Select, ChartModule],
     template: `
         <p-card>
             <ng-template #title>
@@ -55,28 +63,17 @@ import {SurveyReportService} from '@/pabx/survey-report/survey-report.service';
             @if (!selectedSurvey) {
                 <div class="text-center p-4">Selecione uma pesquisa acima pra ver o relatório.</div>
             } @else {
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-                    <div class="p-4 border rounded-border border-surface-200 dark:border-surface-700">
-                        <div class="text-surface-500 dark:text-surface-400 text-sm mb-1">Total de respostas</div>
-                        <div class="text-2xl font-semibold">{{ responses.length }}</div>
+                @if (responses.length > 0) {
+                    <h3 class="font-semibold text-lg mb-2">Respostas por pergunta ({{ responses.length }} no total)</h3>
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
+                        @for (chart of questionCharts; track chart.title) {
+                            <div class="rounded-xl border border-surface-200 dark:border-surface-700 p-4">
+                                <h4 class="font-semibold mb-2">{{ chart.title }}</h4>
+                                <p-chart type="bar" height="240" [data]="chart.data" [options]="chart.options"></p-chart>
+                            </div>
+                        }
                     </div>
-                    <div class="p-4 border rounded-border border-surface-200 dark:border-surface-700">
-                        <div class="text-surface-500 dark:text-surface-400 text-sm mb-1">Média Pergunta 1</div>
-                        <div class="text-2xl font-semibold">{{ averageLabel(question1Average) }}</div>
-                    </div>
-                    @if (selectedSurvey.question2AudioId) {
-                        <div class="p-4 border rounded-border border-surface-200 dark:border-surface-700">
-                            <div class="text-surface-500 dark:text-surface-400 text-sm mb-1">Média Pergunta 2</div>
-                            <div class="text-2xl font-semibold">{{ averageLabel(question2Average) }}</div>
-                        </div>
-                    }
-                    @if (selectedSurvey.question3AudioId) {
-                        <div class="p-4 border rounded-border border-surface-200 dark:border-surface-700">
-                            <div class="text-surface-500 dark:text-surface-400 text-sm mb-1">Média Pergunta 3</div>
-                            <div class="text-2xl font-semibold">{{ averageLabel(question3Average) }}</div>
-                        </div>
-                    }
-                </div>
+                }
 
                 <p-table
                     [value]="responses"
@@ -106,12 +103,12 @@ import {SurveyReportService} from '@/pabx/survey-report/survey-report.service';
                         <tr>
                             <td>{{ formatDate(response.createdAt) }}</td>
                             <td>{{ response.callerId }}</td>
-                            <td>{{ response.question1Answer ?? '—' }}</td>
+                            <td>{{ response.question1Answer ?? 'Não respondeu' }}</td>
                             @if (selectedSurvey.question2AudioId) {
-                                <td>{{ response.question2Answer ?? '—' }}</td>
+                                <td>{{ response.question2Answer ?? 'Não respondeu' }}</td>
                             }
                             @if (selectedSurvey.question3AudioId) {
-                                <td>{{ response.question3Answer ?? '—' }}</td>
+                                <td>{{ response.question3Answer ?? 'Não respondeu' }}</td>
                             }
                         </tr>
                     </ng-template>
@@ -135,7 +132,17 @@ import {SurveyReportService} from '@/pabx/survey-report/survey-report.service';
 export class SurveyReportPage implements OnInit {
     surveys: Survey[] = [];
     selectedSurvey: Survey | null = null;
-    responses: SurveyResponse[] = [];
+    private _responses: SurveyResponse[] = [];
+    questionCharts: QuestionChart[] = [];
+
+    get responses(): SurveyResponse[] {
+        return this._responses;
+    }
+
+    set responses(responses: SurveyResponse[]) {
+        this._responses = responses;
+        this.questionCharts = this.buildQuestionCharts();
+    }
     dateRange: Date[] = [];
     loading = false;
 
@@ -154,9 +161,19 @@ export class SurveyReportPage implements OnInit {
     ) {}
 
     ngOnInit(): void {
-        this.surveyService.findAll().then((surveys) => {
-            this.surveys = surveys;
-        });
+        this.surveyService
+            .findAll()
+            .then((surveys) => {
+                this.surveys = surveys;
+            })
+            .catch(() => {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Erro ao carregar pesquisas',
+                    detail: 'Tente novamente mais tarde.',
+                    life: 10_000
+                });
+            });
     }
 
     onSurveySelect(): void {
@@ -230,16 +247,21 @@ export class SurveyReportPage implements OnInit {
         });
     }
 
-    get question1Average(): number | null {
-        return this.average(this.responses.map((r) => r.question1Answer));
-    }
-
-    get question2Average(): number | null {
-        return this.average(this.responses.map((r) => r.question2Answer));
-    }
-
-    get question3Average(): number | null {
-        return this.average(this.responses.map((r) => r.question3Answer));
+    private buildQuestionCharts(): QuestionChart[] {
+        const survey = this.selectedSurvey;
+        if (!survey) return [];
+        const questions: (keyof SurveyResponse)[] = ['question1Answer'];
+        if (survey.question2AudioId) questions.push('question2Answer');
+        if (survey.question3AudioId) questions.push('question3Answer');
+        return questions.map((field, index) => {
+            const { data, options } = buildCountBarChart(
+                answerBars(this._responses.map((r) => r[field] as number | undefined)),
+                'Respostas'
+            );
+            const answers = this._responses.map((r) => r[field] as number | undefined);
+            const average = this.averageLabel(this.average(answers));
+            return { title: `Pergunta ${index + 1} (média ${average})`, data, options };
+        });
     }
 
     private average(values: (number | undefined)[]): number | null {
