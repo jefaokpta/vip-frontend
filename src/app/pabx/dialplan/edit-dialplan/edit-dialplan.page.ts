@@ -29,7 +29,7 @@ import { CalendarActionComponent } from '@/pabx/dialplan/components/calendar-act
 import { CallGroupActionComponent } from '@/pabx/dialplan/components/call-group-action.component';
 import { UraActionComponent } from '@/pabx/dialplan/components/ura-action.component';
 import { QueueActionComponent } from '@/pabx/dialplan/components/queue-action.component';
-import { actionArg3DefaultValue } from '@/pabx/utils';
+import { actionArg3DefaultValue, actionArg3Validators } from '@/pabx/utils';
 
 /**
  * @author Jefferson Alves Reis (jefaokpta)
@@ -163,7 +163,10 @@ export class EditDialplanPage implements OnInit {
                             action.arg2,
                             action.actionEnum === DialPlanActionEnum.SET_VARIABLE ? [Validators.required] : []
                         ],
-                        arg3: [action.arg3 || actionArg3DefaultValue(action.actionEnum)],
+                        arg3: [
+                            action.arg3 || actionArg3DefaultValue(action.actionEnum),
+                            actionArg3Validators(action.actionEnum)
+                        ],
                         arg4: [action.arg4]
                     })
                 );
@@ -177,7 +180,10 @@ export class EditDialplanPage implements OnInit {
                 actionEnum: this.selectedAction?.value,
                 arg1: ['', this.hasValidatorOnArg1(this.selectedAction?.value)],
                 arg2: ['', this.selectedAction.value === DialPlanActionEnum.SET_VARIABLE ? [Validators.required] : []],
-                arg3: [actionArg3DefaultValue(this.selectedAction?.value)],
+                arg3: [
+                    actionArg3DefaultValue(this.selectedAction?.value),
+                    actionArg3Validators(this.selectedAction?.value)
+                ],
                 arg4: ['']
             })
         );

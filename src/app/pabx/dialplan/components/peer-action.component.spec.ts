@@ -38,3 +38,23 @@ describe('PeerActionComponent - tempo de toque', () => {
         expect(emitted).toEqual(['45']);
     });
 });
+
+describe('PeerActionComponent - erro de tempo de toque', () => {
+    it('mostra a mensagem quando timeoutError é verdadeiro', async () => {
+        await TestBed.configureTestingModule({
+            imports: [PeerActionComponent],
+            providers: [
+                provideNoopAnimations(),
+                {
+                    provide: PeerService,
+                    useValue: { findAll: () => Promise.resolve([]), findAvailable: () => Promise.resolve([]) }
+                }
+            ]
+        }).compileComponents();
+        const fixture = TestBed.createComponent(PeerActionComponent);
+        fixture.componentRef.setInput('timeoutError', true);
+        fixture.detectChanges();
+
+        expect(fixture.nativeElement.textContent).toContain('Informe entre 5 e 300 segundos.');
+    });
+});

@@ -156,6 +156,7 @@
                                             [flags]="action.get('arg2').value"
                                             (timeoutChange)="action.get('arg3').setValue($event)"
                                             [timeout]="action.get('arg3').value"
+                                            [timeoutError]="action.get('arg3').invalid"
                                         ></app-peer-action-component>
                                     </ng-container>
                                     <ng-container *ngIf="action.get('actionEnum').value == 'ACCOUNT_CODE'">

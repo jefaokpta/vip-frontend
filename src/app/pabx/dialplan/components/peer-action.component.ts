@@ -48,6 +48,9 @@ import { DEFAULT_DIAL_PEER_TIMEOUT } from '@/pabx/utils';
                         [ngModel]="timeout"
                         (ngModelChange)="onTimeoutChange($event)"
                     />
+                    @if (timeoutError) {
+                        <small class="p-error block mt-2">Informe entre 5 e 300 segundos.</small>
+                    }
                 </div>
             </div>
         </p-panel>
@@ -59,6 +62,7 @@ export class PeerActionComponent implements ControlValueAccessor {
     @Output() flagsChange = new EventEmitter<string>();
     @Input() timeout: string = DEFAULT_DIAL_PEER_TIMEOUT;
     @Output() timeoutChange = new EventEmitter<string>();
+    @Input() timeoutError = false;
     value: string = '';
 
     constructor() {}
