@@ -15,7 +15,7 @@ import {InputNumber} from 'primeng/inputnumber';
 import {PickList} from 'primeng/picklist';
 import {transferPickListItems} from '@/util/utils';
 
-const byName = (a: Peer, b: Peer) => a.name.localeCompare(b.name, 'pt-BR', { numeric: true, sensitivity: 'base' });
+const byPeer = (a: Peer, b: Peer) => a.peer.localeCompare(b.peer, 'pt-BR', { numeric: true, sensitivity: 'base' });
 
 @Component({
     selector: 'app-edit-call-group-page',
@@ -122,7 +122,7 @@ const byName = (a: Peer, b: Peer) => a.name.localeCompare(b.name, 'pt-BR', { num
                         <ng-template let-peer pTemplate="item">
                             <div class="flex items-center gap-2">
                                 <i class="pi pi-phone"></i>
-                                <span>{{ peer.name }} ({{ peer.peer }})</span>
+                                <span>{{ peer.peer }} ({{ peer.name }})</span>
                             </div>
                         </ng-template>
                     </p-picklist>
@@ -208,7 +208,7 @@ export class EditCallGroupPage implements OnInit {
                     callGroupSoundId: group.callGroupSoundId
                 });
                 this.selectedPeers = group.peerIds.map((id) => peers.find((p) => p.id === id)!);
-                this.availablePeers = peers.filter((p) => !group.peerIds.includes(p.id)).sort(byName);
+                this.availablePeers = peers.filter((p) => !group.peerIds.includes(p.id)).sort(byPeer);
             })
             .catch(() => (this.loadError = true));
     }

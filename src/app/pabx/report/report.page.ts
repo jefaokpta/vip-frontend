@@ -3,7 +3,7 @@
  * @email jefaokpta@hotmail.com
  */
 
-import {Component, computed, effect, inject, OnDestroy, OnInit, signal, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, computed, effect, inject, OnDestroy, OnInit, signal, ViewChild} from '@angular/core';
 import {Table, TableModule} from 'primeng/table';
 import {MessageService} from 'primeng/api';
 import {Card} from 'primeng/card';
@@ -106,6 +106,19 @@ interface StatusOption {
                                 styleClass="w-44"
                             ></p-select>
                         </div>
+                        <div class="flex flex-col gap-1">
+                            <label class="text-xs font-semibold uppercase tracking-wide text-surface-500">
+                                Centro de Custo
+                            </label>
+                            <p-select
+                                [options]="costCenterOptions()"
+                                [ngModel]="costCenterFilter()"
+                                (ngModelChange)="costCenterFilter.set($event)"
+                                optionLabel="label"
+                                optionValue="value"
+                                styleClass="w-44"
+                            ></p-select>
+                        </div>
                     </div>
                 </div>
             </ng-template>
@@ -155,6 +168,7 @@ interface StatusOption {
                     <input
                         pInputText
                         type="text"
+                        [value]="searchText()"
                         (input)="onFilterGlobal($event)"
                         placeholder="Pesquisar"
                         class="w-full"
@@ -249,12 +263,14 @@ interface StatusOption {
         <p-toast />
     `
 })
-export class ReportPage implements OnInit, OnDestroy {
+export class ReportPage implements OnInit, AfterViewInit, OnDestroy {
     private readonly reportState = inject(ReportStateService);
 
     readonly cdrs = this.reportState.cdrs;
     readonly dateRange = this.reportState.dateRange;
     readonly statusFilter = this.reportState.statusFilter;
+    readonly costCenterFilter = this.reportState.costCenterFilter;
+    readonly searchText = this.reportState.searchText;
     readonly loading = signal<boolean>(!this.reportState.loaded());
     readonly costCenterLabelsByCode = signal<Map<string, string>>(new Map());
 
@@ -276,8 +292,23 @@ export class ReportPage implements OnInit, OnDestroy {
 
     readonly filteredCdrs = computed(() => {
         const status = this.statusFilter();
-        const all = this.cdrs();
-        return status ? all.filter((c) => c.disposition === status) : all;
+        const costCenter = this.costCenterFilter();
+        return this.cdrs().filter(
+            (c) =>
+                (!status || c.disposition === status) &&
+                (costCenter === null || (c.accountCode ?? '') === costCenter)
+        );
+    });
+
+    readonly costCenterOptions = computed<StatusOption[]>(() => {
+        const labelsByCode = this.costCenterLabelsByCode();
+        const codes = Array.from(new Set(this.cdrs().map((c) => c.accountCode ?? '')));
+        const options = codes
+            .filter((code) => code !== '')
+            .map((code) => ({ label: labelsByCode.get(code) ?? code, value: code }))
+            .sort((a, b) => a.label.localeCompare(b.label));
+        if (codes.includes('')) options.push({ label: 'Sem centro de custo', value: '' });
+        return [{ label: 'Todos', value: null }, ...options];
     });
 
     readonly statusOptions = computed<StatusOption[]>(() => {
@@ -379,6 +410,11 @@ export class ReportPage implements OnInit, OnDestroy {
             });
     }
 
+    ngAfterViewInit(): void {
+        const text = this.searchText();
+        if (text) this.dt.filterGlobal(text, 'contains');
+    }
+
     ngOnDestroy(): void {
         this.themeSubscription.unsubscribe();
     }
@@ -396,6 +432,7 @@ export class ReportPage implements OnInit, OnDestroy {
             const end = new Date(range[1]);
             end.setHours(23, 59, 59, 999);
             this.statusFilter.set(null);
+            this.costCenterFilter.set(null);
             this.load(() => this.reportService.findByDateRange(range[0], end));
         }
     }
@@ -404,12 +441,14 @@ export class ReportPage implements OnInit, OnDestroy {
         this.maxDate = new Date(this.today);
         this.dateRange.set([]);
         this.statusFilter.set(null);
+        this.costCenterFilter.set(null);
         this.load(() => this.reportService.findLast30());
     }
 
     onFilterGlobal(event: Event): void {
         const target = event.target as HTMLInputElement | null;
         if (target) {
+            this.searchText.set(target.value);
             this.dt.filterGlobal(target.value, 'contains');
         }
     }

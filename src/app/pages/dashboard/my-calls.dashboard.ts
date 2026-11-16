@@ -9,7 +9,6 @@ import {MessageService} from 'primeng/api';
 import {Card} from 'primeng/card';
 import {ProgressSpinner} from 'primeng/progressspinner';
 import {Toast} from 'primeng/toast';
-import {CurrencyPipe} from '@angular/common';
 import {ChartModule} from 'primeng/chart';
 import {Tag} from 'primeng/tag';
 import {Button} from 'primeng/button';
@@ -47,7 +46,6 @@ const PERIOD_DAYS = 30;
         Toast,
         ChartModule,
         Tag,
-        CurrencyPipe,
         Button,
         IconField,
         InputIcon,
@@ -144,10 +142,6 @@ const PERIOD_DAYS = 30;
                             Duração
                             <p-sortIcon field="billableSeconds"></p-sortIcon>
                         </th>
-                        <th pSortableColumn="cost">
-                            Custo
-                            <p-sortIcon field="cost"></p-sortIcon>
-                        </th>
                         <th>Ações</th>
                     </tr>
                 </ng-template>
@@ -174,7 +168,6 @@ const PERIOD_DAYS = 30;
                         </td>
                         <td>{{ cdr.costCenter }}</td>
                         <td>{{ formatDuration(cdr.billableSeconds) }}</td>
-                        <td>{{ cdr.cost | currency: 'BRL' : true : '1.2-2' }}</td>
                         <td>
                             <p-button
                                 icon="pi pi-search"
@@ -191,7 +184,7 @@ const PERIOD_DAYS = 30;
 
                 <ng-template pTemplate="emptymessage">
                     <tr>
-                        <td colspan="8">
+                        <td colspan="7">
                             @if (loading()) {
                                 <div class="flex justify-center p-4">
                                     <p-progress-spinner [style]="{ width: '2rem', height: '2rem' }" />
