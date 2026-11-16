@@ -121,7 +121,7 @@ import {Select} from 'primeng/select';
                 [(selection)]="selectedDialplans"
                 dataKey="id"
                 [paginator]="true"
-                [rows]="15"
+                [rows]="60"
                 [tableStyle]="{ 'min-width': '40rem' }"
                 stripedRows
             >
