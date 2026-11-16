@@ -32,6 +32,7 @@ import {PeerTransportEnum} from '@/pabx/types/peer-transport-enum';
                 placeholder="Selecione um ramal"
                 appendTo="body"
             ></p-select>
+            <small *ngIf="loadError" class="p-error block mt-2"> Erro ao carregar ramais. Tente novamente mais tarde. </small>
             <small *ngIf="showError" class="p-error block mt-2"> Ramal é obrigatório. </small>
         </div>
     `
@@ -46,6 +47,7 @@ export class PeerSelectComponent implements ControlValueAccessor, OnInit {
 
     value: string = '';
     peerOptions: { label: string; value: string }[] = [];
+    loadError = false;
 
     constructor(private readonly peerService: PeerService) {}
 
@@ -54,16 +56,19 @@ export class PeerSelectComponent implements ControlValueAccessor, OnInit {
 
     ngOnInit() {
         const peers$ = this.isOnlyAvailable ? this.peerService.findAvailable() : this.peerService.findAll();
-        peers$.then((peers) => {
-            this.peerOptions = peers.map((peer) => ({ label: `${peer.name} (${peer.peer})`, value: peer.peer }));
+        peers$.then((unsorted) => {
+            const peers = [...unsorted].sort((a, b) =>
+                a.peer.localeCompare(b.peer, 'pt-BR', { numeric: true, sensitivity: 'base' })
+            );
+            this.peerOptions = peers.map((peer) => ({ label: `${peer.peer} (${peer.name})`, value: peer.peer }));
             if (this.isShowAnyPeerLabel) this.peerOptions.unshift({ label: 'TODOS', value: 'ANY' });
             if (this.isOnlyWSS) {
                 this.peerOptions = peers
                     .filter((peer) => peer.peerTransportEnums.includes(PeerTransportEnum.WSS))
-                    .map((peer) => ({ label: `${peer.name} (${peer.peer})`, value: peer.peer }));
+                    .map((peer) => ({ label: `${peer.peer} (${peer.name})`, value: peer.peer }));
             }
             if (this.isOnDialplanAction) this.peerOptions.unshift({ label: 'DESTINO', value: 'DST' });
-        });
+        }).catch(() => (this.loadError = true));
     }
 
     writeValue(value: string): void {

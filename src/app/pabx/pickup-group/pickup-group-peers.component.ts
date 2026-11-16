@@ -44,7 +44,7 @@ interface PeerOption {
                 <ng-template let-peer pTemplate="item">
                     <div class="flex items-center gap-2">
                         <i class="pi pi-phone"></i>
-                        <span>{{ peer.name }} ({{ peer.peer }})</span>
+                        <span>{{ peer.peer }} ({{ peer.name }})</span>
                         @if (peer.groupName) {
                             <span class="text-sm text-muted-color">— {{ peer.groupName }}</span>
                         }
@@ -74,7 +74,7 @@ export class PickupGroupPeersComponent implements OnInit {
                 const groupNames = new Map(groups.map((g) => [String(g.id), g.name]));
                 const ownGroup = this.groupId === undefined ? undefined : String(this.groupId);
                 const sorted = [...peers].sort((a, b) =>
-                    a.name.localeCompare(b.name, 'pt-BR', { numeric: true, sensitivity: 'base' })
+                    a.peer.localeCompare(b.peer, 'pt-BR', { numeric: true, sensitivity: 'base' })
                 );
                 this.selectedPeers = sorted
                     .filter((p) => ownGroup && p.pickUpGroup === ownGroup)
