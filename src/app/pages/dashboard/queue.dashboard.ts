@@ -118,7 +118,7 @@ import {UserService} from '@/pages/users/user.service';
                                 *ngFor="let q of queues()"
                                 class="rounded-xl shadow px-4 py-3 flex flex-col gap-2 transition-all duration-300 border-l-4 cursor-pointer hover:opacity-80"
                                 [ngClass]="queueBorderClass(q)"
-                                [routerLink]="['/pabx/queues/detail', q.queue.id]"
+                                [routerLink]="['/pages/queues/detail', q.queue.id]"
                             >
                                 <!-- Header row -->
                                 <div class="flex items-start justify-between">

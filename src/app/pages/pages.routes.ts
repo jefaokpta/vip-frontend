@@ -4,6 +4,7 @@ import {PeerDashboard} from '@/pages/dashboard/peer.dashboard';
 import {QueueDashboard} from '@/pages/dashboard/queue.dashboard';
 import {WorkersDashboard} from '@/pages/dashboard/workers.dashboard';
 import {QueueLoginPage} from '@/pages/queues/queue-login';
+import {QueueDetailPage} from '@/pages/queues/queue-detail.page';
 import {PabxFeaturesPage} from '@/pages/pabx-features/pabx-features.page';
 import {moduleGuard} from '@/security/module-guard';
 import {roleGuard} from '@/security/role-guard';
@@ -27,6 +28,12 @@ export default [
         component: QueueDashboard,
         canActivate: [moduleGuard(ModuleEnum.PABX), roleGuard(RoleEnum.ROLE_COMPANY_SUPERVISOR)],
         data: { breadcrumb: 'Painel de Filas' }
+    },
+    {
+        path: 'queues/detail/:id',
+        component: QueueDetailPage,
+        canActivate: [moduleGuard(ModuleEnum.PABX), roleGuard(RoleEnum.ROLE_COMPANY_SUPERVISOR)],
+        data: { breadcrumb: 'Painel de Filas > Detalhe' }
     },
     { path: 'queue-login', component: QueueLoginPage, data: { breadcrumb: 'Minhas Filas' } },
     { path: 'pabx-features', component: PabxFeaturesPage, data: { breadcrumb: 'Facilidades do PABX' } },
