@@ -141,6 +141,14 @@ export class QueuesPage implements OnInit {
         this.queueService.findAll().then((queues) => {
             this.queues = queues;
             this.loading = false;
+        }).catch(() => {
+            this.loading = false;
+            this.messageService.add({
+                severity: 'error',
+                summary: 'Não foi possível carregar as filas',
+                detail: 'Tente novamente mais tarde.',
+                life: 15_000
+            });
         });
     }
 
