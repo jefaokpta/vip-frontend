@@ -4,6 +4,8 @@ import {NgClass, NgForOf} from '@angular/common';
 import {Card} from 'primeng/card';
 import {ChartModule} from 'primeng/chart';
 import {RouterLink} from '@angular/router';
+import {MessageService} from 'primeng/api';
+import {Toast} from 'primeng/toast';
 import {QueueDashboardService} from '@/pages/dashboard/queue-dashboard.service';
 import {HourlyCalls} from '@/pabx/types/hourly-calls';
 import {
@@ -27,9 +29,10 @@ import {UserService} from '@/pages/users/user.service';
 @Component({
     selector: 'app-queue-dashboard',
     standalone: true,
-    providers: [{ provide: WebsocketService, useFactory: rxStompServiceFactory }],
-    imports: [NgClass, NgForOf, Card, ChartModule, RouterLink],
+    providers: [{ provide: WebsocketService, useFactory: rxStompServiceFactory }, MessageService],
+    imports: [NgClass, NgForOf, Card, ChartModule, RouterLink, Toast],
     template: `
+        <p-toast />
         <div class="flex flex-col gap-4">
             <!-- Page Header -->
             <div>
@@ -118,7 +121,7 @@ import {UserService} from '@/pages/users/user.service';
                                 *ngFor="let q of queues()"
                                 class="rounded-xl shadow px-4 py-3 flex flex-col gap-2 transition-all duration-300 border-l-4 cursor-pointer hover:opacity-80"
                                 [ngClass]="queueBorderClass(q)"
-                                [routerLink]="['/pabx/queues/detail', q.queue.id]"
+                                [routerLink]="['/pages/queues/detail', q.queue.id]"
                             >
                                 <!-- Header row -->
                                 <div class="flex items-start justify-between">
@@ -353,7 +356,8 @@ export class QueueDashboard implements OnInit, OnDestroy {
     constructor(
         private readonly queueDashboardService: QueueDashboardService,
         private readonly webSocketService: WebsocketService,
-        private readonly userService: UserService
+        private readonly userService: UserService,
+        private readonly messageService: MessageService
     ) {}
 
     ngOnInit(): void {
@@ -363,6 +367,13 @@ export class QueueDashboard implements OnInit, OnDestroy {
         this.tickInterval = setInterval(() => this.now.set(Date.now()), 1000);
         this.queueDashboardService.findAllQueueStates().then((queueStates) => {
             this.queues.set(queueStates);
+        }).catch(() => {
+            this.messageService.add({
+                severity: 'error',
+                summary: 'Não foi possível carregar as filas',
+                detail: 'Tente novamente mais tarde.',
+                life: 15_000
+            });
         });
 
         const companyId = this.userService.getUser().companyId;
