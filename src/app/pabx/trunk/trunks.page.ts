@@ -166,11 +166,11 @@ export class TrunkPage implements OnInit {
                             life: 15_000
                         });
                     })
-                    .catch(() => {
+                    .catch((error) => {
                         this.messageService.add({
                             severity: 'error',
-                            summary: 'Desculpe não foi possível remover o tronco',
-                            detail: 'Tente novamente mais tarde.',
+                            summary: 'Não foi possível remover o tronco',
+                            detail: error?.error?.message ?? 'Tente novamente mais tarde.',
                             life: 15_000
                         });
                     });

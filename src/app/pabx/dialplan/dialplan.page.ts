@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, OnInit, signal, ViewChild} from '@angular/core';
 import {Card} from 'primeng/card';
 import {IconField} from 'primeng/iconfield';
 import {InputIcon} from 'primeng/inputicon';
@@ -17,7 +17,12 @@ import {Tooltip} from 'primeng/tooltip';
 import {InputText} from 'primeng/inputtext';
 import {ConfirmationService, MessageService} from 'primeng/api';
 import {DialPlanService} from '@/pabx/dialplan/dial-plan.service';
-import {dialplanDstLabel, dialplanSrcLabel, sortDialplansByDstAndPriority} from '@/pabx/dialplan/utils';
+import {
+    dialplanDstLabel,
+    dialplanSrcLabel,
+    matchesDialplanSearch,
+    sortDialplansByDstAndPriority
+} from '@/pabx/dialplan/utils';
 import {TrunkService} from '@/pabx/trunk/trunk.service';
 import {AliasService} from '@/pabx/alias/alias.service';
 import {FormsModule} from '@angular/forms';
@@ -112,12 +117,11 @@ import {Select} from 'primeng/select';
 
             <p-table
                 #dataTable
-                [value]="dialplans"
+                [value]="visibleDialplans()"
                 [(selection)]="selectedDialplans"
                 dataKey="id"
                 [paginator]="true"
-                [rows]="15"
-                [globalFilterFields]="['name']"
+                [rows]="60"
                 [tableStyle]="{ 'min-width': '40rem' }"
                 stripedRows
             >
@@ -199,6 +203,7 @@ import {Select} from 'primeng/select';
 })
 export class DialplanPage implements OnInit {
     dialplans: DialPlan[] = [];
+    readonly searchText = signal('');
     @ViewChild('dataTable') dt!: Table;
     loading = true;
     selectionMode = false;
@@ -254,6 +259,10 @@ export class DialplanPage implements OnInit {
         }
     }
 
+    visibleDialplans(): DialPlan[] {
+        return this.dialplans.filter((dialplan) => matchesDialplanSearch(dialplan, this.searchText(), this.aliasMap));
+    }
+
     dstLabel(dialplan: DialPlan): string {
         return dialplanDstLabel(dialplan, this.aliasMap);
     }
@@ -269,7 +278,8 @@ export class DialplanPage implements OnInit {
     onFilterGlobal(event: Event) {
         const target = event.target as HTMLInputElement | null;
         if (target) {
-            this.dt.filterGlobal(target.value, 'contains');
+            this.searchText.set(target.value);
+            this.dt.first = 0;
         }
     }
 

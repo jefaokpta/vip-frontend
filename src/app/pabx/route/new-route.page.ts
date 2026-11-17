@@ -4,6 +4,7 @@ import {InputTextModule} from 'primeng/inputtext';
 import {ButtonModule} from 'primeng/button';
 import {CardModule} from 'primeng/card';
 import {Router, RouterLink} from '@angular/router';
+import { withClearedTrunksAsZero } from '@/pabx/route/route-trunks';
 import {RouteService} from '@/pabx/route/route.service';
 import {InputNumber} from 'primeng/inputnumber';
 import {Select} from 'primeng/select';
@@ -115,6 +116,7 @@ import {AccountCode} from '@/pabx/types/account-code';
                                             optionLabel="label"
                                             optionValue="value"
                                             placeholder="Selecione um tronco"
+                                            [showClear]="true"
                                             appendTo="body"
                                         ></p-select>
                                     </td>
@@ -125,6 +127,7 @@ import {AccountCode} from '@/pabx/types/account-code';
                                             optionLabel="label"
                                             optionValue="value"
                                             placeholder="Selecione um tronco"
+                                            [showClear]="true"
                                             appendTo="body"
                                         ></p-select>
                                     </td>
@@ -135,6 +138,7 @@ import {AccountCode} from '@/pabx/types/account-code';
                                             optionLabel="label"
                                             optionValue="value"
                                             placeholder="Selecione um tronco"
+                                            [showClear]="true"
                                             appendTo="body"
                                         ></p-select>
                                     </td>
@@ -199,9 +203,9 @@ export class NewRoutePage implements OnInit {
     private addRouteTrunk(accountCode: string) {
         const routeTrunkRow = this.fb.group({
             accountCode: [accountCode, [Validators.required]],
-            trunk1: [''],
-            trunk2: [''],
-            trunk3: ['']
+            trunk1: [0],
+            trunk2: [0],
+            trunk3: [0]
         });
         this.routeTrunks.push(routeTrunkRow);
     }
@@ -220,7 +224,7 @@ export class NewRoutePage implements OnInit {
         this.pending = true;
         this.showError = false;
         this.routeService
-            .create(this.form.value)
+            .create(withClearedTrunksAsZero(this.form.value))
             .then(() => this.router.navigate(['/pabx/routes']))
             .catch(() => {
                 this.showError = true;

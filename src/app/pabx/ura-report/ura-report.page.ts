@@ -12,9 +12,13 @@ import {Ura} from '@/pabx/types/ura';
 import {UraSelection} from '@/pabx/types/ura-selection';
 import {UraService} from '@/pabx/ura/ura.service';
 import {UraReportService} from '@/pabx/ura-report/ura-report.service';
+import {uraOptionLabel} from '@/pabx/ura-report/ura-option';
+import {buildCountBarChart} from '@/pabx/report/count-bar-chart';
+import {ChartModule} from 'primeng/chart';
 
 interface OptionSummary {
     readonly optionDigit: number;
+    readonly label: string;
     readonly count: number;
     readonly percentage: number;
 }
@@ -23,7 +27,7 @@ interface OptionSummary {
     selector: 'app-ura-report-page',
     standalone: true,
     providers: [MessageService],
-    imports: [Card, TableModule, ProgressSpinner, Toast, NgIf, FormsModule, DatePicker, Select],
+    imports: [Card, TableModule, ProgressSpinner, Toast, NgIf, FormsModule, DatePicker, Select, ChartModule],
     template: `
         <p-card>
             <ng-template #title>
@@ -61,22 +65,14 @@ interface OptionSummary {
             @if (!selectedUra) {
                 <div class="text-center p-4">Selecione uma URA acima pra ver o relatório.</div>
             } @else {
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-                    <div class="p-4 border rounded-border border-surface-200 dark:border-surface-700">
-                        <div class="text-surface-500 dark:text-surface-400 text-sm mb-1">Total de seleções</div>
-                        <div class="text-2xl font-semibold">{{ selections.length }}</div>
+                @if (selections.length > 0) {
+                    <div class="rounded-xl border border-surface-200 dark:border-surface-700 p-4 mb-4">
+                        <h3 class="font-semibold text-lg mb-2">
+                            Seleções por opção ({{ selections.length }} no total)
+                        </h3>
+                        <p-chart type="bar" height="280" [data]="chartData" [options]="chartOptions"></p-chart>
                     </div>
-                    @for (summary of optionSummaries; track summary.optionDigit) {
-                        <div class="p-4 border rounded-border border-surface-200 dark:border-surface-700">
-                            <div class="text-surface-500 dark:text-surface-400 text-sm mb-1">
-                                Opção {{ summary.optionDigit }}
-                            </div>
-                            <div class="text-2xl font-semibold">
-                                {{ summary.count }} ({{ summary.percentage.toFixed(1) }}%)
-                            </div>
-                        </div>
-                    }
-                </div>
+                }
 
                 <p-table
                     [value]="selections"
@@ -93,7 +89,6 @@ interface OptionSummary {
                             </th>
                             <th>Telefone</th>
                             <th>Opção</th>
-                            <th>Ação Executada</th>
                         </tr>
                     </ng-template>
 
@@ -101,14 +96,13 @@ interface OptionSummary {
                         <tr>
                             <td>{{ formatDate(selection.createdAt) }}</td>
                             <td>{{ selection.callerId }}</td>
-                            <td>{{ selection.optionDigit }}</td>
-                            <td>{{ actionLabel(selection) }}</td>
+                            <td>{{ optionLabel(selection.optionDigit) }}</td>
                         </tr>
                     </ng-template>
 
                     <ng-template pTemplate="emptymessage">
                         <tr>
-                            <td colspan="4">
+                            <td colspan="3">
                                 <div class="flex justify-center p-4" *ngIf="loading">
                                     <p-progress-spinner [style]="{ width: '2rem', height: '2rem' }" />
                                 </div>
@@ -125,7 +119,20 @@ interface OptionSummary {
 export class UraReportPage implements OnInit {
     uras: Ura[] = [];
     selectedUra: Ura | null = null;
-    selections: UraSelection[] = [];
+    private _selections: UraSelection[] = [];
+    chartData: unknown;
+    chartOptions: unknown;
+
+    get selections(): UraSelection[] {
+        return this._selections;
+    }
+
+    set selections(selections: UraSelection[]) {
+        this._selections = selections;
+        const { data, options } = buildCountBarChart(this.optionSummaries, 'Seleções');
+        this.chartData = data;
+        this.chartOptions = options;
+    }
     dateRange: Date[] = [];
     loading = false;
 
@@ -144,9 +151,19 @@ export class UraReportPage implements OnInit {
     ) {}
 
     ngOnInit(): void {
-        this.uraService.findAll().then((uras) => {
-            this.uras = uras;
-        });
+        this.uraService
+            .findAll()
+            .then((uras) => {
+                this.uras = uras;
+            })
+            .catch(() => {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Erro ao carregar URAs',
+                    detail: 'Tente novamente mais tarde.',
+                    life: 10_000
+                });
+            });
     }
 
     onUraSelect(): void {
@@ -234,26 +251,14 @@ export class UraReportPage implements OnInit {
             .sort(([a], [b]) => a - b)
             .map(([optionDigit, count]) => ({
                 optionDigit,
+                label: this.optionLabel(optionDigit),
                 count,
                 percentage: (count / total) * 100
             }));
     }
 
-    actionLabel(selection: UraSelection): string {
-        switch (selection.actionType) {
-            case 'HANGUP':
-                return 'Desligou';
-            case 'DIALPEER':
-                return `Ramal ${selection.target}`;
-            case 'RETURN_TO_START':
-                return 'Voltou ao início';
-            case 'CALLGROUP':
-                return `Grupo de captura ${selection.target}`;
-            case 'SUBURA':
-                return `Sub URA ${selection.target}`;
-            default:
-                return selection.actionType;
-        }
+    optionLabel(optionDigit: number): string {
+        return this.selectedUra ? uraOptionLabel(optionDigit, this.selectedUra) : `${optionDigit}`;
     }
 
     formatDate(createdAt: Date | string): string {

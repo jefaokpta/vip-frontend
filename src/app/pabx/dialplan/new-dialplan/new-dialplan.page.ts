@@ -26,7 +26,7 @@ import { CalendarActionComponent } from '@/pabx/dialplan/components/calendar-act
 import { CallGroupActionComponent } from '@/pabx/dialplan/components/call-group-action.component';
 import { UraActionComponent } from '@/pabx/dialplan/components/ura-action.component';
 import { QueueActionComponent } from '@/pabx/dialplan/components/queue-action.component';
-import { actionArg2HasDefaultValue, actionHasArg1 } from '@/pabx/utils';
+import { actionArg2HasDefaultValue, actionArg3DefaultValue, actionArg3Validators, actionHasArg1 } from '@/pabx/utils';
 
 /**
  * @author Jefferson Alves Reis (jefaokpta)
@@ -142,7 +142,10 @@ export class NewDialplanPage implements OnInit {
                     actionArg2HasDefaultValue(this.selectedAction?.value),
                     this.selectedAction.value === DialPlanActionEnum.SET_VARIABLE ? [Validators.required] : []
                 ],
-                arg3: [''],
+                arg3: [
+                    actionArg3DefaultValue(this.selectedAction?.value),
+                    actionArg3Validators(this.selectedAction?.value)
+                ],
                 arg4: ['']
             })
         );

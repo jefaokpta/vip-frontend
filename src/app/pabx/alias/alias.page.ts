@@ -1,19 +1,19 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { Table, TableModule } from 'primeng/table';
-import { ConfirmationService, MessageService } from 'primeng/api';
-import { Card } from 'primeng/card';
-import { IconField } from 'primeng/iconfield';
-import { InputIcon } from 'primeng/inputicon';
-import { InputText } from 'primeng/inputtext';
-import { Button } from 'primeng/button';
-import { AliasService } from '@/pabx/alias/alias.service';
-import { RouterLink } from '@angular/router';
-import { ProgressSpinner } from 'primeng/progressspinner';
-import { ConfirmDialog } from 'primeng/confirmdialog';
-import { Toast } from 'primeng/toast';
-import { Alias } from '@/pabx/types/alias';
-import { NgIf } from '@angular/common';
-import { Tooltip } from 'primeng/tooltip';
+import {Component, OnInit, ViewChild} from '@angular/core';
+import {Table, TableModule} from 'primeng/table';
+import {ConfirmationService, MessageService} from 'primeng/api';
+import {Card} from 'primeng/card';
+import {IconField} from 'primeng/iconfield';
+import {InputIcon} from 'primeng/inputicon';
+import {InputText} from 'primeng/inputtext';
+import {Button} from 'primeng/button';
+import {AliasService} from '@/pabx/alias/alias.service';
+import {RouterLink} from '@angular/router';
+import {ProgressSpinner} from 'primeng/progressspinner';
+import {ConfirmDialog} from 'primeng/confirmdialog';
+import {Toast} from 'primeng/toast';
+import {Alias} from '@/pabx/types/alias';
+import {NgIf} from '@angular/common';
+import {Tooltip} from 'primeng/tooltip';
 
 @Component({
     selector: 'app-alias-page',
@@ -126,10 +126,18 @@ export class AliasPage implements OnInit {
     ) {}
 
     ngOnInit(): void {
-        this.aliasService.findAll().then((aliases) => {
-            this.aliases = aliases;
-            this.loading = false;
-        });
+        this.aliasService
+            .findAll()
+            .then((aliases) => (this.aliases = aliases))
+            .catch((error) => {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Desculpe não foi possível carregar os aliases',
+                    detail: error?.error?.message ?? 'Tente novamente mais tarde.',
+                    life: 15_000
+                });
+            })
+            .finally(() => (this.loading = false));
     }
 
     onFilterGlobal(event: Event) {
@@ -166,11 +174,11 @@ export class AliasPage implements OnInit {
                             life: 15_000
                         });
                     })
-                    .catch(() => {
+                    .catch((error) => {
                         this.messageService.add({
                             severity: 'error',
                             summary: 'Desculpe não foi possível remover o alias',
-                            detail: 'Tente novamente mais tarde.',
+                            detail: error?.error?.message ?? 'Tente novamente mais tarde.',
                             life: 15_000
                         });
                     });
