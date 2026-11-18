@@ -1,20 +1,22 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { Button } from 'primeng/button';
-import { Card } from 'primeng/card';
-import { ConfirmDialog } from 'primeng/confirmdialog';
-import { IconField } from 'primeng/iconfield';
-import { InputIcon } from 'primeng/inputicon';
-import { InputText } from 'primeng/inputtext';
-import { CurrencyPipe, DatePipe, NgIf } from '@angular/common';
-import { ConfirmationService, MessageService, PrimeTemplate } from 'primeng/api';
-import { ProgressSpinner } from 'primeng/progressspinner';
-import { RouterLink } from '@angular/router';
-import { Table, TableModule } from 'primeng/table';
-import { Toast } from 'primeng/toast';
-import { Tooltip } from 'primeng/tooltip';
-import { AccountCode } from '@/pabx/types/account-code';
-import { AccountCodeService } from '@/pabx/accountcode/account-code.service';
-import { Tag } from 'primeng/tag';
+import {UserService} from '@/pages/users/user.service';
+import {RoleEnum} from '@/types/role-enum';
+import {Component, OnInit, ViewChild} from '@angular/core';
+import {Button} from 'primeng/button';
+import {Card} from 'primeng/card';
+import {ConfirmDialog} from 'primeng/confirmdialog';
+import {IconField} from 'primeng/iconfield';
+import {InputIcon} from 'primeng/inputicon';
+import {InputText} from 'primeng/inputtext';
+import {CurrencyPipe, DatePipe, NgIf} from '@angular/common';
+import {ConfirmationService, MessageService, PrimeTemplate} from 'primeng/api';
+import {ProgressSpinner} from 'primeng/progressspinner';
+import {RouterLink} from '@angular/router';
+import {Table, TableModule} from 'primeng/table';
+import {Toast} from 'primeng/toast';
+import {Tooltip} from 'primeng/tooltip';
+import {AccountCode} from '@/pabx/types/account-code';
+import {AccountCodeService} from '@/pabx/accountcode/account-code.service';
+import {Tag} from 'primeng/tag';
 
 @Component({
     selector: 'app-account-code-page',
@@ -58,6 +60,7 @@ import { Tag } from 'primeng/tag';
                             />
                         </p-iconfield>
                         <p-button
+                            *ngIf="canManage"
                             icon="pi pi-plus"
                             label="Centro de Custo"
                             routerLink="new"
@@ -123,6 +126,7 @@ import { Tag } from 'primeng/tag';
                         <td>
                             <div class="flex gap-2">
                                 <p-button
+                                    *ngIf="canManage"
                                     icon="pi pi-pencil"
                                     [routerLink]="['edit', accountCode.code]"
                                     outlined
@@ -131,7 +135,7 @@ import { Tag } from 'primeng/tag';
                                     tooltipPosition="left"
                                 />
                                 <p-button
-                                    *ngIf="isDeletable(accountCode)"
+                                    *ngIf="canManage && isDeletable(accountCode)"
                                     icon="pi pi-trash"
                                     severity="danger"
                                     (click)="confirmDelete(accountCode)"
@@ -164,14 +168,28 @@ export class AccountCodePage implements OnInit {
     constructor(
         private readonly confirmationService: ConfirmationService,
         private readonly messageService: MessageService,
-        private readonly accountCodeService: AccountCodeService
+        private readonly accountCodeService: AccountCodeService,
+        private readonly userService: UserService
     ) {}
 
+    /** Centro de custo define tarifação: criar, editar e excluir só a partir de SAAS_FINANCE; os demais só leem. */
+    get canManage(): boolean {
+        return this.userService.getUser().roles.includes(RoleEnum.ROLE_SAAS_FINANCE);
+    }
+
     ngOnInit(): void {
-        this.accountCodeService.findAll().then((accountCodes) => {
-            this.accountCodes = accountCodes.sort((a, b) => a.code.localeCompare(b.code));
-            this.loading = false;
-        });
+        this.accountCodeService
+            .findAll()
+            .then((accountCodes) => (this.accountCodes = accountCodes.sort((a, b) => a.code.localeCompare(b.code))))
+            .catch(() => {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Não foi possível carregar os centros de custo',
+                    detail: 'Tente novamente mais tarde.',
+                    life: 15_000
+                });
+            })
+            .finally(() => (this.loading = false));
     }
 
     onFilterGlobal(event: Event) {

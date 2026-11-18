@@ -1,3 +1,5 @@
+import {roleGuard} from '@/security/role-guard';
+import {RoleEnum} from '@/types/role-enum';
 import {Routes} from '@angular/router';
 import {DdrPage} from '@/pabx/ddr/ddr.page';
 import {NewDdrPage} from '@/pabx/ddr/new-ddr.page';
@@ -58,7 +60,11 @@ import {WorkerInstanceFormPage} from '@/pabx/worker-instance/worker-instance-for
 export default [
     { path: 'register-instances', component: RegisterInstancePage, data: { breadcrumb: 'Registers' } },
     { path: 'register-instances/new', component: RegisterInstanceFormPage, data: { breadcrumb: 'Registers / Novo' } },
-    { path: 'register-instances/edit/:id', component: RegisterInstanceFormPage, data: { breadcrumb: 'Registers / Editar' } },
+    {
+        path: 'register-instances/edit/:id',
+        component: RegisterInstanceFormPage,
+        data: { breadcrumb: 'Registers / Editar' }
+    },
     { path: 'worker-instances', component: WorkerInstancePage, data: { breadcrumb: 'Workers' } },
     { path: 'worker-instances/new', component: WorkerInstanceFormPage, data: { breadcrumb: 'Workers / Novo' } },
     { path: 'worker-instances/edit/:id', component: WorkerInstanceFormPage, data: { breadcrumb: 'Workers / Editar' } },
@@ -75,10 +81,16 @@ export default [
     { path: 'dialplans/new', component: NewDialplanPage, data: { breadcrumb: 'Regras de Discagem > Nova' } },
     { path: 'dialplans/edit/:id', component: EditDialplanPage, data: { breadcrumb: 'Regras de Discagem > Editar' } },
     { path: 'accountcodes', component: AccountCodePage, data: { breadcrumb: 'Centro de Custos' } },
-    { path: 'accountcodes/new', component: NewAccountCodePage, data: { breadcrumb: 'Centro de Custos > Novo' } },
+    {
+        path: 'accountcodes/new',
+        component: NewAccountCodePage,
+        canActivate: [roleGuard(RoleEnum.ROLE_SAAS_FINANCE)],
+        data: { breadcrumb: 'Centro de Custos > Novo' }
+    },
     {
         path: 'accountcodes/edit/:id',
         component: EditAccountCodePage,
+        canActivate: [roleGuard(RoleEnum.ROLE_SAAS_FINANCE)],
         data: { breadcrumb: 'Centro de Custos > Editar' }
     },
     { path: 'trunks', component: TrunkPage, data: { breadcrumb: 'Troncos' } },
