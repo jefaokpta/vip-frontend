@@ -9,7 +9,7 @@ import { TableModule } from 'primeng/table';
 import { Toast } from 'primeng/toast';
 import { BillingService } from '@/pages/billing/billing.service';
 import { BillingMode, BillingRunSummary } from '@/pages/billing/types';
-import { POLLING_MS, processedCount } from '@/pages/billing/billing.utils';
+import { inclusivePeriodEnd, POLLING_MS, processedCount } from '@/pages/billing/billing.utils';
 
 @Component({
     selector: 'app-billing-runs-page',
@@ -60,7 +60,9 @@ import { POLLING_MS, processedCount } from '@/pages/billing/billing.utils';
                     <tr>
                         <td>{{ run.createdAt | date: 'dd/MM/yyyy HH:mm' }}</td>
                         <td>{{ run.mode }}</td>
-                        <td>{{ run.periodStart | date: 'dd/MM/yyyy' }} - {{ run.periodEnd | date: 'dd/MM/yyyy' }}</td>
+                        <td>
+                            {{ run.periodStart | date: 'dd/MM/yyyy' }} - {{ periodEndOf(run) | date: 'dd/MM/yyyy' }}
+                        </td>
                         <td>{{ run.status }}</td>
                         <td>{{ processed(run) }} de {{ run.totalClients }}</td>
                         <td>{{ run.countsByStatus?.['ERRO'] ?? 0 }}</td>
@@ -125,6 +127,10 @@ export class BillingRunsPage implements OnInit, OnDestroy {
 
     ngOnDestroy(): void {
         this.stopPolling();
+    }
+
+    periodEndOf(run: BillingRunSummary): Date {
+        return inclusivePeriodEnd(run.periodEnd);
     }
 
     processed(run: BillingRunSummary): number {

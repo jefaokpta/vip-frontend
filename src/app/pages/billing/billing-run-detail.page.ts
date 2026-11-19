@@ -7,8 +7,8 @@ import { Card } from 'primeng/card';
 import { TableModule } from 'primeng/table';
 import { Toast } from 'primeng/toast';
 import { BillingService } from '@/pages/billing/billing.service';
-import { BillingRunClient, BillingRunDetail } from '@/pages/billing/types';
-import { POLLING_MS, processedCount } from '@/pages/billing/billing.utils';
+import { BillingRunClient, BillingRunDetail, BillingRunSummary } from '@/pages/billing/types';
+import { inclusivePeriodEnd, POLLING_MS, processedCount } from '@/pages/billing/billing.utils';
 
 @Component({
     selector: 'app-billing-run-detail-page',
@@ -28,7 +28,7 @@ import { POLLING_MS, processedCount } from '@/pages/billing/billing.utils';
                 </ng-template>
                 <p>
                     Período: {{ detail.summary.periodStart | date: 'dd/MM/yyyy' }} -
-                    {{ detail.summary.periodEnd | date: 'dd/MM/yyyy' }} | Status: {{ detail.summary.status }} |
+                    {{ periodEndOf(detail.summary) | date: 'dd/MM/yyyy' }} | Status: {{ detail.summary.status }} |
                     {{ processed }} de {{ detail.summary.totalClients }}
                 </p>
             </p-card>
@@ -127,6 +127,10 @@ export class BillingRunDetailPage implements OnInit, OnDestroy {
         private readonly messageService: MessageService
     ) {
         this.id = Number(this.route.snapshot.params['id']);
+    }
+
+    periodEndOf(run: BillingRunSummary): Date {
+        return inclusivePeriodEnd(run.periodEnd);
     }
 
     get processed(): number {
