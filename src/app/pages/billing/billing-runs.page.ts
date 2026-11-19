@@ -9,14 +9,7 @@ import { TableModule } from 'primeng/table';
 import { Toast } from 'primeng/toast';
 import { BillingService } from '@/pages/billing/billing.service';
 import { BillingMode, BillingRunSummary } from '@/pages/billing/types';
-
-export const POLLING_MS = 10_000;
-
-/** Quantidade de clientes já processados (enviados, simulados ou com erro) de uma execução. */
-export function processedCount(run: BillingRunSummary): number {
-    const c = run.countsByStatus ?? {};
-    return (c['ENVIADO'] ?? 0) + (c['SIMULADO'] ?? 0) + (c['ERRO'] ?? 0);
-}
+import { POLLING_MS, processedCount } from '@/pages/billing/billing.utils';
 
 @Component({
     selector: 'app-billing-runs-page',
@@ -116,6 +109,8 @@ export function processedCount(run: BillingRunSummary): number {
 export class BillingRunsPage implements OnInit, OnDestroy {
     runs: BillingRunSummary[] = [];
     active = false;
+    private loading = false;
+    private loadFailed = false;
     private timer: ReturnType<typeof setInterval> | null = null;
 
     constructor(
@@ -137,14 +132,25 @@ export class BillingRunsPage implements OnInit, OnDestroy {
     }
 
     load(): Promise<void> {
+        if (this.loading) {
+            return Promise.resolve();
+        }
+        this.loading = true;
         return this.billingService
             .listRuns()
             .then((list) => {
                 this.runs = list.runs;
                 this.active = list.active;
+                this.loadFailed = false;
                 this.syncPolling();
             })
-            .catch((err) => this.error(err, 'Não foi possível carregar as execuções'));
+            .catch((err) => {
+                if (!this.loadFailed) {
+                    this.error(err, 'Não foi possível carregar as execuções');
+                }
+                this.loadFailed = true;
+            })
+            .finally(() => (this.loading = false));
     }
 
     confirmStart(): void {

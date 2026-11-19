@@ -108,4 +108,32 @@ describe('BillingRunsPage', () => {
         flushMicrotasks();
         expect(messages.add).toHaveBeenCalledWith(jasmine.objectContaining({ severity: 'error', detail: 'falhou' }));
     }));
+
+    it('nao sobrepoe load quando requisicao pendente', fakeAsync(() => {
+        build(true);
+        let resolve!: (v: { active: boolean; runs: BillingRunSummary[] }) => void;
+        flushMicrotasks();
+        service.listRuns.and.returnValue(new Promise((r) => (resolve = r)));
+        tick(10_000);
+        expect(service.listRuns).toHaveBeenCalledTimes(2);
+        tick(10_000);
+        expect(service.listRuns).toHaveBeenCalledTimes(2);
+        resolve({ active: false, runs: [] });
+        flushMicrotasks();
+        fixture.destroy();
+    }));
+
+    it('toast de erro nao repete a cada tick', fakeAsync(() => {
+        build(true);
+        flushMicrotasks();
+        const messages = fixture.debugElement.injector.get(MessageService);
+        spyOn(messages, 'add');
+        service.listRuns.and.rejectWith({ error: { message: 'x' } });
+        tick(10_000);
+        flushMicrotasks();
+        tick(10_000);
+        flushMicrotasks();
+        expect(messages.add).toHaveBeenCalledTimes(1);
+        fixture.destroy();
+    }));
 });

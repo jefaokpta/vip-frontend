@@ -8,7 +8,7 @@ import { TableModule } from 'primeng/table';
 import { Toast } from 'primeng/toast';
 import { BillingService } from '@/pages/billing/billing.service';
 import { BillingRunClient, BillingRunDetail } from '@/pages/billing/types';
-import { POLLING_MS, processedCount } from '@/pages/billing/billing-runs.page';
+import { POLLING_MS, processedCount } from '@/pages/billing/billing.utils';
 
 @Component({
     selector: 'app-billing-run-detail-page',
@@ -116,6 +116,8 @@ import { POLLING_MS, processedCount } from '@/pages/billing/billing-runs.page';
 export class BillingRunDetailPage implements OnInit, OnDestroy {
     detail: BillingRunDetail | null = null;
     active = false;
+    private loading = false;
+    private loadFailed = false;
     private timer: ReturnType<typeof setInterval> | null = null;
     private readonly id: number;
 
@@ -143,17 +145,31 @@ export class BillingRunDetailPage implements OnInit, OnDestroy {
         return [client.errorCode, client.errorDetail].filter(Boolean).join(' - ');
     }
 
-    /** Execução em andamento = polling ativo (status da própria execução ou lista). */
+    /**
+     * `active` vem de listRuns(): o lock do backend é global, então enquanto qualquer execução
+     * estiver ativa o reexecutar é recusado. Ticks de polling são ignorados enquanto há carga pendente.
+     */
     load(): Promise<void> {
+        if (this.loading) {
+            return Promise.resolve();
+        }
+        this.loading = true;
         return this.billingService
             .getRun(this.id)
             .then(async (detail) => {
-                this.detail = detail;
                 const list = await this.billingService.listRuns();
+                this.detail = detail;
                 this.active = list.active;
+                this.loadFailed = false;
                 this.syncPolling();
             })
-            .catch((err) => this.error(err, 'Não foi possível carregar a execução'));
+            .catch((err) => {
+                if (!this.loadFailed) {
+                    this.error(err, 'Não foi possível carregar a execução');
+                }
+                this.loadFailed = true;
+            })
+            .finally(() => (this.loading = false));
     }
 
     rerun(client: BillingRunClient): Promise<void> {
