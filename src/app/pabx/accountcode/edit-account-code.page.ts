@@ -4,23 +4,24 @@
  * @create 5/13/25
  */
 
-import {Component, OnInit} from '@angular/core';
-import {Button} from 'primeng/button';
-import {InputText} from 'primeng/inputtext';
-import {NgIf} from '@angular/common';
-import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
-import {ActivatedRoute, Router, RouterLink} from '@angular/router';
-import {Card} from 'primeng/card';
-import {AccountCodeService} from '@/pabx/accountcode/account-code.service';
-import {AccountCode} from '@/pabx/types/account-code';
-import {InputNumber} from 'primeng/inputnumber';
-import {MessageService} from 'primeng/api';
-import {Toast} from 'primeng/toast';
+import { Component, OnInit } from '@angular/core';
+import { Button } from 'primeng/button';
+import { InputText } from 'primeng/inputtext';
+import { NgIf } from '@angular/common';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { Card } from 'primeng/card';
+import { AccountCodeService } from '@/pabx/accountcode/account-code.service';
+import { AccountCode, allowsSpecialLabel, SPECIAL_LABEL_OPTIONS } from '@/pabx/types/account-code';
+import { Select } from 'primeng/select';
+import { InputNumber } from 'primeng/inputnumber';
+import { MessageService } from 'primeng/api';
+import { Toast } from 'primeng/toast';
 
 @Component({
     selector: 'app-edit-account-code-page',
     providers: [MessageService],
-    imports: [Button, InputText, NgIf, ReactiveFormsModule, RouterLink, Card, InputNumber, Toast],
+    imports: [Button, InputText, NgIf, ReactiveFormsModule, RouterLink, Card, InputNumber, Toast, Select],
     template: `
         <p-toast></p-toast>
         <p-card>
@@ -82,6 +83,17 @@ import {Toast} from 'primeng/toast';
                     </small>
                 </div>
 
+                <div class="field mb-4">
+                    <label for="specialLabel" class="block mb-2">Label especial</label>
+                    <p-select
+                        id="specialLabel"
+                        [options]="specialLabelOptions"
+                        formControlName="specialLabel"
+                        optionLabel="label"
+                        optionValue="value"
+                    ></p-select>
+                </div>
+
                 <div class="flex mt-4">
                     <p-button type="submit" label="Salvar" icon="pi pi-save" [disabled]="form.invalid"></p-button>
                 </div>
@@ -93,6 +105,7 @@ export class EditAccountCodePage implements OnInit {
     form!: FormGroup;
     private readonly id: string;
     accountCode?: AccountCode;
+    readonly specialLabelOptions = SPECIAL_LABEL_OPTIONS;
 
     constructor(
         private readonly fb: FormBuilder,
@@ -111,7 +124,8 @@ export class EditAccountCodePage implements OnInit {
             acTitle: ['', [Validators.required]],
             fraction: ['', [Validators.required]],
             cost: ['', [Validators.required]],
-            cadence: ['', [Validators.required]]
+            cadence: ['', [Validators.required]],
+            specialLabel: [null]
         });
         this.accountCodeService
             .findById(this.id)
@@ -119,6 +133,13 @@ export class EditAccountCodePage implements OnInit {
                 this.accountCode = accountCode;
                 this.form.patchValue(accountCode);
                 this.acTitle?.setValue(accountCode.title);
+                this.specialLabel?.setValue(accountCode.specialLabel ?? null);
+                if (this.canHaveSpecialLabel) {
+                    this.specialLabel?.enable();
+                } else {
+                    this.specialLabel?.setValue(null);
+                    this.specialLabel?.disable();
+                }
             })
             .catch(() => {
                 this.messageService.add({
@@ -131,7 +152,11 @@ export class EditAccountCodePage implements OnInit {
     }
 
     onSubmit() {
-        const accode = { ...this.form.value, title: this.acTitle?.value };
+        const accode = {
+            ...this.form.value,
+            title: this.acTitle?.value,
+            specialLabel: this.canHaveSpecialLabel ? (this.specialLabel?.value ?? null) : null
+        };
         this.accountCodeService
             .update(accode)
             .then(() => {
@@ -145,6 +170,14 @@ export class EditAccountCodePage implements OnInit {
                     life: 15_000
                 });
             });
+    }
+
+    get specialLabel() {
+        return this.form.get('specialLabel');
+    }
+
+    get canHaveSpecialLabel(): boolean {
+        return allowsSpecialLabel(this.accountCode?.code);
     }
 
     get acTitle() {

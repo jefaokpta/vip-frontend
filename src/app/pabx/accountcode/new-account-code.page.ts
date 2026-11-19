@@ -4,17 +4,18 @@
  * @create 5/13/25
  */
 
-import {Component, OnInit} from '@angular/core';
-import {Button} from 'primeng/button';
-import {InputText} from 'primeng/inputtext';
-import {NgIf} from '@angular/common';
-import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
-import {Router, RouterLink} from '@angular/router';
-import {Card} from 'primeng/card';
-import {Select} from 'primeng/select';
-import {AccountCodeService} from '@/pabx/accountcode/account-code.service';
-import {MessageService} from 'primeng/api';
-import {Toast} from 'primeng/toast';
+import { Component, OnInit } from '@angular/core';
+import { Button } from 'primeng/button';
+import { InputText } from 'primeng/inputtext';
+import { NgIf } from '@angular/common';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
+import { Card } from 'primeng/card';
+import { Select } from 'primeng/select';
+import { AccountCodeService } from '@/pabx/accountcode/account-code.service';
+import { MessageService } from 'primeng/api';
+import { allowsSpecialLabel, SPECIAL_LABEL_OPTIONS } from '@/pabx/types/account-code';
+import { Toast } from 'primeng/toast';
 
 @Component({
     selector: 'app-new-account-code-page',
@@ -61,6 +62,17 @@ import {Toast} from 'primeng/toast';
                     </small>
                 </div>
 
+                <div class="field mb-4">
+                    <label for="specialLabel" class="block mb-2">Label especial</label>
+                    <p-select
+                        id="specialLabel"
+                        [options]="specialLabelOptions"
+                        formControlName="specialLabel"
+                        optionLabel="label"
+                        optionValue="value"
+                    ></p-select>
+                </div>
+
                 <div class="flex mt-4">
                     <p-button type="submit" label="Salvar" icon="pi pi-save" [disabled]="form.invalid"></p-button>
                 </div>
@@ -70,6 +82,7 @@ import {Toast} from 'primeng/toast';
 })
 export class NewAccountCodePage implements OnInit {
     form!: FormGroup;
+    readonly specialLabelOptions = SPECIAL_LABEL_OPTIONS;
     codeOptions: { label: string; value: string }[] = [];
 
     constructor(
@@ -82,7 +95,16 @@ export class NewAccountCodePage implements OnInit {
     ngOnInit(): void {
         this.form = this.fb.group({
             acTitle: ['', [Validators.required]],
-            code: ['', [Validators.required]]
+            code: ['', [Validators.required]],
+            specialLabel: [{ value: null, disabled: true }]
+        });
+        this.code?.valueChanges.subscribe((code) => {
+            if (allowsSpecialLabel(code)) {
+                this.specialLabel?.enable();
+            } else {
+                this.specialLabel?.setValue(null);
+                this.specialLabel?.disable();
+            }
         });
         this.accountCodeService
             .findAll()
@@ -106,13 +128,21 @@ export class NewAccountCodePage implements OnInit {
         return this.form.get('acTitle');
     }
 
+    get specialLabel() {
+        return this.form.get('specialLabel');
+    }
+
     get code() {
         return this.form.get('code');
     }
 
     onSubmit() {
         this.accountCodeService
-            .create({ ...this.form.value, title: this.acTitle?.value })
+            .create({
+                ...this.form.value,
+                title: this.acTitle?.value,
+                specialLabel: this.specialLabel?.value ?? null
+            })
             .then(() => this.router.navigate(['/pabx/accountcodes']))
             .catch((err) => {
                 this.messageService.add({

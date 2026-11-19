@@ -13,6 +13,8 @@ CRUD de centros de custo (`AccountCode`), usados para classificar chamadas nos r
 - Centros de custo cujo `code` tem `'00'` no segundo segmento (`code.split('.')[1] === '00'`) não podem ser excluídos pela UI (`isDeletable`).
 - Após salvar, as páginas de formulário voltam para `/pabx/accountcodes`.
 
+- `specialLabel` (`'0800' | '4000' | null`) só é editável quando o `code` começa com `"1."`; nas telas o select fica desabilitado e vira `null` caso contrário (o backend responde 400 se violado).
+
 ## Side Effects
 - HTTP: `GET|POST /accounts`, `GET|PUT|DELETE /accounts/{id}`.
 

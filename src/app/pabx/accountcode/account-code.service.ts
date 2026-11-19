@@ -20,7 +20,7 @@ export class AccountCodeService {
         return executeRequest(this.http.delete(`${this.BACKEND}/accounts/${id}`, httpHeaders()));
     }
 
-    create(accountCode: AccountCode) {
+    create(accountCode: Partial<AccountCode>) {
         return executeRequest(this.http.post(`${this.BACKEND}/accounts`, accountCode, httpHeaders()));
     }
 

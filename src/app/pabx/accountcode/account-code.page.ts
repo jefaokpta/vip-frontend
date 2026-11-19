@@ -1,22 +1,22 @@
-import {UserService} from '@/pages/users/user.service';
-import {RoleEnum} from '@/types/role-enum';
-import {Component, OnInit, ViewChild} from '@angular/core';
-import {Button} from 'primeng/button';
-import {Card} from 'primeng/card';
-import {ConfirmDialog} from 'primeng/confirmdialog';
-import {IconField} from 'primeng/iconfield';
-import {InputIcon} from 'primeng/inputicon';
-import {InputText} from 'primeng/inputtext';
-import {CurrencyPipe, DatePipe, NgIf} from '@angular/common';
-import {ConfirmationService, MessageService, PrimeTemplate} from 'primeng/api';
-import {ProgressSpinner} from 'primeng/progressspinner';
-import {RouterLink} from '@angular/router';
-import {Table, TableModule} from 'primeng/table';
-import {Toast} from 'primeng/toast';
-import {Tooltip} from 'primeng/tooltip';
-import {AccountCode} from '@/pabx/types/account-code';
-import {AccountCodeService} from '@/pabx/accountcode/account-code.service';
-import {Tag} from 'primeng/tag';
+import { UserService } from '@/pages/users/user.service';
+import { RoleEnum } from '@/types/role-enum';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { Button } from 'primeng/button';
+import { Card } from 'primeng/card';
+import { ConfirmDialog } from 'primeng/confirmdialog';
+import { IconField } from 'primeng/iconfield';
+import { InputIcon } from 'primeng/inputicon';
+import { InputText } from 'primeng/inputtext';
+import { CurrencyPipe, DatePipe, NgIf } from '@angular/common';
+import { ConfirmationService, MessageService, PrimeTemplate } from 'primeng/api';
+import { ProgressSpinner } from 'primeng/progressspinner';
+import { RouterLink } from '@angular/router';
+import { Table, TableModule } from 'primeng/table';
+import { Toast } from 'primeng/toast';
+import { Tooltip } from 'primeng/tooltip';
+import { AccountCode } from '@/pabx/types/account-code';
+import { AccountCodeService } from '@/pabx/accountcode/account-code.service';
+import { Tag } from 'primeng/tag';
 
 @Component({
     selector: 'app-account-code-page',
@@ -88,6 +88,7 @@ import {Tag} from 'primeng/tag';
                         <th style="width: 10%">Cadência</th>
                         <th style="width: 10%">Fração</th>
                         <th style="width: 10%">Custo</th>
+                        <th style="width: 8%">Label</th>
                         <th>Vigência</th>
                         <th style="width: 10%">Ações</th>
                     </tr>
@@ -115,6 +116,7 @@ import {Tag} from 'primeng/tag';
                                 ></i>
                             </div>
                         </td>
+                        <td>{{ accountCode.specialLabel }}</td>
                         <td>
                             <ng-container *ngIf="accountCode.updatedAt; else noUpdatedAt">
                                 {{ accountCode.updatedAt | date: 'dd/MM/yyyy' }}
