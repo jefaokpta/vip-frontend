@@ -10,10 +10,12 @@ import { CompanyService } from '@/pages/company/company.service';
 import { InputMask } from 'primeng/inputmask';
 import { ToggleSwitch } from 'primeng/toggleswitch';
 import { ConfirmDialog } from 'primeng/confirmdialog';
-import { ConfirmationService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { UserService } from '@/pages/users/user.service';
 import { RoleEnum } from '@/types/role-enum';
 import { ServiceEnum } from '@/types/service-enum';
+import { BillingService } from '@/pages/billing/billing.service';
+import { FranchiseType } from '@/pages/billing/types';
 import { Tab, TabList, TabPanel, TabPanels, Tabs } from 'primeng/tabs';
 
 /**
@@ -64,6 +66,7 @@ import { Tab, TabList, TabPanel, TabPanels, Tabs } from 'primeng/tabs';
                 <p-tablist>
                     <p-tab value="0">Dados</p-tab>
                     <p-tab *ngIf="canManageServices" value="1">Serviços</p-tab>
+                    <p-tab *ngIf="canManageBilling" value="2">Franquia</p-tab>
                 </p-tablist>
                 <p-tabpanels>
                     <p-tabpanel value="0">
@@ -152,6 +155,81 @@ import { Tab, TabList, TabPanel, TabPanels, Tabs } from 'primeng/tabs';
                         </div>
                         <small *ngIf="servicesError" class="text-red-500">{{ servicesError }}</small>
                     </p-tabpanel>
+                    <p-tabpanel *ngIf="canManageBilling" value="2">
+                        <form [formGroup]="billingForm" (ngSubmit)="onSaveBilling()" class="p-fluid">
+                            <div class="field mb-4">
+                                <label for="franchiseType" class="block mb-2">Tipo de franquia</label>
+                                <select id="franchiseType" formControlName="franchiseType" class="p-inputtext">
+                                    <option *ngFor="let t of franchiseTypes" [value]="t.value">{{ t.label }}</option>
+                                </select>
+                            </div>
+                            <div class="field mb-4">
+                                <label for="franchiseValue" class="block mb-2">Valor</label>
+                                <input
+                                    id="franchiseValue"
+                                    type="number"
+                                    step="0.01"
+                                    min="0"
+                                    pInputText
+                                    formControlName="franchiseValue"
+                                />
+                            </div>
+                            <ng-container *ngIf="isMinutos">
+                                <div class="field mb-4">
+                                    <label for="franchiseMinutes" class="block mb-2">Minutos</label>
+                                    <input
+                                        id="franchiseMinutes"
+                                        type="number"
+                                        step="1"
+                                        min="0"
+                                        pInputText
+                                        formControlName="franchiseMinutes"
+                                    />
+                                </div>
+                                <div class="field mb-4">
+                                    <label for="exceedingMinuteRate" class="block mb-2"
+                                        >Tarifa do minuto excedente</label
+                                    >
+                                    <input
+                                        id="exceedingMinuteRate"
+                                        type="number"
+                                        step="0.0001"
+                                        min="0"
+                                        pInputText
+                                        formControlName="exceedingMinuteRate"
+                                    />
+                                </div>
+                            </ng-container>
+                            <div class="field mb-4">
+                                <label for="franchise0800" class="block mb-2">Franquia 0800</label>
+                                <input
+                                    id="franchise0800"
+                                    type="number"
+                                    step="0.01"
+                                    min="0"
+                                    pInputText
+                                    formControlName="franchise0800"
+                                />
+                            </div>
+                            <div class="field mb-4">
+                                <label for="franchise4000" class="block mb-2">Franquia 4000</label>
+                                <input
+                                    id="franchise4000"
+                                    type="number"
+                                    step="0.01"
+                                    min="0"
+                                    pInputText
+                                    formControlName="franchise4000"
+                                />
+                            </div>
+                            <p-button
+                                type="submit"
+                                label="Salvar franquia"
+                                icon="pi pi-save"
+                                [disabled]="pendingBilling"
+                            />
+                        </form>
+                    </p-tabpanel>
                 </p-tabpanels>
             </p-tabs>
         </p-card>
@@ -166,6 +244,13 @@ export class EditCompanyPage implements OnInit {
     pendingServices = false;
     servicesError = '';
     readonly canManageServices: boolean;
+    readonly canManageBilling: boolean;
+    pendingBilling = false;
+    billingForm!: FormGroup;
+    readonly franchiseTypes: { label: string; value: FranchiseType }[] = [
+        { label: 'Consumo', value: 'CONSUMO' },
+        { label: 'Minutos', value: 'MINUTOS' }
+    ];
     readonly serviceOptions = [
         { label: 'PABX', value: ServiceEnum.PABX },
         { label: 'IA', value: ServiceEnum.IA },
@@ -180,8 +265,11 @@ export class EditCompanyPage implements OnInit {
         private readonly router: Router,
         private readonly activatedRoute: ActivatedRoute,
         private readonly confirmationService: ConfirmationService,
+        private readonly billingService: BillingService,
+        private readonly messageService: MessageService,
         userService: UserService
     ) {
+        this.canManageBilling = userService.getUser().roles.includes(RoleEnum.ROLE_SAAS_FINANCE);
         this.canManageServices = userService.getUser().roles.includes(RoleEnum.ROLE_SAAS_SUPPORT);
     }
 
@@ -198,7 +286,59 @@ export class EditCompanyPage implements OnInit {
         return this.form.get('corporateName');
     }
 
+    get isMinutos(): boolean {
+        return this.billingForm?.get('franchiseType')?.value === 'MINUTOS';
+    }
+
+    private loadBilling(companyId: string) {
+        this.billingService
+            .getCompanyBilling(companyId)
+            .then((billing) => this.billingForm.patchValue(billing))
+            .catch((err) => {
+                if (err?.status === 404) return; // sem franquia configurada: formulário vazio
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Não foi possível carregar a franquia',
+                    detail: err?.error?.message ?? 'Tente novamente mais tarde.',
+                    life: 15_000
+                });
+            });
+    }
+
+    onSaveBilling() {
+        this.pendingBilling = true;
+        const v = this.billingForm.value;
+        const minutos = v.franchiseType === 'MINUTOS';
+        this.billingService
+            .saveCompanyBilling(this.companyId?.value, {
+                franchiseType: v.franchiseType,
+                franchiseValue: Number(v.franchiseValue) || 0,
+                franchiseMinutes: minutos ? Number(v.franchiseMinutes) || 0 : 0,
+                exceedingMinuteRate: minutos ? Number(v.exceedingMinuteRate) || 0 : 0,
+                franchise0800: Number(v.franchise0800) || 0,
+                franchise4000: Number(v.franchise4000) || 0
+            })
+            .then(() => this.messageService.add({ severity: 'success', summary: 'Franquia salva', life: 5_000 }))
+            .catch((err) =>
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Não foi possível salvar a franquia',
+                    detail: err?.error?.message ?? 'Tente novamente mais tarde.',
+                    life: 15_000
+                })
+            )
+            .finally(() => (this.pendingBilling = false));
+    }
+
     ngOnInit(): void {
+        this.billingForm = this.fb.group({
+            franchiseType: ['CONSUMO'],
+            franchiseValue: [0],
+            franchiseMinutes: [0],
+            exceedingMinuteRate: [0],
+            franchise0800: [0],
+            franchise4000: [0]
+        });
         this.form = this.fb.group({
             id: ['', [Validators.required]],
             name: ['', [Validators.required]],
@@ -213,10 +353,16 @@ export class EditCompanyPage implements OnInit {
             ]
         });
         const companyId = this.activatedRoute.snapshot.paramMap.get('id')!;
-        this.companyService.findCompanyId(companyId).then((company) => {
-            this.form.patchValue(company);
-            this.services = company.services ?? [];
-        });
+        this.companyService
+            .findCompanyId(companyId)
+            .then((company) => {
+                this.form.patchValue(company);
+                this.services = company.services ?? [];
+                if (this.canManageBilling) this.loadBilling(company.companyId);
+            })
+            .catch(() => {
+                this.showError = true;
+            });
     }
 
     hasService(service: ServiceEnum): boolean {
