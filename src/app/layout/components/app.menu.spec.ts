@@ -1,10 +1,10 @@
-import {TestBed} from '@angular/core/testing';
-import {provideRouter} from '@angular/router';
-import {MenuItem} from 'primeng/api';
-import {AppMenu} from '@/layout/components/app.menu';
-import {UserService} from '@/pages/users/user.service';
-import {RoleEnum} from '@/types/role-enum';
-import {ModuleEnum} from '@/types/module-enum';
+import { TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
+import { MenuItem } from 'primeng/api';
+import { AppMenu } from '@/layout/components/app.menu';
+import { UserService } from '@/pages/users/user.service';
+import { RoleEnum } from '@/types/role-enum';
+import { ModuleEnum } from '@/types/module-enum';
 
 describe('AppMenu', () => {
     function buildMenu(roles: RoleEnum[], modules: ModuleEnum[]): MenuItem[] {
@@ -83,5 +83,11 @@ describe('AppMenu', () => {
 
     it('usuário sem módulos não vê o grupo SERVIÇOS', () => {
         expect(labels(buildMenu(USER, []))).not.toContain('SERVIÇOS');
+    });
+
+    it('menu Financeiro so para ROLE_SAAS_FINANCE', () => {
+        expect(labels(buildMenu(USER, []))).not.toContain('Financeiro');
+        TestBed.resetTestingModule();
+        expect(labels(buildMenu([...USER, RoleEnum.ROLE_SAAS_FINANCE], []))).toContain('Financeiro');
     });
 });

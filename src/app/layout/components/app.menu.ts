@@ -278,6 +278,12 @@ export class AppMenu implements OnInit {
                     roles: [RoleEnum.ROLE_SAAS_SUPPORT],
                     icon: 'pi pi-fw pi-sitemap',
                     routerLink: ['/pages/tenants']
+                },
+                {
+                    label: 'Financeiro',
+                    icon: 'pi pi-fw pi-wallet',
+                    roles: [RoleEnum.ROLE_SAAS_FINANCE],
+                    routerLink: ['/pages/billing']
                 }
             ]
         }

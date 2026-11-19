@@ -16,6 +16,7 @@ export default [
     { path: 'tenants', loadChildren: () => import('@/pages/tenant/tenant.routes') },
     { path: 'blocked-ips', loadChildren: () => import('@/pages/blocked-ip/blocked-ip.routes') },
     { path: 'users', loadChildren: () => import('@/pages/users/users.routes') },
+    { path: 'billing', loadChildren: () => import('@/pages/billing/billing.routes') },
     { path: 'profile', component: PersonPage, data: { breadcrumb: 'Perfil' } },
     {
         path: 'peers',
