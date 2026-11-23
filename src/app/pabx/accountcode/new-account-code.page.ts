@@ -4,20 +4,24 @@
  * @create 5/13/25
  */
 
-import { Component, OnInit } from '@angular/core';
-import { Button } from 'primeng/button';
-import { InputText } from 'primeng/inputtext';
-import { NgIf } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
-import { Card } from 'primeng/card';
-import { Select } from 'primeng/select';
-import { AccountCodeService } from '@/pabx/accountcode/account-code.service';
+import {Component, OnInit} from '@angular/core';
+import {Button} from 'primeng/button';
+import {InputText} from 'primeng/inputtext';
+import {NgIf} from '@angular/common';
+import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {Router, RouterLink} from '@angular/router';
+import {Card} from 'primeng/card';
+import {Select} from 'primeng/select';
+import {AccountCodeService} from '@/pabx/accountcode/account-code.service';
+import {MessageService} from 'primeng/api';
+import {Toast} from 'primeng/toast';
 
 @Component({
     selector: 'app-new-account-code-page',
-    imports: [Button, InputText, NgIf, ReactiveFormsModule, RouterLink, Card, Select],
+    providers: [MessageService],
+    imports: [Button, InputText, NgIf, ReactiveFormsModule, RouterLink, Card, Select, Toast],
     template: `
+        <p-toast />
         <p-card>
             <ng-template #title>
                 <div class="flex justify-between">
@@ -71,7 +75,8 @@ export class NewAccountCodePage implements OnInit {
     constructor(
         private readonly fb: FormBuilder,
         private readonly router: Router,
-        private readonly accountCodeService: AccountCodeService
+        private readonly accountCodeService: AccountCodeService,
+        private readonly messageService: MessageService
     ) {}
 
     ngOnInit(): void {
@@ -79,12 +84,22 @@ export class NewAccountCodePage implements OnInit {
             acTitle: ['', [Validators.required]],
             code: ['', [Validators.required]]
         });
-        this.accountCodeService.findAll().then((accountCodes) => {
-            this.codeOptions = accountCodes.map((accountCode) => ({
-                label: accountCode.title,
-                value: accountCode.code
-            }));
-        });
+        this.accountCodeService
+            .findAll()
+            .then((accountCodes) => {
+                this.codeOptions = accountCodes.map((accountCode) => ({
+                    label: accountCode.title,
+                    value: accountCode.code
+                }));
+            })
+            .catch(() => {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Não foi possível carregar os centros de custo',
+                    detail: 'Tente novamente mais tarde.',
+                    life: 15_000
+                });
+            });
     }
 
     get acTitle() {
@@ -98,6 +113,14 @@ export class NewAccountCodePage implements OnInit {
     onSubmit() {
         this.accountCodeService
             .create({ ...this.form.value, title: this.acTitle?.value })
-            .then(() => this.router.navigate(['/pabx/accountcodes']));
+            .then(() => this.router.navigate(['/pabx/accountcodes']))
+            .catch((err) => {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Desculpe não foi possível salvar o centro de custo',
+                    detail: err?.error?.message || 'Tente novamente mais tarde.',
+                    life: 15_000
+                });
+            });
     }
 }

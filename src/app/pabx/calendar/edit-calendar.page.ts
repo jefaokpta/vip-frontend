@@ -1,24 +1,26 @@
-import { Component, OnInit } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { InputTextModule } from 'primeng/inputtext';
-import { ButtonModule } from 'primeng/button';
-import { CardModule } from 'primeng/card';
-import { NgForOf, NgIf } from '@angular/common';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { DatePicker } from 'primeng/datepicker';
-import { SelectButton } from 'primeng/selectbutton';
-import { Calendar } from '@/pabx/types/calendar';
-import { CalendarTypeEnum } from '@/pabx/types/calendar-type-enum';
-import { CalendarService } from '@/pabx/calendar/calendar.service';
-import { calendarTypeOptions, calendarValidateRangeDates, calendarWeekDays } from '@/pabx/calendar/utils';
-import { RadioButton } from 'primeng/radiobutton';
-import { Select } from 'primeng/select';
-import { TableModule } from 'primeng/table';
-import { PeerActionComponent } from '@/pabx/dialplan/components/peer-action.component';
-import { PlaybackActionComponent } from '@/pabx/dialplan/components/playback-action.component';
-import { calendarActionOptions } from '@/pabx/dialplan/utils';
-import { actionArg2HasDefaultValue, actionHasArg1 } from '@/pabx/utils';
-import { HangupActionComponent } from '@/pabx/dialplan/components/hangup-action-component';
+import {Component, OnInit} from '@angular/core';
+import {FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {InputTextModule} from 'primeng/inputtext';
+import {ButtonModule} from 'primeng/button';
+import {CardModule} from 'primeng/card';
+import {NgForOf, NgIf} from '@angular/common';
+import {ActivatedRoute, Router, RouterLink} from '@angular/router';
+import {DatePicker} from 'primeng/datepicker';
+import {SelectButton} from 'primeng/selectbutton';
+import {Calendar} from '@/pabx/types/calendar';
+import {CalendarTypeEnum} from '@/pabx/types/calendar-type-enum';
+import {CalendarService} from '@/pabx/calendar/calendar.service';
+import {calendarTypeOptions, calendarValidateRangeDates, calendarWeekDays} from '@/pabx/calendar/utils';
+import {RadioButton} from 'primeng/radiobutton';
+import {Select} from 'primeng/select';
+import {TableModule} from 'primeng/table';
+import {PeerActionComponent} from '@/pabx/dialplan/components/peer-action.component';
+import {PlaybackActionComponent} from '@/pabx/dialplan/components/playback-action.component';
+import {calendarActionOptions} from '@/pabx/dialplan/utils';
+import {actionArg2HasDefaultValue, actionHasArg1} from '@/pabx/utils';
+import {HangupActionComponent} from '@/pabx/dialplan/components/hangup-action-component';
+import {CallGroupActionComponent} from '@/pabx/dialplan/components/call-group-action.component';
+import {QueueActionComponent} from '@/pabx/dialplan/components/queue-action.component';
 
 @Component({
     selector: 'app-edit-calendar-page',
@@ -38,7 +40,9 @@ import { HangupActionComponent } from '@/pabx/dialplan/components/hangup-action-
         TableModule,
         PeerActionComponent,
         PlaybackActionComponent,
-        HangupActionComponent
+        HangupActionComponent,
+        CallGroupActionComponent,
+        QueueActionComponent
     ],
     template: `
         <p-card>
@@ -183,6 +187,18 @@ import { HangupActionComponent } from '@/pabx/dialplan/components/hangup-action-
                                         <ng-container *ngIf="action.get('actionEnum').value == 'PLAYBACK'">
                                             <app-playback-action-component formControlName="arg1" />
                                         </ng-container>
+                                        <ng-container *ngIf="action.get('actionEnum').value == 'CALL_GROUP'">
+                                            <app-call-group-action-component
+                                                formControlName="arg1"
+                                                [showError]="action.get('arg1').errors?.['required']"
+                                            />
+                                        </ng-container>
+                                        <ng-container *ngIf="action.get('actionEnum').value == 'QUEUE'">
+                                            <app-queue-action-component
+                                                formControlName="arg1"
+                                                [showError]="action.get('arg1').errors?.['required']"
+                                            />
+                                        </ng-container>
                                         <ng-container *ngIf="action.get('actionEnum').value == 'HANGUP'">
                                             <app-hangup-action-component />
                                         </ng-container>
@@ -210,6 +226,7 @@ import { HangupActionComponent } from '@/pabx/dialplan/components/hangup-action-
                 </div>
 
                 <small *ngIf="showError" class="text-red-500"> Erro ao salvar o calendário </small>
+                <small *ngIf="loadError" class="text-red-500 block"> Erro ao carregar o calendário. Tente novamente mais tarde. </small>
             </form>
         </p-card>
     `
@@ -218,6 +235,7 @@ export class EditCalendarPage implements OnInit {
     form!: FormGroup;
     pending = false;
     showError = false;
+    loadError = false;
 
     calendarTypes = calendarTypeOptions;
 
@@ -259,6 +277,8 @@ export class EditCalendarPage implements OnInit {
                 this.onCalendarTypeChange(calendar.weekDays!);
             }
             this.loadActions(calendar);
+        }).catch(() => {
+            this.loadError = true;
         });
     }
 
