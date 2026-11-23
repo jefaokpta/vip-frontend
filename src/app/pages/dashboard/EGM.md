@@ -8,6 +8,7 @@ Painéis operacionais: "Minhas Chamadas" (página inicial do app), painel de ram
 - `MyCallsStateService` (`my-calls-state.service.ts`): `cdrs`, `loaded` (readonly), `setCdrs(cdrs)`, `reset()`.
 - `PeerDashboard` (`app-components-dashboard`, `peer.dashboard.ts`): `canCall(pr)`, `callPeer(pr)`, `setViewMode('unified' | 'department')`, helpers de rótulo/classe por status e `getCallDuration(pr)`.
 - `PeerDashboardService` (`peer-dashboard.service.ts`): `findPeerRegistries()`.
+- `transportDots(pr)` (`peer-transport-dots.ts`): um ponto por tech de `pr.peer.peerTransportEnums`, com verde para registrada, laranja para UNREACHABLE e cinza para ausente de `pr.transports`. O cartão do ramal mostra os pontos ao lado do número.
 - `QueueDashboard` (`app-queue-dashboard`, `queue.dashboard.ts`): helpers de exibição (`alertsOf`, `queueTme`, `queueSl`, etc.).
 - `QueueDashboardService` (`queue-dashboard.service.ts`): `findAllQueueStates()`, `findTodayHourly()`, `forceLogoutMember(queueId, memberId)`.
 - `queue-dashboard.metrics.ts`: `globalTmeSeconds`, `globalServiceLevel`, `queueServiceLevel`, `queueAlerts`, `serviceLevelSeverity`, `memberCounts`, `percentOf`, `memberAlerts`, `formatDuration`; tipos `QueueAlert` (`'SLA_CRITICAL' | 'TME_HIGH'`) e `MemberAlert` (`'LONG_PAUSE' | 'LONG_CALL'`).
@@ -25,6 +26,7 @@ Painéis operacionais: "Minhas Chamadas" (página inicial do app), painel de ram
 ## Side Effects
 - HTTP: `GET /cdrs/mine` (via `ReportService`), `GET /accounts` (via `AccountCodeService`), `GET /callstates/peerregistries`, `GET /queues/states`, `GET /dac-report/today-hourly` (a cada 60 s), `DELETE /queues/states/{queueId}/members/{memberId}/logout`, `GET /callstates/workers/overview`.
 - STOMP: `/topic/peerregistries/{companyId}`, `/topic/peerregistries-removed/{companyId}`, `/topic/queuestates/{companyId}`, `/topic/queues-removed/{companyId}`; `PeerDashboard` e `QueueDashboard` fornecem a própria instância de `WebsocketService`.
+- O status do cartão (`contactStatusEventEnum`) é o agregado de todas as techs, calculado no manager; os pontos mostram cada tech isolada.
 - `localStorage['peer-dashboard-view-mode']` guarda o modo de visualização do painel de ramais.
 - `callPeer` abre a sidebar do webphone e inicia chamada SIP.
 - Timers `setInterval`, limpos em `ngOnDestroy`.

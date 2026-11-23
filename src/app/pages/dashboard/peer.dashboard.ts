@@ -17,6 +17,7 @@ import {PickupGroupService} from '@/pabx/pickup-group/pickup-group.service';
 import {WebphoneService} from '@/webphone/webphone.service';
 import {LayoutService} from '@/layout/service/layout.service';
 import {Tooltip} from 'primeng/tooltip';
+import {transportDots} from '@/pages/dashboard/peer-transport-dots';
 
 const SEM_DEPARTAMENTO = 'Sem departamento';
 const VIEW_MODE_KEY = 'peer-dashboard-view-mode';
@@ -116,7 +117,18 @@ const VIEW_MODE_KEY = 'peer-dashboard-view-mode';
                             </span>
                         </div>
                         <div class="flex items-center justify-between">
-                            <span class="font-bold text-base">{{ pr.peer.peer }}</span>
+                            <span class="font-bold text-base flex items-center gap-1">
+                                {{ pr.peer.peer }}
+                                @for (dot of transportDots(pr); track dot.tech) {
+                                    <span
+                                        class="inline-block w-2 h-2 rounded-full"
+                                        [ngClass]="dot.cssClass"
+                                        [pTooltip]="dot.tooltip"
+                                        tooltipPosition="top"
+                                        [attr.aria-label]="dot.tooltip"
+                                    ></span>
+                                }
+                            </span>
                             @if (canCall(pr)) {
                                 <button
                                     type="button"
@@ -150,6 +162,7 @@ const VIEW_MODE_KEY = 'peer-dashboard-view-mode';
 })
 export class PeerDashboard implements OnDestroy, OnInit {
     private readonly subscriptions: Subscription[] = [];
+    readonly transportDots = transportDots;
     private readonly peerRegistriesMap = signal(new Map<string, PeerRegistry>());
     private readonly now = signal(Date.now());
     private clockInterval?: ReturnType<typeof setInterval>;
