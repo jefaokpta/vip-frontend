@@ -116,29 +116,31 @@ const VIEW_MODE_KEY = 'peer-dashboard-view-mode';
                                 {{ peerBadgeLabel(pr) }}
                             </span>
                         </div>
-                        <div class="flex items-center justify-between">
-                            <span class="font-bold text-base flex items-center gap-1">
-                                {{ pr.peer.peer }}
-                                @for (dot of transportDots(pr); track dot.tech) {
-                                    <span
-                                        class="inline-block w-2 h-2 rounded-full"
-                                        [ngClass]="dot.cssClass"
-                                        [pTooltip]="dot.tooltip"
+                        <div class="flex items-start justify-between">
+                            <span class="font-bold text-base">{{ pr.peer.peer }}</span>
+                            <div class="flex flex-col items-end">
+                                <div class="flex items-center gap-1">
+                                    @for (dot of transportDots(pr); track dot.tech) {
+                                        <span
+                                            class="inline-block w-2 h-2 rounded-full"
+                                            [ngClass]="dot.cssClass"
+                                            [pTooltip]="dot.tooltip"
+                                            tooltipPosition="top"
+                                            [attr.aria-label]="dot.tooltip"
+                                        ></span>
+                                    }
+                                </div>
+                                @if (canCall(pr)) {
+                                    <button
+                                        type="button"
+                                        class="pi pi-phone text-green-500 hover:text-green-700 cursor-pointer p-1"
+                                        (click)="callPeer(pr)"
+                                        pTooltip="Ligar pelo webphone"
                                         tooltipPosition="top"
-                                        [attr.aria-label]="dot.tooltip"
-                                    ></span>
+                                        [attr.aria-label]="'Ligar para ' + pr.peer.peer"
+                                    ></button>
                                 }
-                            </span>
-                            @if (canCall(pr)) {
-                                <button
-                                    type="button"
-                                    class="pi pi-phone text-green-500 hover:text-green-700 cursor-pointer p-1"
-                                    (click)="callPeer(pr)"
-                                    pTooltip="Ligar pelo webphone"
-                                    tooltipPosition="top"
-                                    [attr.aria-label]="'Ligar para ' + pr.peer.peer"
-                                ></button>
-                            }
+                            </div>
                         </div>
                         <span class="text-sm">{{ pr.peer.name }}</span>
                         @if (pr.channel) {
