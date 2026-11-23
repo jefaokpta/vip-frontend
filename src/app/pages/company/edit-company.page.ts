@@ -1,22 +1,22 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { InputTextModule } from 'primeng/inputtext';
-import { ButtonModule } from 'primeng/button';
-import { CardModule } from 'primeng/card';
-import { ToastModule } from 'primeng/toast';
-import { NgFor, NgIf } from '@angular/common';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { CompanyService } from '@/pages/company/company.service';
-import { InputMask } from 'primeng/inputmask';
-import { ToggleSwitch } from 'primeng/toggleswitch';
-import { ConfirmDialog } from 'primeng/confirmdialog';
-import { ConfirmationService, MessageService } from 'primeng/api';
-import { UserService } from '@/pages/users/user.service';
-import { RoleEnum } from '@/types/role-enum';
-import { ServiceEnum } from '@/types/service-enum';
-import { BillingService } from '@/pages/billing/billing.service';
-import { FranchiseType } from '@/pages/billing/types';
-import { Tab, TabList, TabPanel, TabPanels, Tabs } from 'primeng/tabs';
+import {Component, OnInit} from '@angular/core';
+import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
+import {InputTextModule} from 'primeng/inputtext';
+import {ButtonModule} from 'primeng/button';
+import {CardModule} from 'primeng/card';
+import {ToastModule} from 'primeng/toast';
+import {NgFor, NgIf} from '@angular/common';
+import {ActivatedRoute, Router, RouterLink} from '@angular/router';
+import {CompanyService} from '@/pages/company/company.service';
+import {InputMask} from 'primeng/inputmask';
+import {ToggleSwitch} from 'primeng/toggleswitch';
+import {ConfirmDialog} from 'primeng/confirmdialog';
+import {ConfirmationService, MessageService} from 'primeng/api';
+import {UserService} from '@/pages/users/user.service';
+import {RoleEnum} from '@/types/role-enum';
+import {ServiceEnum} from '@/types/service-enum';
+import {BillingService} from '@/pages/billing/billing.service';
+import {FranchiseType} from '@/pages/billing/types';
+import {Tab, TabList, TabPanel, TabPanels, Tabs} from 'primeng/tabs';
 
 /**
  * @author Jefferson Alves Reis (jefaokpta)
@@ -66,7 +66,7 @@ import { Tab, TabList, TabPanel, TabPanels, Tabs } from 'primeng/tabs';
                 <p-tablist>
                     <p-tab value="0">Dados</p-tab>
                     <p-tab *ngIf="canManageServices" value="1">Serviços</p-tab>
-                    <p-tab *ngIf="canManageBilling" value="2">Franquia</p-tab>
+                    <p-tab *ngIf="canManageBilling" value="2">Faturamento</p-tab>
                 </p-tablist>
                 <p-tabpanels>
                     <p-tabpanel value="0">
@@ -164,7 +164,7 @@ import { Tab, TabList, TabPanel, TabPanels, Tabs } from 'primeng/tabs';
                                 </select>
                             </div>
                             <div class="field mb-4">
-                                <label for="franchiseValue" class="block mb-2">Valor</label>
+                                <label for="franchiseValue" class="block mb-2">Valor Mensal (R$)</label>
                                 <input
                                     id="franchiseValue"
                                     type="number"
@@ -188,7 +188,7 @@ import { Tab, TabList, TabPanel, TabPanels, Tabs } from 'primeng/tabs';
                                 </div>
                                 <div class="field mb-4">
                                     <label for="exceedingMinuteRate" class="block mb-2"
-                                        >Tarifa do minuto excedente</label
+                                        >Tarifa do minuto excedente (R$)</label
                                     >
                                     <input
                                         id="exceedingMinuteRate"
@@ -201,7 +201,7 @@ import { Tab, TabList, TabPanel, TabPanels, Tabs } from 'primeng/tabs';
                                 </div>
                             </ng-container>
                             <div class="field mb-4">
-                                <label for="franchise0800" class="block mb-2">Franquia 0800</label>
+                                <label for="franchise0800" class="block mb-2">Franquia 0800 (R$)</label>
                                 <input
                                     id="franchise0800"
                                     type="number"
@@ -212,7 +212,7 @@ import { Tab, TabList, TabPanel, TabPanels, Tabs } from 'primeng/tabs';
                                 />
                             </div>
                             <div class="field mb-4">
-                                <label for="franchise4000" class="block mb-2">Franquia 4000</label>
+                                <label for="franchise4000" class="block mb-2">Franquia 4000 (R$)</label>
                                 <input
                                     id="franchise4000"
                                     type="number"
@@ -224,7 +224,7 @@ import { Tab, TabList, TabPanel, TabPanels, Tabs } from 'primeng/tabs';
                             </div>
                             <p-button
                                 type="submit"
-                                label="Salvar franquia"
+                                label="Salvar"
                                 icon="pi pi-save"
                                 [disabled]="pendingBilling"
                             />
