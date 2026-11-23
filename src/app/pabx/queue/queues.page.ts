@@ -1,18 +1,18 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { Table, TableModule } from 'primeng/table';
-import { ConfirmationService, MessageService } from 'primeng/api';
-import { Card } from 'primeng/card';
-import { IconField } from 'primeng/iconfield';
-import { InputIcon } from 'primeng/inputicon';
-import { InputText } from 'primeng/inputtext';
-import { Button } from 'primeng/button';
-import { RouterLink } from '@angular/router';
-import { ProgressSpinner } from 'primeng/progressspinner';
-import { ConfirmDialog } from 'primeng/confirmdialog';
-import { Toast } from 'primeng/toast';
-import { Tooltip } from 'primeng/tooltip';
-import { Queue } from '@/pabx/types/queue';
-import { QueueService } from '@/pabx/queue/queue.service';
+import {Component, OnInit, ViewChild} from '@angular/core';
+import {Table, TableModule} from 'primeng/table';
+import {ConfirmationService, MessageService} from 'primeng/api';
+import {Card} from 'primeng/card';
+import {IconField} from 'primeng/iconfield';
+import {InputIcon} from 'primeng/inputicon';
+import {InputText} from 'primeng/inputtext';
+import {Button} from 'primeng/button';
+import {RouterLink} from '@angular/router';
+import {ProgressSpinner} from 'primeng/progressspinner';
+import {ConfirmDialog} from 'primeng/confirmdialog';
+import {Toast} from 'primeng/toast';
+import {Tooltip} from 'primeng/tooltip';
+import {Queue} from '@/pabx/types/queue';
+import {QueueService} from '@/pabx/queue/queue.service';
 
 @Component({
     selector: 'app-queues-page',
@@ -83,7 +83,7 @@ import { QueueService } from '@/pabx/queue/queue.service';
                             <div class="flex gap-2">
                                 <p-button
                                     icon="pi pi-eye"
-                                    [routerLink]="['detail', queue.id]"
+                                    [routerLink]="['/pages/queues/detail', queue.id]"
                                     outlined
                                     size="small"
                                     pTooltip="Monitorar"
@@ -141,6 +141,14 @@ export class QueuesPage implements OnInit {
         this.queueService.findAll().then((queues) => {
             this.queues = queues;
             this.loading = false;
+        }).catch(() => {
+            this.loading = false;
+            this.messageService.add({
+                severity: 'error',
+                summary: 'Não foi possível carregar as filas',
+                detail: 'Tente novamente mais tarde.',
+                life: 15_000
+            });
         });
     }
 
