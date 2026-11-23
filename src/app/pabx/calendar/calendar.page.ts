@@ -168,6 +168,14 @@ export class CalendarPage implements OnInit {
         this.calendarService.findAll().then((calendars) => {
             this.calendars = calendars;
             this.loading = false;
+        }).catch(() => {
+            this.loading = false;
+            this.messageService.add({
+                severity: 'error',
+                summary: 'Não foi possível carregar os calendários',
+                detail: 'Tente novamente mais tarde.',
+                life: 15_000
+            });
         });
     }
 
