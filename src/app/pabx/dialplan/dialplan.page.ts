@@ -130,6 +130,7 @@ import {Select} from 'primeng/select';
                         @if (selectionMode) {
                             <th style="width: 3rem"><p-tableHeaderCheckbox /></th>
                         }
+                        <th style="width: 5rem">ID</th>
                         <th>Nome</th>
                         <th>Origem</th>
                         <th>Destino</th>
@@ -144,6 +145,7 @@ import {Select} from 'primeng/select';
                         @if (selectionMode) {
                             <td><p-tableCheckbox [value]="dialplan" /></td>
                         }
+                        <td>{{ dialplan.id }}</td>
                         <td>{{ dialplan.name }}</td>
                         <td>{{ srcLabel(dialplan) }}</td>
                         <td>{{ dstLabel(dialplan) }}</td>
@@ -192,7 +194,7 @@ import {Select} from 'primeng/select';
                 <ng-template pTemplate="emptymessage">
                     <p-progress-spinner *ngIf="loading" [style]="{ width: '2rem', height: '2rem' }" />
                     <tr>
-                        <td colspan="8" *ngIf="!loading" class="text-center p-4">Nenhuma regra encontrada.</td>
+                        <td colspan="9" *ngIf="!loading" class="text-center p-4">Nenhuma regra encontrada.</td>
                     </tr>
                 </ng-template>
             </p-table>

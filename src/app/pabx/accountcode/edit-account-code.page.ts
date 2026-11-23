@@ -113,11 +113,21 @@ export class EditAccountCodePage implements OnInit {
             cost: ['', [Validators.required]],
             cadence: ['', [Validators.required]]
         });
-        this.accountCodeService.findById(this.id).then((accountCode) => {
-            this.accountCode = accountCode;
-            this.form.patchValue(accountCode);
-            this.acTitle?.setValue(accountCode.title);
-        });
+        this.accountCodeService
+            .findById(this.id)
+            .then((accountCode) => {
+                this.accountCode = accountCode;
+                this.form.patchValue(accountCode);
+                this.acTitle?.setValue(accountCode.title);
+            })
+            .catch(() => {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Não foi possível carregar o centro de custo',
+                    detail: 'Tente novamente mais tarde.',
+                    life: 15_000
+                });
+            });
     }
 
     onSubmit() {
@@ -127,11 +137,11 @@ export class EditAccountCodePage implements OnInit {
             .then(() => {
                 this.router.navigate(['/pabx/accountcodes']);
             })
-            .catch(() => {
+            .catch((err) => {
                 this.messageService.add({
                     severity: 'error',
                     summary: 'Desculpe não foi possível salvar o centro de custo',
-                    detail: 'Tente novamente mais tarde.',
+                    detail: err?.error?.message || 'Tente novamente mais tarde.',
                     life: 15_000
                 });
             });
