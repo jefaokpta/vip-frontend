@@ -139,7 +139,7 @@ import {SplitButton} from 'primeng/splitbutton';
                     Digite o ramal de destino
                 </p>
                 <p *ngIf="transferMode() === 'attended' && phoneStatus().session" class="mt-4 text-sm text-primary">
-                    Digite o ramal. Desligue para concluir; *0 volta para a chamada.
+                    Digite o ramal. Desligue para concluir; *0 ou o ramal desligando volta para a chamada.
                 </p>
                 <p *ngIf="dialedDigits() && phoneStatus().session" class="mt-4 text-xl tracking-widest break-all">
                     {{ dialedDigits() }}
