@@ -16,8 +16,13 @@ export class ReportService {
 
     constructor(private readonly http: HttpClient) {}
 
-    findLast30(): Promise<Cdr[]> {
-        return executeRequest(this.http.get<Cdr[]>(`${this.BACKEND}/cdrs/last`, httpHeaders()), 10_000);
+    /** Todas as chamadas do dia atual (00:00 até 23:59:59.999, horário local). */
+    findToday(): Promise<Cdr[]> {
+        const start = new Date();
+        start.setHours(0, 0, 0, 0);
+        const end = new Date(start);
+        end.setHours(23, 59, 59, 999);
+        return this.findByDateRange(start, end);
     }
 
     /** Chamadas feitas e recebidas pelo usuário logado nos últimos 30 dias. */
