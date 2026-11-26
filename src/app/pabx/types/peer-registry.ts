@@ -11,4 +11,6 @@ export interface PeerRegistry {
     /** Status de cada tech presente; o contactStatusEventEnum é o agregado delas. */
     readonly transports?: Partial<Record<PeerTransportEnum, ContactStatusEventEnum>>;
     readonly channel?: Channel;
+    /** Destino do siga-me; ausente/null quando inativo. */
+    readonly followMe?: string | null;
 }
