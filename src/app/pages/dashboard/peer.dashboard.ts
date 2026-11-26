@@ -143,9 +143,9 @@ const VIEW_MODE_KEY = 'peer-dashboard-view-mode';
                             </div>
                         </div>
                         <span class="text-sm">{{ pr.peer.name }}</span>
-                        @if (pr.followMe) {
-                            <div class="text-xs text-primary mt-1" pTooltip="Chamadas desviadas para {{ pr.followMe }}">
-                                <i class="pi pi-directions"></i> Siga-me → {{ pr.followMe }}
+                        @if (pr.peer.followMe) {
+                            <div class="text-xs text-primary mt-1" pTooltip="Chamadas desviadas para {{ pr.peer.followMe }}">
+                                <i class="pi pi-directions"></i> Siga-me → {{ pr.peer.followMe }}
                             </div>
                         }
                         @if (pr.channel) {

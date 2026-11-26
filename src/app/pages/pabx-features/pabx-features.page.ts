@@ -169,8 +169,7 @@ export class PabxFeaturesPage {
                     ],
                     notes: [
                         'Você ouve um bip quando o siga-me é ativado. Se o destino não existir ou não puder ser discado, você ouve uma mensagem de número inválido.',
-                        'Chamadas de filas e de grupos de chamada continuam tocando no seu ramal.',
-                        'O siga-me é desligado se o PABX for reiniciado.'
+                        'Chamadas de filas e de grupos de chamada continuam tocando no seu ramal.'
                     ]
                 },
                 {
