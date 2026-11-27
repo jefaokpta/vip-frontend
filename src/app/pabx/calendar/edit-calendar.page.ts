@@ -199,6 +199,11 @@ import {QueueActionComponent} from '@/pabx/dialplan/components/queue-action.comp
                                                 [showError]="action.get('arg1').errors?.['required']"
                                             />
                                         </ng-container>
+                                        <ng-container *ngIf="action.get('actionEnum').value == 'CALENDAR_EXTERNAL_CALL'">
+                                            <input pInputText class="p-inputtext" formControlName="arg1" placeholder="Número de telefone" inputmode="numeric" />
+                                            <small class="p-error block mt-2" *ngIf="action.get('arg1').errors?.['required']">Número é obrigatório</small>
+                                            <small class="p-error block mt-2" *ngIf="action.get('arg1').errors?.['pattern']">Use somente dígitos</small>
+                                        </ng-container>
                                         <ng-container *ngIf="action.get('actionEnum').value == 'HANGUP'">
                                             <app-hangup-action-component />
                                         </ng-container>
@@ -226,7 +231,7 @@ import {QueueActionComponent} from '@/pabx/dialplan/components/queue-action.comp
                 </div>
 
                 <small *ngIf="showError" class="text-red-500"> Erro ao salvar o calendário </small>
-                <small *ngIf="loadError" class="text-red-500 block"> Erro ao carregar o calendário. Tente novamente mais tarde. </small>
+                <small *ngIf="loadError" class="p-error block mt-2"> Erro ao carregar o calendário. Tente novamente mais tarde. </small>
             </form>
         </p-card>
     `

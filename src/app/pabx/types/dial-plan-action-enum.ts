@@ -10,5 +10,6 @@ export enum DialPlanActionEnum {
     CALENDAR = 'CALENDAR',
     CALL_GROUP = 'CALL_GROUP',
     URA = 'URA',
-    QUEUE = 'QUEUE'
+    QUEUE = 'QUEUE',
+    CALENDAR_EXTERNAL_CALL = 'CALENDAR_EXTERNAL_CALL'
 }
