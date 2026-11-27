@@ -12,8 +12,8 @@ describe('ReportPage', () => {
     const cdrsFixture: Cdr[] = [{ id: 1, disposition: 'ANSWERED' } as Cdr];
 
     beforeEach(() => {
-        reportServiceSpy = jasmine.createSpyObj('ReportService', ['findLast30', 'findByDateRange', 'findById']);
-        reportServiceSpy.findLast30.and.resolveTo(cdrsFixture);
+        reportServiceSpy = jasmine.createSpyObj('ReportService', ['findToday', 'findByDateRange', 'findById']);
+        reportServiceSpy.findToday.and.resolveTo(cdrsFixture);
         reportServiceSpy.findByDateRange.and.resolveTo(cdrsFixture);
 
         accountCodeServiceSpy = jasmine.createSpyObj('AccountCodeService', ['findAll']);
@@ -28,12 +28,12 @@ describe('ReportPage', () => {
         });
     });
 
-    it('primeira visita: sem estado prévio, busca os últimos 30 dias', async () => {
+    it('primeira visita: sem estado prévio, busca as chamadas de hoje', async () => {
         const fixture = TestBed.createComponent(ReportPage);
         fixture.componentInstance.ngOnInit();
         await fixture.whenStable();
 
-        expect(reportServiceSpy.findLast30).toHaveBeenCalledTimes(1);
+        expect(reportServiceSpy.findToday).toHaveBeenCalledTimes(1);
         expect(fixture.componentInstance.cdrs()).toEqual(cdrsFixture);
     });
 
@@ -48,7 +48,7 @@ describe('ReportPage', () => {
         fixture.componentInstance.ngOnInit();
         await fixture.whenStable();
 
-        expect(reportServiceSpy.findLast30).not.toHaveBeenCalled();
+        expect(reportServiceSpy.findToday).not.toHaveBeenCalled();
         expect(reportServiceSpy.findByDateRange).not.toHaveBeenCalled();
         expect(fixture.componentInstance.cdrs()).toEqual(cdrsFixture);
         expect(fixture.componentInstance.dateRange()).toEqual(previousRange);

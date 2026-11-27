@@ -20,7 +20,13 @@ describe('Facilidades do PABX', () => {
         ['Transferência cega', 'Transferência assistida', 'Estacionar', 'Resgatar', 'Capturar'].forEach((name) =>
             expect(text).toContain(name)
         );
-        ['*1', '*2', '*7', '*7 + ramal', '*8', '*8 + ramal'].forEach((code) => expect(text).toContain(code));
+        ['*1', '*2', '*7', '*7 + ramal', '*8', '*8 + ramal', '*25 + ramal ou número', '*26'].forEach((code) =>
+            expect(text).toContain(code)
+        );
+    });
+
+    it('avisa que o siga-me não vale para filas', () => {
+        expect(pageText()).toContain('filas e de grupos de chamada');
     });
 
     it('avisa o limite real de estacionamento', () => {

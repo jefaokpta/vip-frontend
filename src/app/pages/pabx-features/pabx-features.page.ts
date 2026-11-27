@@ -154,6 +154,33 @@ export class PabxFeaturesPage {
                     notes: ['Se esse ramal não estiver tocando, a ligação é encerrada.']
                 }
             ]
+        },
+        {
+            title: 'Siga-me',
+            features: [
+                {
+                    name: 'Ativar siga-me',
+                    code: '*25 + ramal ou número',
+                    when: DIAL_LIKE_A_CALL,
+                    summary: 'Desvia todas as chamadas do seu ramal para outro ramal ou para um número externo.',
+                    steps: [
+                        'Disque *25 seguido do ramal de destino. Exemplo: *25102 para o ramal 102.',
+                        'Para um número externo, disque *25 seguido do número como você discaria normalmente. Exemplo: *2511999998888.'
+                    ],
+                    notes: [
+                        'Você ouve um bip quando o siga-me é ativado. Se o destino não existir ou não puder ser discado, você ouve uma mensagem de número inválido.',
+                        'Chamadas de filas e de grupos de chamada continuam tocando no seu ramal.'
+                    ]
+                },
+                {
+                    name: 'Desativar siga-me',
+                    code: '*26',
+                    when: DIAL_LIKE_A_CALL,
+                    summary: 'Volta a receber as chamadas no seu ramal.',
+                    steps: ['Disque *26 e chame. Você ouve um bip de confirmação.'],
+                    notes: []
+                }
+            ]
         }
     ];
 }

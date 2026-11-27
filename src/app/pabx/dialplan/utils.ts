@@ -44,6 +44,7 @@ export function calendarActionOptions() {
         { label: 'Tocar Audio', value: DialPlanActionEnum.PLAYBACK },
         { label: 'Grupo de Chamada', value: DialPlanActionEnum.CALL_GROUP },
         { label: 'Fila', value: DialPlanActionEnum.QUEUE },
+        { label: 'Ligação externa', value: DialPlanActionEnum.CALENDAR_EXTERNAL_CALL },
         { label: 'Desligar', value: DialPlanActionEnum.HANGUP }
     ];
 }
