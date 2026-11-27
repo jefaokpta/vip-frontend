@@ -1,4 +1,4 @@
-import { actionArg3DefaultValue, actionArg3Validators } from '@/pabx/utils';
+import { actionArg3DefaultValue, actionArg3Validators, actionHasArg1 } from '@/pabx/utils';
 import { FormControl } from '@angular/forms';
 import { DialPlanActionEnum } from '@/pabx/types/dial-plan-action-enum';
 
@@ -30,4 +30,13 @@ describe('actionArg3Validators', () => {
     it('outras ações não validam arg3', () => {
         expect(validate(DialPlanActionEnum.CALENDAR, '999')).toBeTrue();
     });
+});
+
+describe('actionHasArg1 CALENDAR_EXTERNAL_CALL', () => {
+    const valid = (value: string) =>
+        new FormControl(value, actionHasArg1(DialPlanActionEnum.CALENDAR_EXTERNAL_CALL) as any).valid;
+
+    it('aceita só dígitos', () => expect(valid('011999990000')).toBeTrue());
+    it('é obrigatório', () => expect(valid('')).toBeFalse());
+    it('rejeita espaço e traço', () => expect(valid('011 9999-0000')).toBeFalse());
 });

@@ -387,7 +387,7 @@ export class ReportPage implements OnInit, AfterViewInit, OnDestroy {
 
     ngOnInit(): void {
         if (!this.reportState.loaded()) {
-            this.load(() => this.reportService.findLast30());
+            this.load(() => this.reportService.findToday());
         }
         this.accountCodeService
             .findAll()
@@ -442,7 +442,7 @@ export class ReportPage implements OnInit, AfterViewInit, OnDestroy {
         this.dateRange.set([]);
         this.statusFilter.set(null);
         this.costCenterFilter.set(null);
-        this.load(() => this.reportService.findLast30());
+        this.load(() => this.reportService.findToday());
     }
 
     onFilterGlobal(event: Event): void {

@@ -46,6 +46,7 @@ export function actionArg3Validators(selectedAction: DialPlanActionEnum): Valida
 
 export function actionHasArg1(selectedAction: DialPlanActionEnum): Validators[] {
     if (selectedAction === DialPlanActionEnum.ANSWER || selectedAction === DialPlanActionEnum.HANGUP) return [];
+    if (selectedAction === DialPlanActionEnum.CALENDAR_EXTERNAL_CALL) return [Validators.required, Validators.pattern(/^\d+$/)];
     return [Validators.required];
 }
 

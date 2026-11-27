@@ -17,4 +17,6 @@ export interface Peer {
     readonly callLimit: number;
     readonly userName?: string;
     readonly clidDdrId?: number | null;
+    /** Destino do siga-me; ausente/null quando inativo. */
+    readonly followMe?: string | null;
 }
