@@ -1,3 +1,4 @@
+import {MessageService} from 'primeng/api';
 import {ComponentFixture, fakeAsync, flushMicrotasks, TestBed, tick} from '@angular/core/testing';
 import {provideRouter} from '@angular/router';
 import {Subject} from 'rxjs';
@@ -66,7 +67,7 @@ describe('QueueDashboard', () => {
                 { provide: UserService, useValue: { getUser: () => ({ companyId: 1 }) } }
             ]
         }).overrideComponent(QueueDashboard, {
-            set: { providers: [{ provide: WebsocketService, useValue: { watch: () => new Subject() } }] }
+            set: { providers: [{ provide: WebsocketService, useValue: { watch: () => new Subject() } }, MessageService] }
         });
         return TestBed.createComponent(QueueDashboard);
     }
