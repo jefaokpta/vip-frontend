@@ -1,14 +1,14 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { CurrencyPipe, DatePipe, JsonPipe } from '@angular/common';
-import { ActivatedRoute, RouterLink } from '@angular/router';
-import { MessageService, PrimeTemplate } from 'primeng/api';
-import { Button } from 'primeng/button';
-import { Card } from 'primeng/card';
-import { TableModule } from 'primeng/table';
-import { Toast } from 'primeng/toast';
-import { BillingService } from '@/pages/billing/billing.service';
-import { BillingRunClient, BillingRunDetail, BillingRunSummary } from '@/pages/billing/types';
-import { inclusivePeriodEnd, POLLING_MS, processedCount } from '@/pages/billing/billing.utils';
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {CurrencyPipe, DatePipe, JsonPipe} from '@angular/common';
+import {ActivatedRoute, RouterLink} from '@angular/router';
+import {MessageService, PrimeTemplate} from 'primeng/api';
+import {Button} from 'primeng/button';
+import {Card} from 'primeng/card';
+import {TableModule} from 'primeng/table';
+import {Toast} from 'primeng/toast';
+import {BillingService} from '@/pages/billing/billing.service';
+import {BillingRunClient, BillingRunDetail, BillingRunSummary} from '@/pages/billing/types';
+import {inclusivePeriodEnd, POLLING_MS, processedCount} from '@/pages/billing/billing.utils';
 
 @Component({
     selector: 'app-billing-run-detail-page',
@@ -32,17 +32,6 @@ import { inclusivePeriodEnd, POLLING_MS, processedCount } from '@/pages/billing/
                     {{ processed }} de {{ detail.summary.totalClients }}
                 </p>
             </p-card>
-
-            @if (detail.orphanContracts.length) {
-                <p-card class="block mb-4" id="orphan-card">
-                    <ng-template #title>Contratos sem empresa</ng-template>
-                    <ul class="list-disc pl-6">
-                        @for (c of detail.orphanContracts; track c) {
-                            <li>{{ c }}</li>
-                        }
-                    </ul>
-                </p-card>
-            }
 
             <p-card>
                 <p-table [value]="detail.clients" dataKey="companyId" [tableStyle]="{ 'min-width': '40rem' }">
@@ -109,6 +98,17 @@ import { inclusivePeriodEnd, POLLING_MS, processedCount } from '@/pages/billing/
                     </ng-template>
                 </p-table>
             </p-card>
+
+            @if (detail.orphanContracts.length) {
+                <p-card class="block mt-4" id="orphan-card">
+                    <ng-template #title>Contratos sem empresa</ng-template>
+                    <ul class="list-disc pl-6">
+                        @for (c of detail.orphanContracts; track c) {
+                            <li>{{ c }}</li>
+                        }
+                    </ul>
+                </p-card>
+            }
         }
         <p-toast />
     `
