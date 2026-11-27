@@ -231,7 +231,7 @@ import {QueueActionComponent} from '@/pabx/dialplan/components/queue-action.comp
                 </div>
 
                 <small *ngIf="showError" class="text-red-500"> Erro ao salvar o calendário </small>
-                <small *ngIf="loadError" class="p-error block mt-2"> Erro ao carregar o calendário. Tente novamente mais tarde. </small>
+                <small *ngIf="loadError" class="text-red-500 block"> Erro ao carregar o calendário. Tente novamente mais tarde. </small>
             </form>
         </p-card>
     `
