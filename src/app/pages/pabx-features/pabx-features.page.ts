@@ -91,6 +91,7 @@ export class PabxFeaturesPage {
                         'Fale com o ramal e desligue para concluir a transferência.'
                     ],
                     notes: [
+                        'Para desistir e voltar para quem está em espera, digite *0.',
                         'Se o ramal consultado desligar, você volta a falar com quem estava em espera.',
                         'Se você desligar antes de o ramal atender e ele não atender, a chamada volta para o seu ramal.',
                         'Se o ramal não existir, você ouve um beep e continua na chamada.'

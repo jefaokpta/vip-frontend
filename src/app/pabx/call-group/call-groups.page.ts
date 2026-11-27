@@ -1,19 +1,19 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { Table, TableModule } from 'primeng/table';
-import { ConfirmationService, MessageService } from 'primeng/api';
-import { Card } from 'primeng/card';
-import { IconField } from 'primeng/iconfield';
-import { InputIcon } from 'primeng/inputicon';
-import { InputText } from 'primeng/inputtext';
-import { Button } from 'primeng/button';
-import { RouterLink } from '@angular/router';
-import { ProgressSpinner } from 'primeng/progressspinner';
-import { ConfirmDialog } from 'primeng/confirmdialog';
-import { Toast } from 'primeng/toast';
-import { CallGroup } from '@/pabx/types/call-group';
-import { CallGroupStrategyEnum } from '@/pabx/types/call-group-strategy-enum';
-import { Tooltip } from 'primeng/tooltip';
-import { CallGroupService } from '@/pabx/call-group/call-group.service';
+import {Component, OnInit, ViewChild} from '@angular/core';
+import {Table, TableModule} from 'primeng/table';
+import {ConfirmationService, MessageService} from 'primeng/api';
+import {Card} from 'primeng/card';
+import {IconField} from 'primeng/iconfield';
+import {InputIcon} from 'primeng/inputicon';
+import {InputText} from 'primeng/inputtext';
+import {Button} from 'primeng/button';
+import {RouterLink} from '@angular/router';
+import {ProgressSpinner} from 'primeng/progressspinner';
+import {ConfirmDialog} from 'primeng/confirmdialog';
+import {Toast} from 'primeng/toast';
+import {CallGroup} from '@/pabx/types/call-group';
+import {CallGroupStrategyEnum} from '@/pabx/types/call-group-strategy-enum';
+import {Tooltip} from 'primeng/tooltip';
+import {CallGroupService} from '@/pabx/call-group/call-group.service';
 
 @Component({
     selector: 'app-call-groups-page',
@@ -133,10 +133,18 @@ export class CallGroupsPage implements OnInit {
     ) {}
 
     ngOnInit(): void {
-        this.callGroupService.findAll().then((groups) => {
-            this.groups = groups;
-            this.loading = false;
-        });
+        this.callGroupService
+            .findAll()
+            .then((groups) => (this.groups = groups))
+            .catch(() => {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Não foi possível carregar os grupos de chamada',
+                    detail: 'Tente novamente mais tarde.',
+                    life: 15_000
+                });
+            })
+            .finally(() => (this.loading = false));
     }
 
     onFilterGlobal(event: Event) {
@@ -182,11 +190,11 @@ export class CallGroupsPage implements OnInit {
                             life: 15_000
                         });
                     })
-                    .catch(() => {
+                    .catch((err) => {
                         this.messageService.add({
                             severity: 'error',
                             summary: 'Não foi possível remover o grupo de chamada',
-                            detail: 'Tente novamente mais tarde.',
+                            detail: err?.error?.message || 'Tente novamente mais tarde.',
                             life: 15_000
                         });
                     });

@@ -42,6 +42,7 @@ export function calendarActionOptions() {
     return [
         { label: 'Ramal', value: DialPlanActionEnum.DIAL_PEER },
         { label: 'Tocar Audio', value: DialPlanActionEnum.PLAYBACK },
+        { label: 'Grupo de Chamada', value: DialPlanActionEnum.CALL_GROUP },
         { label: 'Fila', value: DialPlanActionEnum.QUEUE },
         { label: 'Desligar', value: DialPlanActionEnum.HANGUP }
     ];
